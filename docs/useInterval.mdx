@@ -1,0 +1,50 @@
+import ExampleBox from "../examples/ExampleBox";
+import UseIntervalExample from "../examples/UseIntervalExample";
+
+Loop run callback.
+
+## Usage
+
+```ts
+function useInterval(
+  callback: () => void,
+  ms: number
+): [start: () => void, cancel: () => void];
+```
+
+### Params
+
+- **`callback`:** the function that called at intervals.
+- **`ms`:** interval time, in milliseconds.
+
+### Results
+
+- **`start`:** start function.
+- **`cancel`:** cancel function.
+
+## Example
+
+<ExampleBox>
+  <UseIntervalExample />
+</ExampleBox>
+
+```tsx
+import React, { useState } from "react";
+import { useInterval } from "@lilib/hooks";
+
+function Example() {
+  const [count, setCount] = useState(0);
+  const [start, cancel] = useInterval(() => {
+    setCount((count) => ++count);
+  }, 1000);
+
+  return (
+    <>
+      <button onClick={start}>Start</button>
+      <button onClick={cancel}>Cancel</button> Count: {count}
+    </>
+  );
+}
+
+export default Example;
+```

@@ -1,0 +1,33 @@
+Sets up the event listener to the target.
+
+## Usage
+
+```ts
+function useEventListener<T extends EventTarget, E extends Event>(
+  target: T | null,
+  type: string,
+  listener: (this: T, event: E) => any,
+  options?: boolean | { capture?: boolean; once?: boolean; passive?: boolean }
+): void;
+```
+
+### Params
+
+- **`target`:** event target. If it is null, do nothing.
+- **`type`:** event type.
+- **`listener`:** listener function.
+- **`options`:** same as the third parameter of the [`addEventListener`](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener) function.
+
+## Example
+
+```tsx
+import React from "react";
+import { useEventListener } from "@lilib/hooks";
+
+function Example() {
+  useEventListener(window, "click", () => {
+    // Do something
+  });
+  ...
+}
+```

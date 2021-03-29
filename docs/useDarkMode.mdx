@@ -1,0 +1,27 @@
+import ExampleBox from "../examples/ExampleBox";
+import UseDarkModeExample from "../examples/UseDarkModeExample";
+
+Detect whether the system prefers color schema is dark.
+
+## Usage
+
+```ts
+function useDarkMode(): boolean;
+```
+
+## Example
+
+<ExampleBox>
+  <UseDarkModeExample />
+</ExampleBox>
+
+```tsx
+import { useDarkMode } from "@lilib/hooks";
+
+function Example() {
+  const isDarkMode = useDarkMode();
+  return `Is dark mode: ${isDarkMode}`;
+}
+
+export default Example;
+```

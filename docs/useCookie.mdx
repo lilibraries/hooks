@@ -1,0 +1,59 @@
+import ExampleBox from "../examples/ExampleBox";
+import UseCookieExample from "../examples/UseCookieExample";
+
+This hook use [js-cookie](https://github.com/js-cookie/js-cookie) as the parser. You can use this hook to get, set and/or remove cookies.
+
+## Usage
+
+```ts
+function useCookie(
+  name: string,
+  defaultValue?: string,
+  options?: Cookies.CookieAttributes
+): [
+  value: string | undefined,
+  actions: {
+    set: (newValue: string) => void;
+    remove: () => void;
+  }
+];
+```
+
+### Params
+
+- **`name`:** cookie name.
+- **`defaultValue`:** default value, it will be returnd when the specified cookie is non-existant.
+- **`options`:** [js-cookie attributes](https://github.com/js-cookie/js-cookie#cookie-attributes).
+
+### Results
+
+- **`value`:** cookie value, it may be undefined.
+- **`set`:** a function that can set the named cookie a new value.
+- **`remove`:** a function that can remove the named cookie, and return the defaultValue.
+
+## Example
+
+<ExampleBox>
+  <UseCookieExample />
+</ExampleBox>
+
+```tsx
+import React from "react";
+import { useCookie } from "@lilib/hooks";
+
+function Example() {
+  const [value, { set, remove }] = useCookie("name", "default value");
+
+  return (
+    <>
+      <div>
+        <button onClick={() => set("new value")}>Set</button>
+        <button onClick={remove}>Remove</button>
+      </div>
+      <div>Cookie value: {value}</div>
+    </>
+  );
+}
+
+export default Example;
+```

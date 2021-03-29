@@ -1,0 +1,94 @@
+import ExampleBox from "../examples/ExampleBox";
+import UseDebounceExample from "../examples/UseDebounceExample";
+
+Use debounced callback.
+
+## Usage
+
+```ts
+function useDebounce<T extends (...args: any[]) => any>(
+  callback: T,
+  options: number | { wait: number; leading?: boolean; trailing?: boolean }
+): [
+  debouncedCallback: (...args: Parameters<T>) => ReturnType<T> | undefined,
+  {
+    flush: () => ReturnType<T> | undefined;
+    cancel: () => void;
+  }
+];
+```
+
+### Params
+
+- **`callback`:** original callback function.
+- **`options`:** debounce wait time or an options object.
+  - **`options.wait`:** debounce wait time, in milliseconds.
+  - **`options.leading`:** run callback on the leading edge, default is false.
+  - **`options.trailing`:** run callback on the trailing edge, default is true.
+
+### Results
+
+- **`debouncedCallback`:** debounced callback.
+- **`flush`:** flush funciton, run callback immediately.
+- **`cancel`:** cancel debounce timer.
+
+## Example
+
+<ExampleBox>
+  <UseDebounceExample />
+</ExampleBox>
+
+```tsx
+import React, { useState } from "react";
+import { useDebounce, useToggle, useUpdate } from "@lilib/hooks";
+
+function random() {
+  return Math.ceil(Math.random() * 5000);
+}
+
+function Example() {
+  const [wait, setWait] = useState(random());
+  const [leading, { toggle: toggleLeading }] = useToggle(false);
+  const [trailing, { toggle: toggleTrailing }] = useToggle(true);
+
+  const [value, setValue] = useState("");
+  const [debouncedValue, setDebouncedValue] = useState("");
+  const [debouncedCallback, { flush, cancel }] = useDebounce(
+    () => {
+      setDebouncedValue(value);
+    },
+    { wait, leading, trailing }
+  );
+
+  useUpdate(debouncedCallback, [value]);
+
+  return (
+    <>
+      <p>
+        Actions:{" "}
+        <button onClick={() => setWait(random())}>Change wait time</button>
+        <button onClick={() => toggleLeading()}>Toggle leading</button>
+        <button onClick={() => toggleTrailing()}>Toggle trailing</button>
+      </p>
+      <p>
+        Options:{" "}
+        {`{ wait: ${wait}, leading: ${leading}, trailing: ${trailing} }`}
+      </p>
+      <p>
+        Enter value:{" "}
+        <input
+          value={value}
+          onChange={(event) => {
+            setValue(event.target.value);
+          }}
+        />
+        <button onClick={() => flush()}>Flush</button>
+        <button onClick={cancel}>Cancel</button>
+      </p>
+      <div>Debounced value: {debouncedValue}</div>
+    </>
+  );
+}
+
+export default Example;
+```

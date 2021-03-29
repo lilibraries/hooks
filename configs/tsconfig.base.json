@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "target": "ES5",
+    "module": "ES6",
+    "lib": ["DOM", "ES2020"],
+    "moduleResolution": "Node",
+    "skipLibCheck": true,
+    "jsx": "react",
+    "strict": true,
+    "isolatedModules": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true
+  }
+}

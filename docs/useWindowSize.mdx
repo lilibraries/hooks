@@ -1,0 +1,27 @@
+import ExampleBox from "../examples/ExampleBox";
+import UseWindowSizeExample from "../examples/UseWindowSizeExample";
+
+Returns window width and height.
+
+## Usage
+
+```ts
+function useWindowSize(): { width: number; height: number };
+```
+
+## Example
+
+<ExampleBox>
+  <UseWindowSizeExample />
+</ExampleBox>
+
+```tsx
+import { useWindowSize } from "@lilib/hooks";
+
+function Example() {
+  const { width, height } = useWindowSize();
+  return `Width: ${width}px; Height: ${height}px`;
+}
+
+export default Example;
+```

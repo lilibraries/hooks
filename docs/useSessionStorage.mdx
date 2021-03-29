@@ -1,0 +1,64 @@
+import ExampleBox from "../examples/ExampleBox";
+import UseSessionStorageExample from "../examples/UseSessionStorageExample";
+
+Get or set sessionStorage.
+
+## Usage
+
+```ts
+function useSessionStorage<T = any>(
+  key: string,
+  defaultValue?: T,
+  options?: {
+    serialize?: (value: T) => string;
+    deserialize?: (raw: string) => T;
+  }
+): [
+  value: T | null,
+  actions: {
+    set: (newValue: T) => void;
+    remove: () => void;
+  }
+];
+```
+
+### Params
+
+- **`key`:** sessionStorage key.
+- **`defaultValue`:** default value.
+- **`options.serialize`:** options object.
+  - **`options.serialize`:** serialization function, default is `JSON.stringify`.
+  - **`options.deserialize`:** deserialization function, default is `JSON.parse`.
+
+### Results
+
+- **`value`:** parsed by the deserialization function.
+- **`set`:** the function that used to set sessionStorage.
+- **`remove`:** the function that used to remove sessionStorage.
+
+## Example
+
+<ExampleBox>
+  <UseSessionStorageExample />
+</ExampleBox>
+
+```tsx
+import React from "react";
+import { useSessionStorage } from "@lilib/hooks";
+
+function Example() {
+  const [value, { set, remove }] = useSessionStorage("key", "default value");
+
+  return (
+    <>
+      <div>
+        <button onClick={() => set("new value")}>Set</button>
+        <button onClick={remove}>Remove</button>
+      </div>
+      <div>The value is: {value}</div>
+    </>
+  );
+}
+
+export default Example;
+```

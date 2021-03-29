@@ -1,0 +1,58 @@
+import ExampleBox from "../examples/ExampleBox";
+import UseToggleExample from "../examples/UseToggleExample";
+
+Use boolean value.
+
+## Usage
+
+```ts
+function useToggle(
+  initialValue?: boolean
+): [
+  value: boolean,
+  actions: {
+    toggle: (newValue?: boolean) => void;
+    toggleOn: () => void;
+    toggleOff: () => void;
+  }
+];
+```
+
+### Params
+
+- **`initialValue`:** optional initial value, default is false.
+
+### Results
+
+- **`value`:** a boolean value, can be changed by the following functions.
+- **`toggle`:** toggle the value. If the newValue param is specified, the value will be set to the newValue.
+- **`toggleOn`:** set the value to true.
+- **`toggleOff`:** set the value to false.
+
+## Example
+
+<ExampleBox>
+  <UseToggleExample />
+</ExampleBox>
+
+```tsx
+import React from "react";
+import { useToggle } from "@lilib/hooks";
+
+function Example() {
+  const [visible, { toggle, toggleOn, toggleOff }] = useToggle(true);
+
+  return (
+    <>
+      <button onClick={() => toggle()}>Toggle</button>
+      <button onClick={toggleOn}>Show</button>
+      <button onClick={toggleOff}>Hide</button>
+      <div style={{ display: visible ? "block" : "none" }}>
+        Example text can be handled by the buttons above.
+      </div>
+    </>
+  );
+}
+
+export default Example;
+```

@@ -1,0 +1,21 @@
+Returns the same function no matter whether the callback param changes.
+
+## Usage
+
+```ts
+function usePersist<T extends (...args: any[]) => any>(callback: T): T;
+```
+
+## Example
+
+```tsx
+import React from "react";
+import { usePersist } from "@lilib/hooks";
+
+function Example() {
+  const persistedCallback = usePersist(() => {
+    // Do something
+  });
+  ...
+}
+```

@@ -1,0 +1,90 @@
+import ExampleBox from "../examples/ExampleBox";
+import UseThrottledExample from "../examples/UseThrottledExample";
+
+Throttle a value.
+
+## Usage
+
+```ts
+function useThrottled<T = any>(
+  value: T,
+  options: number | { wait: number; leading?: boolean; trailing?: boolean }
+): [
+  throttledValue: T,
+  {
+    flush: (finalValue?: T) => void;
+    cancel: () => void;
+  }
+];
+```
+
+### Params
+
+- **`value`:** the value that will be changed.
+- **`options`:** throttle wait time or an options object.
+  - **`options.wait`:** throttle wait time, in milliseconds.
+  - **`options.leading`:** change throttledValue on the leading edge, default is false.
+  - **`options.trailing`:** change throttledValue on the trailing edge, default is true.
+
+### Results
+
+- **`throttledValue`:** throttled value.
+- **`flush`:** flush funciton. The finalValue will be returned as throttledValue if it is specified.
+- **`cancel`:** cancel throttle timer.
+
+## Example
+
+<ExampleBox>
+  <UseThrottledExample />
+</ExampleBox>
+
+```tsx
+import React, { useState } from "react";
+import { useThrottled, useToggle } from "@lilib/hooks";
+
+function random() {
+  return Math.ceil(Math.random() * 5000);
+}
+
+function Example() {
+  const [wait, setWait] = useState(random());
+  const [leading, { toggle: toggleLeading }] = useToggle(false);
+  const [trailing, { toggle: toggleTrailing }] = useToggle(true);
+
+  const [value, setValue] = useState("");
+  const options = { wait, leading, trailing };
+  const [throttledValue, { flush, cancel }] = useThrottled(value, options);
+
+  return (
+    <>
+      <p>
+        Actions:{" "}
+        <button onClick={() => setWait(random())}>Change wait time</button>
+        <button onClick={() => toggleLeading()}>Toggle leading</button>
+        <button onClick={() => toggleTrailing()}>Toggle trailing</button>
+      </p>
+      <p>
+        Options:{" "}
+        {`{ wait: ${wait}, leading: ${leading}, trailing: ${trailing} }`}
+      </p>
+      <p>
+        Enter value:{" "}
+        <input
+          value={value}
+          onChange={(event) => {
+            setValue(event.target.value);
+          }}
+        />
+        <button onClick={() => flush()}>Flush</button>
+        <button onClick={() => flush("final value")}>
+          Flush with "final value"
+        </button>
+        <button onClick={cancel}>Cancel</button>
+      </p>
+      <div>Throttled value: {throttledValue}</div>
+    </>
+  );
+}
+
+export default Example;
+```

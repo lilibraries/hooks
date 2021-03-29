@@ -1,0 +1,27 @@
+Run effect after the component is updated or the deps are changed, ignore on mount.
+
+## Usage
+
+```ts
+function useUpdate(
+  effect: React.EffectCallback,
+  deps?: React.DependencyList
+): void;
+```
+
+## Example
+
+```tsx
+import React from "react";
+import { useUpdate } from "@lilib/hooks";
+
+function Example() {
+  const [signal, setSignal] = useState({});
+
+  useUpdate(() => {
+    console.log("Signal changed");
+  }, [signal]);
+
+  return <button onClick={() => setSignal({})}>Change signal</button>;
+}
+```

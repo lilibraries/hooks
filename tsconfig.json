@@ -1,0 +1,11 @@
+{
+  "extends": "./configs/tsconfig.base.json",
+  "include": ["src", "tests", "docs", "examples"],
+  "compilerOptions": {
+    "noEmit": true,
+    "baseUrl": ".",
+    "paths": {
+      "@lilib/hooks": ["src"]
+    }
+  }
+}

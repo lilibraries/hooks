@@ -1,0 +1,24 @@
+It's similar to [`useUpdate`](./useUpdate), except it uses [`useIsomorphicLayoutEffect`](./useIsomorphicLayoutEffect) internally.
+
+## Usage
+
+```ts
+function useUpdateLayoutEffect(
+  callback: React.EffectCallback,
+  deps?: React.DependencyList
+): void;
+```
+
+## Example
+
+```tsx
+import React from "react";
+import { useUpdateLayoutEffect } from "@lilib/hooks";
+
+function Example() {
+  useUpdateLayoutEffect(() => {
+    console.log("Update");
+  });
+  ...
+}
+```

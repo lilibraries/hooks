@@ -1,0 +1,21 @@
+Run effect after the component is mounted.
+
+## Usage
+
+```ts
+function useMount(effect: () => void): void;
+```
+
+## Example
+
+```tsx
+import React from "react";
+import { useMount } from "@lilib/hooks";
+
+function Example() {
+  useMount(() => {
+    console.log("Component is mounted");
+  });
+  ...
+}
+```

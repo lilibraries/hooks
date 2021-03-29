@@ -1,0 +1,4 @@
+{
+  "presets": [["./babel.preset.js", { "target": "cjs" }]],
+  "include": ["../src"]
+}

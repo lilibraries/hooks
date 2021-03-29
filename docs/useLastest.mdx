@@ -1,0 +1,25 @@
+Returns a ref object whose `.current` property is assigned to lastest updated value.
+
+## Usage
+
+```ts
+function useLastest<T>(value: T): React.MutableRefObject<T>;
+```
+
+## Example
+
+```ts
+import { useEffect, useLastest } from "react";
+
+function useUnmount(effect: () => void) {
+  const effectRef = useLastest(effect);
+
+  useEffect(() => {
+    return () => {
+      effectRef.current();
+    };
+  }, []);
+}
+
+export default useUnmount;
+```

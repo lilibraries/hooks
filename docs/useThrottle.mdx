@@ -1,0 +1,94 @@
+import ExampleBox from "../examples/ExampleBox";
+import UseThrottleExample from "../examples/UseThrottleExample";
+
+Use throttled callback.
+
+## Usage
+
+```ts
+function useThrottle<T extends (...args: any[]) => any>(
+  callback: T,
+  options: number | { wait: number; leading?: boolean; trailing?: boolean }
+): [
+  throttledCallback: (...args: Parameters<T>) => ReturnType<T> | undefined,
+  {
+    flush: () => ReturnType<T> | undefined;
+    cancel: () => void;
+  }
+];
+```
+
+### Params
+
+- **`callback`:** original callback function.
+- **`options`:** throttle wait time or an options object.
+  - **`options.wait`:** throttle wait time, in milliseconds.
+  - **`options.leading`:** run callback on the leading edge, default is false.
+  - **`options.trailing`:** run callback on the trailing edge, default is true.
+
+### Results
+
+- **`throttledCallback`:** throttled callback.
+- **`flush`:** flush funciton, run callback immediately.
+- **`cancel`:** cancel throttle timer.
+
+## Example
+
+<ExampleBox>
+  <UseThrottleExample />
+</ExampleBox>
+
+```tsx
+import React, { useState } from "react";
+import { useThrottle, useToggle, useUpdate } from "@lilib/hooks";
+
+function random() {
+  return Math.ceil(Math.random() * 5000);
+}
+
+function Example() {
+  const [wait, setWait] = useState(random());
+  const [leading, { toggle: toggleLeading }] = useToggle(false);
+  const [trailing, { toggle: toggleTrailing }] = useToggle(true);
+
+  const [value, setValue] = useState("");
+  const [throttledValue, setThrottledValue] = useState("");
+  const [throttledCallback, { flush, cancel }] = useThrottle(
+    () => {
+      setThrottledValue(value);
+    },
+    { wait, leading, trailing }
+  );
+
+  useUpdate(throttledCallback, [value]);
+
+  return (
+    <>
+      <p>
+        Actions:{" "}
+        <button onClick={() => setWait(random())}>Change wait time</button>
+        <button onClick={() => toggleLeading()}>Toggle leading</button>
+        <button onClick={() => toggleTrailing()}>Toggle trailing</button>
+      </p>
+      <p>
+        Options:{" "}
+        {`{ wait: ${wait}, leading: ${leading}, trailing: ${trailing} }`}
+      </p>
+      <p>
+        Enter value:{" "}
+        <input
+          value={value}
+          onChange={(event) => {
+            setValue(event.target.value);
+          }}
+        />
+        <button onClick={() => flush()}>Flush</button>
+        <button onClick={cancel}>Cancel</button>
+      </p>
+      <div>Throttled value: {throttledValue}</div>
+    </>
+  );
+}
+
+export default Example;
+```

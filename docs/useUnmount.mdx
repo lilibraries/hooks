@@ -1,0 +1,21 @@
+Run effect on the component unmount.
+
+## Usage
+
+```ts
+function useUnmount(callback: () => void): void;
+```
+
+## Example
+
+```tsx
+import React from "react";
+import { useUnmount } from "@lilib/hooks";
+
+function Example() {
+  useUnmount(() => {
+    console.log("Component will unmount");
+  });
+  ...
+}
+```

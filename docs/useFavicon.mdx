@@ -1,0 +1,24 @@
+Set document favicon.
+
+## Usage
+
+```ts
+function useFavicon(href: string, options?: { restore?: boolean }): void;
+```
+
+### Params
+
+- **`href`:** favicon url.
+- **`options.restore`:** restore previous favicon on the component unmount.
+
+## Example
+
+```tsx
+import React from "react";
+import { useFavicon } from "@lilib/hooks";
+
+function Example() {
+  useFavicon("https://reactjs.org/favicon.ico", { restore: true });
+  ...
+}
+```

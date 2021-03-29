@@ -1,0 +1,24 @@
+In the DOM environment, this hook is the same as React.useLayoutEffect. In the SSR environment, it is the same as React.useEffect.
+
+## Usage
+
+```ts
+function useIsomorphicLayoutEffect(
+  effect: React.EffectCallback,
+  deps?: React.DependencyList
+): void;
+```
+
+## Example
+
+```tsx
+import React from "react";
+import { useIsomorphicLayoutEffect } from "@lilib/hooks";
+
+function Example() {
+  useIsomorphicLayoutEffect(() => {
+    console.log("Run effect");
+  });
+  ...
+}
+```
