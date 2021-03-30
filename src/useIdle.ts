@@ -9,12 +9,18 @@ function cancelIdleCallbackPolyfill(id: ReturnType<typeof setTimeout>) {
   clearTimeout(id);
 }
 
-const requestIdleCallback =
-  ((window as any).requestIdleCallback as typeof requestIdleCallbackPolyfill) ||
-  requestIdleCallbackPolyfill;
-const cancelIdleCallback =
-  ((window as any).cancelIdleCallback as typeof cancelIdleCallbackPolyfill) ||
-  cancelIdleCallbackPolyfill;
+let requestIdleCallback = requestIdleCallbackPolyfill;
+let cancelIdleCallback = cancelIdleCallbackPolyfill;
+
+if (typeof window !== "undefined") {
+  if (
+    (window as any).requestIdleCallback &&
+    (window as any).cancelIdleCallback
+  ) {
+    requestIdleCallback = (window as any).requestIdleCallback;
+    cancelIdleCallback = (window as any).cancelIdleCallback;
+  }
+}
 
 function useIdle(callback: () => void) {
   const timerRef = useRef<ReturnType<typeof requestIdleCallback>>();
