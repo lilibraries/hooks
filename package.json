@@ -17,6 +17,7 @@
     "build:esm": "babel src --out-dir dist/esm --config-file ./configs/babel.esm.json --extensions .ts,.tsx --source-maps --no-babelrc",
     "build:types": "tsc -p ./configs/tsconfig.types.json",
     "docs:build": "docusaurus build",
+    "docs:serve": "docusaurus serve",
     "docs:deploy": "gh-pages -d build",
     "release": "npm run lint && npm run test && npm run build && npm publish && npm run docs:build && npm run docs:deploy"
   },
@@ -59,8 +60,8 @@
     "@babel/preset-typescript": "^7.12.7",
     "@commitlint/cli": "^11.0.0",
     "@commitlint/config-conventional": "^11.0.0",
-    "@docusaurus/core": "2.0.0-alpha.70",
-    "@docusaurus/preset-classic": "2.0.0-alpha.70",
+    "@docusaurus/core": "2.0.0-alpha.72",
+    "@docusaurus/preset-classic": "2.0.0-alpha.72",
     "@mdx-js/react": "^1.6.22",
     "@sinonjs/fake-timers": "^6.0.1",
     "@testing-library/react-hooks": "^3.7.0",
