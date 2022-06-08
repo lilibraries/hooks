@@ -80,7 +80,7 @@ function createStorageHook(storage: Storage | null) {
           }
         }
 
-        if (typeof window !== undefined) {
+        if (typeof window !== "undefined") {
           window.addEventListener("storage", listener);
           return () => window.removeEventListener("storage", listener);
         }
