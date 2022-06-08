@@ -1,6 +1,6 @@
 # @lilib/hooks
 
-React hooks library.
+React hook library.
 
 ## Install
 

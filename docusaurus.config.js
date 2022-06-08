@@ -4,21 +4,16 @@ const path = require("path");
 
 module.exports = {
   title: "@lilib/hooks",
-  tagline: "React hooks library.",
-  url: "https://lilibraries.github.io/hooks/",
+  url: "https://lilibraries.github.io/",
   baseUrl: "/hooks/",
   onBrokenLinks: "throw",
-  onBrokenMarkdownLinks: "warn",
-  favicon: "favicon.ico",
+  onBrokenMarkdownLinks: "throw",
+  onDuplicateRoutes: "throw",
   organizationName: "lilibraries",
   projectName: "hooks",
   themeConfig: {
     navbar: {
       title: "@lilib/hooks",
-      // logo: {
-      //   alt: "lilib",
-      //   src: "logo.svg",
-      // },
       items: [
         {
           href: "https://github.com/lilibraries/hooks",
@@ -28,7 +23,6 @@ module.exports = {
       ],
     },
     footer: {
-      style: "dark",
       copyright: `Copyright © ${new Date().getFullYear()} 李蔚生. Code licensed MIT, docs CC BY 3.0. Built with Docusaurus.`,
     },
   },

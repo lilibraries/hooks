@@ -119,5 +119,6 @@ dist
 .DS_Store
 
 # Docusaurus
-.docusaurus
 build
+.docusaurus
+

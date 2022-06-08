@@ -1,11 +1,6 @@
 {
   "extends": ["react-app", "react-app/jest", "prettier"],
   "rules": {
-    "react-hooks/exhaustive-deps": [
-      "warn",
-      {
-        "additionalHooks": "(useUpdate|useUpdateLayoutEffect|useIsomorphicLayoutEffect|useFactory|useRequest)"
-      }
-    ]
+    "testing-library/no-node-access": "off"
   }
 }
