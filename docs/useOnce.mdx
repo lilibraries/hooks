@@ -1,0 +1,21 @@
+Run callback synchronously only once.
+
+## Usage
+
+```ts
+function useOnce(callbck: () => void): void;
+```
+
+## Example
+
+```jsx
+import React from "react";
+import { useOnce } from "@lilib/hooks";
+
+function Example() {
+  useOnce(() => {
+    console.log("Run callback");
+  });
+  ...
+}
+```

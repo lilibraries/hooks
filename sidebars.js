@@ -3,8 +3,9 @@ module.exports = {
     "getting-started",
     {
       type: "category",
-      label: "Lifecycles",
+      label: "Effects",
       items: [
+        "useOnce",
         "useMount",
         "useUpdate",
         "useUnmount",
