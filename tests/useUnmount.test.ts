@@ -6,9 +6,11 @@ describe("useUnmount", () => {
     const mock = jest.fn();
     const { rerender, unmount } = renderHook(() => useUnmount(mock));
 
-    expect(mock).toBeCalledTimes(0);
+    expect(mock).not.toBeCalled();
+
     rerender();
-    expect(mock).toBeCalledTimes(0);
+    expect(mock).not.toBeCalled();
+
     unmount();
     expect(mock).toBeCalledTimes(1);
   });
@@ -21,19 +23,23 @@ describe("useUnmount", () => {
       { initialProps: mock1 }
     );
 
-    expect(mock1).toBeCalledTimes(0);
-    expect(mock2).toBeCalledTimes(0);
+    expect(mock1).not.toBeCalled();
+    expect(mock2).not.toBeCalled();
+
     rerender();
-    expect(mock1).toBeCalledTimes(0);
-    expect(mock2).toBeCalledTimes(0);
+    expect(mock1).not.toBeCalled();
+    expect(mock2).not.toBeCalled();
+
     rerender(mock2);
-    expect(mock1).toBeCalledTimes(0);
-    expect(mock2).toBeCalledTimes(0);
+    expect(mock1).not.toBeCalled();
+    expect(mock2).not.toBeCalled();
+
     rerender();
-    expect(mock1).toBeCalledTimes(0);
-    expect(mock2).toBeCalledTimes(0);
+    expect(mock1).not.toBeCalled();
+    expect(mock2).not.toBeCalled();
+
     unmount();
-    expect(mock1).toBeCalledTimes(0);
+    expect(mock1).not.toBeCalled();
     expect(mock2).toBeCalledTimes(1);
   });
 });
