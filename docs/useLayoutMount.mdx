@@ -1,0 +1,21 @@
+It's similar to [`useMount`](./useMount), except it uses [`useIsomorphicLayoutEffect`](./useIsomorphicLayoutEffect) internally.
+
+## Usage
+
+```ts
+function useLayoutMount(effect: () => void): void;
+```
+
+## Example
+
+```tsx
+import React from "react";
+import { useLayoutMount } from "@lilib/hooks";
+
+function Example() {
+  useLayoutMount(() => {
+    console.log("Component is mounted");
+  });
+  ...
+}
+```

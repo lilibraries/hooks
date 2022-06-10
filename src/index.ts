@@ -14,6 +14,7 @@ export { default as useOnce } from "./useOnce";
 export { default as useMount } from "./useMount";
 export { default as useUpdate } from "./useUpdate";
 export { default as useUnmount } from "./useUnmount";
+export { default as useLayoutMount } from "./useLayoutMount";
 export { default as useUpdateLayoutEffect } from "./useUpdateLayoutEffect";
 export { default as useIsomorphicLayoutEffect } from "./useIsomorphicLayoutEffect";
 

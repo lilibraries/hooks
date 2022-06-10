@@ -9,6 +9,7 @@ module.exports = {
         "useMount",
         "useUpdate",
         "useUnmount",
+        "useLayoutMount",
         "useUpdateLayoutEffect",
         "useIsomorphicLayoutEffect",
       ],
