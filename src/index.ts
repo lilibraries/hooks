@@ -1,3 +1,14 @@
+// Utils
+export * from "./utils/types";
+export { default as depsEqual } from "./utils/depsEqual";
+export { default as getTarget } from "./utils/getTarget";
+export { default as hasOwn } from "./utils/hasOwn";
+export { default as isBrowser } from "./utils/isBrowser";
+export { default as isEventTarget } from "./utils/isEventTarget";
+export { default as isFunction } from "./utils/isFunction";
+export { default as isObject } from "./utils/isObject";
+export { default as mergeRefs } from "./utils/mergeRefs";
+
 // Effects
 export { default as useOnce } from "./useOnce";
 export { default as useMount } from "./useMount";
