@@ -1,8 +1,8 @@
-import { renderHook } from "@testing-library/react-hooks";
 import { useOnce } from "@lilib/hooks";
+import { renderHook } from "@testing-library/react-hooks";
 
 describe("useOnce", () => {
-  it("should run callback synchronously only once", () => {
+  it("should run effect synchronously only once", () => {
     const mock = jest.fn();
     const { rerender, unmount } = renderHook(() => {
       useOnce(mock);

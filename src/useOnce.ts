@@ -1,10 +1,10 @@
 import { useRef } from "react";
 
-function useOnce(callback: () => void) {
+function useOnce(effect: () => void) {
   const calledRef = useRef(false);
 
   if (!calledRef.current) {
-    callback();
+    effect();
     calledRef.current = true;
   }
 }

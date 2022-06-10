@@ -1,9 +1,9 @@
-Run callback synchronously only once.
+Run effect synchronously only once.
 
 ## Usage
 
 ```ts
-function useOnce(callbck: () => void): void;
+function useOnce(effect: () => void): void;
 ```
 
 ## Example
@@ -14,7 +14,7 @@ import { useOnce } from "@lilib/hooks";
 
 function Example() {
   useOnce(() => {
-    console.log("Run callback");
+    console.log("Run effect");
   });
   ...
 }
