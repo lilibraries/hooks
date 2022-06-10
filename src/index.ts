@@ -15,7 +15,7 @@ export { default as useMount } from "./useMount";
 export { default as useUpdate } from "./useUpdate";
 export { default as useUnmount } from "./useUnmount";
 export { default as useLayoutMount } from "./useLayoutMount";
-export { default as useUpdateLayoutEffect } from "./useUpdateLayoutEffect";
+export { default as useLayoutUpdate } from "./useLayoutUpdate";
 export { default as useIsomorphicLayoutEffect } from "./useIsomorphicLayoutEffect";
 
 // States
