@@ -1,18 +1,6 @@
-import { DependencyList, EffectCallback, useEffect, useRef } from "react";
+import { useEffect } from "react";
+import createUpdateHook from "./creators/createUpdateHook";
 
-function useUpdate(effect: EffectCallback, deps?: DependencyList) {
-  const mountedRef = useRef(false);
-
-  useEffect(
-    () => {
-      if (mountedRef.current) {
-        return effect();
-      } else {
-        mountedRef.current = true;
-      }
-    },
-    deps // eslint-disable-line
-  );
-}
+const useUpdate = createUpdateHook(useEffect);
 
 export default useUpdate;

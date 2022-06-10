@@ -1,12 +1,6 @@
 import { useEffect } from "react";
+import createMountHook from "./creators/createMountHook";
 
-function useMount(effect: () => void) {
-  useEffect(
-    () => {
-      effect();
-    },
-    [] // eslint-disable-line
-  );
-}
+const useMount = createMountHook(useEffect);
 
 export default useMount;
