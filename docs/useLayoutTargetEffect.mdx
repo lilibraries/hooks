@@ -1,0 +1,39 @@
+It's similar to [`useTargetEffect`](./useTargetEffect), except it uses [`useIsomorphicLayoutEffect`](./useIsomorphicLayoutEffect) internally.
+
+## API
+
+```ts
+type Target<T> = T | undefined | null;
+type TargetCreator<T> =
+  | Target<T>
+  | (() => Target<T>)
+  | React.RefObject<Target<T>>
+  | React.MutableRefObject<Target<T>>;
+
+function useLayoutTargetEffect(
+  effect: React.EffectCallback,
+  deps: React.DependencyList,
+  targets: TargetCreator<any>[]
+): void;
+```
+
+## Example
+
+```ts
+import React, { useRef } from "react";
+import { useLayoutTargetEffect } from "@lilib/hooks";
+
+function Example() {
+  const domRef = useRef<HTMLDivElement>(null);
+
+  useLayoutTargetEffect(
+    () => {
+      // Do something.
+    },
+    [],
+    [domRef]
+  );
+
+  ...
+}
+```
