@@ -1,9 +1,11 @@
-import ExampleBox from "../examples/ExampleBox";
-import UseSessionStorageExample from "../examples/UseSessionStorageExample";
+import CodeBlock from "@theme/CodeBlock";
+import ExampleBlock from "../examples/ExampleBlock";
+import Example from "../examples/UseSessionStorage";
+import ExampleCode from "!!raw-loader!../examples/UseSessionStorage";
 
 Get or set sessionStorage.
 
-## Usage
+## API
 
 ```ts
 function useSessionStorage<T = any>(
@@ -22,7 +24,7 @@ function useSessionStorage<T = any>(
 ];
 ```
 
-### Params
+Params:
 
 - **`key`:** sessionStorage key.
 - **`defaultValue`:** default value.
@@ -30,7 +32,7 @@ function useSessionStorage<T = any>(
   - **`options.serialize`:** serialization function, default is `JSON.stringify`.
   - **`options.deserialize`:** deserialization function, default is `JSON.parse`.
 
-### Results
+Results:
 
 - **`value`:** parsed by the deserialization function.
 - **`set`:** the function that used to set sessionStorage.
@@ -38,27 +40,7 @@ function useSessionStorage<T = any>(
 
 ## Example
 
-<ExampleBox>
-  <UseSessionStorageExample />
-</ExampleBox>
-
-```tsx
-import React from "react";
-import { useSessionStorage } from "@lilib/hooks";
-
-function Example() {
-  const [value, { set, remove }] = useSessionStorage("key", "default value");
-
-  return (
-    <>
-      <div>
-        <button onClick={() => set("new value")}>Set</button>
-        <button onClick={remove}>Remove</button>
-      </div>
-      <div>The value is: {value}</div>
-    </>
-  );
-}
-
-export default Example;
-```
+<ExampleBlock>
+  <Example />
+</ExampleBlock>
+<CodeBlock language="tsx">{ExampleCode}</CodeBlock>

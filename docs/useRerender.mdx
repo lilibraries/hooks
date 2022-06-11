@@ -1,9 +1,11 @@
-import ExampleBox from "../examples/ExampleBox";
-import UseRerenderExample from "../examples/UseRerenderExample";
+import CodeBlock from "@theme/CodeBlock";
+import ExampleBlock from "../examples/ExampleBlock";
+import Example from "../examples/UseRerender";
+import ExampleCode from "!!raw-loader!../examples/UseRerender";
 
 This hook returns a function that you can use to rerender the component. It is usually used to rerender mutable data.
 
-## Usage
+## API
 
 ```ts
 function useRerender(): () => void;
@@ -11,30 +13,7 @@ function useRerender(): () => void;
 
 ## Example
 
-<ExampleBox>
-  <UseRerenderExample />
-</ExampleBox>
-
-```tsx
-import React from "react";
-import { useRerender } from "@lilib/hooks";
-
-let count = 0;
-
-function Example() {
-  const rerender = useRerender();
-
-  function handleClick() {
-    count++;
-    rerender();
-  }
-
-  return (
-    <>
-      <button onClick={handleClick}>+1</button> {count}
-    </>
-  );
-}
-
-export default Example;
-```
+<ExampleBlock>
+  <Example />
+</ExampleBlock>
+<CodeBlock language="tsx">{ExampleCode}</CodeBlock>

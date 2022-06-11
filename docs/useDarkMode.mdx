@@ -1,9 +1,11 @@
-import ExampleBox from "../examples/ExampleBox";
-import UseDarkModeExample from "../examples/UseDarkModeExample";
+import CodeBlock from "@theme/CodeBlock";
+import ExampleBlock from "../examples/ExampleBlock";
+import Example from "../examples/UseDarkMode";
+import ExampleCode from "!!raw-loader!../examples/UseDarkMode";
 
 Detect whether the system prefers color schema is dark.
 
-## Usage
+## API
 
 ```ts
 function useDarkMode(): boolean;
@@ -11,17 +13,7 @@ function useDarkMode(): boolean;
 
 ## Example
 
-<ExampleBox>
-  <UseDarkModeExample />
-</ExampleBox>
-
-```tsx
-import { useDarkMode } from "@lilib/hooks";
-
-function Example() {
-  const isDarkMode = useDarkMode();
-  return `Is dark mode: ${isDarkMode}`;
-}
-
-export default Example;
-```
+<ExampleBlock>
+  <Example />
+</ExampleBlock>
+<CodeBlock language="tsx">{ExampleCode}</CodeBlock>

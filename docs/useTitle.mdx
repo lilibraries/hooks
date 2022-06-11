@@ -1,43 +1,24 @@
-import ExampleBox from "../examples/ExampleBox";
-import UseTitleExample from "../examples/UseTitleExample";
+import CodeBlock from "@theme/CodeBlock";
+import ExampleBlock from "../examples/ExampleBlock";
+import Example from "../examples/UseTitle";
+import ExampleCode from "!!raw-loader!../examples/UseTitle";
 
 Set document title.
 
-## Usage
+## API
 
 ```ts
 function useTitle(title: string, options?: { restore?: boolean }): void;
 ```
 
-### Params
+Params:
 
 - **`title`:** document title.
 - **`options.restore`:** restore previous title on the component unmount.
 
 ## Example
 
-<ExampleBox>
-  <UseTitleExample />
-</ExampleBox>
-
-```tsx
-import React, { useState } from "react";
-import { useTitle } from "@lilib/hooks";
-
-function Example() {
-  const [title, setTitle] = useState("");
-  useTitle(title, { restore: true });
-
-  return (
-    <input
-      placeholder="Enter title"
-      value={title}
-      onChange={(event) => {
-        setTitle(event.target.value);
-      }}
-    />
-  );
-}
-
-export default Example;
-```
+<ExampleBlock>
+  <Example />
+</ExampleBlock>
+<CodeBlock language="tsx">{ExampleCode}</CodeBlock>

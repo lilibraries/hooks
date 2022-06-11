@@ -1,9 +1,11 @@
-import ExampleBox from "../examples/ExampleBox";
-import UseLocalStorageExample from "../examples/UseLocalStorageExample";
+import CodeBlock from "@theme/CodeBlock";
+import ExampleBlock from "../examples/ExampleBlock";
+import Example from "../examples/UseLocalStorage";
+import ExampleCode from "!!raw-loader!../examples/UseLocalStorage";
 
 Get or set localStorage.
 
-## Usage
+## API
 
 ```ts
 function useLocalStorage<T = any>(
@@ -22,7 +24,7 @@ function useLocalStorage<T = any>(
 ];
 ```
 
-### Params
+Params:
 
 - **`key`:** localStorage key.
 - **`defaultValue`:** default value.
@@ -30,7 +32,7 @@ function useLocalStorage<T = any>(
   - **`options.serialize`:** serialization function, default is `JSON.stringify`.
   - **`options.deserialize`:** deserialization function, default is `JSON.parse`.
 
-### Results
+Results:
 
 - **`value`:** parsed by the deserialization function.
 - **`set`:** the function that used to set localStorage.
@@ -38,27 +40,7 @@ function useLocalStorage<T = any>(
 
 ## Example
 
-<ExampleBox>
-  <UseLocalStorageExample />
-</ExampleBox>
-
-```tsx
-import React from "react";
-import { useLocalStorage } from "@lilib/hooks";
-
-function Example() {
-  const [value, { set, remove }] = useLocalStorage("key", "default value");
-
-  return (
-    <>
-      <div>
-        <button onClick={() => set("new value")}>Set</button>
-        <button onClick={remove}>Remove</button>
-      </div>
-      <div>The value is: {value}</div>
-    </>
-  );
-}
-
-export default Example;
-```
+<ExampleBlock>
+  <Example />
+</ExampleBlock>
+<CodeBlock language="tsx">{ExampleCode}</CodeBlock>

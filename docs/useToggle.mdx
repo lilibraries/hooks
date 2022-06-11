@@ -1,9 +1,11 @@
-import ExampleBox from "../examples/ExampleBox";
-import UseToggleExample from "../examples/UseToggleExample";
+import CodeBlock from "@theme/CodeBlock";
+import ExampleBlock from "../examples/ExampleBlock";
+import Example from "../examples/UseToggle";
+import ExampleCode from "!!raw-loader!../examples/UseToggle";
 
 Use boolean value.
 
-## Usage
+## API
 
 ```ts
 function useToggle(initialValue?: boolean): [
@@ -16,11 +18,11 @@ function useToggle(initialValue?: boolean): [
 ];
 ```
 
-### Params
+Params:
 
 - **`initialValue`:** optional initial value, default is false.
 
-### Results
+Results:
 
 - **`value`:** a boolean value, can be changed by the following functions.
 - **`toggle`:** toggle the value. If the newValue param is specified, the value will be set to the newValue.
@@ -29,28 +31,7 @@ function useToggle(initialValue?: boolean): [
 
 ## Example
 
-<ExampleBox>
-  <UseToggleExample />
-</ExampleBox>
-
-```tsx
-import React from "react";
-import { useToggle } from "@lilib/hooks";
-
-function Example() {
-  const [visible, { toggle, toggleOn, toggleOff }] = useToggle(true);
-
-  return (
-    <>
-      <button onClick={() => toggle()}>Toggle</button>
-      <button onClick={toggleOn}>Show</button>
-      <button onClick={toggleOff}>Hide</button>
-      <div style={{ display: visible ? "block" : "none" }}>
-        Example text can be handled by the buttons above.
-      </div>
-    </>
-  );
-}
-
-export default Example;
-```
+<ExampleBlock>
+  <Example />
+</ExampleBlock>
+<CodeBlock language="tsx">{ExampleCode}</CodeBlock>

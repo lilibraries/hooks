@@ -1,9 +1,11 @@
-import ExampleBox from "../examples/ExampleBox";
-import UseOnlineExample from "../examples/UseOnlineExample";
+import CodeBlock from "@theme/CodeBlock";
+import ExampleBlock from "../examples/ExampleBlock";
+import Example from "../examples/UseOnline";
+import ExampleCode from "!!raw-loader!../examples/UseOnline";
 
 Detect whether the network is online.
 
-## Usage
+## API
 
 ```ts
 function useOnline(): boolean;
@@ -11,17 +13,7 @@ function useOnline(): boolean;
 
 ## Example
 
-<ExampleBox>
-  <UseOnlineExample />
-</ExampleBox>
-
-```tsx
-import { useOnline } from "@lilib/hooks";
-
-function Example() {
-  const online = useOnline();
-  return "The network is: " + (online ? "online" : "offline");
-}
-
-export default Example;
-```
+<ExampleBlock>
+  <Example />
+</ExampleBlock>
+<CodeBlock language="tsx">{ExampleCode}</CodeBlock>

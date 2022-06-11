@@ -1,9 +1,11 @@
-import ExampleBox from "../examples/ExampleBox";
-import UseDebouncedExample from "../examples/UseDebouncedExample";
+import CodeBlock from "@theme/CodeBlock";
+import ExampleBlock from "../examples/ExampleBlock";
+import Example from "../examples/UseDebounced";
+import ExampleCode from "!!raw-loader!../examples/UseDebounced";
 
 Debounce a value.
 
-## Usage
+## API
 
 ```ts
 function useDebounced<T = any>(
@@ -18,7 +20,7 @@ function useDebounced<T = any>(
 ];
 ```
 
-### Params
+Params:
 
 - **`value`:** the value that will be changed.
 - **`options`:** debounce wait time or an options object.
@@ -26,7 +28,7 @@ function useDebounced<T = any>(
   - **`options.leading`:** change debouncedValue on the leading edge, default is false.
   - **`options.trailing`:** change debouncedValue on the trailing edge, default is true.
 
-### Results
+Results:
 
 - **`debouncedValue`:** debounced value.
 - **`flush`:** flush funciton. The finalValue will be returned as debouncedValue if it is specified.
@@ -34,57 +36,7 @@ function useDebounced<T = any>(
 
 ## Example
 
-<ExampleBox>
-  <UseDebouncedExample />
-</ExampleBox>
-
-```tsx
-import React, { useState } from "react";
-import { useDebounced, useToggle } from "@lilib/hooks";
-
-function random() {
-  return Math.ceil(Math.random() * 5000);
-}
-
-function Example() {
-  const [wait, setWait] = useState(random());
-  const [leading, { toggle: toggleLeading }] = useToggle(false);
-  const [trailing, { toggle: toggleTrailing }] = useToggle(true);
-
-  const [value, setValue] = useState("");
-  const options = { wait, leading, trailing };
-  const [debouncedValue, { flush, cancel }] = useDebounced(value, options);
-
-  return (
-    <>
-      <p>
-        Actions:{" "}
-        <button onClick={() => setWait(random())}>Change wait time</button>
-        <button onClick={() => toggleLeading()}>Toggle leading</button>
-        <button onClick={() => toggleTrailing()}>Toggle trailing</button>
-      </p>
-      <p>
-        Options:{" "}
-        {`{ wait: ${wait}, leading: ${leading}, trailing: ${trailing} }`}
-      </p>
-      <p>
-        Enter value:{" "}
-        <input
-          value={value}
-          onChange={(event) => {
-            setValue(event.target.value);
-          }}
-        />
-        <button onClick={() => flush()}>Flush</button>
-        <button onClick={() => flush("final value")}>
-          Flush with "final value"
-        </button>
-        <button onClick={cancel}>Cancel</button>
-      </p>
-      <div>Debounced value: {debouncedValue}</div>
-    </>
-  );
-}
-
-export default Example;
-```
+<ExampleBlock>
+  <Example />
+</ExampleBlock>
+<CodeBlock language="tsx">{ExampleCode}</CodeBlock>

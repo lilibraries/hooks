@@ -1,16 +1,16 @@
 Invoke the callback when the browser is idle. This hook uses [window.requestIdleCallback](https://developer.mozilla.org/en-US/docs/Web/API/Window/requestIdleCallback) by default. If the window.requestIdleCallback is non-existent, it uses setTimeout.
 
-## Usage
+## API
 
 ```ts
 function useIdle(callback: () => void): [start: () => void, cancel: () => void];
 ```
 
-### Params
+Params:
 
 - **`callback`:** the function that will be invoked.
 
-### Results
+Results:
 
 - **`start`:** start function.
 - **`cancel`:** cancel function.

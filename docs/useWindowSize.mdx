@@ -1,9 +1,11 @@
-import ExampleBox from "../examples/ExampleBox";
-import UseWindowSizeExample from "../examples/UseWindowSizeExample";
+import CodeBlock from "@theme/CodeBlock";
+import ExampleBlock from "../examples/ExampleBlock";
+import Example from "../examples/UseWindowSize";
+import ExampleCode from "!!raw-loader!../examples/UseWindowSize";
 
 Returns window width and height.
 
-## Usage
+## API
 
 ```ts
 function useWindowSize(): { width: number; height: number };
@@ -11,17 +13,7 @@ function useWindowSize(): { width: number; height: number };
 
 ## Example
 
-<ExampleBox>
-  <UseWindowSizeExample />
-</ExampleBox>
-
-```tsx
-import { useWindowSize } from "@lilib/hooks";
-
-function Example() {
-  const { width, height } = useWindowSize();
-  return `Width: ${width}px; Height: ${height}px`;
-}
-
-export default Example;
-```
+<ExampleBlock>
+  <Example />
+</ExampleBlock>
+<CodeBlock language="tsx">{ExampleCode}</CodeBlock>

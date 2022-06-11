@@ -1,9 +1,11 @@
-import ExampleBox from "../examples/ExampleBox";
-import UseTimeoutExample from "../examples/UseTimeoutExample";
+import CodeBlock from "@theme/CodeBlock";
+import ExampleBlock from "../examples/ExampleBlock";
+import Example from "../examples/UseTimeout";
+import ExampleCode from "!!raw-loader!../examples/UseTimeout";
 
 Delay running callback.
 
-## Usage
+## API
 
 ```ts
 function useTimeout(
@@ -12,39 +14,19 @@ function useTimeout(
 ): [start: () => void, cancel: () => void];
 ```
 
-### Params
+Params:
 
 - **`callback`:** the function that be delayed calling.
 - **`ms`:** delay time, in milliseconds.
 
-### Results
+Results:
 
 - **`start`:** start function.
 - **`cancel`:** cancel function.
 
 ## Example
 
-<ExampleBox>
-  <UseTimeoutExample />
-</ExampleBox>
-
-```tsx
-import React, { useState } from "react";
-import { useTimeout } from "@lilib/hooks";
-
-function Example() {
-  const [count, setCount] = useState(0);
-  const [increase, cancel] = useTimeout(() => {
-    setCount((count) => ++count);
-  }, 1000);
-
-  return (
-    <>
-      <button onClick={increase}>+1 after one second</button>
-      <button onClick={cancel}>Cancel</button> Count: {count}
-    </>
-  );
-}
-
-export default Example;
-```
+<ExampleBlock>
+  <Example />
+</ExampleBlock>
+<CodeBlock language="tsx">{ExampleCode}</CodeBlock>

@@ -1,9 +1,11 @@
-import ExampleBox from "../examples/ExampleBox";
-import UseIntervalExample from "../examples/UseIntervalExample";
+import CodeBlock from "@theme/CodeBlock";
+import ExampleBlock from "../examples/ExampleBlock";
+import Example from "../examples/UseInterval";
+import ExampleCode from "!!raw-loader!../examples/UseInterval";
 
 Loop run callback.
 
-## Usage
+## API
 
 ```ts
 function useInterval(
@@ -12,39 +14,19 @@ function useInterval(
 ): [start: () => void, cancel: () => void];
 ```
 
-### Params
+Params:
 
 - **`callback`:** the function that called at intervals.
 - **`ms`:** interval time, in milliseconds.
 
-### Results
+Results:
 
 - **`start`:** start function.
 - **`cancel`:** cancel function.
 
 ## Example
 
-<ExampleBox>
-  <UseIntervalExample />
-</ExampleBox>
-
-```tsx
-import React, { useState } from "react";
-import { useInterval } from "@lilib/hooks";
-
-function Example() {
-  const [count, setCount] = useState(0);
-  const [start, cancel] = useInterval(() => {
-    setCount((count) => ++count);
-  }, 1000);
-
-  return (
-    <>
-      <button onClick={start}>Start</button>
-      <button onClick={cancel}>Cancel</button> Count: {count}
-    </>
-  );
-}
-
-export default Example;
-```
+<ExampleBlock>
+  <Example />
+</ExampleBlock>
+<CodeBlock language="tsx">{ExampleCode}</CodeBlock>

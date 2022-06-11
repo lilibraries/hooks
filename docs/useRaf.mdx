@@ -1,16 +1,16 @@
 Use [requestAnimationFrame](https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame) to invoke the callback before the browser repainting.
 
-## Usage
+## API
 
 ```ts
 function useRaf(callback: () => void): [start: () => void, cancel: () => void];
 ```
 
-### Params
+Params:
 
 - **`callback`:** the function that will be invoked.
 
-### Results
+Results:
 
 - **`start`:** start function.
 - **`cancel`:** cancel function.

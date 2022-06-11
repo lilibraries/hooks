@@ -1,0 +1,12 @@
+.exampleBlock {
+  padding: calc(var(--ifm-pre-padding) - 4px);
+  border: 2px solid rgba(128, 128, 128, 0.25);
+  border-bottom: 0;
+  border-top-left-radius: var(--ifm-pre-border-radius);
+  border-top-right-radius: var(--ifm-pre-border-radius);
+}
+
+.exampleBlock + div {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}

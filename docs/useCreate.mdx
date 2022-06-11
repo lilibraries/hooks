@@ -1,6 +1,6 @@
 This hook is similar to `React.useMemo`, but the deps is an empty array by default, and ensures that the create function is executed only once with deps unchanged.
 
-## Usage
+## API
 
 ```ts
 function useCreate<T>(create: () => T, deps?: React.DependencyList): T;
