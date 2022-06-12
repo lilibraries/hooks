@@ -2,7 +2,7 @@ import { useRef, useState } from "react";
 import { is } from "./utils";
 import useUpdate from "./useUpdate";
 import usePersist from "./usePersist";
-import useLastest from "./useLastest";
+import useLatestRef from "./useLatestRef";
 import createDebounceHook from "./createDebounceHook";
 
 function createDebouncedValueHook(throttle: boolean = false) {
@@ -12,7 +12,7 @@ function createDebouncedValueHook(throttle: boolean = false) {
     value: T,
     options: number | { wait: number; leading?: boolean; trailing?: boolean }
   ) {
-    const valueRef = useLastest(value);
+    const valueRef = useLatestRef(value);
     const [debouncedValue, setDebouncedValue] = useState(value);
     const debouncedValueRef = useRef(debouncedValue);
 

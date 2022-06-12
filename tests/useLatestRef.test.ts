@@ -1,12 +1,12 @@
-import { useLastest } from "@lilib/hooks";
+import { useLatestRef } from "@lilib/hooks";
 import { renderHook } from "@testing-library/react-hooks";
 
-describe("useLastest", () => {
+describe("useLatestRef", () => {
   it("should return the same ref object when the component rerenders", () => {
     const results: any[] = [];
     const { rerender, unmount } = renderHook(
       (value) => {
-        results.push(useLastest(value));
+        results.push(useLatestRef(value));
       },
       { initialProps: 0 }
     );
@@ -21,9 +21,9 @@ describe("useLastest", () => {
     }
   });
 
-  it("should use lastest value", () => {
+  it("should use latest value", () => {
     const { result, rerender, unmount } = renderHook(
-      (value) => useLastest(value),
+      (value) => useLatestRef(value),
       { initialProps: 0 }
     );
 

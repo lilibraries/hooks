@@ -1,0 +1,19 @@
+Return a ref object whose `.current` property is assigned to latest updated value.
+
+## API
+
+```ts
+function useLatestRef<T>(value: T): React.MutableRefObject<T>;
+```
+
+## Example
+
+```ts
+import React from "react";
+import { useLatestRef } from "@lilib/hooks";
+
+function Example(props) {
+  const valueRef = useLatestRef(props.value)
+  ...
+}
+```

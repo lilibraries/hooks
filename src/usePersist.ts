@@ -1,8 +1,8 @@
 import { useRef } from "react";
-import useLastest from "./useLastest";
+import useLatestRef from "./useLatestRef";
 
 function usePersist<T extends (...args: any[]) => any>(callback: T): T {
-  const lastestCallbackRef = useLastest(callback);
+  const lastestCallbackRef = useLatestRef(callback);
   const persistedCallbackRef = useRef<T>();
 
   if (persistedCallbackRef.current === undefined) {
