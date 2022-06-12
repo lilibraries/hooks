@@ -23,4 +23,17 @@ describe("useSafeState", () => {
     });
     expect(result.current[0]).toBe(1);
   });
+
+  it("can pass a function to `setState`", () => {
+    const { result } = renderHook(() => useSafeState(() => 0));
+
+    expect(result.current[0]).toBe(0);
+
+    act(() => {
+      result.current[1]((prevState) => {
+        return prevState + 1;
+      });
+    });
+    expect(result.current[0]).toBe(1);
+  });
 });

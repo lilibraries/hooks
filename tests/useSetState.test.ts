@@ -29,4 +29,17 @@ describe("useSetState", () => {
     });
     expect(result.current[0]).toEqual({ a: "a" });
   });
+
+  it("can pass a function to `setState`", () => {
+    const { result } = renderHook(() => useSetState<any>(() => ({ a: "a" })));
+
+    expect(result.current[0]).toEqual({ a: "a" });
+
+    act(() => {
+      result.current[1](({ a }) => {
+        return { b: a + "b" };
+      });
+    });
+    expect(result.current[0]).toEqual({ a: "a", b: "ab" });
+  });
 });
