@@ -2,6 +2,15 @@ import { useSetState } from "@lilib/hooks";
 import { act, renderHook } from "@testing-library/react-hooks";
 
 describe("useSetState", () => {
+  it("should always return the same `setState` function", () => {
+    const { result, rerender } = renderHook(() => useSetState({}));
+    const [, setState1] = result.current;
+    rerender();
+    const [, setState2] = result.current;
+
+    expect(setState1).toBe(setState2);
+  });
+
   it("should merge states", () => {
     const { result } = renderHook(() => useSetState<any>({ a: "a", b: "b" }));
 

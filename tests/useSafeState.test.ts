@@ -2,6 +2,15 @@ import { useSafeState } from "@lilib/hooks";
 import { act, renderHook } from "@testing-library/react-hooks";
 
 describe("useSafeState", () => {
+  it("should always return the same `setState` function", () => {
+    const { result, rerender } = renderHook(() => useSafeState());
+    const [, setState1] = result.current;
+    rerender();
+    const [, setState2] = result.current;
+
+    expect(setState1).toBe(setState2);
+  });
+
   it("should not set state after the component is unmounted", () => {
     const { result, rerender, unmount } = renderHook(() => useSafeState(0));
 

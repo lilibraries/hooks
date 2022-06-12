@@ -2,6 +2,15 @@ import { useControllableState } from "@lilib/hooks";
 import { act, renderHook } from "@testing-library/react-hooks";
 
 describe("useControllableState", () => {
+  it("should always return the same `setState` function", () => {
+    const { result, rerender } = renderHook(() => useControllableState());
+    const [, setState1] = result.current;
+    rerender();
+    const [, setState2] = result.current;
+
+    expect(setState1).toBe(setState2);
+  });
+
   it("can be uncontrolled", () => {
     const { result } = renderHook(() => useControllableState("default"));
 
