@@ -30,6 +30,7 @@ export { default as useThrottled } from "./useThrottled";
 
 // Callbacks
 export { default as usePersist } from "./usePersist";
+export { default as useRerender } from "./useRerender";
 export { default as useDebounce } from "./useDebounce";
 export { default as useThrottle } from "./useThrottle";
 export { default as useTimeout } from "./useTimeout";
@@ -60,4 +61,3 @@ export { default as useSessionStorage } from "./useSessionStorage";
 
 // Utils
 export { default as useCreate } from "./useCreate";
-export { default as useRerender } from "./useRerender";

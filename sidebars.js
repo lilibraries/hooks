@@ -33,6 +33,7 @@ module.exports = {
       label: "Callbacks",
       items: [
         "usePersist",
+        "useRerender",
         "useDebounce",
         "useThrottle",
         "useTimeout",
@@ -73,7 +74,7 @@ module.exports = {
     {
       type: "category",
       label: "Utils",
-      items: ["useCreate", "useRerender"],
+      items: ["useCreate"],
     },
   ],
 };
