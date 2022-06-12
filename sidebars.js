@@ -22,6 +22,7 @@ module.exports = {
       items: [
         "useSetState",
         "useSafeState",
+        "useControllableState",
         "useToggle",
         "useDebounced",
         "useThrottled",
