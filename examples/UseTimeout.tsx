@@ -9,7 +9,7 @@ function Example() {
 
   return (
     <>
-      <button onClick={increase}>+1 after one second</button>
+      <button onClick={increase}>+1 after one second</button>{" "}
       <button onClick={cancel}>Cancel</button> Count: {count}
     </>
   );

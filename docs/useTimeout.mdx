@@ -10,19 +10,19 @@ Delay running callback.
 ```ts
 function useTimeout(
   callback: () => void,
-  ms: number
+  delay?: number
 ): [start: () => void, cancel: () => void];
 ```
 
-Params:
+### Params
 
-- **`callback`:** the function that be delayed calling.
-- **`ms`:** delay time, in milliseconds.
+- **`callback`:** the function that will be delayed calling.
+- **`delay`:** optional delay time, in milliseconds.
 
-Results:
+### Results
 
-- **`start`:** start function.
-- **`cancel`:** cancel function.
+- **`start`:** set a timer, automatically clear the previous timer.
+- **`cancel`:** cancel timer.
 
 ## Example
 

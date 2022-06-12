@@ -5,6 +5,7 @@ describe("useTimeout", () => {
   beforeEach(() => {
     jest.useFakeTimers();
   });
+
   afterEach(() => {
     jest.runOnlyPendingTimers();
     jest.useRealTimers();
@@ -23,6 +24,7 @@ describe("useTimeout", () => {
   it("should not run callback automatically", () => {
     const mock = jest.fn();
     renderHook(() => useTimeout(mock, 10));
+
     jest.advanceTimersByTime(100);
     expect(mock).not.toBeCalled();
   });
@@ -34,6 +36,7 @@ describe("useTimeout", () => {
 
     act(() => start());
     jest.advanceTimersByTime(9);
+
     act(() => start());
     jest.advanceTimersByTime(9);
     expect(mock).not.toBeCalled();
@@ -45,6 +48,7 @@ describe("useTimeout", () => {
     act(() => start());
     jest.advanceTimersByTime(10);
     expect(mock).toBeCalledTimes(1);
+
     jest.advanceTimersByTime(20);
     expect(mock).toBeCalledTimes(1);
 
@@ -54,12 +58,13 @@ describe("useTimeout", () => {
 
     act(() => start());
     jest.advanceTimersByTime(9);
+
     unmount();
     jest.runOnlyPendingTimers();
     expect(mock).toBeCalledTimes(2);
   });
 
-  it("should always run lastest callback", () => {
+  it("should always run latest callback", () => {
     const mock1 = jest.fn();
     const mock2 = jest.fn();
     const mock3 = jest.fn();
@@ -79,25 +84,5 @@ describe("useTimeout", () => {
     expect(mock1).not.toBeCalled();
     expect(mock2).not.toBeCalled();
     expect(mock3).toBeCalledTimes(1);
-  });
-
-  it("should update timer when the `ms` changes", () => {
-    const mock = jest.fn();
-    const { result, rerender } = renderHook((ms) => useTimeout(mock, ms), {
-      initialProps: 10,
-    });
-    const [start] = result.current;
-
-    rerender(20);
-    jest.advanceTimersByTime(21);
-    expect(mock).not.toBeCalled();
-
-    act(() => start());
-    jest.advanceTimersByTime(19);
-    rerender(30);
-    jest.advanceTimersByTime(29);
-    expect(mock).not.toBeCalled();
-    jest.runOnlyPendingTimers();
-    expect(mock).toBeCalledTimes(1);
   });
 });
