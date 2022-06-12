@@ -1,0 +1,24 @@
+It returns a ref object used to determine whether the component is mounted. Do not use in effect hooks, it is recommended to use synchronously.
+
+## API
+
+```ts
+function useMounted(): React.MutableRefObject<boolean>;
+```
+
+## Example
+
+```tsx
+import React from "react";
+import { useMountedRef } from "@lilib/hooks";
+
+function Example() {
+  const mountedRef = useMountedRef();
+
+  if (!mountedRef.current) {
+    // Do something.
+  }
+
+  ...
+}
+```

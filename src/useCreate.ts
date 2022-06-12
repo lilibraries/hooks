@@ -1,10 +1,10 @@
 import { DependencyList, useRef } from "react";
 import { areDepsEqual } from "./utils";
-import useMounted from "./useMounted";
+import useMountedRef from "./useMountedRef";
 import usePrevious from "./usePrevious";
 
 function useCreate<T>(create: () => T, deps: DependencyList = []): T {
-  const mountedRef = useMounted();
+  const mountedRef = useMountedRef();
   const previousDepsRef = usePrevious(deps);
   const valueRef = useRef<T>();
 

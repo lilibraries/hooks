@@ -1,7 +1,7 @@
 import { extname } from "./utils";
 import useCreate from "./useCreate";
 import useUnmount from "./useUnmount";
-import useMounted from "./useMounted";
+import useMountedRef from "./useMountedRef";
 import usePrevious from "./usePrevious";
 
 const mimes = {
@@ -23,7 +23,7 @@ function useFavicon(href: string, options?: { restore?: boolean }) {
     (document.querySelector("link[rel*='icon']") as HTMLLinkElement) ||
     document.createElement("link");
 
-  const mountedRef = useMounted();
+  const mountedRef = useMountedRef();
   const previousHrefRef = usePrevious(href);
 
   if (!mountedRef.current || previousHrefRef.current !== href) {

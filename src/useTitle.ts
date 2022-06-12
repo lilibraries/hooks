@@ -1,10 +1,10 @@
 import { useRef } from "react";
 import useUnmount from "./useUnmount";
-import useMounted from "./useMounted";
+import useMountedRef from "./useMountedRef";
 import usePrevious from "./usePrevious";
 
 function useTitle(title: string, options?: { restore?: boolean }) {
-  const mountedRef = useMounted();
+  const mountedRef = useMountedRef();
   const oldTitleRef = useRef(document.title);
   const previousTitleRef = usePrevious(title);
 

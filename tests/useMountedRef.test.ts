@@ -1,11 +1,11 @@
+import { useMountedRef } from "@lilib/hooks";
 import { renderHook } from "@testing-library/react-hooks";
-import { useMounted } from "@lilib/hooks";
 
-describe("useMounted", () => {
+describe("useMountedRef", () => {
   it("should return the same ref object when the component rerenders", () => {
     const results: any[] = [];
     const { rerender, unmount } = renderHook(() => {
-      results.push(useMounted());
+      results.push(useMountedRef());
     });
 
     rerender();
@@ -20,9 +20,11 @@ describe("useMounted", () => {
   it("should return true after the component is mounted, otherwise return false", () => {
     let first: boolean | undefined;
     const { result, rerender, unmount } = renderHook(() => {
-      const mounted = useMounted();
-      if (first === undefined) first = mounted.current;
-      return mounted;
+      const mountedRef = useMountedRef();
+      if (first === undefined) {
+        first = mountedRef.current;
+      }
+      return mountedRef;
     });
 
     expect(first).toBe(false);
