@@ -1,4 +1,4 @@
-Returns the same function no matter whether the callback param changes.
+It returns the same function no matter whether the `callback` parameter is changed or not, and it is used in the same way as `callback`.
 
 ## API
 
@@ -13,8 +13,8 @@ import React from "react";
 import { usePersist } from "@lilib/hooks";
 
 function Example() {
-  const persistedCallback = usePersist(() => {
-    // Do something
+  const callback = usePersist(() => {
+    // Do something.
   });
   ...
 }

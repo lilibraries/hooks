@@ -2,16 +2,16 @@ import { useRef } from "react";
 import useLatestRef from "./useLatestRef";
 
 function usePersist<T extends (...args: any[]) => any>(callback: T): T {
-  const lastestCallbackRef = useLatestRef(callback);
-  const persistedCallbackRef = useRef<T>();
+  const resultRef = useRef<T>();
+  const callbackRef = useLatestRef(callback);
 
-  if (persistedCallbackRef.current === undefined) {
-    persistedCallbackRef.current = function (this: any, ...args) {
-      return lastestCallbackRef.current.apply(this, args);
+  if (!resultRef.current) {
+    resultRef.current = function (this: any, ...args) {
+      return callbackRef.current.apply(this, args);
     } as T;
   }
 
-  return persistedCallbackRef.current;
+  return resultRef.current;
 }
 
 export default usePersist;
