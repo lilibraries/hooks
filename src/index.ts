@@ -39,6 +39,7 @@ export { default as useAnimation } from "./useAnimation";
 // Refs
 export { default as useLatestRef } from "./useLatestRef";
 export { default as usePreviousRef } from "./usePreviousRef";
+export { default as useMergedRef } from "./useMergedRef";
 export { default as useMountedRef } from "./useMountedRef";
 export { default as useUnmountedRef } from "./useUnmountedRef";
 

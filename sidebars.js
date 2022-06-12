@@ -42,6 +42,7 @@ module.exports = {
       items: [
         "useLatestRef",
         "usePreviousRef",
+        "useMergedRef",
         "useMountedRef",
         "useUnmountedRef",
       ],
