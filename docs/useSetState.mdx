@@ -1,0 +1,24 @@
+import CodeBlock from "@theme/CodeBlock";
+import ExampleBlock from "../examples/ExampleBlock";
+import Example from "../examples/UseSetState";
+import ExampleCode from "!!raw-loader!../examples/UseSetState";
+
+This hook is like `this.setState` method of class component. It requires an object as the initial state, and can only update part of the state. The new state will be merged with the old state.
+
+## API
+
+```ts
+function useSetState<S extends object>(
+  initialState: S | (() => S)
+): readonly [
+  state: S,
+  setState: (patch: Partial<S> | ((prevState: S) => Partial<S>)) => void
+];
+```
+
+## Example
+
+<ExampleBlock>
+  <Example />
+</ExampleBlock>
+<CodeBlock language="tsx">{ExampleCode}</CodeBlock>
