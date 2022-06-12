@@ -2,7 +2,7 @@ import { useMountedRef } from "@lilib/hooks";
 import { renderHook } from "@testing-library/react-hooks";
 
 describe("useMountedRef", () => {
-  it("should return the same ref object when the component rerenders", () => {
+  it("should always return the same ref object", () => {
     const results: any[] = [];
     const { rerender, unmount } = renderHook(() => {
       results.push(useMountedRef());
