@@ -20,14 +20,14 @@ function useToggle(initialValue?: boolean): [
 
 Params:
 
-- **`initialValue`:** optional initial value, default is false.
+- **`initialValue`:** optional initial value, default is `false`.
 
 Results:
 
 - **`value`:** a boolean value, can be changed by the following functions.
-- **`toggle`:** toggle the value. If the newValue param is specified, the value will be set to the newValue.
-- **`toggleOn`:** set the value to true.
-- **`toggleOff`:** set the value to false.
+- **`actions.toggle`:** toggle the value. If the `newValue` param is not `undefined`, the value will be set to the `newValue`.
+- **`actions.toggleOn`:** set the value to `true`.
+- **`actions.toggleOff`:** set the value to `false`.
 
 ## Example
 
