@@ -40,6 +40,7 @@ export { default as useAnimation } from "./useAnimation";
 export { default as useLatestRef } from "./useLatestRef";
 export { default as usePreviousRef } from "./usePreviousRef";
 export { default as useMountedRef } from "./useMountedRef";
+export { default as useUnmountedRef } from "./useUnmountedRef";
 
 // BOM and DOM
 export { default as useTitle } from "./useTitle";
