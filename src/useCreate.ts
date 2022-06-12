@@ -1,14 +1,17 @@
 import { DependencyList, useRef } from "react";
-import { areDepsEqual } from "./utils";
 import useMountedRef from "./useMountedRef";
-import usePrevious from "./usePrevious";
+import usePreviousRef from "./usePreviousRef";
+import depsEqual from "./utils/depsEqual";
 
 function useCreate<T>(create: () => T, deps: DependencyList = []): T {
   const mountedRef = useMountedRef();
-  const previousDepsRef = usePrevious(deps);
+  const prevDepsRef = usePreviousRef(deps);
   const valueRef = useRef<T>();
 
-  if (!mountedRef.current || !areDepsEqual(previousDepsRef.current, deps)) {
+  if (
+    !mountedRef.current ||
+    (prevDepsRef.current && !depsEqual(prevDepsRef.current, deps))
+  ) {
     valueRef.current = create();
   }
 

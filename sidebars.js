@@ -39,7 +39,7 @@ module.exports = {
     {
       type: "category",
       label: "Refs",
-      items: ["useLatestRef", "usePrevious", "useMountedRef"],
+      items: ["useLatestRef", "usePreviousRef", "useMountedRef"],
     },
     {
       type: "category",

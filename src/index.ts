@@ -38,7 +38,7 @@ export { default as useAnimation } from "./useAnimation";
 
 // Refs
 export { default as useLatestRef } from "./useLatestRef";
-export { default as usePrevious } from "./usePrevious";
+export { default as usePreviousRef } from "./usePreviousRef";
 export { default as useMountedRef } from "./useMountedRef";
 
 // BOM and DOM

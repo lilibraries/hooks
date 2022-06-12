@@ -2,7 +2,7 @@ import { extname } from "./utils";
 import useCreate from "./useCreate";
 import useUnmount from "./useUnmount";
 import useMountedRef from "./useMountedRef";
-import usePrevious from "./usePrevious";
+import usePreviousRef from "./usePreviousRef";
 
 const mimes = {
   ico: "image/x-icon",
@@ -24,9 +24,9 @@ function useFavicon(href: string, options?: { restore?: boolean }) {
     document.createElement("link");
 
   const mountedRef = useMountedRef();
-  const previousHrefRef = usePrevious(href);
+  const prevHrefRef = usePreviousRef(href);
 
-  if (!mountedRef.current || previousHrefRef.current !== href) {
+  if (!mountedRef.current || prevHrefRef.current !== href) {
     link.href = href;
     link.rel = "shortcut icon";
     link.type = mimes[extname(href) as keyof typeof mimes] || mimes.ico;

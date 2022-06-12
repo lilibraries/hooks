@@ -1,0 +1,19 @@
+Return a ref object whose `.current` property is assigned to previous updated value, the first time is `undefined`.
+
+## API
+
+```ts
+function usePreviousRef<T>(value: T): React.MutableRefObject<T | undefined>;
+```
+
+## Example
+
+```ts
+import React from "react";
+import { usePreviousRef } from "@lilib/hooks";
+
+function Example(props) {
+  const valueRef = usePreviousRef(props.value)
+  ...
+}
+```
