@@ -19,7 +19,7 @@ module.exports = {
     {
       type: "category",
       label: "States",
-      items: ["useToggle", "useDebounced", "useThrottled"],
+      items: ["useSafeState", "useToggle", "useDebounced", "useThrottled"],
     },
     {
       type: "category",

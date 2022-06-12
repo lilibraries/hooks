@@ -21,6 +21,7 @@ export { default as useLayoutTargetEffect } from "./useLayoutTargetEffect";
 export { default as useIsomorphicLayoutEffect } from "./useIsomorphicLayoutEffect";
 
 // States
+export { default as useSafeState } from "./useSafeState";
 export { default as useToggle } from "./useToggle";
 export { default as useDebounced } from "./useDebounced";
 export { default as useThrottled } from "./useThrottled";
