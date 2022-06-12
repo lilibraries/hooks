@@ -9,7 +9,7 @@ function Example() {
 
   return (
     <>
-      <button onClick={start}>Start</button>
+      <button onClick={start}>Start</button>{" "}
       <button onClick={cancel}>Cancel</button> Count: {count}
     </>
   );

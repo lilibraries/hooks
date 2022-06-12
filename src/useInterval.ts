@@ -1,10 +1,10 @@
 import useTimeout from "./useTimeout";
 
-function useInterval(callback: () => void, ms: number) {
+function useInterval(callback: () => void, interval: number) {
   const [start, cancel] = useTimeout(() => {
     callback();
     start();
-  }, ms);
+  }, interval);
 
   return [start, cancel] as const;
 }
