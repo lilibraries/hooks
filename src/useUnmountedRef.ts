@@ -2,13 +2,13 @@ import { useRef } from "react";
 import useUnmount from "./useUnmount";
 
 function useUnmountedRef() {
-  const mountedRef = useRef(false);
+  const unmountedRef = useRef(false);
 
   useUnmount(() => {
-    mountedRef.current = true;
+    unmountedRef.current = true;
   });
 
-  return mountedRef;
+  return unmountedRef;
 }
 
 export default useUnmountedRef;
