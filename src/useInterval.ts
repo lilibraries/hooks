@@ -1,6 +1,6 @@
 import useTimeout from "./useTimeout";
 
-function useInterval(callback: () => void, interval: number) {
+function useInterval(callback: () => void, interval?: number) {
   const [start, cancel] = useTimeout(() => {
     callback();
     start();

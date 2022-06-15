@@ -10,14 +10,14 @@ Loop run callback.
 ```ts
 function useInterval(
   callback: () => void,
-  interval: number
+  interval?: number
 ): [start: () => void, cancel: () => void];
 ```
 
 Params:
 
 - **`callback`:** the function that is called at intervals.
-- **`interval`:** required interval time, in milliseconds.
+- **`interval`:** optional interval time, in milliseconds.
 
 Results:
 
