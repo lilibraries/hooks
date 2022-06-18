@@ -8,12 +8,12 @@ Set document title.
 ## API
 
 ```ts
-function useTitle(title: string, options?: { restore?: boolean }): void;
+function useTitle(title?: string, options?: { restore?: boolean }): void;
 ```
 
 Params:
 
-- **`title`:** document title.
+- **`title`:** document title. If it's falsy, do nothing.
 - **`options.restore`:** restore previous title on the component unmount.
 
 ## Example
