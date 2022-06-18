@@ -10,10 +10,10 @@ Use throttled callback.
 ```ts
 function useThrottle<T extends (...args: any[]) => any>(
   callback: T,
-  options: number | { wait: number; leading?: boolean; trailing?: boolean }
+  options?: number | { wait?: number; leading?: boolean; trailing?: boolean }
 ): [
-  throttledCallback: (...args: Parameters<T>) => ReturnType<T> | undefined,
-  {
+  throttled: (...args: Parameters<T>) => ReturnType<T> | undefined,
+  actions: {
     flush: () => ReturnType<T> | undefined;
     cancel: () => void;
   }
@@ -24,15 +24,15 @@ Params:
 
 - **`callback`:** original callback function.
 - **`options`:** throttle wait time or an options object.
-  - **`options.wait`:** throttle wait time, in milliseconds.
-  - **`options.leading`:** run callback on the leading edge, default is false.
-  - **`options.trailing`:** run callback on the trailing edge, default is true.
+  - **`options.wait`:** throttle wait time, in milliseconds, default is `0`.
+  - **`options.leading`:** run callback on the leading edge, default is `false`.
+  - **`options.trailing`:** run callback on the trailing edge, default is `true`.
 
 Results:
 
-- **`throttledCallback`:** throttled callback.
-- **`flush`:** flush funciton, run callback immediately.
-- **`cancel`:** cancel throttle timer.
+- **`throttled`:** throttled callback.
+- **`actions.flush`:** flush funciton, run callback immediately.
+- **`actions.cancel`:** cancel throttle timer.
 
 ## Example
 

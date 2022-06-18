@@ -20,12 +20,12 @@ module.exports = {
       type: "category",
       label: "States",
       items: [
+        "useToggle",
+        "useThrottled",
+        "useDebounced",
         "useSetState",
         "useSafeState",
         "useControllableState",
-        "useToggle",
-        "useDebounced",
-        "useThrottled",
       ],
     },
     {
@@ -34,8 +34,8 @@ module.exports = {
       items: [
         "usePersist",
         "useRerender",
-        "useDebounce",
         "useThrottle",
+        "useDebounce",
         "useTimeout",
         "useInterval",
         "useRaf",

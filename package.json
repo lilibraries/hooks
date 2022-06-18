@@ -47,7 +47,11 @@
   "dependencies": {
     "@babel/runtime-corejs3": "^7.18.3",
     "@types/js-cookie": "^3.0.2",
-    "js-cookie": "^3.0.1"
+    "@types/lodash.debounce": "^4.0.7",
+    "@types/lodash.throttle": "^4.1.7",
+    "js-cookie": "^3.0.1",
+    "lodash.debounce": "^4.0.8",
+    "lodash.throttle": "^4.1.1"
   },
   "devDependencies": {
     "@babel/cli": "^7.17.10",

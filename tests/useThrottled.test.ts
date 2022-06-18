@@ -210,7 +210,7 @@ describe("useThrottled", () => {
     act(() => {
       clock.tick(11);
     });
-    expect(result.current[0]).toBe(9);
+    expect(result.current[0]).toBe(8);
   });
 
   it("should flush and cancel correctly", () => {

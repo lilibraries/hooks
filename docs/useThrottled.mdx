@@ -10,10 +10,10 @@ Throttle a value.
 ```ts
 function useThrottled<T = any>(
   value: T,
-  options: number | { wait: number; leading?: boolean; trailing?: boolean }
+  options?: number | { wait?: number; leading?: boolean; trailing?: boolean }
 ): [
-  throttledValue: T,
-  {
+  throttled: T,
+  actions: {
     flush: (finalValue?: T) => void;
     cancel: () => void;
   }
@@ -24,15 +24,15 @@ Params:
 
 - **`value`:** the value that will be changed.
 - **`options`:** throttle wait time or an options object.
-  - **`options.wait`:** throttle wait time, in milliseconds.
-  - **`options.leading`:** change throttledValue on the leading edge, default is false.
-  - **`options.trailing`:** change throttledValue on the trailing edge, default is true.
+  - **`options.wait`:** throttle wait time, in milliseconds, default is `0`.
+  - **`options.leading`:** change throttled value on the leading edge, default is `false`.
+  - **`options.trailing`:** change throttled value on the trailing edge, default is `true`.
 
 Results:
 
-- **`throttledValue`:** throttled value.
-- **`flush`:** flush funciton. The finalValue will be returned as throttledValue if it is specified.
-- **`cancel`:** cancel throttle timer.
+- **`throttled`:** throttled value.
+- **`actions.flush`:** flush funciton. The `finalValue` will be returned as `throttled` if it is specified.
+- **`actions.cancel`:** cancel throttle timer.
 
 ## Example
 

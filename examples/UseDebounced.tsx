@@ -18,8 +18,8 @@ function Example() {
     <>
       <p>
         Actions:{" "}
-        <button onClick={() => setWait(random())}>Change wait time</button>
-        <button onClick={() => toggleLeading()}>Toggle leading</button>
+        <button onClick={() => setWait(random())}>Change wait time</button>{" "}
+        <button onClick={() => toggleLeading()}>Toggle leading</button>{" "}
         <button onClick={() => toggleTrailing()}>Toggle trailing</button>
       </p>
       <p>
@@ -33,11 +33,11 @@ function Example() {
           onChange={(event) => {
             setValue(event.target.value);
           }}
-        />
-        <button onClick={() => flush()}>Flush</button>
+        />{" "}
+        <button onClick={() => flush()}>Flush</button>{" "}
         <button onClick={() => flush("final value")}>
           Flush with "final value"
-        </button>
+        </button>{" "}
         <button onClick={cancel}>Cancel</button>
       </p>
       <div>Debounced value: {debouncedValue}</div>

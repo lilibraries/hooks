@@ -64,7 +64,7 @@ describe("useThrottle", () => {
     expect(mock).not.toBeCalled();
   });
 
-  it("should trigger callback on the leading edge by default", () => {
+  it("should trigger callback on the trailing edge by default", () => {
     const mock = jest.fn();
     const { result } = renderHook(() => useThrottle(mock, 10));
     const [throttled] = result.current;
@@ -105,10 +105,14 @@ describe("useThrottle", () => {
     clock.tick(5);
     act(() => throttled());
     expect(mock).toBeCalledTimes(3);
+    clock.tick(5);
+    act(() => throttled());
     clock.tick(100);
     expect(mock).toBeCalledTimes(4);
     act(() => throttled());
     expect(mock).toBeCalledTimes(5);
+    clock.tick(5);
+    act(() => throttled());
     clock.tick(100);
     expect(mock).toBeCalledTimes(6);
   });
@@ -176,6 +180,8 @@ describe("useThrottle", () => {
     rerender({ wait: 10, leading: true, trailing: true });
     act(() => throttled());
     expect(mock).toBeCalledTimes(2);
+    clock.tick(5);
+    act(() => throttled());
     clock.tick(100);
     expect(mock).toBeCalledTimes(3);
 
@@ -189,73 +195,9 @@ describe("useThrottle", () => {
     clock.tick(5);
     rerender({ wait: 20, leading: false, trailing: true });
     clock.tick(10);
-    expect(mock).toBeCalledTimes(4);
+    expect(mock).toBeCalledTimes(5);
     clock.tick(5);
     expect(mock).toBeCalledTimes(5);
-  });
-
-  it("should return value correctly", () => {
-    let count = 0;
-    let sum: number | undefined;
-    const mock = jest.fn(() => ++count);
-    const { result, rerender } = renderHook(
-      (options) => useThrottle(mock, options),
-      { initialProps: { wait: 10, leading: false, trailing: true } }
-    );
-    const [throttled] = result.current;
-
-    act(() => {
-      sum = throttled();
-    });
-    expect(count).toBe(0);
-    expect(sum).toBeUndefined();
-    clock.tick(10);
-    expect(count).toBe(1);
-    expect(sum).toBeUndefined();
-    act(() => {
-      sum = throttled();
-    });
-    expect(count).toBe(1);
-    expect(sum).toBe(1);
-    clock.tick(10);
-    expect(count).toBe(2);
-    expect(sum).toBe(1);
-
-    rerender({ wait: 10, leading: true, trailing: false });
-    act(() => {
-      sum = throttled();
-    });
-    expect(count).toBe(3);
-    expect(sum).toBe(3);
-    clock.tick(10);
-    expect(count).toBe(3);
-    expect(sum).toBe(3);
-    act(() => {
-      sum = throttled();
-    });
-    expect(count).toBe(4);
-    expect(sum).toBe(4);
-    clock.tick(100);
-    expect(count).toBe(4);
-    expect(sum).toBe(4);
-
-    rerender({ wait: 10, leading: true, trailing: true });
-    act(() => {
-      sum = throttled();
-    });
-    expect(count).toBe(5);
-    expect(sum).toBe(5);
-    clock.tick(10);
-    expect(count).toBe(6);
-    expect(sum).toBe(5);
-    act(() => {
-      sum = throttled();
-    });
-    expect(count).toBe(7);
-    expect(sum).toBe(7);
-    clock.tick(100);
-    expect(count).toBe(8);
-    expect(sum).toBe(7);
   });
 
   it("should flush and cancel correctly", () => {

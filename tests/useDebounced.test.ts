@@ -208,7 +208,7 @@ describe("useDebounced", () => {
     act(() => {
       clock.tick(19);
     });
-    expect(result.current[0]).toBe(7);
+    expect(result.current[0]).toBe(8);
     act(() => {
       clock.tick(1);
     });

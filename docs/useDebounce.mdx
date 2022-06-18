@@ -10,10 +10,12 @@ Use debounced callback.
 ```ts
 function useDebounce<T extends (...args: any[]) => any>(
   callback: T,
-  options: number | { wait: number; leading?: boolean; trailing?: boolean }
+  options?:
+    | number
+    | { wait?: number; maxWait?: number; leading?: boolean; trailing?: boolean }
 ): [
-  debouncedCallback: (...args: Parameters<T>) => ReturnType<T> | undefined,
-  {
+  debounced: (...args: Parameters<T>) => ReturnType<T> | undefined,
+  actions: {
     flush: () => ReturnType<T> | undefined;
     cancel: () => void;
   }
@@ -24,15 +26,16 @@ Params:
 
 - **`callback`:** original callback function.
 - **`options`:** debounce wait time or an options object.
-  - **`options.wait`:** debounce wait time, in milliseconds.
-  - **`options.leading`:** run callback on the leading edge, default is false.
-  - **`options.trailing`:** run callback on the trailing edge, default is true.
+  - **`options.wait`:** debounce wait time, in milliseconds, default is `0`.
+  - **`options.maxWait`:** max wait time, in milliseconds, default is `Infinity`.
+  - **`options.leading`:** run callback on the leading edge, default is `false`.
+  - **`options.trailing`:** run callback on the trailing edge, default is `true`.
 
 Results:
 
-- **`debouncedCallback`:** debounced callback.
-- **`flush`:** flush funciton, run callback immediately.
-- **`cancel`:** cancel debounce timer.
+- **`debounced`:** debounced callback.
+- **`actions.flush`:** flush funciton, run callback immediately.
+- **`actions.cancel`:** cancel debounce timer.
 
 ## Example
 
