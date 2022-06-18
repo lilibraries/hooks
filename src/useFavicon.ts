@@ -1,8 +1,8 @@
-import { extname } from "./utils";
 import useCreate from "./useCreate";
 import useUnmount from "./useUnmount";
 import useMountedRef from "./useMountedRef";
 import usePreviousRef from "./usePreviousRef";
+import extname from "./utils/extname";
 
 const mimes = {
   ico: "image/x-icon",

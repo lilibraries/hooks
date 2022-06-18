@@ -1,5 +1,4 @@
 import { useRef, useState } from "react";
-import { is } from "./utils";
 import useUpdate from "./useUpdate";
 import usePersist from "./usePersist";
 import useLatestRef from "./useLatestRef";
@@ -17,7 +16,7 @@ function createDebouncedValueHook(throttle: boolean = false) {
     const debouncedValueRef = useRef(debouncedValue);
 
     function changeValue(newValue: T) {
-      if (!is(debouncedValueRef.current, newValue)) {
+      if (!Object.is(debouncedValueRef.current, newValue)) {
         debouncedValueRef.current = newValue;
         setDebouncedValue(newValue);
       }
