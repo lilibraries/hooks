@@ -23,6 +23,7 @@ module.exports = {
         "useToggle",
         "useThrottled",
         "useDebounced",
+        "useMemoized",
         "useSetState",
         "useSafeState",
         "useControllableState",

@@ -22,18 +22,19 @@ export { default as useLayoutTargetEffect } from "./useLayoutTargetEffect";
 export { default as useIsomorphicLayoutEffect } from "./useIsomorphicLayoutEffect";
 
 // States
+export { default as useToggle } from "./useToggle";
+export { default as useThrottled } from "./useThrottled";
+export { default as useDebounced } from "./useDebounced";
+export { default as useMemoized } from "./useMemoized";
 export { default as useSetState } from "./useSetState";
 export { default as useSafeState } from "./useSafeState";
 export { default as useControllableState } from "./useControllableState";
-export { default as useToggle } from "./useToggle";
-export { default as useDebounced } from "./useDebounced";
-export { default as useThrottled } from "./useThrottled";
 
 // Callbacks
 export { default as usePersist } from "./usePersist";
 export { default as useRerender } from "./useRerender";
-export { default as useDebounce } from "./useDebounce";
 export { default as useThrottle } from "./useThrottle";
+export { default as useDebounce } from "./useDebounce";
 export { default as useTimeout } from "./useTimeout";
 export { default as useInterval } from "./useInterval";
 export { default as useRaf } from "./useRaf";
