@@ -17,6 +17,7 @@ describe("useIdle", () => {
     const [start1, cancel1] = result.current;
     rerender();
     const [start2, cancel2] = result.current;
+
     expect(start1).toBe(start2);
     expect(cancel1).toBe(cancel2);
   });
@@ -27,10 +28,12 @@ describe("useIdle", () => {
     const [start] = result.current;
 
     expect(mock).not.toBeCalled();
+
     act(() => {
       start();
     });
     expect(mock).not.toBeCalled();
+
     act(() => {
       clock.runToFrame();
     });
@@ -43,10 +46,12 @@ describe("useIdle", () => {
     const [start, cancel] = result.current;
 
     expect(mock).not.toBeCalled();
+
     act(() => {
       start();
     });
     expect(mock).not.toBeCalled();
+
     act(() => {
       cancel();
     });
@@ -62,10 +67,12 @@ describe("useIdle", () => {
     const [start] = result.current;
 
     expect(mock).not.toBeCalled();
+
     act(() => {
       start();
     });
     expect(mock).not.toBeCalled();
+
     unmount();
     act(() => {
       clock.runToFrame();
@@ -88,6 +95,7 @@ describe("useIdle", () => {
     act(() => {
       clock.runToFrame();
     });
+
     expect(mock1).not.toBeCalled();
     expect(mock2).toBeCalledTimes(1);
   });

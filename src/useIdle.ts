@@ -1,42 +1,44 @@
-import { useCallback, useRef } from "react";
+import { useRef } from "react";
 import usePersist from "./usePersist";
 import useUnmount from "./useUnmount";
+import useLatestRef from "./useLatestRef";
 
-function requestIdleCallbackPolyfill(callback: () => void) {
-  return setTimeout(callback, 1);
-}
-function cancelIdleCallbackPolyfill(id: ReturnType<typeof setTimeout>) {
-  clearTimeout(id);
-}
+const hasNative =
+  typeof window !== "undefined" &&
+  !!window.requestIdleCallback &&
+  !!window.cancelIdleCallback;
 
-let requestIdleCallback = requestIdleCallbackPolyfill;
-let cancelIdleCallback = cancelIdleCallbackPolyfill;
-
-if (typeof window !== "undefined") {
-  if (
-    (window as any).requestIdleCallback &&
-    (window as any).cancelIdleCallback
-  ) {
-    requestIdleCallback = (window as any).requestIdleCallback;
-    cancelIdleCallback = (window as any).cancelIdleCallback;
+const requestIdleCallback = (callback: () => void) => {
+  if (hasNative) {
+    return window.requestIdleCallback(callback);
+  } else {
+    return +setTimeout(callback, 1);
   }
-}
+};
+
+const cancelIdleCallback = (id: number) => {
+  if (hasNative) {
+    window.cancelIdleCallback(id);
+  } else {
+    clearTimeout(id);
+  }
+};
 
 function useIdle(callback: () => void) {
-  const timerRef = useRef<ReturnType<typeof requestIdleCallback>>();
-  const handler = usePersist(callback);
+  const timerRef = useRef<number>();
+  const callbackRef = useLatestRef(callback);
 
-  const cancel = useCallback(() => {
+  const cancel = usePersist(() => {
     if (timerRef.current !== undefined) {
       cancelIdleCallback(timerRef.current);
       timerRef.current = undefined;
     }
-  }, []);
+  });
 
   const start = usePersist(() => {
     cancel();
     timerRef.current = requestIdleCallback(() => {
-      handler();
+      callbackRef.current();
     });
   });
 
