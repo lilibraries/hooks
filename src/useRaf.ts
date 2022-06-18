@@ -1,22 +1,24 @@
-import { useCallback, useRef } from "react";
+import { useRef } from "react";
+import raf from "raf";
 import useUnmount from "./useUnmount";
 import usePersist from "./usePersist";
+import useLatestRef from "./useLatestRef";
 
 function useRaf(callback: () => void) {
   const timerRef = useRef<number>();
-  const handler = usePersist(callback);
+  const callbackRef = useLatestRef(callback);
 
-  const cancel = useCallback(() => {
+  const cancel = usePersist(() => {
     if (timerRef.current !== undefined) {
-      cancelAnimationFrame(timerRef.current);
+      raf.cancel(timerRef.current);
       timerRef.current = undefined;
     }
-  }, []);
+  });
 
   const start = usePersist(() => {
     cancel();
-    timerRef.current = requestAnimationFrame(() => {
-      handler();
+    timerRef.current = raf(() => {
+      callbackRef.current();
     });
   });
 

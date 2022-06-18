@@ -1,8 +1,3 @@
-import CodeBlock from "@theme/CodeBlock";
-import ExampleBlock from "../examples/ExampleBlock";
-import Example from "../examples/UseNextFrame";
-import ExampleCode from "!!raw-loader!../examples/UseNextFrame";
-
 Ensure the callback is invoked after the current paiting.
 
 ## API
@@ -19,12 +14,18 @@ Params:
 
 Results:
 
-- **`start`:** schedule function.
+- **`start`:** start function.
 - **`cancel`:** cancel function.
 
 ## Example
 
-<ExampleBlock>
-  <Example />
-</ExampleBlock>
-<CodeBlock language="tsx">{ExampleCode}</CodeBlock>
+```tsx
+import React from "react";
+import { useNextFrame } from "@lilib/hooks";
+
+function Example() {
+  const [start, cancel] = useNextFrame(() => {
+    // Do something
+  });
+}
+```

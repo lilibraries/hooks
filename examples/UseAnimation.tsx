@@ -19,16 +19,21 @@ for (let type in Easing) {
 function Example() {
   const [algorithmName, setAlgorithmName] = useState(options[0]);
   const [percent, setPercent] = useState(0);
-  const [start, cancel] = useAnimation((percent) => setPercent(percent), {
-    duration: 1000,
-    algorithm: algorithms[algorithmName],
-  });
+  const [start, cancel] = useAnimation(
+    (percent) => {
+      setPercent(percent);
+    },
+    {
+      duration: 1000,
+      algorithm: algorithms[algorithmName],
+    }
+  );
 
   return (
     <>
       <div>
-        <button onClick={start}>Start</button>
-        <button onClick={cancel}>Cancel</button>
+        <button onClick={start}>Start</button>{" "}
+        <button onClick={cancel}>Cancel</button>{" "}
         <select
           value={algorithmName}
           onChange={(event) => {

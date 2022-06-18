@@ -37,12 +37,12 @@ module.exports = {
         "useRerender",
         "useThrottle",
         "useDebounce",
-        "useTimeout",
-        "useInterval",
         "useRaf",
         "useIdle",
-        "useNextFrame",
+        "useTimeout",
+        "useInterval",
         "useAnimation",
+        "useNextFrame",
       ],
     },
     {
@@ -58,7 +58,7 @@ module.exports = {
     },
     {
       type: "category",
-      label: "BOM and DOM",
+      label: "Browser",
       items: [
         "useTitle",
         "useFavicon",

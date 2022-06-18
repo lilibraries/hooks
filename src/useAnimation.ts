@@ -1,6 +1,10 @@
 import { useCallback, useRef } from "react";
+import raf from "raf";
 import useUnmount from "./useUnmount";
 import usePersist from "./usePersist";
+import useLatestRef from "./useLatestRef";
+import isObject from "./utils/isObject";
+import isFunction from "./utils/isFunction";
 
 function useAnimation(
   callback: (percent: number) => void,
@@ -13,18 +17,18 @@ function useAnimation(
 
   if (typeof options === "number") {
     duration = options;
-  } else if (typeof options === "object" && options !== null) {
-    if ("duration" in options) {
+  } else if (isObject(options)) {
+    if (options.duration !== undefined) {
       duration = +options.duration;
     }
-    if (typeof options.algorithm === "function") {
+    if (isFunction(options.algorithm)) {
       algorithm = options.algorithm;
     }
   }
 
   const timerRef = useRef<number>();
   const startTimeRef = useRef<number>();
-  const handler = usePersist(callback);
+  const callbackRef = useLatestRef(callback);
 
   const step = usePersist((timestamp: number) => {
     if (startTimeRef.current === undefined) {
@@ -38,19 +42,19 @@ function useAnimation(
     if (percent > 1) percent = 1;
 
     if (percent < 1) {
-      timerRef.current = requestAnimationFrame(step);
+      timerRef.current = raf(step);
     }
 
     if (algorithm) {
-      handler(algorithm(percent));
+      callbackRef.current(algorithm(percent));
     } else {
-      handler(percent);
+      callbackRef.current(percent);
     }
   });
 
   const cancel = useCallback(() => {
     if (timerRef.current !== undefined) {
-      cancelAnimationFrame(timerRef.current);
+      raf.cancel(timerRef.current);
       timerRef.current = undefined;
     }
     startTimeRef.current = undefined;
@@ -58,7 +62,7 @@ function useAnimation(
 
   const start = usePersist(() => {
     cancel();
-    timerRef.current = requestAnimationFrame(step);
+    timerRef.current = raf(step);
   });
 
   useUnmount(cancel);
