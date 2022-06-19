@@ -24,18 +24,18 @@ function useDebounced<T = any>(
 
 Params:
 
-- **`value`:** the value that will be changed.
-- **`options`:** debounce wait time or an options object.
-  - **`options.wait`:** debounce wait time, in milliseconds, default is `0`.
-  - **`options.maxWait`:** max wait time, in milliseconds, default is `Infinity`.
-  - **`options.leading`:** change debounced value on the leading edge, default is `false`.
-  - **`options.trailing`:** change debounced value on the trailing edge, default is `true`.
+- **`value`:** The value that will be changed.
+- **`options`:** Debounce wait time or an options object.
+  - **`options.wait`:** Debounce wait time, in milliseconds. Default is `0`.
+  - **`options.maxWait`:** Max wait time, in milliseconds. Default is `Infinity`.
+  - **`options.leading`:** Change debounced value on the leading edge. Default is `false`.
+  - **`options.trailing`:** Change debounced value on the trailing edge. Default is `true`.
 
 Results:
 
-- **`debounced`:** debounced value.
-- **`actions.flush`:** flush funciton. The `finalValue` will be returned as `debounced` if it is specified.
-- **`actions.cancel`:** cancel debounce timer.
+- **`debounced`:** Debounced value.
+- **`actions.flush`:** Flush funciton. The `finalValue` will be returned as `debounced` if it is specified.
+- **`actions.cancel`:** Cancel debounce timer.
 
 ## Example
 

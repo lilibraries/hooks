@@ -22,17 +22,17 @@ function useThrottle<T extends (...args: any[]) => any>(
 
 Params:
 
-- **`callback`:** original callback function.
-- **`options`:** throttle wait time or an options object.
-  - **`options.wait`:** throttle wait time, in milliseconds, default is `0`.
-  - **`options.leading`:** run callback on the leading edge, default is `false`.
-  - **`options.trailing`:** run callback on the trailing edge, default is `true`.
+- **`callback`:** Original callback function.
+- **`options`:** Throttle wait time or an options object.
+  - **`options.wait`:** Throttle wait time, in milliseconds. Default is `0`.
+  - **`options.leading`:** Run callback on the leading edge. Default is `false`.
+  - **`options.trailing`:** Run callback on the trailing edge. Default is `true`.
 
 Results:
 
-- **`throttled`:** throttled callback.
-- **`actions.flush`:** flush funciton, run callback immediately.
-- **`actions.cancel`:** cancel throttle timer.
+- **`throttled`:** Throttled callback.
+- **`actions.flush`:** Flush funciton. Run callback immediately.
+- **`actions.cancel`:** Cancel throttle timer.
 
 ## Example
 

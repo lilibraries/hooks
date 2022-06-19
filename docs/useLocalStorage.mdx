@@ -26,17 +26,17 @@ function useLocalStorage<T = any>(
 
 Params:
 
-- **`key`:** localStorage key.
-- **`defaultValue`:** default value.
-- **`options.serialize`:** options object.
-  - **`options.serialize`:** serialization function, default is `JSON.stringify`.
-  - **`options.deserialize`:** deserialization function, default is `JSON.parse`.
+- **`key`:** `localStorage` key.
+- **`defaultValue`:** Default value.
+- **`options.serialize`:** Options object.
+  - **`options.serialize`:** Serialization function, default is `JSON.stringify`.
+  - **`options.deserialize`:** Deserialization function, default is `JSON.parse`.
 
 Results:
 
-- **`value`:** parsed by the deserialization function.
-- **`set`:** the function that used to set localStorage.
-- **`remove`:** the function that used to remove localStorage.
+- **`value`:** Parsed by the deserialization function.
+- **`set`:** The function that used to set localStorage.
+- **`remove`:** The function that used to remove localStorage.
 
 ## Example
 

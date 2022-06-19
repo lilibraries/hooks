@@ -22,17 +22,17 @@ function useThrottled<T = any>(
 
 Params:
 
-- **`value`:** the value that will be changed.
-- **`options`:** throttle wait time or an options object.
-  - **`options.wait`:** throttle wait time, in milliseconds, default is `0`.
-  - **`options.leading`:** change throttled value on the leading edge, default is `false`.
-  - **`options.trailing`:** change throttled value on the trailing edge, default is `true`.
+- **`value`:** The value that will be changed.
+- **`options`:** Throttle wait time or an options object.
+  - **`options.wait`:** Throttle wait time, in milliseconds. Default is `0`.
+  - **`options.leading`:** Change throttled value on the leading edge. Default is `false`.
+  - **`options.trailing`:** Change throttled value on the trailing edge. Default is `true`.
 
 Results:
 
-- **`throttled`:** throttled value.
-- **`actions.flush`:** flush funciton. The `finalValue` will be returned as `throttled` if it is specified.
-- **`actions.cancel`:** cancel throttle timer.
+- **`throttled`:** Throttled value.
+- **`actions.flush`:** Flush funciton. The `finalValue` will be returned as `throttled` if it is specified.
+- **`actions.cancel`:** Cancel throttle timer.
 
 ## Example
 

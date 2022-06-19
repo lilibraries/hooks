@@ -24,18 +24,18 @@ function useDebounce<T extends (...args: any[]) => any>(
 
 Params:
 
-- **`callback`:** original callback function.
-- **`options`:** debounce wait time or an options object.
-  - **`options.wait`:** debounce wait time, in milliseconds, default is `0`.
-  - **`options.maxWait`:** max wait time, in milliseconds, default is `Infinity`.
-  - **`options.leading`:** run callback on the leading edge, default is `false`.
-  - **`options.trailing`:** run callback on the trailing edge, default is `true`.
+- **`callback`:** Original callback function.
+- **`options`:** Debounce wait time or an options object.
+  - **`options.wait`:** Debounce wait time, in milliseconds. Default is `0`.
+  - **`options.maxWait`:** Max wait time, in milliseconds. Default is `Infinity`.
+  - **`options.leading`:** Run callback on the leading edge. Default is `false`.
+  - **`options.trailing`:** Run callback on the trailing edge. Default is `true`.
 
 Results:
 
-- **`debounced`:** debounced callback.
-- **`actions.flush`:** flush funciton, run callback immediately.
-- **`actions.cancel`:** cancel debounce timer.
+- **`debounced`:** Debounced callback.
+- **`actions.flush`:** Flush funciton. Run callback immediately.
+- **`actions.cancel`:** Cancel debounce timer.
 
 ## Example
 
