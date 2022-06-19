@@ -49,13 +49,14 @@ export { default as useMergedRef } from "./useMergedRef";
 export { default as useMountedRef } from "./useMountedRef";
 export { default as useUnmountedRef } from "./useUnmountedRef";
 
-// BOM and DOM
+// Browser
 export { default as useTitle } from "./useTitle";
-export { default as useOnline } from "./useOnline";
 export { default as useFavicon } from "./useFavicon";
+export { default as useOnline } from "./useOnline";
 export { default as useDarkMode } from "./useDarkMode";
-export { default as useWindowSize } from "./useWindowSize";
 export { default as usePageVisible } from "./usePageVisible";
+export { default as useMatchMedia } from "./useMatchMedia";
+export { default as useWindowSize } from "./useWindowSize";
 export { default as useEventListener } from "./useEventListener";
 export { default as useCookie } from "./useCookie";
 export { default as useLocalStorage } from "./useLocalStorage";

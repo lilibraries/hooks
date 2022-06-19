@@ -1,0 +1,19 @@
+import CodeBlock from "@theme/CodeBlock";
+import ExampleBlock from "../examples/ExampleBlock";
+import Example from "../examples/UseMatchMedia";
+import ExampleCode from "!!raw-loader!../examples/UseMatchMedia";
+
+Use [`window.matchMedia()`](https://developer.mozilla.org/en-US/docs/Web/API/Window/matchMedia) to determine if the document matches the media query string.
+
+## API
+
+```ts
+function useMatchMedia(query: string): boolean;
+```
+
+## Example
+
+<ExampleBlock>
+  <Example />
+</ExampleBlock>
+<CodeBlock language="tsx">{ExampleCode}</CodeBlock>
