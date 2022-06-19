@@ -1,8 +1,8 @@
-import useCreate from "./useCreate";
+import { useMemo } from "react";
 import useUnmount from "./useUnmount";
-import useMountedRef from "./useMountedRef";
 import usePreviousRef from "./usePreviousRef";
 import extname from "./utils/extname";
+import isBrowser from "./utils/isBrowser";
 
 const mimes = {
   ico: "image/x-icon",
@@ -10,45 +10,63 @@ const mimes = {
   gif: "image/gif",
 };
 
-function useFavicon(href: string, options?: { restore?: boolean }) {
-  const restore = options ? !!options.restore : false;
-  const head = useCreate(() => document.getElementsByTagName("head")[0]);
+function getHead() {
+  if (isBrowser) {
+    return document.getElementsByTagName("head")[0];
+  }
+}
 
-  const oldIconData = useCreate(() => {
-    const link = document.querySelector("link[rel*='icon']") as HTMLLinkElement;
-    if (link) return { type: link.type, rel: link.rel, href: link.href };
-  });
+function getLink() {
+  if (isBrowser) {
+    return document.querySelector("link[rel*='icon']") as HTMLLinkElement;
+  }
+}
 
-  const link =
-    (document.querySelector("link[rel*='icon']") as HTMLLinkElement) ||
-    document.createElement("link");
-
-  const mountedRef = useMountedRef();
+function useFavicon(
+  href?: string,
+  options?: { mime?: string; restore?: boolean }
+) {
+  const { mime, restore } = options || {};
   const prevHrefRef = usePreviousRef(href);
 
-  if (!mountedRef.current || prevHrefRef.current !== href) {
+  const oldIconData = useMemo(() => {
+    if (isBrowser) {
+      const link = getLink();
+      if (link) {
+        return { type: link.type, rel: link.rel, href: link.href };
+      }
+    }
+  }, []);
+
+  if (isBrowser && href && href !== prevHrefRef.current) {
+    const link = getLink() || document.createElement("link");
+
     link.href = href;
     link.rel = "shortcut icon";
-    link.type = mimes[extname(href) as keyof typeof mimes] || mimes.ico;
+    link.type = mime || mimes[extname(href) as keyof typeof mimes] || mimes.ico;
 
-    if (!document.querySelector("link[rel*='icon']")) {
-      head.appendChild(link);
+    if (!getLink()) {
+      const head = getHead();
+      head?.appendChild(link);
     }
   }
 
   useUnmount(() => {
-    if (restore) {
+    if (isBrowser && restore) {
       if (oldIconData === undefined) {
-        head.removeChild(link);
+        const head = getHead();
+        const link = getLink();
+        link && head?.removeChild(link);
       } else {
-        link.type = oldIconData.type;
-        link.rel = oldIconData.rel;
-        link.href = oldIconData.href;
+        const link = getLink();
+        if (link) {
+          link.type = oldIconData.type;
+          link.rel = oldIconData.rel;
+          link.href = oldIconData.href;
+        }
       }
     }
   });
 }
 
-const useNoop: typeof useFavicon = () => {};
-
-export default typeof document !== "undefined" ? useFavicon : useNoop;
+export default useFavicon;

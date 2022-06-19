@@ -3,12 +3,16 @@ Set document favicon.
 ## API
 
 ```ts
-function useFavicon(href: string, options?: { restore?: boolean }): void;
+function useFavicon(
+  href?: string,
+  options?: { mime?: string; restore?: boolean }
+): void;
 ```
 
 Params:
 
-- **`href`:** favicon url.
+- **`href`:** favicon url. If it's falsy, do nothing.
+- **`options.mime`:** specify the MIME type. Get automatically according to `href` extname.
 - **`options.restore`:** restore previous favicon on the component unmount.
 
 ## Example
@@ -18,7 +22,7 @@ import React from "react";
 import { useFavicon } from "@lilib/hooks";
 
 function Example() {
-  useFavicon("https://reactjs.org/favicon.ico", { restore: true });
+  useFavicon("https://example.com/favicon.ico", { restore: true });
   ...
 }
 ```
