@@ -1,21 +1,7 @@
-import { useState } from "react";
-import useCreate from "./useCreate";
-import useEventListener from "./useEventListener";
+import useMatchMedia from "./useMatchMedia";
 
-const query = "(prefers-color-scheme: dark)";
-
-function useDarkTheme(): boolean {
-  const media = useCreate(() => window.matchMedia(query));
-  const [dark, setDark] = useState(media.matches);
-
-  useEventListener(media, "change", (event: MediaQueryListEvent) => {
-    setDark(event.matches);
-  });
-
-  return dark;
+function useDarkMode(): boolean {
+  return useMatchMedia("(prefers-color-scheme: dark)");
 }
 
-const env =
-  typeof window !== "undefined" && typeof window.matchMedia !== "undefined";
-
-export default env ? useDarkTheme : () => false;
+export default useDarkMode;
