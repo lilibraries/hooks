@@ -4,14 +4,14 @@ Set document favicon.
 
 ```ts
 function useFavicon(
-  href?: string,
+  href: string,
   options?: { mime?: string; restore?: boolean }
 ): void;
 ```
 
 Params:
 
-- **`href`:** Favicon url. If it's falsy, do nothing.
+- **`href`:** Required favicon url. If it's an empty string, do nothing.
 - **`options.mime`:** Specify the MIME type. Get automatically according to `href` extname.
 - **`options.restore`:** Restore previous favicon on the component unmount.
 

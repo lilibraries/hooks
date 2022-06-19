@@ -23,7 +23,7 @@ function getLink() {
 }
 
 function useFavicon(
-  href?: string,
+  href: string,
   options?: { mime?: string; restore?: boolean }
 ) {
   const { mime, restore } = options || {};
