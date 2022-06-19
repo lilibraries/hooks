@@ -1,33 +1,41 @@
-Sets up the event listener to the target.
+import CodeBlock from "@theme/CodeBlock";
+import ExampleBlock from "../examples/ExampleBlock";
+import Example from "../examples/UseEventListener";
+import ExampleCode from "!!raw-loader!../examples/UseEventListener";
+
+Set up the event listener to the target.
 
 ## API
 
 ```ts
-function useEventListener<T extends EventTarget, E extends Event>(
-  target: T | null,
-  type: string,
-  listener: (this: T, event: E) => any,
+type Target<T> = T | undefined | null;
+type TargetCreator<T> =
+  | Target<T>
+  | (() => Target<T>)
+  | React.RefObject<Target<T>>
+  | React.MutableRefObject<Target<T>>;
+
+function useEventListener<
+  T extends EventTarget = EventTarget,
+  E extends Event = Event
+>(
+  target: TargetCreator<T>,
+  eventName: string,
+  listener: (event: E) => void,
   options?: boolean | { capture?: boolean; once?: boolean; passive?: boolean }
 ): void;
 ```
 
 Params:
 
-- **`target`:** event target. If it is null, do nothing.
-- **`type`:** event type.
-- **`listener`:** listener function.
-- **`options`:** same as the third parameter of the [`addEventListener`](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener) function.
+- **`target`:** Event target. It can be `undefined`, `null`, event target, a ref object or a function that returns a event target.
+- **`eventName`:** Event name.
+- **`listener`:** Listener function.
+- **`options`:** Similar to the third parameter of the [`addEventListener`](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener) function.
 
 ## Example
 
-```tsx
-import React from "react";
-import { useEventListener } from "@lilib/hooks";
-
-function Example() {
-  useEventListener(window, "click", () => {
-    // Do something
-  });
-  ...
-}
-```
+<ExampleBlock>
+  <Example />
+</ExampleBlock>
+<CodeBlock language="tsx">{ExampleCode}</CodeBlock>

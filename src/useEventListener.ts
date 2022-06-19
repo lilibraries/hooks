@@ -1,10 +1,17 @@
-import { useEffect } from "react";
 import usePersist from "./usePersist";
+import useTargetEffect from "./useTargetEffect";
+import isObject from "./utils/isObject";
+import getTarget from "./utils/getTarget";
+import isEventTarget from "./utils/isEventTarget";
+import { TargetCreator } from "./utils/types";
 
-function useEventListener<T extends EventTarget, E extends Event>(
-  target: T | null,
-  type: string,
-  listener: (this: T, event: E) => any,
+function useEventListener<
+  T extends EventTarget = EventTarget,
+  E extends Event = Event
+>(
+  target: TargetCreator<T>,
+  eventName: string,
+  listener: (event: E) => void,
   options?: boolean | AddEventListenerOptions
 ) {
   let capture: boolean | undefined;
@@ -13,29 +20,41 @@ function useEventListener<T extends EventTarget, E extends Event>(
 
   if (typeof options === "boolean") {
     capture = options;
-  } else if (typeof options === "object" && options !== null) {
-    if ("capture" in options) capture = !!options.capture;
-    if ("once" in options) once = !!options.once;
-    if ("passive" in options) passive = !!options.passive;
+  } else if (isObject(options)) {
+    if (options.capture !== undefined) {
+      capture = !!options.capture;
+    }
+    if (options.once !== undefined) {
+      once = !!options.once;
+    }
+    if (options.passive !== undefined) {
+      passive = !!options.passive;
+    }
   }
 
-  const handler = usePersist(listener);
+  const handler = usePersist(listener) as EventListener;
 
-  useEffect(() => {
-    if (target && target.addEventListener && target.removeEventListener) {
-      target.addEventListener(type, handler as EventListener, {
-        capture,
-        once,
-        passive,
-      });
+  useTargetEffect(
+    () => {
+      const element = getTarget(target);
 
-      return () => {
-        target.removeEventListener(type, handler as EventListener, {
+      if (isEventTarget(element)) {
+        element.addEventListener(eventName, handler, {
           capture,
+          once,
+          passive,
         });
-      };
-    }
-  }, [target, type, handler, capture, once, passive]);
+
+        return () => {
+          element.removeEventListener(eventName, handler, {
+            capture,
+          });
+        };
+      }
+    },
+    [eventName, capture, once, passive],
+    [target]
+  );
 }
 
 export default useEventListener;
