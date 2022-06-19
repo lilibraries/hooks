@@ -67,6 +67,7 @@ module.exports = {
         "usePageVisible",
         "useMatchMedia",
         "useWindowSize",
+        "useClickAway",
         "useEventListener",
         "useCookie",
         "useLocalStorage",

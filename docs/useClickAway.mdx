@@ -1,0 +1,36 @@
+import CodeBlock from "@theme/CodeBlock";
+import ExampleBlock from "../examples/ExampleBlock";
+import Example from "../examples/UseClickAway";
+import ExampleCode from "!!raw-loader!../examples/UseClickAway";
+
+Trigger a callback when clicking outside the target area.
+
+```ts
+type Target<T> = T | undefined | null;
+type TargetCreator<T> =
+  | Target<T>
+  | (() => Target<T>)
+  | React.RefObject<Target<T>>
+  | React.MutableRefObject<Target<T>>;
+
+function useClickAway<E extends Event = Event>(
+  target: TargetCreator<Node> | TargetCreator<Node>[],
+  listener: (event: E) => void,
+  options?: {
+    container?: TargetCreator<Element>;
+    eventName?: string | string[];
+  }
+): void;
+```
+
+- **`target`:** Target node or nodes.
+- **`listener`:** Listener function.
+- **`options.container`:** Container for binding events. Default is `document`.
+- **`options.eventName`:** Event name or names. Default is `"mousedown"`.
+
+## Example
+
+<ExampleBlock>
+  <Example />
+</ExampleBlock>
+<CodeBlock language="tsx">{ExampleCode}</CodeBlock>

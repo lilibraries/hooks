@@ -57,6 +57,7 @@ export { default as useDarkMode } from "./useDarkMode";
 export { default as usePageVisible } from "./usePageVisible";
 export { default as useMatchMedia } from "./useMatchMedia";
 export { default as useWindowSize } from "./useWindowSize";
+export { default as useClickAway } from "./useClickAway";
 export { default as useEventListener } from "./useEventListener";
 export { default as useCookie } from "./useCookie";
 export { default as useLocalStorage } from "./useLocalStorage";
