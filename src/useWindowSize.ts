@@ -1,22 +1,24 @@
 import { useState } from "react";
 import useEventListener from "./useEventListener";
+import isBrowser from "./utils/isBrowser";
 
 function useWindowSize() {
-  const [{ width, height }, setState] = useState({
-    width: window.innerWidth,
-    height: window.innerHeight,
+  const [{ width, height }, setState] = useState(() => {
+    if (isBrowser) {
+      return { width: window.innerWidth, height: window.innerHeight };
+    } else {
+      return { width: 0, height: 0 };
+    }
   });
 
   function listener() {
     setState({ width: window.innerWidth, height: window.innerHeight });
   }
 
-  useEventListener(window, "resize", listener);
-  useEventListener(window, "orientationchange", listener);
+  useEventListener(() => window, "resize", listener);
+  useEventListener(() => window, "orientationchange", listener);
 
   return { width, height } as const;
 }
 
-export default typeof window !== "undefined"
-  ? useWindowSize
-  : () => ({ width: 0, height: 0 });
+export default useWindowSize;
