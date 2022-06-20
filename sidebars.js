@@ -66,6 +66,7 @@ module.exports = {
         "useDarkMode",
         "usePageVisible",
         "useMatchMedia",
+        "useSize",
         "useWindowSize",
         "useClickAway",
         "useEventListener",

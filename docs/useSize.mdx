@@ -1,0 +1,40 @@
+import CodeBlock from "@theme/CodeBlock";
+import ExampleBlock from "../examples/ExampleBlock";
+import Example from "../examples/UseSize";
+import ExampleCode from "!!raw-loader!../examples/UseSize";
+
+Get DOM element size.
+
+## API
+
+```ts
+type Target<T> = T | undefined | null;
+type TargetCreator<T> =
+  | Target<T>
+  | (() => Target<T>)
+  | React.RefObject<Target<T>>
+  | React.MutableRefObject<Target<T>>;
+
+function useSize(target: TargetCreator<Element>): {
+  readonly width: number;
+  readonly height: number;
+};
+```
+
+Params:
+
+- **`target`:** A DOM element. It can be `undefined`, `null`, a DOM element, a ref object references a DOM element, or a function returns a DOM element.
+
+Results:
+
+- **`width`:** Element width. Default is `0`.
+- **`height`:** Element height. Default is `0`.
+
+## Example
+
+You can change the browser window size to see the effect.
+
+<ExampleBlock>
+  <Example />
+</ExampleBlock>
+<CodeBlock language="tsx">{ExampleCode}</CodeBlock>
