@@ -14,7 +14,7 @@ function useDebounce<T extends (...args: any[]) => any>(
     | number
     | { wait?: number; maxWait?: number; leading?: boolean; trailing?: boolean }
 ): [
-  debounced: (...args: Parameters<T>) => ReturnType<T> | undefined,
+  debouncedCallback: (...args: Parameters<T>) => ReturnType<T> | undefined,
   actions: {
     flush: () => ReturnType<T> | undefined;
     cancel: () => void;
@@ -33,7 +33,7 @@ Params:
 
 Results:
 
-- **`debounced`:** Debounced callback.
+- **`debouncedCallback`:** Debounced callback.
 - **`actions.flush`:** Flush funciton. Run callback immediately.
 - **`actions.cancel`:** Cancel debounce timer.
 

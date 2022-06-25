@@ -12,7 +12,7 @@ function useThrottle<T extends (...args: any[]) => any>(
   callback: T,
   options?: number | { wait?: number; leading?: boolean; trailing?: boolean }
 ): [
-  throttled: (...args: Parameters<T>) => ReturnType<T> | undefined,
+  throttledCallback: (...args: Parameters<T>) => ReturnType<T> | undefined,
   actions: {
     flush: () => ReturnType<T> | undefined;
     cancel: () => void;
@@ -30,9 +30,10 @@ Params:
 
 Results:
 
-- **`throttled`:** Throttled callback.
-- **`actions.flush`:** Flush funciton. Run callback immediately.
-- **`actions.cancel`:** Cancel throttle timer.
+- **`throttledCallback`:** Throttled callback.
+- **`actions`:** Actions object.
+  - **`actions.flush`:** Flush funciton. Run callback immediately.
+  - **`actions.cancel`:** Cancel throttle timer.
 
 ## Example
 

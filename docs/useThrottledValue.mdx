@@ -8,7 +8,7 @@ Throttle a value.
 ## API
 
 ```ts
-function useThrottledValue<T = any>(
+function useThrottledValue<T>(
   value: T,
   options?: number | { wait?: number; leading?: boolean; trailing?: boolean }
 ): [
