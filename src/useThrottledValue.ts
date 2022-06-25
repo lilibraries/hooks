@@ -4,17 +4,17 @@ import useSafeState from "./useSafeState";
 import useLatestRef from "./useLatestRef";
 import useThrottle, { ThrottleOptions } from "./useThrottle";
 
-function useThrottled<T>(value: T, options?: number | ThrottleOptions) {
+function useThrottledValue<T>(value: T, options?: number | ThrottleOptions) {
   const valueRef = useLatestRef(value);
-  const [throttled, setThrottled] = useSafeState(value);
-  const [changeDelay, { cancel }] = useThrottle(setThrottled, options);
+  const [throttledValue, setThrottledValue] = useSafeState(value);
+  const [changeDelay, { cancel }] = useThrottle(setThrottledValue, options);
 
   const flush = usePersist(function (finalValue?: T) {
     cancel();
     if (arguments.length > 0) {
-      setThrottled(finalValue as T);
+      setThrottledValue(finalValue as T);
     } else {
-      setThrottled(valueRef.current);
+      setThrottledValue(valueRef.current);
     }
   });
 
@@ -25,7 +25,7 @@ function useThrottled<T>(value: T, options?: number | ThrottleOptions) {
     [value] // eslint-disable-line
   );
 
-  return [throttled, { flush, cancel }] as const;
+  return [throttledValue, { flush, cancel }] as const;
 }
 
-export default useThrottled;
+export default useThrottledValue;

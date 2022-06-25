@@ -1,8 +1,8 @@
-import { useThrottled } from "@lilib/hooks";
+import { useThrottledValue } from "@lilib/hooks";
 import { act, renderHook } from "@testing-library/react-hooks";
 import FakeTimers, { InstalledClock } from "@sinonjs/fake-timers";
 
-describe("useThrottled", () => {
+describe("useThrottledValue", () => {
   let clock: InstalledClock;
 
   beforeEach(() => {
@@ -12,8 +12,8 @@ describe("useThrottled", () => {
     clock.uninstall();
   });
 
-  it("should return the same actions when the component rerenders", () => {
-    const { result, rerender } = renderHook(() => useThrottled("", 10));
+  it("should return the same actions when the component is rerendered", () => {
+    const { result, rerender } = renderHook(() => useThrottledValue("", 10));
     const [, actions1] = result.current;
     rerender();
     const [, actions2] = result.current;
@@ -25,7 +25,7 @@ describe("useThrottled", () => {
   it("should clear timer when the component is unmounted", () => {
     const { result, rerender, unmount } = renderHook(
       (value) => {
-        return useThrottled(value, 10);
+        return useThrottledValue(value, 10);
       },
       { initialProps: 1 }
     );
@@ -45,7 +45,7 @@ describe("useThrottled", () => {
 
   it("should throttle value by default", () => {
     const { result, rerender } = renderHook(
-      (value) => useThrottled(value, 10),
+      (value) => useThrottledValue(value, 10),
       { initialProps: 0 }
     );
 
@@ -65,7 +65,7 @@ describe("useThrottled", () => {
 
   it("should trigger on the two edges when `options.leading` is true", () => {
     const { result, rerender } = renderHook(
-      (value) => useThrottled(value, { wait: 10, leading: true }),
+      (value) => useThrottledValue(value, { wait: 10, leading: true }),
       { initialProps: 1 }
     );
     expect(result.current[0]).toBe(1);
@@ -85,7 +85,7 @@ describe("useThrottled", () => {
   it("should only trigger on the leading edge if the `options.leading` is true and the `options.trailing` is false", () => {
     const { result, rerender } = renderHook(
       (value) =>
-        useThrottled(value, { wait: 10, leading: true, trailing: false }),
+        useThrottledValue(value, { wait: 10, leading: true, trailing: false }),
       { initialProps: 1 }
     );
     expect(result.current[0]).toBe(1);
@@ -111,7 +111,7 @@ describe("useThrottled", () => {
   it("should not change value if two edge case options are false", () => {
     const { result, rerender } = renderHook(
       (value) =>
-        useThrottled(value, { wait: 10, leading: false, trailing: false }),
+        useThrottledValue(value, { wait: 10, leading: false, trailing: false }),
       { initialProps: 1 }
     );
     expect(result.current[0]).toBe(1);
@@ -130,7 +130,7 @@ describe("useThrottled", () => {
 
   it("could change options dynamically", () => {
     const { result, rerender } = renderHook(
-      ({ value, options }) => useThrottled(value, options),
+      ({ value, options }) => useThrottledValue(value, options),
       {
         initialProps: {
           value: 1,
@@ -215,7 +215,7 @@ describe("useThrottled", () => {
 
   it("should flush and cancel correctly", () => {
     const { result, rerender } = renderHook(
-      (value) => useThrottled(value, 10),
+      (value) => useThrottledValue(value, 10),
       { initialProps: 1 }
     );
     expect(result.current[0]).toBe(1);

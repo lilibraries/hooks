@@ -20,12 +20,12 @@ export { default as useLayoutTargetEffect } from "./useLayoutTargetEffect";
 export { default as useIsomorphicLayoutEffect } from "./useIsomorphicLayoutEffect";
 
 export { default as useToggle } from "./useToggle";
-export { default as useThrottled } from "./useThrottled";
-export { default as useDebounced } from "./useDebounced";
-export { default as useMemoized } from "./useMemoized";
 export { default as useSetState } from "./useSetState";
 export { default as useSafeState } from "./useSafeState";
 export { default as useControllableState } from "./useControllableState";
+export { default as useThrottledValue } from "./useThrottledValue";
+export { default as useDebounced } from "./useDebounced";
+export { default as useMemoized } from "./useMemoized";
 
 export { default as usePersist } from "./usePersist";
 export { default as useRerender } from "./useRerender";

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useThrottled, useToggle } from "@lilib/hooks";
+import { useThrottledValue, useToggle } from "@lilib/hooks";
 
 function random() {
   return Math.ceil(Math.random() * 5000);
@@ -12,7 +12,7 @@ function Example() {
 
   const [value, setValue] = useState("");
   const options = { wait, leading, trailing };
-  const [throttledValue, { flush, cancel }] = useThrottled(value, options);
+  const [throttledValue, { flush, cancel }] = useThrottledValue(value, options);
 
   return (
     <>

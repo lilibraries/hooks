@@ -21,12 +21,12 @@ module.exports = {
       label: "States",
       items: [
         "useToggle",
-        "useThrottled",
-        "useDebounced",
-        "useMemoized",
         "useSetState",
         "useSafeState",
         "useControllableState",
+        "useThrottledValue",
+        "useDebounced",
+        "useMemoized",
       ],
     },
     {

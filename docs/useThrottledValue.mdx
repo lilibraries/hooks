@@ -1,18 +1,18 @@
 import CodeBlock from "@theme/CodeBlock";
 import ExampleBlock from "../examples/ExampleBlock";
-import Example from "../examples/UseThrottled";
-import ExampleCode from "!!raw-loader!../examples/UseThrottled";
+import Example from "../examples/UseThrottledValue";
+import ExampleCode from "!!raw-loader!../examples/UseThrottledValue";
 
 Throttle a value.
 
 ## API
 
 ```ts
-function useThrottled<T = any>(
+function useThrottledValue<T = any>(
   value: T,
   options?: number | { wait?: number; leading?: boolean; trailing?: boolean }
 ): [
-  throttled: T,
+  throttledValue: T,
   actions: {
     flush: (finalValue?: T) => void;
     cancel: () => void;
@@ -22,7 +22,7 @@ function useThrottled<T = any>(
 
 Params:
 
-- **`value`:** The value that will be changed.
+- **`value`:** The value that will be throttled.
 - **`options`:** Throttle wait time or an options object.
   - **`options.wait`:** Throttle wait time, in milliseconds. Default is `0`.
   - **`options.leading`:** Change throttled value on the leading edge. Default is `false`.
@@ -30,9 +30,10 @@ Params:
 
 Results:
 
-- **`throttled`:** Throttled value.
-- **`actions.flush`:** Flush funciton. The `finalValue` will be returned as `throttled` if it is specified.
-- **`actions.cancel`:** Cancel throttle timer.
+- **`throttledValue`:** Throttled value.
+- **`actions`:** Actions object.
+  - **`actions.flush`:** Flush funciton. The `finalValue` will be returned as `throttledValue` if it is specified.
+  - **`actions.cancel`:** Cancel throttle timer.
 
 ## Example
 
