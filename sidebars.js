@@ -42,7 +42,6 @@ module.exports = {
         "useTimeout",
         "useInterval",
         "useAnimation",
-        "useNextFrame",
       ],
     },
     {

@@ -31,11 +31,10 @@ export { default as usePersist } from "./usePersist";
 export { default as useRerender } from "./useRerender";
 export { default as useThrottle } from "./useThrottle";
 export { default as useDebounce } from "./useDebounce";
-export { default as useTimeout } from "./useTimeout";
-export { default as useInterval } from "./useInterval";
 export { default as useRaf } from "./useRaf";
 export { default as useIdle } from "./useIdle";
-export { default as useNextFrame } from "./useNextFrame";
+export { default as useTimeout } from "./useTimeout";
+export { default as useInterval } from "./useInterval";
 export { default as useAnimation } from "./useAnimation";
 
 export { default as useLatestRef } from "./useLatestRef";
