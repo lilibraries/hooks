@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useDebounced, useToggle } from "@lilib/hooks";
+import { useDebouncedValue, useToggle } from "@lilib/hooks";
 
 function random() {
   return Math.ceil(Math.random() * 5000);
@@ -12,7 +12,7 @@ function Example() {
 
   const [value, setValue] = useState("");
   const options = { wait, leading, trailing };
-  const [debouncedValue, { flush, cancel }] = useDebounced(value, options);
+  const [debouncedValue, { flush, cancel }] = useDebouncedValue(value, options);
 
   return (
     <>

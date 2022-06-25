@@ -4,17 +4,17 @@ import useSafeState from "./useSafeState";
 import useLatestRef from "./useLatestRef";
 import useDebounce, { DebounceOptions } from "./useDebounce";
 
-function useDebounced<T>(value: T, options?: number | DebounceOptions) {
+function useDebouncedValue<T>(value: T, options?: number | DebounceOptions) {
   const valueRef = useLatestRef(value);
-  const [debounced, setDebounced] = useSafeState(value);
-  const [changeDelay, { cancel }] = useDebounce(setDebounced, options);
+  const [debouncedValue, setDebouncedValue] = useSafeState(value);
+  const [changeDelay, { cancel }] = useDebounce(setDebouncedValue, options);
 
   const flush = usePersist(function (finalValue?: T) {
     cancel();
     if (arguments.length > 0) {
-      setDebounced(finalValue as T);
+      setDebouncedValue(finalValue as T);
     } else {
-      setDebounced(valueRef.current);
+      setDebouncedValue(valueRef.current);
     }
   });
 
@@ -25,7 +25,7 @@ function useDebounced<T>(value: T, options?: number | DebounceOptions) {
     [value] // eslint-disable-line
   );
 
-  return [debounced, { flush, cancel }] as const;
+  return [debouncedValue, { flush, cancel }] as const;
 }
 
-export default useDebounced;
+export default useDebouncedValue;

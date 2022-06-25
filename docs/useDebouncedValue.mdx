@@ -1,20 +1,20 @@
 import CodeBlock from "@theme/CodeBlock";
 import ExampleBlock from "../examples/ExampleBlock";
-import Example from "../examples/UseDebounced";
-import ExampleCode from "!!raw-loader!../examples/UseDebounced";
+import Example from "../examples/UseDebouncedValue";
+import ExampleCode from "!!raw-loader!../examples/UseDebouncedValue";
 
 Debounce a value.
 
 ## API
 
 ```ts
-function useDebounced<T = any>(
+function UseDebouncedValue<T = any>(
   value: T,
   options?:
     | number
     | { wait: number; maxWait?: number; leading?: boolean; trailing?: boolean }
 ): [
-  debounced: T,
+  debouncedValue: T,
   actions: {
     flush: (finalValue?: T) => void;
     cancel: () => void;
@@ -33,9 +33,10 @@ Params:
 
 Results:
 
-- **`debounced`:** Debounced value.
-- **`actions.flush`:** Flush funciton. The `finalValue` will be returned as `debounced` if it is specified.
-- **`actions.cancel`:** Cancel debounce timer.
+- **`debouncedValue`:** Debounced value.
+- **`actions`:** Actions object.
+  - **`actions.flush`:** Flush funciton. The `finalValue` will be returned as `debouncedValue` if it is specified.
+  - **`actions.cancel`:** Cancel debounce timer.
 
 ## Example
 

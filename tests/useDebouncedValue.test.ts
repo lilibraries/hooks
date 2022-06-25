@@ -1,8 +1,8 @@
-import { useDebounced } from "@lilib/hooks";
+import { useDebouncedValue } from "@lilib/hooks";
 import { act, renderHook } from "@testing-library/react-hooks";
 import FakeTimers, { InstalledClock } from "@sinonjs/fake-timers";
 
-describe("useDebounced", () => {
+describe("useDebouncedValue", () => {
   let clock: InstalledClock;
 
   beforeEach(() => {
@@ -12,8 +12,8 @@ describe("useDebounced", () => {
     clock.uninstall();
   });
 
-  it("should return the same actions when the component rerenders", () => {
-    const { result, rerender } = renderHook(() => useDebounced("", 10));
+  it("should return the same actions when the component is rerendered", () => {
+    const { result, rerender } = renderHook(() => useDebouncedValue("", 10));
     const [, actions1] = result.current;
     rerender();
     const [, actions2] = result.current;
@@ -25,7 +25,7 @@ describe("useDebounced", () => {
   it("should clear timer when the component is unmounted", () => {
     const { result, rerender, unmount } = renderHook(
       (value) => {
-        return useDebounced(value, 10);
+        return useDebouncedValue(value, 10);
       },
       { initialProps: 1 }
     );
@@ -45,7 +45,7 @@ describe("useDebounced", () => {
 
   it("should deounce value by default", () => {
     const { result, rerender } = renderHook(
-      (value) => useDebounced(value, 10),
+      (value) => useDebouncedValue(value, 10),
       { initialProps: 0 }
     );
 
@@ -69,7 +69,7 @@ describe("useDebounced", () => {
 
   it("should trigger on the two edges when `options.leading` is true", () => {
     const { result, rerender } = renderHook(
-      (value) => useDebounced(value, { wait: 10, leading: true }),
+      (value) => useDebouncedValue(value, { wait: 10, leading: true }),
       { initialProps: 1 }
     );
     expect(result.current[0]).toBe(1);
@@ -89,7 +89,7 @@ describe("useDebounced", () => {
   it("should only trigger on the leading edge if the `options.leading` is true and the `options.trailing` is false", () => {
     const { result, rerender } = renderHook(
       (value) =>
-        useDebounced(value, { wait: 10, leading: true, trailing: false }),
+        useDebouncedValue(value, { wait: 10, leading: true, trailing: false }),
       { initialProps: 1 }
     );
     expect(result.current[0]).toBe(1);
@@ -109,7 +109,7 @@ describe("useDebounced", () => {
   it("should not change value if two edge case options are false", () => {
     const { result, rerender } = renderHook(
       (value) =>
-        useDebounced(value, { wait: 10, leading: false, trailing: false }),
+        useDebouncedValue(value, { wait: 10, leading: false, trailing: false }),
       { initialProps: 1 }
     );
     expect(result.current[0]).toBe(1);
@@ -128,7 +128,7 @@ describe("useDebounced", () => {
 
   it("could change options dynamically", () => {
     const { result, rerender } = renderHook(
-      ({ value, options }) => useDebounced(value, options),
+      ({ value, options }) => useDebouncedValue(value, options),
       {
         initialProps: {
           value: 1,
@@ -217,7 +217,7 @@ describe("useDebounced", () => {
 
   it("should flush and cancel correctly", () => {
     const { result, rerender } = renderHook(
-      (value) => useDebounced(value, 10),
+      (value) => useDebouncedValue(value, 10),
       { initialProps: 1 }
     );
     expect(result.current[0]).toBe(1);
