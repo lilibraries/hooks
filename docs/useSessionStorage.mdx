@@ -3,40 +3,58 @@ import ExampleBlock from "../examples/ExampleBlock";
 import Example from "../examples/UseSessionStorage";
 import ExampleCode from "!!raw-loader!../examples/UseSessionStorage";
 
-Get or set sessionStorage.
+Get, set and/or remove `sessionStorage`.
 
 ## API
 
 ```ts
-function useSessionStorage<T = any>(
+function useSessionStorage<T>(
   key: string,
-  defaultValue?: T,
-  options?: {
+  options: {
+    defaultValue: T;
+    polling?: boolean;
+    pollingInterval?: number;
     serialize?: (value: T) => string;
-    deserialize?: (raw: string) => T;
+    deserialize?: (value: string) => T;
   }
-): [
-  value: T | null,
-  actions: {
-    set: (newValue: T) => void;
-    remove: () => void;
+): readonly [
+  value: T,
+  setSessionStorage: (
+    newValue: T | undefined | ((prevValue: T) => T | undefined)
+  ) => void
+];
+
+function useSessionStorage<T>(
+  key: string,
+  options?: {
+    defaultValue?: T;
+    polling?: boolean;
+    pollingInterval?: number;
+    serialize?: (value: T) => string;
+    deserialize?: (value: string) => T;
   }
+): readonly [
+  value: T | undefined,
+  setSessionStorage: (
+    newValue: T | undefined | ((prevValue: T | undefined) => T | undefined)
+  ) => void
 ];
 ```
 
 Params:
 
 - **`key`:** `sessionStorage` key.
-- **`defaultValue`:** Default value.
-- **`options.serialize`:** Options object.
-  - **`options.serialize`:** Serialization function, default is `JSON.stringify`.
-  - **`options.deserialize`:** Deserialization function, default is `JSON.parse`.
+- **`options`:** Options object.
+  - **`options.defaultValue`:** Default value.
+  - **`options.polling`:** Pollingly update value. Default is `false`.
+  - **`options.pollingInterval`:** Polling interval time, in milliseconds. Default is `100`.
+  - **`options.serialize`:** Serialization function. Default is `JSON.stringify`.
+  - **`options.deserialize`:** Deserialization function. Default is `JSON.parse`.
 
 Results:
 
 - **`value`:** Parsed by the deserialization function.
-- **`set`:** The function that used to set sessionStorage.
-- **`remove`:** The function that used to remove sessionStorage.
+- **`setSessionStorage`:** Set `sessionStorage`. If the `newValue` is `undefined`, return the `defaultValue`.
 
 ## Example
 

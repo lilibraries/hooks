@@ -1,7 +1,6 @@
-import createStorageHook from "./createStorageHook";
+import isBrowser from "./utils/isBrowser";
+import createStorageHook from "./creators/createStorageHook";
 
-const useSessionStorage = createStorageHook(
-  typeof sessionStorage !== "undefined" ? sessionStorage : null
-);
+const useSessionStorage = createStorageHook(isBrowser ? sessionStorage : null);
 
 export default useSessionStorage;

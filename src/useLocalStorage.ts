@@ -1,7 +1,6 @@
-import createStorageHook from "./createStorageHook";
+import isBrowser from "./utils/isBrowser";
+import createStorageHook from "./creators/createStorageHook";
 
-const useLocalStorage = createStorageHook(
-  typeof localStorage !== "undefined" ? localStorage : null
-);
+const useLocalStorage = createStorageHook(isBrowser ? localStorage : null);
 
 export default useLocalStorage;
