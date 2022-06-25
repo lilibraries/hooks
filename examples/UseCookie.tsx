@@ -2,13 +2,18 @@ import React from "react";
 import { useCookie } from "@lilib/hooks";
 
 function Example() {
-  const [value, { set, remove }] = useCookie("name", "default value");
+  const [value, setCookie] = useCookie("name", {
+    polling: true,
+    defaultValue: "default value",
+  });
 
   return (
     <>
       <div>
-        <button onClick={() => set("new value")}>Set</button>
-        <button onClick={remove}>Remove</button>
+        <button onClick={() => setCookie(Math.random().toString())}>
+          Set random cookie
+        </button>{" "}
+        <button onClick={() => setCookie(undefined)}>Remove</button>
       </div>
       <div>Cookie value: {value}</div>
     </>

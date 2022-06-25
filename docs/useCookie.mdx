@@ -8,30 +8,65 @@ This hook use [js-cookie](https://github.com/js-cookie/js-cookie) as the parser.
 ## API
 
 ```ts
+interface CookieAttributes {
+  path?: string;
+  domain?: string;
+  secure?: boolean;
+  expires?: number | Date;
+  sameSite?: "strict" | "Strict" | "lax" | "Lax" | "none" | "None";
+}
+
 function useCookie(
   name: string,
-  defaultValue?: string,
-  options?: Cookies.CookieAttributes
-): [
-  value: string | undefined,
-  actions: {
-    set: (newValue: string) => void;
-    remove: () => void;
+  options: {
+    defaultValue: string;
+    polling?: boolean;
+    pollingInterval?: number;
   }
+): readonly [
+  value: string,
+  setCookie: (
+    newValue: string | undefined | ((prevValue: string) => string | undefined),
+    attributes?: CookieAttributes
+  ) => void
+];
+
+function useCookie(
+  name: string,
+  options?: {
+    defaultValue?: string;
+    polling?: boolean;
+    pollingInterval?: number;
+  }
+): readonly [
+  value: string | undefined,
+  setCookie: (
+    newValue:
+      | string
+      | undefined
+      | ((prevValue: string | undefined) => string | undefined),
+    attributes?: CookieAttributes
+  ) => void
 ];
 ```
 
 Params:
 
 - **`name`:** Cookie name.
-- **`defaultValue`:** Default value, it will be returnd when the specified cookie is non-existant.
-- **`options`:** [js-cookie attributes](https://github.com/js-cookie/js-cookie#cookie-attributes).
+- **`options`:** Options object.
+  - **`options.defaultValue`:** Default value. It will be returnd when the specified cookie is non-existant.
+  - **`options.polling`:** Pollingly update cookie value. Default is `false`.
+  - **`options.pollingInterval`:** Polling interval time, in milliseconds. Default is `100`.
+
+<!-- - **`defaultValue`:** Default value, it will be returnd when the specified cookie is non-existant.
+- **`options`:** [js-cookie attributes](https://github.com/js-cookie/js-cookie#cookie-attributes). -->
 
 Results:
 
-- **`value`:** Cookie value, it may be undefined.
-- **`set`:** A function that can set the named cookie a new value.
-- **`remove`:** A function that can remove the named cookie, and return the defaultValue.
+- **`value`:** Cookie value.
+- **`setCookie`:** A function that can set or remove the named cookie. It accepts two params:
+  - **`newValue`:** The new cookie value. If it is `undefined` or a function that returns `undefined`, the named cookie will be cleared, and the `options.defaultValue` will be returnd as `value`.
+  - **`attributes`:** Cookie attributes. See [js-cookie attributes](https://github.com/js-cookie/js-cookie#cookie-attributes).
 
 ## Example
 

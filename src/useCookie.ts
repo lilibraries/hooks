@@ -1,47 +1,118 @@
-import { useState } from "react";
+import { useEffect } from "react";
 import Cookies, { CookieAttributes } from "js-cookie";
 import useUpdate from "./useUpdate";
 import usePersist from "./usePersist";
+import useInterval from "./useInterval";
+import useSafeState from "./useSafeState";
+import isFunction from "./utils/isFunction";
 
 function useCookie(
   name: string,
-  defaultValue?: string,
-  options?: CookieAttributes
+  options: {
+    defaultValue: string;
+    polling?: boolean;
+    pollingInterval?: number;
+  }
+): readonly [
+  string,
+  (
+    newValue: string | undefined | ((prevValue: string) => string | undefined),
+    attributes?: CookieAttributes
+  ) => void
+];
+
+function useCookie(
+  name: string,
+  options?: {
+    defaultValue?: string;
+    polling?: boolean;
+    pollingInterval?: number;
+  }
+): readonly [
+  string | undefined,
+  (
+    newValue:
+      | string
+      | undefined
+      | ((prevValue: string | undefined) => string | undefined),
+    attributes?: CookieAttributes
+  ) => void
+];
+
+function useCookie(
+  name: string,
+  options?: {
+    defaultValue?: string;
+    polling?: boolean;
+    pollingInterval?: number;
+  }
 ) {
-  const getCookie = usePersist(() => {
-    const value = Cookies.get(name);
-    return value !== undefined ? value : defaultValue;
-  });
+  const {
+    defaultValue,
+    polling = false,
+    pollingInterval = 100,
+  } = options || {};
 
-  const [value, setValue] = useState(getCookie());
+  function getCookie() {
+    const cookie = Cookies.get(name);
+    return cookie !== undefined ? cookie : defaultValue;
+  }
 
-  const set = usePersist((newValue: string) => {
-    Cookies.set(name, newValue, options);
-    setValue(newValue);
-  });
+  const [value, setValue] = useSafeState(getCookie);
 
-  const remove = usePersist(() => {
-    Cookies.remove(name, options);
-    setValue(getCookie());
-  });
-
-  useUpdate(
-    () => {
-      setValue(getCookie());
-    },
-    [name] // eslint-disable-line
+  const setCookie = usePersist(
+    (
+      newValue:
+        | string
+        | undefined
+        | ((prevValue: string | undefined) => string | undefined),
+      attributes?: CookieAttributes
+    ) => {
+      setValue((prevValue) => {
+        newValue = isFunction(newValue) ? newValue(prevValue) : newValue;
+        if (newValue === undefined) {
+          Cookies.remove(name, attributes);
+          return defaultValue;
+        } else {
+          Cookies.set(name, newValue, attributes);
+          return newValue;
+        }
+      });
+    }
   );
 
-  useUpdate(
+  const [startPolling, cancelPolling] = useInterval(() => {
+    const newValue = getCookie();
+    if (newValue !== value) {
+      setValue(newValue);
+    }
+  }, pollingInterval);
+
+  useEffect(
     () => {
-      if (Cookies.get(name) === undefined) {
-        setValue(defaultValue);
+      cancelPolling();
+      if (polling) {
+        startPolling();
       }
     },
-    [defaultValue] // eslint-disable-line
+    [polling] // eslint-disable-line
   );
 
-  return [value, { set, remove }] as const;
+  useUpdate(() => {
+    cancelPolling();
+    setValue(getCookie());
+    if (polling) {
+      startPolling();
+    }
+  }, [name]);
+
+  useUpdate(() => {
+    if (Cookies.get(name) === undefined && defaultValue !== value) {
+      setValue(defaultValue);
+    }
+  }, [defaultValue]);
+
+  return [value, setCookie] as const;
 }
 
 export default useCookie;
