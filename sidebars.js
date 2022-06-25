@@ -75,10 +75,5 @@ module.exports = {
         "useSessionStorage",
       ],
     },
-    {
-      type: "category",
-      label: "Utils",
-      items: ["useCreate"],
-    },
   ],
 };

@@ -1,4 +1,3 @@
-// Utils
 export * from "./utils/types";
 export { default as depsEqual } from "./utils/depsEqual";
 export { default as extname } from "./utils/extname";
@@ -10,7 +9,6 @@ export { default as isFunction } from "./utils/isFunction";
 export { default as isObject } from "./utils/isObject";
 export { default as mergeRefs } from "./utils/mergeRefs";
 
-// Effects
 export { default as useOnce } from "./useOnce";
 export { default as useMount } from "./useMount";
 export { default as useUpdate } from "./useUpdate";
@@ -21,7 +19,6 @@ export { default as useLayoutUpdate } from "./useLayoutUpdate";
 export { default as useLayoutTargetEffect } from "./useLayoutTargetEffect";
 export { default as useIsomorphicLayoutEffect } from "./useIsomorphicLayoutEffect";
 
-// States
 export { default as useToggle } from "./useToggle";
 export { default as useThrottled } from "./useThrottled";
 export { default as useDebounced } from "./useDebounced";
@@ -30,7 +27,6 @@ export { default as useSetState } from "./useSetState";
 export { default as useSafeState } from "./useSafeState";
 export { default as useControllableState } from "./useControllableState";
 
-// Callbacks
 export { default as usePersist } from "./usePersist";
 export { default as useRerender } from "./useRerender";
 export { default as useThrottle } from "./useThrottle";
@@ -42,14 +38,12 @@ export { default as useIdle } from "./useIdle";
 export { default as useNextFrame } from "./useNextFrame";
 export { default as useAnimation } from "./useAnimation";
 
-// Refs
 export { default as useLatestRef } from "./useLatestRef";
 export { default as usePreviousRef } from "./usePreviousRef";
 export { default as useMergedRef } from "./useMergedRef";
 export { default as useMountedRef } from "./useMountedRef";
 export { default as useUnmountedRef } from "./useUnmountedRef";
 
-// Browser
 export { default as useTitle } from "./useTitle";
 export { default as useFavicon } from "./useFavicon";
 export { default as useOnline } from "./useOnline";
@@ -63,6 +57,3 @@ export { default as useEventListener } from "./useEventListener";
 export { default as useCookie } from "./useCookie";
 export { default as useLocalStorage } from "./useLocalStorage";
 export { default as useSessionStorage } from "./useSessionStorage";
-
-// Utils
-export { default as useCreate } from "./useCreate";
