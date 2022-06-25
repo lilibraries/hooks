@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import deepEqual from "fast-deep-equal";
+import deepEqual from "fast-deep-equal/es6";
 import useUpdate from "../useUpdate";
 import usePersist from "../usePersist";
 import useInterval from "../useInterval";
