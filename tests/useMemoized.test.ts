@@ -1,7 +1,7 @@
-import { useMemoized } from "@lilib/hooks";
+import { useMemoizedValue } from "@lilib/hooks";
 import { renderHook } from "@testing-library/react-hooks";
 
-describe("useMemoized", () => {
+describe("useMemoizedValue", () => {
   it("should return value correctly", () => {
     const a = { value: "value" };
     const b = { value: "value" };
@@ -9,7 +9,7 @@ describe("useMemoized", () => {
 
     const { result, rerender } = renderHook(
       (value: typeof a) => {
-        return useMemoized(value);
+        return useMemoizedValue(value);
       },
       { initialProps: a }
     );

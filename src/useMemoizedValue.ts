@@ -2,7 +2,7 @@ import { useRef } from "react";
 import deepEqual from "fast-deep-equal/es6/react";
 import useMountedRef from "./useMountedRef";
 
-function useMemoized<T>(value: T): T {
+function useMemoizedValue<T>(value: T): T {
   const resultRef = useRef(value);
   const mountedRef = useMountedRef();
 
@@ -15,4 +15,4 @@ function useMemoized<T>(value: T): T {
   return resultRef.current;
 }
 
-export default useMemoized;
+export default useMemoizedValue;

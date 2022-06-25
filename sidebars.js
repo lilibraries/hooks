@@ -26,7 +26,7 @@ module.exports = {
         "useControllableState",
         "useThrottledValue",
         "useDebouncedValue",
-        "useMemoized",
+        "useMemoizedValue",
       ],
     },
     {

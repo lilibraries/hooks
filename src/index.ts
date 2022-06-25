@@ -25,7 +25,7 @@ export { default as useSafeState } from "./useSafeState";
 export { default as useControllableState } from "./useControllableState";
 export { default as useThrottledValue } from "./useThrottledValue";
 export { default as useDebouncedValue } from "./useDebouncedValue";
-export { default as useMemoized } from "./useMemoized";
+export { default as useMemoizedValue } from "./useMemoizedValue";
 
 export { default as usePersist } from "./usePersist";
 export { default as useRerender } from "./useRerender";

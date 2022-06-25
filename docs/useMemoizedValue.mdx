@@ -3,17 +3,17 @@ Return the previous value when the value has not changed. Use deep comparison.
 ## API
 
 ```ts
-function useMemoized<T>(value: T): T;
+function useMemoizedValue<T>(value: T): T;
 ```
 
 ## Example
 
 ```ts
 import { useMemo, DependencyList } from "react";
-import { useMemoized } from "@lilib/hooks";
+import { useMemoizedValue } from "@lilib/hooks";
 
 function useDeepCompareMemo<T>(factory: () => T, deps?: DependencyList): T {
-  return useMemo(factory, useMemoized(deps));
+  return useMemo(factory, useMemoizedValue(deps));
 }
 
 export default useDeepCompareMemo;
