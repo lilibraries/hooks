@@ -40,7 +40,7 @@
     "dist:copy": "copyfiles \"src/**/*\" dist",
     "deploy": "gh-pages -d build",
     "postversion": "copyfiles -f package.json LICENSE README.md dist",
-    "release": "yarn lint && yarn test && yarn dist && semantic-release -d && semantic-release && yarn build && yarn deploy"
+    "release": "yarn lint && yarn test && yarn dist && semantic-release && yarn build && yarn deploy"
   },
   "peerDependencies": {
     "react": "^16.8.0 || ^17.0.0 || ^18.0.0",
