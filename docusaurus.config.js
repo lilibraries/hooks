@@ -23,7 +23,7 @@ module.exports = {
       ],
     },
     footer: {
-      copyright: `Copyright © ${new Date().getFullYear()} 李蔚生. Code licensed MIT, docs CC BY 3.0. Built with Docusaurus.`,
+      copyright: `Copyright © 李蔚生. Code licensed MIT, docs CC BY 3.0. Built with Docusaurus.`,
     },
   },
   presets: [
