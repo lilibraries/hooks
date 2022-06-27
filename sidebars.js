@@ -74,5 +74,6 @@ module.exports = {
         "useSessionStorage",
       ],
     },
+    "CHANGELOG",
   ],
 };
