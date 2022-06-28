@@ -1,6 +1,6 @@
 {
   "*.{ts,tsx}": [
-    "tsc-files --noEmit",
+    "tsc-files --noEmit examples/assets.d.ts",
     "eslint --fix",
     "jest --bail --findRelatedTests",
     "prettier --write",

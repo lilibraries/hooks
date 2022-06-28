@@ -32,6 +32,6 @@ describe("useMountedRef", () => {
     rerender();
     expect(result.current.current).toBe(true);
     unmount();
-    expect(result.current.current).toBe(true);
+    expect(result.current.current).toBe(false);
   });
 });

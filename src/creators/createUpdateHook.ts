@@ -1,4 +1,5 @@
 import { useEffect, useRef, EffectCallback, DependencyList } from "react";
+import useUnmount from "../useUnmount";
 
 function createUpdateHook(useHook: typeof useEffect) {
   return function (effect: EffectCallback, deps?: DependencyList) {
@@ -11,6 +12,10 @@ function createUpdateHook(useHook: typeof useEffect) {
         mountedRef.current = true;
       }
     }, deps);
+
+    useUnmount(() => {
+      mountedRef.current = false;
+    });
   };
 }
 

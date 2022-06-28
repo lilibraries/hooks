@@ -42,7 +42,10 @@ function createTargetEffectHook(useHook: typeof useEffect) {
       }
     });
 
-    useUnmount(destroy);
+    useUnmount(() => {
+      destroy();
+      mountedRef.current = false;
+    });
   };
 }
 

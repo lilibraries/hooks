@@ -1,12 +1,15 @@
-import { useRef } from "react";
-import useUnmount from "./useUnmount";
+import { useEffect, useRef } from "react";
 
 function useUnmountedRef() {
   const unmountedRef = useRef(false);
 
-  useUnmount(() => {
-    unmountedRef.current = true;
-  });
+  useEffect(() => {
+    unmountedRef.current = false;
+
+    return () => {
+      unmountedRef.current = true;
+    };
+  }, []);
 
   return unmountedRef;
 }

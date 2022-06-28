@@ -1,12 +1,15 @@
-import { useRef } from "react";
-import useMount from "./useMount";
+import { useEffect, useRef } from "react";
 
 function useMountedRef() {
   const mountedRef = useRef(false);
 
-  useMount(() => {
+  useEffect(() => {
     mountedRef.current = true;
-  });
+
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
 
   return mountedRef;
 }
