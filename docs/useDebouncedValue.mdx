@@ -13,11 +13,11 @@ function useDebouncedValue<T>(
   options?:
     | number
     | { wait: number; maxWait?: number; leading?: boolean; trailing?: boolean }
-): [
+): readonly [
   debouncedValue: T,
   actions: {
-    flush: (finalValue?: T) => void;
-    cancel: () => void;
+    readonly flush: (finalValue?: T) => void;
+    readonly cancel: () => void;
   }
 ];
 ```

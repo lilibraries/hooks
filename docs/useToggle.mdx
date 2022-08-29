@@ -11,9 +11,9 @@ Use boolean value.
 function useToggle(initialValue?: boolean): readonly [
   value: boolean,
   actions: {
-    toggle: (newValue?: boolean) => void;
-    toggleOn: () => void;
-    toggleOff: () => void;
+    readonly toggle: (newValue?: boolean) => void;
+    readonly toggleOn: () => void;
+    readonly toggleOff: () => void;
   }
 ];
 ```

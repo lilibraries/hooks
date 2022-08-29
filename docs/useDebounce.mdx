@@ -13,11 +13,11 @@ function useDebounce<T extends (...args: any[]) => any>(
   options?:
     | number
     | { wait?: number; maxWait?: number; leading?: boolean; trailing?: boolean }
-): [
+): readonly [
   debouncedCallback: (...args: Parameters<T>) => ReturnType<T> | undefined,
   actions: {
-    flush: () => ReturnType<T> | undefined;
-    cancel: () => void;
+    readonly flush: () => ReturnType<T> | undefined;
+    readonly cancel: () => void;
   }
 ];
 ```

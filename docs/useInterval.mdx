@@ -11,7 +11,7 @@ Loop run callback.
 function useInterval(
   callback: () => void,
   interval?: number
-): [start: () => void, cancel: () => void];
+): readonly [start: () => void, cancel: () => void];
 ```
 
 Params:

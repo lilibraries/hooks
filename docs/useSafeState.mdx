@@ -17,7 +17,7 @@ function useSafeState<S = undefined>(): readonly [
 
 ```tsx
 import React from "react";
-import { useSafeState } from "@lilib/hooks";
+import { useMount, useSafeState } from "@lilib/hooks";
 
 function Example() {
   const [data, setData] = useSafeState<any>();

@@ -11,11 +11,11 @@ Use throttled callback.
 function useThrottle<T extends (...args: any[]) => any>(
   callback: T,
   options?: number | { wait?: number; leading?: boolean; trailing?: boolean }
-): [
+): readonly [
   throttledCallback: (...args: Parameters<T>) => ReturnType<T> | undefined,
   actions: {
-    flush: () => ReturnType<T> | undefined;
-    cancel: () => void;
+    readonly flush: () => ReturnType<T> | undefined;
+    readonly cancel: () => void;
   }
 ];
 ```

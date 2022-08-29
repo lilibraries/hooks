@@ -1,4 +1,4 @@
-It returns a ref object used to determine whether the component is unmounted.
+It returns a ref object that used to determine whether the component is unmounted.
 
 ## API
 
@@ -15,7 +15,7 @@ import { useUnmountedRef } from "@lilib/hooks";
 function Example() {
   const unmountedRef = useUnmountedRef();
 
-  if (!unmountedRef.current) {
+  if (unmountedRef.current) {
     // Do something.
   }
 

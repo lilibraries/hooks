@@ -11,7 +11,7 @@ Delay running callback.
 function useTimeout(
   callback: () => void,
   delay?: number
-): [start: () => void, cancel: () => void];
+): readonly [start: () => void, cancel: () => void];
 ```
 
 ### Params
