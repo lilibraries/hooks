@@ -1,8 +1,8 @@
-import { useState } from "react";
 import usePersist from "./usePersist";
+import useSafeState from "./useSafeState";
 
 function useToggle(initialValue: boolean = false) {
-  const [value, setValue] = useState(!!initialValue);
+  const [value, setValue] = useSafeState(!!initialValue);
 
   const toggle = usePersist((newValue?: boolean) => {
     if (newValue !== undefined) {
