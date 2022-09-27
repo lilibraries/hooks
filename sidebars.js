@@ -1,6 +1,6 @@
 module.exports = {
   docs: [
-    "getting-started",
+    "GettingStarted",
     {
       type: "category",
       label: "Effects",

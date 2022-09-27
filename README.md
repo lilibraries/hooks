@@ -28,4 +28,4 @@ https://lilibraries.github.io/hooks/
 
 ## License
 
-Code licensed MIT, docs CC BY 3.0.
+Code licensed MIT, docs CC BY 4.0.
