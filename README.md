@@ -6,8 +6,6 @@ React hook library.
 
 ```shell
 npm install --save @lilib/hooks
-# Or
-yarn add @lilib/hooks
 ```
 
 ## Example

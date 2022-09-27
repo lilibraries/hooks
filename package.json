@@ -41,8 +41,8 @@
     "dist:esm": "babel src --out-dir dist/esm --config-file ./babel.esm.json --extensions .ts,.tsx --no-babelrc",
     "dist:types": "tsc -p ./tsconfig.build.json",
     "dist:umd": "node ./rollup.js",
-    "gh-pages": "yarn build && gh-pages -d build",
-    "release": "yarn lint && yarn test && yarn dist && yarn build && standard-version -n -i docs/CHANGELOG.md && npm publish"
+    "gh-pages": "npm run build && gh-pages -d build",
+    "release": "npm run lint && npm run test && npm run dist && npm run build && standard-version -n -i docs/CHANGELOG.md && npm publish"
   },
   "peerDependencies": {
     "react": "^16.8.0 || ^17.0.0 || ^18.0.0",
