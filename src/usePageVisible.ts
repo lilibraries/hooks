@@ -1,10 +1,10 @@
 import { useState } from "react";
 import useEventListener from "./useEventListener";
-import isBrowser from "./utils/isBrowser";
+import inBrowser from "./utils/inBrowser";
 
 function usePageVisible() {
   const [visible, setVisible] = useState(() => {
-    if (isBrowser) {
+    if (inBrowser) {
       return !document.hidden;
     } else {
       return true;

@@ -1,6 +1,6 @@
-import isBrowser from "./utils/isBrowser";
+import inBrowser from "./utils/inBrowser";
 import createStorageHook from "./factories/createStorageHook";
 
-const useSessionStorage = createStorageHook(isBrowser ? sessionStorage : null);
+const useSessionStorage = createStorageHook(inBrowser ? sessionStorage : null);
 
 export default useSessionStorage;

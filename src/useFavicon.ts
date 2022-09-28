@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import useUnmount from "./useUnmount";
 import usePreviousRef from "./usePreviousRef";
 import extname from "./utils/extname";
-import isBrowser from "./utils/isBrowser";
+import inBrowser from "./utils/inBrowser";
 
 const mimes = {
   ico: "image/x-icon",
@@ -11,13 +11,13 @@ const mimes = {
 };
 
 function getHead() {
-  if (isBrowser) {
+  if (inBrowser) {
     return document.getElementsByTagName("head")[0];
   }
 }
 
 function getLink() {
-  if (isBrowser) {
+  if (inBrowser) {
     return document.querySelector("link[rel*='icon']") as HTMLLinkElement;
   }
 }
@@ -30,7 +30,7 @@ function useFavicon(
   const prevHrefRef = usePreviousRef(href);
 
   const oldIconData = useMemo(() => {
-    if (isBrowser) {
+    if (inBrowser) {
       const link = getLink();
       if (link) {
         return { type: link.type, rel: link.rel, href: link.href };
@@ -38,7 +38,7 @@ function useFavicon(
     }
   }, []);
 
-  if (isBrowser && href && href !== prevHrefRef.current) {
+  if (inBrowser && href && href !== prevHrefRef.current) {
     const link = getLink() || document.createElement("link");
 
     link.href = href;
@@ -52,7 +52,7 @@ function useFavicon(
   }
 
   useUnmount(() => {
-    if (isBrowser && restore) {
+    if (inBrowser && restore) {
       if (oldIconData === undefined) {
         const head = getHead();
         const link = getLink();

@@ -1,10 +1,10 @@
 import useSafeState from "./useSafeState";
 import useEventListener from "./useEventListener";
-import isBrowser from "./utils/isBrowser";
+import inBrowser from "./utils/inBrowser";
 
 function useOnline() {
   const [online, setOnline] = useSafeState(() => {
-    if (isBrowser) {
+    if (inBrowser) {
       return window.navigator.onLine;
     } else {
       return true;

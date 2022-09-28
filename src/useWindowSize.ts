@@ -1,10 +1,10 @@
 import { useState } from "react";
 import useEventListener from "./useEventListener";
-import isBrowser from "./utils/isBrowser";
+import inBrowser from "./utils/inBrowser";
 
 function useWindowSize() {
   const [{ width, height }, setState] = useState(() => {
-    if (isBrowser) {
+    if (inBrowser) {
       return { width: window.innerWidth, height: window.innerHeight };
     } else {
       return { width: 0, height: 0 };
