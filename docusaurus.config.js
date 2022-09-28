@@ -32,7 +32,7 @@ module.exports = {
       {
         docs: {
           routeBasePath: "/",
-          sidebarPath: require.resolve("./sidebars.js"),
+          sidebarPath: require.resolve("./docs/sidebars.js"),
         },
       },
     ],

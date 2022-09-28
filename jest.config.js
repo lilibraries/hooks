@@ -3,6 +3,6 @@ module.exports = {
   roots: ["<rootDir>/tests"],
   testMatch: ["**/?(*.)+(spec|test).[jt]s?(x)"],
   testEnvironment: "jsdom",
-  setupFilesAfterEnv: ["<rootDir>/jest.setup.ts"],
   moduleNameMapper: { "@lilib/hooks": "<rootDir>/src" },
+  setupFilesAfterEnv: ["<rootDir>/configs/jest.setup.ts"],
 };
