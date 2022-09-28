@@ -1,4 +1,4 @@
-function depsEqual(x: readonly unknown[], y: readonly unknown[]) {
+function areDepsEqual(x: readonly unknown[], y: readonly unknown[]) {
   if (x === y) {
     return true;
   }
@@ -18,4 +18,4 @@ function depsEqual(x: readonly unknown[], y: readonly unknown[]) {
   return true;
 }
 
-export default depsEqual;
+export default areDepsEqual;

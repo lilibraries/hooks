@@ -1,7 +1,7 @@
 import { DependencyList, EffectCallback, useEffect, useRef } from "react";
 import useUnmount from "../useUnmount";
-import depsEqual from "../utils/depsEqual";
 import getTarget from "../utils/getTarget";
+import areDepsEqual from "../utils/areDepsEqual";
 import { Target, TargetCreator } from "../utils/types";
 
 function createTargetEffectHook(useHook: typeof useEffect) {
@@ -30,8 +30,8 @@ function createTargetEffectHook(useHook: typeof useEffect) {
 
       if (mountedRef.current) {
         if (
-          !depsEqual(deps, depsRef.current) ||
-          !depsEqual(deps2, deps2Ref.current)
+          !areDepsEqual(deps, depsRef.current) ||
+          !areDepsEqual(deps2, deps2Ref.current)
         ) {
           destroy();
           create();

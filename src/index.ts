@@ -1,5 +1,6 @@
 export * from "./utils/types";
-export { default as depsEqual } from "./utils/depsEqual";
+
+export { default as areDepsEqual } from "./utils/areDepsEqual";
 export { default as extname } from "./utils/extname";
 export { default as getTarget } from "./utils/getTarget";
 export { default as hasOwn } from "./utils/hasOwn";
