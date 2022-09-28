@@ -1,4 +1,4 @@
-import createUpdateHook from "./creators/createUpdateHook";
+import createUpdateHook from "./factories/createUpdateHook";
 import useIsomorphicLayoutEffect from "./useIsomorphicLayoutEffect";
 
 const useLayoutUpdate = createUpdateHook(useIsomorphicLayoutEffect);

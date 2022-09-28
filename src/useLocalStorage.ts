@@ -1,5 +1,5 @@
 import isBrowser from "./utils/isBrowser";
-import createStorageHook from "./creators/createStorageHook";
+import createStorageHook from "./factories/createStorageHook";
 
 const useLocalStorage = createStorageHook(isBrowser ? localStorage : null);
 

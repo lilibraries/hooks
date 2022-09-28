@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import createMountHook from "./creators/createMountHook";
+import createMountHook from "./factories/createMountHook";
 
 const useMount = createMountHook(useEffect);
 

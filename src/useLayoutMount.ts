@@ -1,4 +1,4 @@
-import createMountHook from "./creators/createMountHook";
+import createMountHook from "./factories/createMountHook";
 import useIsomorphicLayoutEffect from "./useIsomorphicLayoutEffect";
 
 const useLayoutMount = createMountHook(useIsomorphicLayoutEffect);

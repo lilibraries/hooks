@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import createUpdateHook from "./creators/createUpdateHook";
+import createUpdateHook from "./factories/createUpdateHook";
 
 const useUpdate = createUpdateHook(useEffect);
 

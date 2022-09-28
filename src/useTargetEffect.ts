@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import createTargetEffectHook from "./creators/createTargetEffectHook";
+import createTargetEffectHook from "./factories/createTargetEffectHook";
 
 const useTargetEffect = createTargetEffectHook(useEffect);
 
