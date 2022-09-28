@@ -3,7 +3,6 @@ export * from "./utils/types";
 export { default as areDepsEqual } from "./utils/areDepsEqual";
 export { default as extname } from "./utils/extname";
 export { default as getTarget } from "./utils/getTarget";
-export { default as hasOwn } from "./utils/hasOwn";
 export { default as isBrowser } from "./utils/isBrowser";
 export { default as isEventTarget } from "./utils/isEventTarget";
 export { default as isFunction } from "./utils/isFunction";
