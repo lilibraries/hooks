@@ -3,7 +3,7 @@ import useTargetEffect from "./useTargetEffect";
 import isObject from "./utils/isObject";
 import getTarget from "./utils/getTarget";
 import isEventTarget from "./utils/isEventTarget";
-import { TargetCreator } from "./utils/types";
+import { TargetCreator } from "./types";
 
 function useEventListener<
   T extends EventTarget = EventTarget,

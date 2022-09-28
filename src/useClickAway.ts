@@ -1,7 +1,7 @@
 import useLatestRef from "./useLatestRef";
 import useTargetEffect from "./useTargetEffect";
 import getTarget from "./utils/getTarget";
-import { TargetCreator } from "./utils/types";
+import { TargetCreator } from "./types";
 
 function useClickAway<E extends Event = Event>(
   target: TargetCreator<Node> | TargetCreator<Node>[],

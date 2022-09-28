@@ -4,13 +4,7 @@ import useLatestRef from "./useLatestRef";
 import usePersist from "./usePersist";
 import useUnmount from "./useUnmount";
 import isObject from "./utils/isObject";
-
-export interface DebounceOptions {
-  wait?: number;
-  maxWait?: number;
-  leading?: boolean;
-  trailing?: boolean;
-}
+import { DebounceOptions } from "./types";
 
 function useDebounce<T extends (...args: any[]) => any>(
   callback: T,

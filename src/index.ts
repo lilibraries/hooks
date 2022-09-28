@@ -1,4 +1,4 @@
-export * from "./utils/types";
+export * from "./types";
 
 export { default as areDepsEqual } from "./utils/areDepsEqual";
 export { default as extname } from "./utils/extname";

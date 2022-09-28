@@ -1,7 +1,7 @@
 import isBrowser from "./isBrowser";
 import isObject from "./isObject";
 import isFunction from "./isFunction";
-import { TargetCreator, Target } from "./types";
+import { Target, TargetCreator } from "../types";
 
 function getTarget<T>(target: TargetCreator<T>): Target<T> {
   if (!isBrowser) {

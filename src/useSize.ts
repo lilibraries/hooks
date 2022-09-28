@@ -3,7 +3,7 @@ import usePersist from "./usePersist";
 import useSafeState from "./useSafeState";
 import useLayoutTargetEffect from "./useLayoutTargetEffect";
 import getTarget from "./utils/getTarget";
-import { TargetCreator } from "./utils/types";
+import { TargetCreator } from "./types";
 
 function useSize(target: TargetCreator<Element>) {
   const [{ width, height }, setSize] = useSafeState(() => {

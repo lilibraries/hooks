@@ -6,3 +6,16 @@ export type TargetCreator<T> =
   | (() => Target<T>)
   | RefObject<Target<T>>
   | MutableRefObject<Target<T>>;
+
+export interface DebounceOptions {
+  wait?: number;
+  maxWait?: number;
+  leading?: boolean;
+  trailing?: boolean;
+}
+
+export interface ThrottleOptions {
+  wait?: number;
+  leading?: boolean;
+  trailing?: boolean;
+}
