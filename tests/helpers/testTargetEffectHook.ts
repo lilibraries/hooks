@@ -1,5 +1,5 @@
 import { TargetCreator, useTargetEffect } from "@lilib/hooks";
-import { renderHook } from "@testing-library/react-hooks";
+import renderHook from "./renderHook";
 
 function testTargetEffectHook(name: string, useHook: typeof useTargetEffect) {
   describe(name, () => {

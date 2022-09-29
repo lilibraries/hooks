@@ -1,5 +1,5 @@
 import { useUpdate } from "@lilib/hooks";
-import { renderHook } from "@testing-library/react-hooks";
+import renderHook from "./renderHook";
 
 function testUpdateHook(name: string, useHook: typeof useUpdate) {
   describe(name, () => {

@@ -1,6 +1,6 @@
 import { createRef, useImperativeHandle } from "react";
 import { useMergedRef } from "@lilib/hooks";
-import { renderHook } from "@testing-library/react-hooks";
+import renderHook from "./helpers/renderHook";
 
 describe("useMergedRef", () => {
   it("should combine multiple refs into one", () => {

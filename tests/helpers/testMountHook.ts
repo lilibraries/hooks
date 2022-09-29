@@ -1,5 +1,5 @@
 import { useMount } from "@lilib/hooks";
-import { renderHook } from "@testing-library/react-hooks";
+import renderHook from "./renderHook";
 
 function testMountHook(name: string, useHook: typeof useMount) {
   describe(name, () => {
@@ -7,7 +7,6 @@ function testMountHook(name: string, useHook: typeof useMount) {
       const mock = jest.fn();
       const { rerender, unmount } = renderHook(() => {
         useHook(mock);
-        expect(mock).not.toBeCalled();
       });
 
       expect(mock).toBeCalledTimes(1);

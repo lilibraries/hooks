@@ -1,5 +1,5 @@
 import { usePreviousRef } from "@lilib/hooks";
-import { renderHook } from "@testing-library/react-hooks";
+import renderHook from "./helpers/renderHook";
 
 describe("usePreviousRef", () => {
   it("should return the same ref object when the component rerenders", () => {

@@ -1,5 +1,5 @@
 import { useUnmountedRef } from "@lilib/hooks";
-import { renderHook } from "@testing-library/react-hooks";
+import renderHook from "./helpers/renderHook";
 
 describe("useUnmountedRef", () => {
   it("should always return the same ref object", () => {

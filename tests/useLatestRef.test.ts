@@ -1,5 +1,5 @@
 import { useLatestRef } from "@lilib/hooks";
-import { renderHook } from "@testing-library/react-hooks";
+import renderHook from "./helpers/renderHook";
 
 describe("useLatestRef", () => {
   it("should return the same ref object when the component rerenders", () => {

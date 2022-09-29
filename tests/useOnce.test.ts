@@ -1,5 +1,5 @@
 import { useOnce } from "@lilib/hooks";
-import { renderHook } from "@testing-library/react-hooks";
+import renderHook from "./helpers/renderHook";
 
 describe("useOnce", () => {
   it("should run effect synchronously only once", () => {

@@ -1,5 +1,6 @@
 import { useLocalStorage } from "@lilib/hooks";
-import { act, renderHook } from "@testing-library/react-hooks";
+import { act } from "react-dom/test-utils";
+import renderHook from "./renderHook";
 
 function testStorgeHook(
   name: string,

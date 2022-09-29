@@ -1,5 +1,5 @@
 import { useTitle } from "@lilib/hooks";
-import { renderHook } from "@testing-library/react-hooks";
+import renderHook from "./helpers/renderHook";
 
 describe("useTitle", () => {
   it("should update document title", () => {

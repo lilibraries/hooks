@@ -1,5 +1,6 @@
 import { useSetState } from "@lilib/hooks";
-import { act, renderHook } from "@testing-library/react-hooks";
+import { act } from "react-dom/test-utils";
+import renderHook from "./helpers/renderHook";
 
 describe("useSetState", () => {
   it("should always return the same `setState` function", () => {

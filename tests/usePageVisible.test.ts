@@ -1,5 +1,5 @@
 import { usePageVisible } from "@lilib/hooks";
-import { renderHook } from "@testing-library/react-hooks";
+import renderHook from "./helpers/renderHook";
 
 describe("usePageVisible", () => {
   it("should return a boolean value", () => {

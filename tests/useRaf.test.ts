@@ -1,4 +1,5 @@
-import { act, renderHook } from "@testing-library/react-hooks";
+import { act } from "react-dom/test-utils";
+import renderHook from "./helpers/renderHook";
 import FakeTimers, { InstalledClock } from "@sinonjs/fake-timers";
 
 let clock: InstalledClock;

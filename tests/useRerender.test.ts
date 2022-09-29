@@ -1,5 +1,6 @@
 import { useRerender } from "@lilib/hooks";
-import { act, renderHook } from "@testing-library/react-hooks";
+import { act } from "react-dom/test-utils";
+import renderHook from "./helpers/renderHook";
 
 describe("useRerender", () => {
   it("should update the component when the rerender function calls", () => {

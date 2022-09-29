@@ -1,5 +1,5 @@
 import { useFavicon } from "@lilib/hooks";
-import { renderHook } from "@testing-library/react-hooks";
+import renderHook from "./helpers/renderHook";
 
 describe("useFavicon", () => {
   it("should set favicon correctly without original favicon", () => {

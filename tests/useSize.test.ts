@@ -1,5 +1,5 @@
 import { useSize } from "@lilib/hooks";
-import { renderHook } from "@testing-library/react-hooks";
+import renderHook from "./helpers/renderHook";
 
 describe("useSize", () => {
   it("should return element size", () => {

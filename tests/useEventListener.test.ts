@@ -1,5 +1,5 @@
 import { useEventListener } from "@lilib/hooks";
-import { renderHook } from "@testing-library/react-hooks";
+import renderHook from "./helpers/renderHook";
 
 describe("useEventListener", () => {
   it("should trigger event correctly", () => {

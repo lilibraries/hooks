@@ -1,5 +1,5 @@
 import { useUnmount } from "@lilib/hooks";
-import { renderHook } from "@testing-library/react-hooks";
+import renderHook from "./helpers/renderHook";
 
 describe("useUnmount", () => {
   it("should only run effect when the component will unmount", () => {
@@ -26,15 +26,7 @@ describe("useUnmount", () => {
     expect(mock1).not.toBeCalled();
     expect(mock2).not.toBeCalled();
 
-    rerender();
-    expect(mock1).not.toBeCalled();
-    expect(mock2).not.toBeCalled();
-
     rerender(mock2);
-    expect(mock1).not.toBeCalled();
-    expect(mock2).not.toBeCalled();
-
-    rerender();
     expect(mock1).not.toBeCalled();
     expect(mock2).not.toBeCalled();
 
