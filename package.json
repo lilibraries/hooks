@@ -41,10 +41,10 @@
     "lint": "tsc -p tsconfig.json --noEmit && eslint . --ext .jsx,.js,.ts,.tsx && prettier --check . --loglevel warn",
     "lint:fix": "tsc -p tsconfig.json --noEmit && eslint . --ext .jsx,.js,.ts,.tsx --fix && prettier --write . --loglevel warn",
     "dist": "rimraf dist && concurrently --kill-others-on-fail npm:dist:*",
-    "dist:cjs": "babel src --out-dir dist/cjs --config-file ./configs/babel.cjs.json --extensions .ts,.tsx --no-babelrc",
-    "dist:esm": "babel src --out-dir dist/esm --config-file ./configs/babel.esm.json --extensions .ts,.tsx --no-babelrc",
+    "dist:cjs": "babel src --out-dir dist/cjs --config-file ./babel.cjs.json --extensions .ts,.tsx --no-babelrc",
+    "dist:esm": "babel src --out-dir dist/esm --config-file ./babel.esm.json --extensions .ts,.tsx --no-babelrc",
     "dist:umd": "rollup --config",
-    "dist:types": "tsc -p ./configs/tsconfig.build.json",
+    "dist:types": "tsc -p ./tsconfig.build.json",
     "gh-pages": "npm run build && gh-pages -d build",
     "release": "npm run lint && npm run test:all && npm run dist && npm run build && standard-version -n -i docs/CHANGELOG.md && npm publish"
   },

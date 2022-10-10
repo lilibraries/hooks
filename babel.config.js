@@ -3,6 +3,6 @@ const isTest = env === "test";
 
 module.exports = {
   presets: isTest
-    ? ["./configs/babel.preset.js"]
+    ? ["./babel.preset.js"]
     : [require.resolve("@docusaurus/core/lib/babel/preset")],
 };

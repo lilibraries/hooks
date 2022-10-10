@@ -15,10 +15,7 @@ module.exports = {
     commonjs(),
     babel({
       presets: [
-        [
-          path.resolve(__dirname, "./configs/babel.preset.js"),
-          { module: "esm" },
-        ],
+        [path.resolve(__dirname, "./babel.preset.js"), { module: "esm" }],
       ],
       babelHelpers: "runtime",
       extensions: [".ts", ".tsx"],

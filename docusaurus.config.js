@@ -3,7 +3,7 @@
 const path = require("path");
 
 module.exports = {
-  title: "@lilib/hooks",
+  title: "Hooks",
   url: "https://lilibraries.github.io/",
   baseUrl: "/hooks/",
   onBrokenLinks: "throw",
@@ -13,7 +13,7 @@ module.exports = {
   projectName: "hooks",
   themeConfig: {
     navbar: {
-      title: "@lilib/hooks",
+      title: "Hooks",
       items: [
         {
           href: "https://github.com/lilibraries/hooks",

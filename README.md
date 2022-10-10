@@ -1,4 +1,4 @@
-# @lilib/hooks
+# Hooks
 
 React hook library.
 
