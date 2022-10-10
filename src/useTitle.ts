@@ -3,11 +3,11 @@ import useUnmount from "./useUnmount";
 import usePreviousRef from "./usePreviousRef";
 import inBrowser from "./utils/inBrowser";
 
-function useTitle(title: string, options?: { restore?: boolean }) {
+function useTitle(title: string | null, options?: { restore?: boolean }) {
   const oldTitleRef = useRef(inBrowser ? document.title : "");
   const prevTitleRef = usePreviousRef(title);
 
-  if (inBrowser && title && title !== prevTitleRef.current) {
+  if (inBrowser && title != null && title !== prevTitleRef.current) {
     document.title = title;
   }
 
