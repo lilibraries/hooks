@@ -7,7 +7,10 @@ import useDebounce, { DebounceOptions } from "./useDebounce";
 function useDebouncedValue<T>(value: T, options?: number | DebounceOptions) {
   const valueRef = useLatestRef(value);
   const [debouncedValue, setDebouncedValue] = useSafeState(value);
-  const [changeDelay, { cancel }] = useDebounce(setDebouncedValue, options);
+  const [updateDebouncedValue, { cancel }] = useDebounce(
+    setDebouncedValue,
+    options
+  );
 
   const flush = usePersist(function (finalValue?: T) {
     cancel();
@@ -18,12 +21,9 @@ function useDebouncedValue<T>(value: T, options?: number | DebounceOptions) {
     }
   });
 
-  useUpdate(
-    () => {
-      changeDelay(value);
-    },
-    [value] // eslint-disable-line
-  );
+  useUpdate(() => {
+    updateDebouncedValue(value);
+  }, [value]);
 
   return [debouncedValue, { flush, cancel }] as const;
 }

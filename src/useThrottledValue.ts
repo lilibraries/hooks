@@ -7,7 +7,10 @@ import useThrottle, { ThrottleOptions } from "./useThrottle";
 function useThrottledValue<T>(value: T, options?: number | ThrottleOptions) {
   const valueRef = useLatestRef(value);
   const [throttledValue, setThrottledValue] = useSafeState(value);
-  const [changeDelay, { cancel }] = useThrottle(setThrottledValue, options);
+  const [updateThrottledValue, { cancel }] = useThrottle(
+    setThrottledValue,
+    options
+  );
 
   const flush = usePersist(function (finalValue?: T) {
     cancel();
@@ -18,12 +21,9 @@ function useThrottledValue<T>(value: T, options?: number | ThrottleOptions) {
     }
   });
 
-  useUpdate(
-    () => {
-      changeDelay(value);
-    },
-    [value] // eslint-disable-line
-  );
+  useUpdate(() => {
+    updateThrottledValue(value);
+  }, [value]);
 
   return [throttledValue, { flush, cancel }] as const;
 }
