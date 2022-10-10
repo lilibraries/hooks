@@ -4,7 +4,12 @@ import useLatestRef from "./useLatestRef";
 import usePersist from "./usePersist";
 import useUnmount from "./useUnmount";
 import isObject from "./utils/isObject";
-import { ThrottleOptions } from "./types";
+
+export interface ThrottleOptions {
+  wait?: number;
+  leading?: boolean;
+  trailing?: boolean;
+}
 
 function useThrottle<T extends (...args: any[]) => any>(
   callback: T,

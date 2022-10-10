@@ -2,8 +2,7 @@ import useUpdate from "./useUpdate";
 import usePersist from "./usePersist";
 import useSafeState from "./useSafeState";
 import useLatestRef from "./useLatestRef";
-import useThrottle from "./useThrottle";
-import { ThrottleOptions } from "./types";
+import useThrottle, { ThrottleOptions } from "./useThrottle";
 
 function useThrottledValue<T>(value: T, options?: number | ThrottleOptions) {
   const valueRef = useLatestRef(value);

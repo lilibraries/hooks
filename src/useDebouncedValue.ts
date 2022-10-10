@@ -2,8 +2,7 @@ import useUpdate from "./useUpdate";
 import usePersist from "./usePersist";
 import useSafeState from "./useSafeState";
 import useLatestRef from "./useLatestRef";
-import useDebounce from "./useDebounce";
-import { DebounceOptions } from "./types";
+import useDebounce, { DebounceOptions } from "./useDebounce";
 
 function useDebouncedValue<T>(value: T, options?: number | DebounceOptions) {
   const valueRef = useLatestRef(value);
