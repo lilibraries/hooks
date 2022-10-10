@@ -18,8 +18,6 @@ module.exports = function (api, options = {}) {
           : {
               bugfixes: true,
               modules: isCJS ? "cjs" : isESM ? false : "auto",
-              forceAllTransforms: true,
-              ignoreBrowserslistConfig: true,
             },
       ],
       [
