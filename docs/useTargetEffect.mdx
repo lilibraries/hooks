@@ -19,7 +19,7 @@ function useTargetEffect(
 
 ## Example
 
-```ts
+```tsx
 import React, { useRef } from "react";
 import { useTargetEffect } from "@lilib/hooks";
 
@@ -34,6 +34,6 @@ function Example() {
     [domRef]
   );
 
-  ...
+  return <div ref={domRef}>...</div>;
 }
 ```

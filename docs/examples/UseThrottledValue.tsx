@@ -1,31 +1,12 @@
 import React, { useState } from "react";
-import { useThrottledValue, useToggle } from "@lilib/hooks";
-
-function random() {
-  return Math.ceil(Math.random() * 5000);
-}
+import { useThrottledValue } from "@lilib/hooks";
 
 function Example() {
-  const [wait, setWait] = useState(random());
-  const [leading, { toggle: toggleLeading }] = useToggle(false);
-  const [trailing, { toggle: toggleTrailing }] = useToggle(true);
-
   const [value, setValue] = useState("");
-  const options = { wait, leading, trailing };
-  const [throttledValue, { flush, cancel }] = useThrottledValue(value, options);
+  const [throttledValue] = useThrottledValue(value, 500);
 
   return (
     <>
-      <p>
-        Actions:{" "}
-        <button onClick={() => setWait(random())}>Change wait time</button>{" "}
-        <button onClick={() => toggleLeading()}>Toggle leading</button>{" "}
-        <button onClick={() => toggleTrailing()}>Toggle trailing</button>
-      </p>
-      <p>
-        Options:{" "}
-        {`{ wait: ${wait}, leading: ${leading}, trailing: ${trailing} }`}
-      </p>
       <p>
         Enter value:{" "}
         <input
@@ -33,12 +14,7 @@ function Example() {
           onChange={(event) => {
             setValue(event.target.value);
           }}
-        />{" "}
-        <button onClick={() => flush()}>Flush</button>{" "}
-        <button onClick={() => flush("final value")}>
-          Flush with "final value"
-        </button>{" "}
-        <button onClick={cancel}>Cancel</button>
+        />
       </p>
       <div>Throttled value: {throttledValue}</div>
     </>

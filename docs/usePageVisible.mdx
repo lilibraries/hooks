@@ -1,8 +1,3 @@
-import CodeBlock from "@theme/CodeBlock";
-import ExampleBlock from "./components/ExampleBlock";
-import Example from "./examples/UsePageVisible";
-import ExampleCode from "!!raw-loader!./examples/UsePageVisible";
-
 Detect whether the page is visible.
 
 ## API
@@ -13,7 +8,9 @@ function usePageVisible(): boolean;
 
 ## Example
 
-<ExampleBlock>
-  <Example />
-</ExampleBlock>
-<CodeBlock language="tsx">{ExampleCode}</CodeBlock>
+```ts
+function Example() {
+  const isPageVisible = usePageVisible()
+  ...
+}
+```
