@@ -5,9 +5,9 @@ import extname from "./utils/extname";
 import inBrowser from "./utils/inBrowser";
 
 const mimes = {
-  ico: "image/x-icon",
-  png: "image/png",
   gif: "image/gif",
+  png: "image/png",
+  ico: "image/x-icon",
 };
 
 function getHead() {
@@ -23,7 +23,7 @@ function getLink() {
 }
 
 function useFavicon(
-  href: string,
+  href: string | null,
   options?: { mime?: string; restore?: boolean }
 ) {
   const { mime, restore } = options || {};
@@ -38,7 +38,7 @@ function useFavicon(
     }
   }, []);
 
-  if (inBrowser && href && href !== prevHrefRef.current) {
+  if (inBrowser && href != null && href !== prevHrefRef.current) {
     const link = getLink() || document.createElement("link");
 
     link.href = href;
