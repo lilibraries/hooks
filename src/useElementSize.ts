@@ -5,7 +5,7 @@ import useLayoutTargetEffect from "./useLayoutTargetEffect";
 import getTarget from "./utils/getTarget";
 import { TargetCreator } from "./types";
 
-function useSize(target: TargetCreator<Element>) {
+function useElementSize(target: TargetCreator<Element>) {
   const [{ width, height }, setSize] = useSafeState(() => {
     const element = getTarget(target);
     if (element) {
@@ -44,4 +44,4 @@ function useSize(target: TargetCreator<Element>) {
   return { width, height } as const;
 }
 
-export default useSize;
+export default useElementSize;

@@ -1,7 +1,7 @@
 import CodeBlock from "@theme/CodeBlock";
 import ExampleBlock from "./components/ExampleBlock";
-import Example from "./examples/UseSize";
-import ExampleCode from "!!raw-loader!./examples/UseSize";
+import Example from "./examples/UseElementSize";
+import ExampleCode from "!!raw-loader!./examples/UseElementSize";
 
 Get DOM element size.
 
@@ -15,7 +15,7 @@ type TargetCreator<T> =
   | React.RefObject<Target<T>>
   | React.MutableRefObject<Target<T>>;
 
-function useSize(target: TargetCreator<Element>): {
+function useElementSize(target: TargetCreator<Element>): {
   readonly width: number;
   readonly height: number;
 };

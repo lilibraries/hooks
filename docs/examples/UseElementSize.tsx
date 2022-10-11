@@ -1,9 +1,9 @@
 import React, { useRef } from "react";
-import { useSize } from "@lilib/hooks";
+import { useElementSize } from "@lilib/hooks";
 
 function Example() {
   const ref = useRef(null);
-  const { width, height } = useSize(ref);
+  const { width, height } = useElementSize(ref);
 
   return (
     <div
