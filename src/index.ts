@@ -1,6 +1,7 @@
 export * from "./types";
 
 export { default as areDepsEqual } from "./utils/areDepsEqual";
+export { default as Cache } from "./utils/Cache";
 export { default as extname } from "./utils/extname";
 export { default as getTarget } from "./utils/getTarget";
 export { default as inBrowser } from "./utils/inBrowser";
