@@ -13,7 +13,7 @@ function useAnimation(
   options:
     | number
     | { duration: number; algorithm?: (percent: number) => number }
-): readonly [start: () => void, cancel: () => void];
+): [start: () => void, cancel: () => void];
 ```
 
 Params:

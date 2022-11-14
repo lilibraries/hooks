@@ -17,7 +17,7 @@ function useSessionStorage<T>(
     serialize?: (value: T) => string;
     deserialize?: (value: string) => T;
   }
-): readonly [
+): [
   value: T | undefined,
   setSessionStorage: (
     newValue: T | undefined | ((prevValue: T | undefined) => T | undefined)

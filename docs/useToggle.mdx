@@ -8,12 +8,12 @@ Use boolean value.
 ## API
 
 ```ts
-function useToggle(initialValue?: boolean): readonly [
+function useToggle(initialValue?: boolean): [
   value: boolean,
   actions: {
-    readonly toggle: (newValue?: boolean) => void;
-    readonly toggleOn: () => void;
-    readonly toggleOff: () => void;
+    toggle: (newValue?: boolean) => void;
+    toggleOn: () => void;
+    toggleOff: () => void;
   }
 ];
 ```

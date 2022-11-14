@@ -3,9 +3,7 @@ Use [requestAnimationFrame](https://developer.mozilla.org/en-US/docs/Web/API/win
 ## API
 
 ```ts
-function useRaf(
-  callback: () => void
-): readonly [start: () => void, cancel: () => void];
+function useRaf(callback: () => void): [start: () => void, cancel: () => void];
 ```
 
 Params:

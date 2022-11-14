@@ -10,7 +10,7 @@ This hook is like `this.setState` method of class component. It requires an obje
 ```ts
 function useSetState<S extends object>(
   initialState: S | (() => S)
-): readonly [
+): [
   state: S,
   setState: (patch: Partial<S> | ((prevState: S) => Partial<S>)) => void
 ];
