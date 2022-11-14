@@ -1,7 +1,7 @@
-import { useClickAway } from "@lilib/hooks";
+import { useClickOutside } from "@lilib/hooks";
 import renderHook from "./helpers/renderHook";
 
-describe("useClickAway", () => {
+describe("useClickOutside", () => {
   let button: HTMLButtonElement;
   let container: HTMLDivElement;
 
@@ -16,7 +16,7 @@ describe("useClickAway", () => {
   it("should trigger events correctly", () => {
     const mock = jest.fn();
     const { unmount } = renderHook(() => {
-      useClickAway(() => button, mock);
+      useClickOutside(() => button, mock);
     });
 
     const mouseDownEvent = document.createEvent("MouseEvents");
@@ -41,7 +41,7 @@ describe("useClickAway", () => {
   it("could change default container and event name", () => {
     const mock = jest.fn();
     renderHook(() => {
-      useClickAway(() => button, mock, { container, eventName: "click" });
+      useClickOutside(() => button, mock, { container, eventName: "click" });
     });
 
     button.click();

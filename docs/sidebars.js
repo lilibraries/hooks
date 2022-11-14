@@ -66,7 +66,7 @@ module.exports = {
         "useMatchMedia",
         "useWindowSize",
         "useElementSize",
-        "useClickAway",
+        "useClickOutside",
         "useEventListener",
         "useCookie",
         "useLocalStorage",

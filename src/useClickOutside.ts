@@ -3,7 +3,7 @@ import useTargetEffect from "./useTargetEffect";
 import getTarget from "./utils/getTarget";
 import { TargetCreator } from "./types";
 
-function useClickAway<E extends Event = Event>(
+function useClickOutside<E extends Event = Event>(
   target: TargetCreator<Node> | TargetCreator<Node>[],
   listener: (event: E) => void,
   options?: {
@@ -44,4 +44,4 @@ function useClickAway<E extends Event = Event>(
   );
 }
 
-export default useClickAway;
+export default useClickOutside;

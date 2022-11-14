@@ -1,14 +1,14 @@
 import CodeBlock from "@theme/CodeBlock";
 import ExampleBlock from "./components/ExampleBlock";
-import Example from "./examples/UseClickAway";
-import ExampleCode from "!!raw-loader!./examples/UseClickAway";
+import Example from "./examples/UseClickOutside";
+import ExampleCode from "!!raw-loader!./examples/UseClickOutside";
 
 Trigger a callback when clicking outside the target area.
 
 ## API
 
 ```ts
-function useClickAway<E extends Event = Event>(
+function useClickOutside<E extends Event = Event>(
   target: TargetCreator<Node> | TargetCreator<Node>[],
   listener: (event: E) => void,
   options?: {
