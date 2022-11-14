@@ -1,14 +1,13 @@
 export * from "./types";
 
-export { default as areDepsEqual } from "./utils/areDepsEqual";
-export { default as Cache } from "./utils/Cache";
-export { default as extname } from "./utils/extname";
-export { default as getTarget } from "./utils/getTarget";
 export { default as inBrowser } from "./utils/inBrowser";
-export { default as isEventTarget } from "./utils/isEventTarget";
-export { default as isFunction } from "./utils/isFunction";
-export { default as isObject } from "./utils/isObject";
 export { default as mergeRefs } from "./utils/mergeRefs";
+export { default as getTarget } from "./utils/getTarget";
+export { default as getExtname } from "./utils/getExtname";
+export { default as isObject } from "./utils/isObject";
+export { default as isFunction } from "./utils/isFunction";
+export { default as areDepsEqual } from "./utils/areDepsEqual";
+export { default as isEventTarget } from "./utils/isEventTarget";
 
 export { default as useOnce } from "./useOnce";
 export { default as useMount } from "./useMount";

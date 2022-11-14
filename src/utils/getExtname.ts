@@ -1,5 +1,7 @@
-function extname(url: string): string {
-  if (typeof url === "string" && url !== "") {
+function getExtname(url: string): string {
+  url = String(url);
+
+  if (url) {
     const blocks = url.split(/[#?]/);
 
     if (blocks.length) {
@@ -15,4 +17,4 @@ function extname(url: string): string {
   return "";
 }
 
-export default extname;
+export default getExtname;

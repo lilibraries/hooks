@@ -1,8 +1,8 @@
 import { useMemo } from "react";
 import useUnmount from "./useUnmount";
 import usePreviousRef from "./usePreviousRef";
-import extname from "./utils/extname";
 import inBrowser from "./utils/inBrowser";
+import getExtname from "./utils/getExtname";
 
 const mimes = {
   gif: "image/gif",
@@ -43,7 +43,8 @@ function useFavicon(
 
     link.href = href;
     link.rel = "shortcut icon";
-    link.type = mime || mimes[extname(href) as keyof typeof mimes] || mimes.ico;
+    link.type =
+      mime || mimes[getExtname(href) as keyof typeof mimes] || mimes.ico;
 
     if (!getLink()) {
       const head = getHead();
