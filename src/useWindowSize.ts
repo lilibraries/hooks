@@ -7,7 +7,7 @@ function useWindowSize() {
     if (inBrowser) {
       return { width: window.innerWidth, height: window.innerHeight };
     } else {
-      return { width: 0, height: 0 };
+      return { width: undefined, height: undefined };
     }
   });
 

@@ -8,7 +8,10 @@ Get window size.
 ## API
 
 ```ts
-function useWindowSize(): { width: number; height: number };
+function useWindowSize(): {
+  width: number | undefined;
+  height: number | undefined;
+};
 ```
 
 ## Example

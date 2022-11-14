@@ -3,7 +3,7 @@ import { useElementSize } from "@lilib/hooks";
 
 function Example() {
   const ref = useRef(null);
-  const { width, height } = useElementSize(ref);
+  const { width = 0, height = 0 } = useElementSize(ref);
 
   return (
     <div
@@ -13,7 +13,7 @@ function Example() {
         border: "1px solid rgba(128, 128, 128, 0.25)",
       }}
     >
-      Width: {width} Height: {height}
+      Element size: {JSON.stringify({ width, height })}
     </div>
   );
 }

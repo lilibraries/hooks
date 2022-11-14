@@ -10,7 +10,7 @@ describe("useElementSize", () => {
       return useElementSize(() => element);
     });
 
-    expect(typeof result.current.width).toBe("number");
-    expect(typeof result.current.height).toBe("number");
+    expect("width" in result.current).toBe(true);
+    expect("height" in result.current).toBe(true);
   });
 });

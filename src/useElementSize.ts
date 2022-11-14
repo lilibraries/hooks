@@ -12,7 +12,7 @@ function useElementSize(target: TargetCreator<Element>) {
       const rect = element.getBoundingClientRect();
       return { width: rect.width, height: rect.height };
     } else {
-      return { width: 0, height: 0 };
+      return { width: undefined, height: undefined };
     }
   });
 
