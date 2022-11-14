@@ -4,10 +4,8 @@ This hook is used in the same way as React.useState, expect that calling `setSta
 
 ```ts
 function useSafeState<S>(
-  initialState: S | (() => S)
-): readonly [state: S, setState: React.Dispatch<React.SetStateAction<S>>];
-
-function useSafeState<S = undefined>(): readonly [
+  initialState?: S | (() => S)
+): readonly [
   state: S | undefined,
   setState: React.Dispatch<React.SetStateAction<S | undefined>>
 ];

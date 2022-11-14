@@ -10,22 +10,6 @@ Get, set and/or remove `localStorage`.
 ```ts
 function useLocalStorage<T>(
   key: string,
-  options: {
-    defaultValue: T;
-    polling?: boolean;
-    pollingInterval?: number;
-    serialize?: (value: T) => string;
-    deserialize?: (value: string) => T;
-  }
-): readonly [
-  value: T,
-  setLocalStorage: (
-    newValue: T | undefined | ((prevValue: T) => T | undefined)
-  ) => void
-];
-
-function useLocalStorage<T>(
-  key: string,
   options?: {
     defaultValue?: T;
     polling?: boolean;

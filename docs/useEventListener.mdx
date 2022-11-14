@@ -8,13 +8,6 @@ Set up the event listener to the target.
 ## API
 
 ```ts
-type Target<T> = T | undefined | null;
-type TargetCreator<T> =
-  | Target<T>
-  | (() => Target<T>)
-  | React.RefObject<Target<T>>
-  | React.MutableRefObject<Target<T>>;
-
 function useEventListener<
   T extends EventTarget = EventTarget,
   E extends Event = Event
@@ -24,6 +17,13 @@ function useEventListener<
   listener: (event: E) => void,
   options?: boolean | { capture?: boolean; once?: boolean; passive?: boolean }
 ): void;
+
+type Target<T> = T | undefined | null;
+type TargetCreator<T> =
+  | Target<T>
+  | (() => Target<T>)
+  | React.RefObject<Target<T>>
+  | React.MutableRefObject<Target<T>>;
 ```
 
 Params:

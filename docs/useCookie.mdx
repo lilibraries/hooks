@@ -8,29 +8,6 @@ This hook use [js-cookie](https://github.com/js-cookie/js-cookie) as the parser.
 ## API
 
 ```ts
-interface CookieAttributes {
-  path?: string;
-  domain?: string;
-  secure?: boolean;
-  expires?: number | Date;
-  sameSite?: "strict" | "Strict" | "lax" | "Lax" | "none" | "None";
-}
-
-function useCookie(
-  name: string,
-  options: {
-    defaultValue: string;
-    polling?: boolean;
-    pollingInterval?: number;
-  }
-): readonly [
-  value: string,
-  setCookie: (
-    newValue: string | undefined | ((prevValue: string) => string | undefined),
-    attributes?: CookieAttributes
-  ) => void
-];
-
 function useCookie(
   name: string,
   options?: {
@@ -48,6 +25,14 @@ function useCookie(
     attributes?: CookieAttributes
   ) => void
 ];
+
+interface CookieAttributes {
+  path?: string;
+  domain?: string;
+  secure?: boolean;
+  expires?: number | Date;
+  sameSite?: "strict" | "Strict" | "lax" | "Lax" | "none" | "None";
+}
 ```
 
 Params:

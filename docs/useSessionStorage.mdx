@@ -10,22 +10,6 @@ Get, set and/or remove `sessionStorage`.
 ```ts
 function useSessionStorage<T>(
   key: string,
-  options: {
-    defaultValue: T;
-    polling?: boolean;
-    pollingInterval?: number;
-    serialize?: (value: T) => string;
-    deserialize?: (value: string) => T;
-  }
-): readonly [
-  value: T,
-  setSessionStorage: (
-    newValue: T | undefined | ((prevValue: T) => T | undefined)
-  ) => void
-];
-
-function useSessionStorage<T>(
-  key: string,
   options?: {
     defaultValue?: T;
     polling?: boolean;

@@ -8,13 +8,6 @@ Trigger a callback when clicking outside the target area.
 ## API
 
 ```ts
-type Target<T> = T | undefined | null;
-type TargetCreator<T> =
-  | Target<T>
-  | (() => Target<T>)
-  | React.RefObject<Target<T>>
-  | React.MutableRefObject<Target<T>>;
-
 function useClickAway<E extends Event = Event>(
   target: TargetCreator<Node> | TargetCreator<Node>[],
   listener: (event: E) => void,
@@ -23,6 +16,13 @@ function useClickAway<E extends Event = Event>(
     eventName?: string | string[];
   }
 ): void;
+
+type Target<T> = T | undefined | null;
+type TargetCreator<T> =
+  | Target<T>
+  | (() => Target<T>)
+  | React.RefObject<Target<T>>
+  | React.MutableRefObject<Target<T>>;
 ```
 
 - **`target`:** Target node or nodes.

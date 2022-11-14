@@ -3,18 +3,18 @@ This hook is similar to React.useEffect, but it has one more `targets` parameter
 ## API
 
 ```ts
+function useTargetEffect(
+  effect: React.EffectCallback,
+  deps: React.DependencyList,
+  targets: TargetCreator<any>[]
+): void;
+
 type Target<T> = T | undefined | null;
 type TargetCreator<T> =
   | Target<T>
   | (() => Target<T>)
   | React.RefObject<Target<T>>
   | React.MutableRefObject<Target<T>>;
-
-function useTargetEffect(
-  effect: React.EffectCallback,
-  deps: React.DependencyList,
-  targets: TargetCreator<any>[]
-): void;
 ```
 
 ## Example

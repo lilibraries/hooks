@@ -8,17 +8,17 @@ Get DOM element size.
 ## API
 
 ```ts
+function useElementSize(target: TargetCreator<Element>): {
+  readonly width: number;
+  readonly height: number;
+};
+
 type Target<T> = T | undefined | null;
 type TargetCreator<T> =
   | Target<T>
   | (() => Target<T>)
   | React.RefObject<Target<T>>
   | React.MutableRefObject<Target<T>>;
-
-function useElementSize(target: TargetCreator<Element>): {
-  readonly width: number;
-  readonly height: number;
-};
 ```
 
 Params:
