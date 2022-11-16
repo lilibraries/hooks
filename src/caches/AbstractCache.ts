@@ -1,6 +1,6 @@
 const DEFAULT_CACHE_TIME = 5 * 60 * 1000;
 
-class Cache {
+class AbstractCache {
   map = new Map<
     {},
     {
@@ -88,4 +88,4 @@ class Cache {
   }
 }
 
-export default Cache;
+export default AbstractCache;

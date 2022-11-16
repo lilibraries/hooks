@@ -6,3 +6,7 @@ export type TargetCreator<T> =
   | (() => Target<T>)
   | RefObject<Target<T>>
   | MutableRefObject<Target<T>>;
+
+export type ResolvePromise<T extends Promise<any>> = T extends Promise<infer P>
+  ? P
+  : never;
