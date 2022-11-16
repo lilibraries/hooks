@@ -9,8 +9,8 @@ Get DOM element size.
 
 ```ts
 function useElementSize(target: TargetCreator<Element>): {
-  width: number;
-  height: number;
+  width: number | undefined;
+  height: number | undefined;
 };
 
 type Target<T> = T | undefined | null;
@@ -27,8 +27,8 @@ Params:
 
 Results:
 
-- **`width`:** Element width. Default is `0`.
-- **`height`:** Element height. Default is `0`.
+- **`width`:** Element width.
+- **`height`:** Element height.
 
 ## Example
 
