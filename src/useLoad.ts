@@ -2,27 +2,36 @@ import { DependencyList } from "react";
 import { ResolvePromise } from "./types";
 
 export declare function useLoad<
-  C extends (...args: any[]) => Promise<any>,
-  D = ResolvePromise<ReturnType<C>>
+  Callback extends (...args: any[]) => Promise<any>,
+  Data = ResolvePromise<ReturnType<Callback>>
 >(
-  callback: C,
+  callback: Callback,
   deps: DependencyList,
   options?: {
-    key?: any;
+    key?: {};
+
     idle?: boolean;
     imperative?: boolean;
-    fallback?: C;
-    initialData?: D;
-    defaultParams?: Parameters<C>;
+    independent?: boolean;
 
+    fallback?: Callback;
+    initialData?: Data;
+    defaultParams?: Parameters<Callback>;
+
+    cache?: boolean;
+    cacheKey?: {};
+    cacheSync?: boolean;
     cacheTime?: number;
     staleTime?: number;
 
+    retry?: boolean;
     retryLimit?: number;
     retryInterval?: number | ((count: number) => number);
+    fallbackRetry?: boolean;
     fallbackRetryLimit?: number;
     fallbackRetryInterval?: number | ((count: number) => number);
 
+    polling?: boolean;
     pollingInterval?: number;
     pollingInPageHiding?: boolean;
     pollingIntervalInPageHiding?: number;
@@ -32,18 +41,18 @@ export declare function useLoad<
     autoReloadOnWindowFocus?: boolean;
     autoReloadOnNetworkReconnect?: boolean;
 
-    onSuccess: (data: D) => void;
+    onSuccess: (data: Data) => void;
     onFailure: (error: any) => void;
     onFinally: () => void;
   }
 ): {
-  data: D;
+  data: Data | undefined;
   error: any;
   loading: boolean;
   reloading: boolean;
   initializing: boolean;
-  load: C;
+  load: Callback;
   reload: () => void;
-  update: (newData: D | ((prevData?: D) => D)) => void;
+  update: (newData: Data | ((prevData?: Data) => Data)) => void;
   cancel: () => void;
 };

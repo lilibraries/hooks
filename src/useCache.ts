@@ -1,20 +1,15 @@
-export declare function useCache<D>(
-  key: any,
+export declare function useCache<T>(
+  key: {},
   options?: {
-    onSet?: (data: D) => void;
-    onStale?: (data: D) => void;
-    onRemove?: (data: D) => void;
+    cacheTime?: number;
+    cacheSync?: boolean;
+    defaultValue?: T;
+    onSet?: (value: T) => void;
+    onRemove?: (value: T) => void;
   }
 ): [
-  data: D | undefined,
-  actions: {
-    set: (
-      key: any,
-      data: D,
-      options?: { cacheTime?: number; staleTime?: number }
-    ) => void;
-    stale: () => void;
-    remove: () => void;
-    isStale: () => boolean;
-  }
+  value: T | undefined,
+  setCache: (
+    newValue: T | undefined | ((prevValue: T | undefined) => T | undefined)
+  ) => void
 ];

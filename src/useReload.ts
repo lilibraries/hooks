@@ -1,1 +1,1 @@
-export declare function useReload(key: any): () => void;
+export declare function useReload(key: {}): () => void;
