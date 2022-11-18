@@ -1,6 +1,42 @@
 import { DependencyList } from "react";
 import { ResolvePromise } from "./types";
 
+export interface LoadConfigProps {
+  global?: boolean;
+  inherit?: boolean;
+
+  cache?: boolean;
+  cacheTime?: number;
+  staleTime?: number;
+
+  retry?: boolean;
+  retryLimit?: number;
+  retryInterval?: number | ((count: number) => number);
+  fallbackRetry?: boolean;
+  fallbackRetryLimit?: number;
+  fallbackRetryInterval?: number | ((count: number) => number);
+
+  polling?: boolean;
+  pollingInterval?: number;
+  pollingInPageHiding?: boolean;
+  pollingIntervalInPageHiding?: number;
+
+  autoReloadWaitTime?: number;
+  autoReloadOnPageShow?: boolean;
+  autoReloadOnWindowFocus?: boolean;
+  autoReloadOnNetworkReconnect?: boolean;
+
+  onStale?: (data: any, key?: {}) => void;
+  onSuccess?: (data: any, key?: {}) => void;
+  onFailure?: (error: any, key?: {}) => void;
+  onFinally?: (key?: {}) => void;
+
+  handleStale?: (data: any, key?: {}) => void;
+  handleSuccess?: (data: any, key?: {}) => void;
+  handleFailure?: (error: any, key?: {}) => void;
+  handleFinally?: (key?: {}) => void;
+}
+
 export declare function useLoad<
   Callback extends (...args: any[]) => Promise<any>,
   Data = ResolvePromise<ReturnType<Callback>>
@@ -19,8 +55,6 @@ export declare function useLoad<
     defaultParams?: Parameters<Callback>;
 
     cache?: boolean;
-    cacheKey?: {};
-    cacheSync?: boolean;
     cacheTime?: number;
     staleTime?: number;
 
@@ -41,9 +75,10 @@ export declare function useLoad<
     autoReloadOnWindowFocus?: boolean;
     autoReloadOnNetworkReconnect?: boolean;
 
-    onSuccess: (data: Data) => void;
-    onFailure: (error: any) => void;
-    onFinally: () => void;
+    onStale?: (data: Data) => void;
+    onSuccess?: (data: Data) => void;
+    onFailure?: (error: any) => void;
+    onFinally?: () => void;
   }
 ): {
   data: Data | undefined;

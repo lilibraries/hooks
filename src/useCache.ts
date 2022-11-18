@@ -1,3 +1,14 @@
+import AbstractCache from "./caches/AbstractCache";
+
+export interface CacheConfigProps {
+  global?: boolean;
+  inherit?: boolean;
+
+  cache?: AbstractCache;
+  cacheTime?: number;
+  cacheSync?: boolean;
+}
+
 export declare function useCache<T>(
   key: {},
   options?: {
