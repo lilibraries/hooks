@@ -1,10 +1,13 @@
 export * from "./types";
 
 export { default as inBrowser } from "./utils/inBrowser";
+export { default as EventEmitter } from "./utils/EventEmitter";
 export { default as mergeRefs } from "./utils/mergeRefs";
 export { default as getTarget } from "./utils/getTarget";
 export { default as getExtname } from "./utils/getExtname";
 export { default as isObject } from "./utils/isObject";
+export { default as isString } from "./utils/isString";
+export { default as isSymbol } from "./utils/isSymbol";
 export { default as isFunction } from "./utils/isFunction";
 export { default as areDepsEqual } from "./utils/areDepsEqual";
 export { default as isEventTarget } from "./utils/isEventTarget";
