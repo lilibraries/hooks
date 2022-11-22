@@ -16,6 +16,11 @@ describe("utils/EventEmitter", () => {
     ee.once("once", onceMock);
     ee.on(symbol, paramsMock);
 
+    expect(ee.count("base")).toBe(1);
+    expect(ee.count("once")).toBe(1);
+    expect(ee.count(symbol)).toBe(1);
+    expect(ee.count()).toBe(3);
+
     ee.emit("base");
     ee.emit("once");
     ee.emit(symbol, 1, 2);
@@ -23,6 +28,10 @@ describe("utils/EventEmitter", () => {
     expect(baseMock).toBeCalledTimes(1);
     expect(onceMock).toBeCalledTimes(1);
     expect(paramsMock).toBeCalledTimes(1);
+    expect(ee.count("base")).toBe(1);
+    expect(ee.count("once")).toBe(0);
+    expect(ee.count(symbol)).toBe(1);
+    expect(ee.count()).toBe(2);
     expect(sum).toBe(3);
 
     ee.off("base", baseMock);
@@ -33,6 +42,10 @@ describe("utils/EventEmitter", () => {
     expect(baseMock).toBeCalledTimes(1);
     expect(onceMock).toBeCalledTimes(1);
     expect(paramsMock).toBeCalledTimes(2);
+    expect(ee.count("base")).toBe(0);
+    expect(ee.count("once")).toBe(0);
+    expect(ee.count(symbol)).toBe(1);
+    expect(ee.count()).toBe(1);
     expect(sum).toBe(10);
   });
 
@@ -120,5 +133,26 @@ describe("utils/EventEmitter", () => {
     expect(mock).toBeCalledTimes(1);
     expect(error).toBeCalledTimes(1);
     error.mockReset();
+  });
+
+  it("should warn correctly when more than max listeners are listened to", () => {
+    const ee = new EventEmitter();
+    const warn = jest.fn();
+    jest.spyOn(console, "warn").mockImplementation(warn);
+
+    let i = 1;
+    for (; i <= 100; i++) {
+      ee.on("event", () => {});
+    }
+    expect(warn).toBeCalledTimes(0);
+
+    ee.on("event", () => {});
+    expect(warn).toBeCalledTimes(1);
+
+    for (; i <= 110; i++) {
+      ee.on("event", () => {});
+    }
+    expect(warn).toBeCalledTimes(1);
+    warn.mockReset();
   });
 });

@@ -2,14 +2,17 @@ import isString from "./isString";
 import isSymbol from "./isSymbol";
 import isFunction from "./isFunction";
 
-type EventName = string | symbol;
-
-interface EventListener {
+export type EventName = string | symbol;
+export interface EventListener {
   (...args: any[]): void;
 }
+
 interface EventListenerWrapper extends EventListener {
   __LISTENER__?: EventListener;
 }
+
+const MAX = 100;
+const warned: { [message: string]: boolean } = {};
 
 function checkName(name: unknown) {
   if (!isString(name) && !isSymbol(name)) {
@@ -39,10 +42,20 @@ class EventEmitter {
     checkName(name);
     checkListener(listener);
 
-    if (this.events[name]) {
-      this.events[name]?.push(listener);
+    let listeners = this.events[name];
+    if (listeners) {
+      listeners.push(listener);
     } else {
-      this.events[name] = [listener];
+      listeners = this.events[name] = [listener];
+    }
+
+    if (listeners.length > MAX) {
+      // prettier-ignore
+      const message = `More than ${MAX} \`${String(name)}\` events are listened to, which may lead to memory leaks.`;
+      if (!warned[message]) {
+        console.warn(message);
+        warned[message] = true;
+      }
     }
 
     return this;
@@ -108,6 +121,23 @@ class EventEmitter {
     }
 
     return this;
+  }
+
+  count(name?: EventName): number {
+    let sum = 0;
+
+    if (name !== undefined) {
+      sum = this.events[name]?.length || 0;
+    } else {
+      [
+        ...Object.getOwnPropertyNames(this.events),
+        ...Object.getOwnPropertySymbols(this.events),
+      ].forEach((name) => {
+        sum += this.events[name]?.length || 0;
+      });
+    }
+
+    return sum;
   }
 }
 
