@@ -2,11 +2,11 @@ import isString from "./isString";
 import isSymbol from "./isSymbol";
 import isFunction from "./isFunction";
 
-export type EventName = string | symbol;
-export interface EventListener {
+type EventName = string | symbol;
+
+interface EventListener {
   (...args: any[]): void;
 }
-
 interface EventListenerWrapper extends EventListener {
   __LISTENER__?: EventListener;
 }
@@ -127,6 +127,7 @@ class EventEmitter {
     let sum = 0;
 
     if (name !== undefined) {
+      checkName(name);
       sum = this.events[name]?.length || 0;
     } else {
       [
