@@ -18,19 +18,14 @@ describe("utils/EventEmitter", () => {
     emitter.once("once", onceMock);
     emitter.on(symbol, paramsMock);
 
-    expect(emitter.count()).toBe(3);
-    expect(emitter.count("base")).toBe(1);
-    expect(emitter.count("once")).toBe(1);
-    expect(emitter.count(symbol)).toBe(1);
+    expect(sum).toBe(0);
+    expect(baseMock).toBeCalledTimes(0);
+    expect(onceMock).toBeCalledTimes(0);
+    expect(paramsMock).toBeCalledTimes(0);
 
     emitter.emit("base");
     emitter.emit("once");
     emitter.emit(symbol, 1, 2);
-
-    expect(emitter.count()).toBe(2);
-    expect(emitter.count("base")).toBe(1);
-    expect(emitter.count("once")).toBe(0);
-    expect(emitter.count(symbol)).toBe(1);
 
     expect(sum).toBe(3);
     expect(baseMock).toBeCalledTimes(1);
@@ -41,11 +36,6 @@ describe("utils/EventEmitter", () => {
     emitter.emit("base");
     emitter.emit("once");
     emitter.emit(symbol, 3, 4);
-
-    expect(emitter.count()).toBe(1);
-    expect(emitter.count("base")).toBe(0);
-    expect(emitter.count("once")).toBe(0);
-    expect(emitter.count(symbol)).toBe(1);
 
     expect(sum).toBe(10);
     expect(baseMock).toBeCalledTimes(1);
@@ -89,6 +79,16 @@ describe("utils/EventEmitter", () => {
     const invalidListener: any = null;
 
     expect(() => {
+      emitter.checkEventName(invalidName);
+    }).toThrow(TypeError);
+    expect(() => {
+      emitter.checkEventName("");
+    }).toThrow(TypeError);
+    expect(() => {
+      emitter.checkEventListener(invalidListener);
+    }).toThrow(TypeError);
+
+    expect(() => {
       emitter.on(invalidName, validListener);
     }).toThrow(TypeError);
     expect(() => {
@@ -114,7 +114,11 @@ describe("utils/EventEmitter", () => {
     }).toThrow(TypeError);
 
     expect(() => {
-      emitter.count(invalidName);
+      emitter.getListeners(invalidName);
+    }).toThrow(TypeError);
+
+    expect(() => {
+      emitter.getListenersCount(invalidName);
     }).toThrow(TypeError);
   });
 
@@ -145,10 +149,13 @@ describe("utils/EventEmitter", () => {
     error.mockReset();
   });
 
-  it("should warn correctly when more than max listeners are listened to", () => {
+  it("should set maxListeners correctly", () => {
     const emitter = new EventEmitter();
     const warn = jest.fn();
     jest.spyOn(console, "warn").mockImplementation(warn);
+
+    expect(EventEmitter.DEFAULT_MAX_LISTENERS).toBe(100);
+    expect(emitter.getMaxListeners()).toBe(EventEmitter.DEFAULT_MAX_LISTENERS);
 
     let i = 1;
     for (; i <= 100; i++) {
@@ -156,6 +163,7 @@ describe("utils/EventEmitter", () => {
     }
     expect(warn).toBeCalledTimes(0);
 
+    i++;
     emitter.on("event", () => {});
     expect(warn).toBeCalledTimes(1);
 
@@ -164,6 +172,107 @@ describe("utils/EventEmitter", () => {
     }
     expect(warn).toBeCalledTimes(1);
 
+    emitter.setMaxListeners(200);
+    for (; i <= 200; i++) {
+      emitter.on("event", () => {});
+    }
+    expect(warn).toBeCalledTimes(1);
+
+    i++;
+    emitter.on("event", () => {});
+    expect(warn).toBeCalledTimes(2);
+
+    for (; i <= 210; i++) {
+      emitter.on("event", () => {});
+    }
+    expect(warn).toBeCalledTimes(2);
+
     warn.mockReset();
+  });
+
+  it("should remove all listeners correctly", () => {
+    const mock1 = jest.fn();
+    const mock2 = jest.fn();
+
+    const emitter = new EventEmitter();
+    emitter.on("event1", mock1);
+    emitter.on("event1", mock1);
+    emitter.on("event2", mock2);
+    emitter.on("event2", mock2);
+
+    emitter.emit("event1");
+    emitter.emit("event2");
+    expect(mock1).toBeCalledTimes(2);
+    expect(mock2).toBeCalledTimes(2);
+
+    emitter.removeAllListeners("event1");
+    emitter.emit("event1");
+    emitter.emit("event2");
+    expect(mock1).toBeCalledTimes(2);
+    expect(mock2).toBeCalledTimes(4);
+
+    emitter.removeAllListeners();
+    emitter.emit("event1");
+    emitter.emit("event2");
+    expect(mock1).toBeCalledTimes(2);
+    expect(mock2).toBeCalledTimes(4);
+  });
+
+  it("get event names correctly", () => {
+    const emitter = new EventEmitter();
+
+    emitter.on("1", () => {});
+    emitter.on("1", () => {});
+    emitter.on("2", () => {});
+    emitter.once("3", () => {});
+    expect(emitter.getEventNames()).toEqual(["1", "2", "3"]);
+
+    emitter.emit("1");
+    emitter.emit("2");
+    emitter.emit("3");
+    expect(emitter.getEventNames()).toEqual(["1", "2"]);
+  });
+
+  it("should get listeners correctly", () => {
+    const mock1 = jest.fn();
+    const mock2 = jest.fn();
+    const emitter = new EventEmitter();
+
+    emitter.on("event", mock1);
+    emitter.once("event", mock2);
+    expect(emitter.getListeners("event")).toEqual([mock1, mock2]);
+  });
+
+  it("should get listeners count correctly", () => {
+    const emitter = new EventEmitter();
+    const mock = jest.fn();
+
+    emitter.on("event1", mock);
+    emitter.on("event1", mock);
+    emitter.once("event2", mock);
+    expect(emitter.getListenersCount()).toBe(3);
+    expect(emitter.getListenersCount("event1")).toBe(2);
+    expect(emitter.getListenersCount("event2")).toBe(1);
+
+    emitter.emit("event1");
+    emitter.emit("event2");
+    expect(emitter.getListenersCount()).toBe(2);
+    expect(emitter.getListenersCount("event1")).toBe(2);
+    expect(emitter.getListenersCount("event2")).toBe(0);
+
+    emitter.off("event1", mock);
+    expect(emitter.getListenersCount()).toBe(1);
+    expect(emitter.getListenersCount("event1")).toBe(1);
+    expect(emitter.getListenersCount("event2")).toBe(0);
+  });
+
+  it("some methods should return this", () => {
+    const emitter = new EventEmitter();
+
+    expect(emitter.on("event", () => {})).toBe(emitter);
+    expect(emitter.once("event", () => {})).toBe(emitter);
+    expect(emitter.off("event", () => {})).toBe(emitter);
+    expect(emitter.emit("event")).toBe(emitter);
+    expect(emitter.removeAllListeners("event")).toBe(emitter);
   });
 });
