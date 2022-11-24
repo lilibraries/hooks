@@ -18,11 +18,14 @@ module.exports = function (api, options = {}) {
           : {
               bugfixes: true,
               modules: isCJS ? "cjs" : isESM ? false : "auto",
+              forceAllTransforms: true,
+              ignoreBrowserslistConfig: true,
             },
       ],
       [
         "@babel/preset-react",
         {
+          runtime: "classic",
           development: isCJS || isESM ? false : isTest || isDevelopment,
         },
       ],
