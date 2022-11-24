@@ -3,8 +3,6 @@ import raf from "raf";
 import useUnmount from "./useUnmount";
 import usePersist from "./usePersist";
 import useLatestRef from "./useLatestRef";
-import isObject from "./utils/isObject";
-import isFunction from "./utils/isFunction";
 
 function useAnimation(
   callback: (percent: number) => void,
@@ -17,11 +15,11 @@ function useAnimation(
 
   if (typeof options === "number") {
     duration = options;
-  } else if (isObject(options)) {
-    if (options.duration !== undefined) {
+  } else if (options) {
+    if (options.duration) {
       duration = +options.duration;
     }
-    if (isFunction(options.algorithm)) {
+    if (options.algorithm) {
       algorithm = options.algorithm;
     }
   }

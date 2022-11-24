@@ -1,9 +1,9 @@
+import isObject from "lodash/isObject";
 import usePersist from "./usePersist";
 import useTargetEffect from "./useTargetEffect";
-import isObject from "./utils/isObject";
 import getTarget from "./utils/getTarget";
 import isEventTarget from "./utils/isEventTarget";
-import { TargetCreator } from "./types";
+import { TargetCreator } from "./utils/types";
 
 function useEventListener<
   T extends EventTarget = EventTarget,

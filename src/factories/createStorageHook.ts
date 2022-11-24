@@ -1,11 +1,11 @@
 import { useEffect } from "react";
-import deepEqual from "fast-deep-equal/es6";
+import deepEqual from "fast-deep-equal";
+import isFunction from "lodash/isFunction";
 import useUpdate from "../useUpdate";
 import usePersist from "../usePersist";
 import useInterval from "../useInterval";
 import useSafeState from "../useSafeState";
 import useEventListener from "../useEventListener";
-import isFunction from "../utils/isFunction";
 
 function createStorageHook(storage: Storage | null) {
   function useStorage<T>(

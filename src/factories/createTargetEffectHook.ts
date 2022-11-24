@@ -2,7 +2,7 @@ import { DependencyList, EffectCallback, useEffect, useRef } from "react";
 import useUnmount from "../useUnmount";
 import getTarget from "../utils/getTarget";
 import areDepsEqual from "../utils/areDepsEqual";
-import { Target, TargetCreator } from "../types";
+import { Target, TargetCreator } from "../utils/types";
 
 function createTargetEffectHook(useHook: typeof useEffect) {
   return function (

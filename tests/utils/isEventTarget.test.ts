@@ -1,4 +1,4 @@
-import { isEventTarget } from "@lilib/hooks";
+import isEventTarget from "../../src/utils/isEventTarget";
 
 describe("utils/isEventTarget", () => {
   it("should validate correctly", () => {

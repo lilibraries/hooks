@@ -1,10 +1,7 @@
-import AbstractCache from "./caches/AbstractCache";
-
 export interface CacheConfigProps {
   global?: boolean;
   inherit?: boolean;
-
-  cache?: AbstractCache;
+  cache?: any;
   cacheTime?: number;
   cacheSync?: boolean;
 }

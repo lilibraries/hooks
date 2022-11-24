@@ -1,4 +1,4 @@
-import { inBrowser } from "@lilib/hooks";
+import inBrowser from "../../src/utils/inBrowser";
 
 describe("utils/inBrowser", () => {
   it("should be a boolean", () => {

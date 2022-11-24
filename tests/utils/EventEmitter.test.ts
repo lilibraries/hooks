@@ -1,4 +1,4 @@
-import { EventEmitter } from "@lilib/hooks";
+import EventEmitter from "../../src/utils/EventEmitter";
 
 describe("utils/EventEmitter", () => {
   it("should emit callbacks correctly", () => {
@@ -101,6 +101,9 @@ describe("utils/EventEmitter", () => {
     expect(() => {
       emitter.off(validName, invalidListener);
     }).toThrow(TypeError);
+    expect(() => {
+      emitter.off(invalidName);
+    }).toThrow(TypeError);
 
     expect(() => {
       emitter.once(invalidName, validListener);
@@ -155,7 +158,7 @@ describe("utils/EventEmitter", () => {
     jest.spyOn(console, "warn").mockImplementation(warn);
 
     expect(EventEmitter.DEFAULT_MAX_LISTENERS).toBe(100);
-    expect(emitter.getMaxListeners()).toBe(EventEmitter.DEFAULT_MAX_LISTENERS);
+    expect(emitter.maxListeners).toBe(EventEmitter.DEFAULT_MAX_LISTENERS);
 
     let i = 1;
     for (; i <= 100; i++) {
@@ -172,7 +175,7 @@ describe("utils/EventEmitter", () => {
     }
     expect(warn).toBeCalledTimes(1);
 
-    emitter.setMaxListeners(200);
+    emitter.maxListeners = 200;
     for (; i <= 200; i++) {
       emitter.on("event", () => {});
     }
@@ -205,13 +208,13 @@ describe("utils/EventEmitter", () => {
     expect(mock1).toBeCalledTimes(2);
     expect(mock2).toBeCalledTimes(2);
 
-    emitter.removeAllListeners("event1");
+    emitter.off("event1");
     emitter.emit("event1");
     emitter.emit("event2");
     expect(mock1).toBeCalledTimes(2);
     expect(mock2).toBeCalledTimes(4);
 
-    emitter.removeAllListeners();
+    emitter.off();
     emitter.emit("event1");
     emitter.emit("event2");
     expect(mock1).toBeCalledTimes(2);
@@ -273,6 +276,5 @@ describe("utils/EventEmitter", () => {
     expect(emitter.once("event", () => {})).toBe(emitter);
     expect(emitter.off("event", () => {})).toBe(emitter);
     expect(emitter.emit("event")).toBe(emitter);
-    expect(emitter.removeAllListeners("event")).toBe(emitter);
   });
 });

@@ -1,8 +1,8 @@
-import { ResolvePromise } from "./types";
+import { PromiseResolve } from "./utils/types";
 
 export declare function useSubmit<
   Callback extends (...args: any[]) => Promise<any>,
-  Data = ResolvePromise<ReturnType<Callback>>
+  Data = PromiseResolve<ReturnType<Callback>>
 >(
   callback: Callback,
   options?: {

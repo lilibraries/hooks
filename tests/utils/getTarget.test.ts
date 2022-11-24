@@ -1,4 +1,5 @@
-import { getTarget, inBrowser } from "@lilib/hooks";
+import inBrowser from "../../src/utils/inBrowser";
+import getTarget from "../../src/utils/getTarget";
 
 describe("utils/getTarget", () => {
   it("should get target correctly", () => {

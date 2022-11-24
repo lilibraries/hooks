@@ -1,33 +1,25 @@
-import isString from "./isString";
-import isSymbol from "./isSymbol";
-import isFunction from "./isFunction";
+import isString from "lodash/isString";
+import isSymbol from "lodash/isSymbol";
+import isFunction from "lodash/isFunction";
 
-type EventName = string | symbol;
+type Name = string | symbol;
 
-interface EventListener {
+interface Listener {
   (...args: any[]): void;
 }
-interface EventListenerWrapper extends EventListener {
-  __RAW_LISTENER__?: EventListener;
+interface ListenerWrapper extends Listener {
+  __RAW_LISTENER__?: Listener;
 }
 
 class EventEmitter {
   static DEFAULT_MAX_LISTENERS = 100;
 
   private listeners: {
-    [name: EventName]: EventListenerWrapper[] | undefined;
+    [name: Name]: ListenerWrapper[] | undefined;
   } = Object.create(null);
-
-  private maxListeners = EventEmitter.DEFAULT_MAX_LISTENERS;
   private readonly warnedMessages: { [message: string]: boolean } = {};
 
-  getMaxListeners() {
-    return this.maxListeners;
-  }
-
-  setMaxListeners(max: number) {
-    this.maxListeners = max;
-  }
+  maxListeners = EventEmitter.DEFAULT_MAX_LISTENERS;
 
   checkEventName(name: unknown) {
     if (!isString(name) && !isSymbol(name)) {
@@ -48,7 +40,7 @@ class EventEmitter {
     }
   }
 
-  on(name: EventName, listener: EventListener) {
+  on(name: Name, listener: Listener) {
     this.checkEventName(name);
     this.checkEventListener(listener);
 
@@ -60,8 +52,9 @@ class EventEmitter {
     }
 
     if (listeners.length > this.maxListeners) {
-      // prettier-ignore
-      const message = `More than ${this.maxListeners} \`${String(name)}\` events are listened to, which may lead to memory leaks.`;
+      const message =
+        `More than ${this.maxListeners} \`${String(name)}\`` +
+        ` events are listened to, which may lead to memory leaks.`;
       if (!this.warnedMessages[message]) {
         console.warn(message);
         this.warnedMessages[message] = true;
@@ -71,12 +64,12 @@ class EventEmitter {
     return this;
   }
 
-  once(name: EventName, listener: EventListener) {
+  once(name: Name, listener: Listener) {
     this.checkEventName(name);
     this.checkEventListener(listener);
 
-    const wrapper: EventListenerWrapper & {
-      __RAW_LISTENER__: EventListener;
+    const wrapper: ListenerWrapper & {
+      __RAW_LISTENER__: Listener;
     } = (...args: any[]) => {
       this.off(name, wrapper.__RAW_LISTENER__);
       wrapper.__RAW_LISTENER__(...args);
@@ -87,34 +80,41 @@ class EventEmitter {
     return this;
   }
 
-  off(name: EventName, listener: EventListener) {
-    this.checkEventName(name);
-    this.checkEventListener(listener);
+  off(name?: Name, listener?: Listener) {
+    if (listener !== undefined) {
+      this.checkEventName(name);
+      this.checkEventListener(listener);
 
-    const listeners = this.listeners[name];
-    if (listeners) {
-      let position = -1;
-      for (let i = listeners.length - 1; i >= 0; i--) {
-        if (
-          listeners[i] === listener ||
-          listeners[i].__RAW_LISTENER__ === listener
-        ) {
-          position = i;
-          break;
+      const listeners = this.listeners[name as Name];
+      if (listeners) {
+        let position = -1;
+        for (let i = listeners.length - 1; i >= 0; i--) {
+          if (
+            listeners[i] === listener ||
+            listeners[i].__RAW_LISTENER__ === listener
+          ) {
+            position = i;
+            break;
+          }
+        }
+        if (position >= 0) {
+          listeners.splice(position, 1);
+        }
+        if (listeners.length === 0) {
+          delete this.listeners[name as Name];
         }
       }
-      if (position >= 0) {
-        listeners.splice(position, 1);
-      }
-      if (listeners.length === 0) {
-        delete this.listeners[name];
-      }
+    } else if (name !== undefined) {
+      this.checkEventName(name);
+      delete this.listeners[name];
+    } else {
+      this.listeners = Object.create(null);
     }
 
     return this;
   }
 
-  emit(name: EventName, ...args: any[]) {
+  emit(name: Name, ...args: any[]) {
     this.checkEventName(name);
 
     let listeners = this.listeners[name];
@@ -139,24 +139,14 @@ class EventEmitter {
     ];
   }
 
-  getListeners(name: EventName) {
+  getListeners(name: Name) {
     this.checkEventName(name);
     return (this.listeners[name] || []).map((listener) => {
       return listener.__RAW_LISTENER__ || listener;
     });
   }
 
-  removeAllListeners(name?: EventName) {
-    if (name !== undefined) {
-      this.checkEventName(name);
-      delete this.listeners[name];
-    } else {
-      this.listeners = Object.create(null);
-    }
-    return this;
-  }
-
-  getListenersCount(name?: EventName): number {
+  getListenersCount(name?: Name): number {
     let sum = 0;
 
     if (name !== undefined) {

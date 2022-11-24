@@ -1,9 +1,9 @@
 import { useMemo, useRef } from "react";
-import throttle from "lodash.throttle";
-import useLatestRef from "./useLatestRef";
+import isObject from "lodash/isObject";
+import throttle from "lodash/throttle";
 import usePersist from "./usePersist";
 import useUnmount from "./useUnmount";
-import isObject from "./utils/isObject";
+import useLatestRef from "./useLatestRef";
 
 export interface ThrottleOptions {
   wait?: number;

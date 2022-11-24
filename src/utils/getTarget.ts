@@ -1,7 +1,7 @@
+import isObject from "lodash/isObject";
+import isFunction from "lodash/isFunction";
 import inBrowser from "./inBrowser";
-import isObject from "./isObject";
-import isFunction from "./isFunction";
-import { Target, TargetCreator } from "../types";
+import { Target, TargetCreator } from "./types";
 
 function getTarget<T>(target: TargetCreator<T>): Target<T> {
   if (!inBrowser) {

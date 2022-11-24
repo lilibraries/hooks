@@ -1,6 +1,6 @@
+import isFunction from "lodash/isFunction";
 import usePersist from "./usePersist";
 import useSafeState from "./useSafeState";
-import isFunction from "./utils/isFunction";
 
 function useSetState<S extends object>(initialState: S | (() => S)) {
   const [state, setSafeState] = useSafeState(initialState);

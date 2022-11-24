@@ -1,6 +1,6 @@
 import { Ref, RefCallback, MutableRefObject } from "react";
-import isObject from "./isObject";
-import isFunction from "./isFunction";
+import isObject from "lodash/isObject";
+import isFunction from "lodash/isFunction";
 
 function mergeRefs<T>(...refs: Ref<T>[]): RefCallback<T> {
   return (instance: T) => {

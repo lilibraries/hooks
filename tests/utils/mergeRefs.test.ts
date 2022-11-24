@@ -1,4 +1,4 @@
-import { mergeRefs } from "@lilib/hooks";
+import mergeRefs from "../../src/utils/mergeRefs";
 
 describe("utils/mergeRefs", () => {
   it("should merge multiple refs", () => {

@@ -1,4 +1,4 @@
-function getExtname(url: string): string {
+function getUrlExtname(url: string): string {
   url = String(url);
 
   if (url) {
@@ -17,4 +17,4 @@ function getExtname(url: string): string {
   return "";
 }
 
-export default getExtname;
+export default getUrlExtname;

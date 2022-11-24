@@ -1,5 +1,6 @@
-import { TargetCreator, useTargetEffect } from "@lilib/hooks";
+import { useTargetEffect } from "@lilib/hooks";
 import renderHook from "./renderHook";
+import { TargetCreator } from "../../src/utils/types";
 
 function testTargetEffectHook(name: string, useHook: typeof useTargetEffect) {
   describe(name, () => {

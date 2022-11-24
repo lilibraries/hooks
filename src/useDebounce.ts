@@ -1,9 +1,9 @@
 import { useMemo, useRef } from "react";
-import debounce from "lodash.debounce";
-import useLatestRef from "./useLatestRef";
+import isObject from "lodash/isObject";
+import debounce from "lodash/debounce";
 import usePersist from "./usePersist";
 import useUnmount from "./useUnmount";
-import isObject from "./utils/isObject";
+import useLatestRef from "./useLatestRef";
 
 export interface DebounceOptions {
   wait?: number;

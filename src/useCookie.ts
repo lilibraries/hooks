@@ -1,10 +1,10 @@
 import { useEffect } from "react";
+import isFunction from "lodash/isFunction";
 import Cookies, { CookieAttributes } from "js-cookie";
 import useUpdate from "./useUpdate";
 import usePersist from "./usePersist";
 import useInterval from "./useInterval";
 import useSafeState from "./useSafeState";
-import isFunction from "./utils/isFunction";
 
 function useCookie(
   name: string,

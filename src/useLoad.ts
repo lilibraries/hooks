@@ -1,5 +1,5 @@
 import { DependencyList } from "react";
-import { ResolvePromise } from "./types";
+import { PromiseResolve } from "./utils/types";
 
 export interface LoadConfigProps {
   global?: boolean;
@@ -39,7 +39,7 @@ export interface LoadConfigProps {
 
 export declare function useLoad<
   Callback extends (...args: any[]) => Promise<any>,
-  Data = ResolvePromise<ReturnType<Callback>>
+  Data = PromiseResolve<ReturnType<Callback>>
 >(
   callback: Callback,
   deps: DependencyList,
