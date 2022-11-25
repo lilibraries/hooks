@@ -15,6 +15,7 @@ function testStorgeHook(
     afterEach(() => {
       jest.runOnlyPendingTimers();
       jest.useRealTimers();
+      storage.clear();
     });
 
     it("should return the same `set` function when the component is rerendered", () => {
@@ -104,9 +105,6 @@ function testStorgeHook(
 
       rerender("key2");
       expect(result.current[0]).toBe("value2");
-
-      storage.removeItem("key1");
-      storage.removeItem("key2");
     });
 
     it("should retrieve default value when the key changes", () => {
@@ -124,7 +122,7 @@ function testStorgeHook(
     });
 
     it("should auto update value when the `polling` options is `true`", () => {
-      const { result, rerender } = renderHook<
+      const { result, rerender, unmount } = renderHook<
         { polling?: boolean; pollingInterval?: number },
         ReturnType<typeof useLocalStorage>
       >((props) => useHook("key", props), {
@@ -174,23 +172,84 @@ function testStorgeHook(
       storage.setItem("key", JSON.stringify("new value 2"));
       expect(result.current[0]).toBeUndefined();
 
-      storage.removeItem("key");
+      unmount();
     });
 
-    it("should listen to the window `storage` event", () => {
-      const { result } = renderHook(() => useHook("key"));
-
-      expect(result.current[0]).toBeUndefined();
-
+    it("supports `validate` option", () => {
+      const returnTrue = () => true;
+      const returnFalse = () => false;
       storage.setItem("key", JSON.stringify("value"));
-      expect(result.current[0]).toBeUndefined();
 
-      act(() => {
-        window.dispatchEvent(new StorageEvent("storage"));
-      });
+      const { result, rerender, unmount } = renderHook(
+        ({ validate }) =>
+          useHook("key", {
+            validate,
+            defaultValue: "default",
+            polling: true,
+            pollingInterval: 10,
+          }),
+        { initialProps: { validate: returnTrue } }
+      );
       expect(result.current[0]).toBe("value");
 
-      storage.removeItem("key");
+      storage.setItem("key", JSON.stringify("value1"));
+      act(() => {
+        jest.advanceTimersByTime(10);
+      });
+      expect(result.current[0]).toBe("value1");
+
+      rerender({ validate: returnFalse });
+      storage.setItem("key", JSON.stringify("value2"));
+      act(() => {
+        jest.advanceTimersByTime(10);
+      });
+      expect(result.current[0]).toBe("default");
+
+      unmount();
+    });
+
+    it("supports `compare` option", () => {
+      const value = { value: "value" };
+      const value2 = { value: "value2" };
+      const returnTrue = () => true;
+      const returnFalse = () => false;
+      storage.setItem("key", JSON.stringify(value));
+
+      const { result, rerender, unmount } = renderHook(
+        ({ compare }) =>
+          useHook("key", {
+            compare,
+            polling: true,
+            pollingInterval: 10,
+          }),
+        { initialProps: { compare: returnTrue } }
+      );
+
+      const firstValue = result.current[0];
+      expect(firstValue).not.toBe(value);
+      expect(firstValue).toEqual(value);
+
+      storage.setItem("key", JSON.stringify(value2));
+      act(() => {
+        jest.advanceTimersByTime(10);
+      });
+      expect(result.current[0]).toBe(firstValue);
+
+      rerender({ compare: returnFalse });
+      act(() => {
+        jest.advanceTimersByTime(10);
+      });
+      expect(result.current[0]).not.toBe(value2);
+      expect(result.current[0]).toEqual(value2);
+      storage.setItem("key", JSON.stringify(value));
+      act(() => {
+        jest.advanceTimersByTime(10);
+      });
+      expect(result.current[0]).not.toBe(value);
+      expect(result.current[0]).not.toBe(firstValue);
+      expect(result.current[0]).toEqual(value);
+
+      unmount();
     });
   });
 }

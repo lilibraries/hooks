@@ -7,16 +7,19 @@ import useInterval from "../useInterval";
 import useSafeState from "../useSafeState";
 import useEventListener from "../useEventListener";
 
+interface CommonOptions<T> {
+  polling?: boolean;
+  pollingInterval?: number;
+  compare?: (x: any, y: any) => boolean;
+  validate?: (value: T) => boolean;
+  serialize?: (value: T) => string;
+  deserialize?: (raw: string) => T;
+}
+
 function createStorageHook(storage: Storage | null) {
   function useStorage<T>(
     key: string,
-    options: {
-      defaultValue: T;
-      polling?: boolean;
-      pollingInterval?: number;
-      serialize?: (value: T) => string;
-      deserialize?: (value: string) => T;
-    }
+    options: { defaultValue: T } & CommonOptions<T>
   ): readonly [
     T,
     (value: T | undefined | ((prevValue: T) => T | undefined)) => void
@@ -24,13 +27,7 @@ function createStorageHook(storage: Storage | null) {
 
   function useStorage<T>(
     key: string,
-    options?: {
-      defaultValue?: T;
-      polling?: boolean;
-      pollingInterval?: number;
-      serialize?: (value: T) => string;
-      deserialize?: (value: string) => T;
-    }
+    options?: { defaultValue?: T } & CommonOptions<T>
   ): readonly [
     T | undefined,
     (
@@ -40,20 +37,16 @@ function createStorageHook(storage: Storage | null) {
 
   function useStorage<T>(
     key: string,
-    options: {
-      defaultValue?: T;
-      polling?: boolean;
-      pollingInterval?: number;
-      serialize?: (value: T) => string;
-      deserialize?: (value: string) => T;
-    } = {}
+    options: { defaultValue?: T } & CommonOptions<T> = {}
   ) {
     const {
       defaultValue,
-      serialize,
-      deserialize,
       polling = false,
       pollingInterval = 100,
+      compare,
+      validate,
+      serialize,
+      deserialize,
     } = options;
 
     function serializer(value: T): string {
@@ -74,7 +67,12 @@ function createStorageHook(storage: Storage | null) {
       try {
         const raw = storage?.getItem(key);
         if (raw != null) {
-          return deserializer(raw);
+          const value = deserializer(raw);
+          if (validate) {
+            return validate(value) ? value : defaultValue;
+          } else {
+            return value;
+          }
         }
       } catch (error) {
         console.error(error);
@@ -109,7 +107,7 @@ function createStorageHook(storage: Storage | null) {
 
     const handleChange = () => {
       const newValue = getStoredValue();
-      if (!deepEqual(newValue, value)) {
+      if (!(compare || deepEqual)(newValue, value)) {
         setValue(newValue);
       }
     };
@@ -140,7 +138,10 @@ function createStorageHook(storage: Storage | null) {
     }, [key]);
 
     useUpdate(() => {
-      if (storage?.getItem(key) == null && !deepEqual(defaultValue, value)) {
+      if (
+        storage?.getItem(key) == null &&
+        !(compare || deepEqual)(defaultValue, value)
+      ) {
         setValue(defaultValue);
       }
     }, [defaultValue]);

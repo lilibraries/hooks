@@ -14,8 +14,10 @@ function useSessionStorage<T>(
     defaultValue?: T;
     polling?: boolean;
     pollingInterval?: number;
+    compare?: (x: any, y: any) => boolean;
+    validate?: (value: T) => boolean;
     serialize?: (value: T) => string;
-    deserialize?: (value: string) => T;
+    deserialize?: (raw: string) => T;
   }
 ): [
   value: T | undefined,
@@ -32,6 +34,8 @@ Params:
   - **`options.defaultValue`:** Default value.
   - **`options.polling`:** Pollingly update value. Default is `false`.
   - **`options.pollingInterval`:** Polling interval time, in milliseconds. Default is `100`.
+  - **`options.compare`:** The comparison function in polling. Use deep comparison by default.
+  - **`options.validate`:** Validate the value got from `sessionStorage` which deserialized by `deserialize` function. If this function return `false`, the `defaultValue` will be used.
   - **`options.serialize`:** Serialization function. Default is `JSON.stringify`.
   - **`options.deserialize`:** Deserialization function. Default is `JSON.parse`.
 
