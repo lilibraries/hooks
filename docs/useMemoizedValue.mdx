@@ -1,10 +1,18 @@
-Return the previous value when the value has not changed. Use deep comparison.
+Return the previous value when the value has not changed. Use deep comparison by default.
 
 ## API
 
 ```ts
-function useMemoizedValue<T>(value: T): T;
+function useMemoizedValue<T>(
+  value: T,
+  compare?: (x: any, y: any) => boolean
+): T;
 ```
+
+Params:
+
+- **`value`:** The value.
+- **`compare`:** Comparison function.
 
 ## Example
 
