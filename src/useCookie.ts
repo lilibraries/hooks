@@ -6,13 +6,15 @@ import usePersist from "./usePersist";
 import useInterval from "./useInterval";
 import useSafeState from "./useSafeState";
 
+interface CommonOptions {
+  polling?: boolean;
+  pollingInterval?: number;
+  validate?: (value: string) => boolean;
+}
+
 function useCookie(
   name: string,
-  options: {
-    defaultValue: string;
-    polling?: boolean;
-    pollingInterval?: number;
-  }
+  options: { defaultValue: string } & CommonOptions
 ): readonly [
   string,
   (
@@ -23,11 +25,7 @@ function useCookie(
 
 function useCookie(
   name: string,
-  options?: {
-    defaultValue?: string;
-    polling?: boolean;
-    pollingInterval?: number;
-  }
+  options?: { defaultValue?: string } & CommonOptions
 ): readonly [
   string | undefined,
   (
@@ -41,21 +39,26 @@ function useCookie(
 
 function useCookie(
   name: string,
-  options?: {
-    defaultValue?: string;
-    polling?: boolean;
-    pollingInterval?: number;
-  }
+  options: { defaultValue?: string } & CommonOptions = {}
 ) {
   const {
     defaultValue,
     polling = false,
     pollingInterval = 100,
-  } = options || {};
+    validate,
+  } = options;
 
   function getCookie() {
     const cookie = Cookies.get(name);
-    return cookie !== undefined ? cookie : defaultValue;
+    if (cookie !== undefined) {
+      if (validate) {
+        return validate(cookie) ? cookie : defaultValue;
+      } else {
+        return cookie;
+      }
+    } else {
+      return defaultValue;
+    }
   }
 
   const [value, setValue] = useSafeState(getCookie);

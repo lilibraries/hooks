@@ -14,6 +14,7 @@ function useCookie(
     defaultValue?: string;
     polling?: boolean;
     pollingInterval?: number;
+    validate?: (value: string) => boolean;
   }
 ): [
   value: string | undefined,
@@ -42,9 +43,7 @@ Params:
   - **`options.defaultValue`:** Default value. It will be returnd when the specified cookie is non-existant.
   - **`options.polling`:** Pollingly update cookie value. Default is `false`.
   - **`options.pollingInterval`:** Polling interval time, in milliseconds. Default is `100`.
-
-<!-- - **`defaultValue`:** Default value, it will be returnd when the specified cookie is non-existant.
-- **`options`:** [js-cookie attributes](https://github.com/js-cookie/js-cookie#cookie-attributes). -->
+  - **`options.validate`:** Validate the value got from cookie. If this function return `false`, the `defaultValue` will be used.
 
 Results:
 

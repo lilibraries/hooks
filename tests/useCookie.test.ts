@@ -143,4 +143,37 @@ describe("useCookie", () => {
     expect(result.current[0]).toBeUndefined();
     Cookies.remove("name");
   });
+
+  it("supports `validate` option", () => {
+    const returnTrue = () => true;
+    const returnFalse = () => false;
+    Cookies.set("name", "value");
+
+    const { result, rerender, unmount } = renderHook(
+      ({ validate }) =>
+        useCookie("name", {
+          defaultValue: "default",
+          polling: true,
+          pollingInterval: 10,
+          validate,
+        }),
+      { initialProps: { validate: returnTrue } }
+    );
+    expect(result.current[0]).toBe("value");
+
+    Cookies.set("name", "value1");
+    act(() => {
+      jest.advanceTimersByTime(10);
+    });
+    expect(result.current[0]).toBe("value1");
+
+    rerender({ validate: returnFalse });
+    Cookies.set("name", "value2");
+    act(() => {
+      jest.advanceTimersByTime(10);
+    });
+    expect(result.current[0]).toBe("default");
+
+    unmount();
+  });
 });
