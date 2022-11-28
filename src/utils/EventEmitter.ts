@@ -2,24 +2,22 @@ import isString from "lodash/isString";
 import isSymbol from "lodash/isSymbol";
 import isFunction from "lodash/isFunction";
 
-type Name = string | symbol;
+type DefaultName = string | symbol;
+type DefaultListener = (...args: any[]) => void;
+type ListenerWrapper<T extends DefaultListener> = T & { __RAW_LISTENER__?: T };
 
-interface Listener {
-  (...args: any[]): void;
-}
-interface ListenerWrapper extends Listener {
-  __RAW_LISTENER__?: Listener;
-}
-
-class EventEmitter {
+class EventEmitter<
+  Name extends DefaultName = DefaultName,
+  Listener extends DefaultListener = DefaultListener
+> {
   static DEFAULT_MAX_LISTENERS = 100;
 
-  private listeners: {
-    [name: Name]: ListenerWrapper[] | undefined;
+  protected listeners: {
+    [name: PropertyKey]: ListenerWrapper<Listener>[] | undefined;
   } = Object.create(null);
-  private readonly warnedMessages: { [message: string]: boolean } = {};
 
-  maxListeners = EventEmitter.DEFAULT_MAX_LISTENERS;
+  protected maxListeners = EventEmitter.DEFAULT_MAX_LISTENERS;
+  protected readonly warnedMessages: { [message: string]: boolean } = {};
 
   checkEventName(name: unknown) {
     if (!isString(name) && !isSymbol(name)) {
@@ -38,6 +36,15 @@ class EventEmitter {
         `Event listener must be a function. Received: ${typeof listener}`
       );
     }
+  }
+
+  getMaxListeners() {
+    return this.maxListeners;
+  }
+
+  setMaxListeners(count: number) {
+    this.maxListeners = count;
+    return this;
   }
 
   on(name: Name, listener: Listener) {
@@ -68,47 +75,38 @@ class EventEmitter {
     this.checkEventName(name);
     this.checkEventListener(listener);
 
-    const wrapper: ListenerWrapper & {
-      __RAW_LISTENER__: Listener;
-    } = (...args: any[]) => {
+    const wrapper = (...args: Parameters<Listener>[]) => {
       this.off(name, wrapper.__RAW_LISTENER__);
       wrapper.__RAW_LISTENER__(...args);
     };
     wrapper.__RAW_LISTENER__ = listener;
 
-    this.on(name, wrapper);
+    this.on(name, wrapper as ListenerWrapper<Listener>);
     return this;
   }
 
-  off(name?: Name, listener?: Listener) {
-    if (listener !== undefined) {
-      this.checkEventName(name);
-      this.checkEventListener(listener);
+  off(name: Name, listener: Listener) {
+    this.checkEventName(name);
+    this.checkEventListener(listener);
 
-      const listeners = this.listeners[name as Name];
-      if (listeners) {
-        let position = -1;
-        for (let i = listeners.length - 1; i >= 0; i--) {
-          if (
-            listeners[i] === listener ||
-            listeners[i].__RAW_LISTENER__ === listener
-          ) {
-            position = i;
-            break;
-          }
-        }
-        if (position >= 0) {
-          listeners.splice(position, 1);
-        }
-        if (listeners.length === 0) {
-          delete this.listeners[name as Name];
+    const listeners = this.listeners[name];
+    if (listeners) {
+      let position = -1;
+      for (let i = listeners.length - 1; i >= 0; i--) {
+        if (
+          listeners[i] === listener ||
+          listeners[i].__RAW_LISTENER__ === listener
+        ) {
+          position = i;
+          break;
         }
       }
-    } else if (name !== undefined) {
-      this.checkEventName(name);
-      delete this.listeners[name];
-    } else {
-      this.listeners = Object.create(null);
+      if (position >= 0) {
+        listeners.splice(position, 1);
+      }
+      if (listeners.length === 0) {
+        delete this.listeners[name];
+      }
     }
 
     return this;
@@ -159,6 +157,16 @@ class EventEmitter {
     }
 
     return sum;
+  }
+
+  removeAllListeners(name?: Name) {
+    if (name !== undefined) {
+      this.checkEventName(name);
+      delete this.listeners[name];
+    } else {
+      this.listeners = Object.create(null);
+    }
+    return this;
   }
 }
 
