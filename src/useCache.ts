@@ -1,19 +1,13 @@
-export interface CacheConfigProps {
-  global?: boolean;
-  inherit?: boolean;
-  cache?: any;
-  cacheTime?: number;
-  cacheSync?: boolean;
-}
-
 export declare function useCache<T>(
   key: {},
   options?: {
+    defaultValue?: T;
     cacheTime?: number;
     cacheSync?: boolean;
-    defaultValue?: T;
+    compare: (x: any, y: any) => boolean;
+    validate: (value: T) => boolean;
     onSet?: (value: T) => void;
-    onRemove?: (value: T) => void;
+    onDelete?: (value: T) => void;
   }
 ): [
   value: T | undefined,

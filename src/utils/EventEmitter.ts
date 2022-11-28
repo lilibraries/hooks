@@ -22,7 +22,7 @@ class EventEmitter<
   checkEventName(name: unknown) {
     if (!isString(name) && !isSymbol(name)) {
       throw new TypeError(
-        `Event name must be a string or a symbol. Received: ${typeof name}`
+        `Event name must be a string or a symbol. Received: ${typeof name}.`
       );
     }
     if (name === "") {
@@ -33,7 +33,7 @@ class EventEmitter<
   checkEventListener(listener: unknown) {
     if (!isFunction(listener)) {
       throw new TypeError(
-        `Event listener must be a function. Received: ${typeof listener}`
+        `Event listener must be a function. Received: ${typeof listener}.`
       );
     }
   }
