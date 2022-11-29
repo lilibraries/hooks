@@ -1,14 +1,31 @@
-import React, { createContext, FC, ReactNode, useContext } from "react";
+import React, {
+  FC,
+  ReactNode,
+  useContext,
+  useCallback,
+  createContext,
+  useRef,
+} from "react";
 import omit from "lodash/omit";
+import { useSyncExternalStore } from "use-sync-external-store/shim";
 import MemoryCache from "../utils/MemoryCache";
+
+interface Cache {
+  get(key: any): any;
+  set(key: any, data: any, options?: { cacheTime?: number }): any;
+  delete(key: any): any;
+  isReady(): boolean;
+  once(name: "ready", listener: (...args: any[]) => any): any;
+  on(name: "set" | "delete", listener: (key: any, data: any) => any): any;
+  off(name: "ready" | "set" | "delete", listener: (...args: any[]) => any): any;
+}
 
 interface Value {
   global: boolean;
-  cache: MemoryCache;
+  cache: Cache;
   cacheTime: number;
   cacheSync: boolean;
-  compare: (x: any, y: any) => boolean;
-  validate?: (value: any) => boolean;
+  fallback?: ReactNode;
 }
 
 interface Props extends Partial<Value> {
@@ -17,7 +34,7 @@ interface Props extends Partial<Value> {
 }
 
 const globalVar: any = globalThis;
-const GLOBAL_CACHE_KEY = "__LILIB_HOOKS_GLOBAL_CACHE__";
+const GLOBAL_CACHE_ID = "__LILIB_HOOKS_GLOBAL_CACHE__";
 const DEFAULT_CACHE_TIME = 5 * 60 * 1000;
 
 const CacheContext = createContext<Value>({
@@ -25,15 +42,15 @@ const CacheContext = createContext<Value>({
   cache: new MemoryCache(),
   cacheTime: DEFAULT_CACHE_TIME,
   cacheSync: false,
-  compare: Object.is,
 });
-const useCacheConfig = () => useContext(CacheContext);
+export const useCacheConfig = () => useContext(CacheContext);
 
 const CacheConfig: FC<Props> & {
   Context: typeof CacheContext;
   useConfig: typeof useCacheConfig;
 } = (props) => {
   const config = useCacheConfig();
+  const cacheRef = useRef<Cache>();
   let value = omit(props, "inherit", "children") as Value;
 
   if (props.inherit) {
@@ -48,23 +65,42 @@ const CacheConfig: FC<Props> & {
   if (value.cacheSync === undefined) {
     value.cacheSync = false;
   }
-  if (value.compare === undefined) {
-    value.compare = Object.is;
-  }
 
-  if (value.global && globalVar[GLOBAL_CACHE_KEY]) {
-    value.cache = globalVar[GLOBAL_CACHE_KEY];
+  if (value.global && globalVar[GLOBAL_CACHE_ID]) {
+    value.cache = globalVar[GLOBAL_CACHE_ID];
   }
   if (value.cache === undefined) {
-    value.cache = new MemoryCache();
+    if (!cacheRef.current) {
+      cacheRef.current = new MemoryCache();
+    }
+    value.cache = cacheRef.current;
   }
-  if (value.global && !globalVar[GLOBAL_CACHE_KEY]) {
-    globalVar[GLOBAL_CACHE_KEY] = value.cache;
+  if (value.global && !globalVar[GLOBAL_CACHE_ID]) {
+    globalVar[GLOBAL_CACHE_ID] = value.cache;
   }
+
+  const cache = value.cache;
+  const subscribe = useCallback(
+    (listener: () => void) => {
+      if (!cache.isReady()) {
+        cache.once("ready", listener);
+        return () => {
+          cache.off("ready", listener);
+        };
+      } else {
+        return () => {};
+      }
+    },
+    [cache]
+  );
+  const getSnapshot = useCallback(() => {
+    return cache.isReady();
+  }, [cache]);
+  const ready = useSyncExternalStore(subscribe, getSnapshot);
 
   return (
     <CacheContext.Provider value={value}>
-      {props.children}
+      {ready ? props.children : value.fallback}
     </CacheContext.Provider>
   );
 };

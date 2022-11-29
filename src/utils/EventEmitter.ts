@@ -12,14 +12,14 @@ class EventEmitter<
 > {
   static DEFAULT_MAX_LISTENERS = 100;
 
-  protected listeners: {
+  private listeners: {
     [name: PropertyKey]: ListenerWrapper<Listener>[] | undefined;
   } = Object.create(null);
 
-  protected maxListeners = EventEmitter.DEFAULT_MAX_LISTENERS;
+  private maxListeners = EventEmitter.DEFAULT_MAX_LISTENERS;
   protected readonly warnedMessages: { [message: string]: boolean } = {};
 
-  checkEventName(name: unknown) {
+  protected checkEventName(name: unknown) {
     if (!isString(name) && !isSymbol(name)) {
       throw new TypeError(
         `Event name must be a string or a symbol. Received: ${typeof name}.`
@@ -30,7 +30,7 @@ class EventEmitter<
     }
   }
 
-  checkEventListener(listener: unknown) {
+  protected checkEventListener(listener: unknown) {
     if (!isFunction(listener)) {
       throw new TypeError(
         `Event listener must be a function. Received: ${typeof listener}.`

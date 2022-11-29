@@ -7,23 +7,47 @@ interface Record<D = any> {
   cacheTimestamp: number;
 }
 
-type EventName = "set" | "delete";
-type EventListener<K, D> = (key: K, data: D) => void;
-
-class MemoryCache<Key = {}, Data = any> extends EventEmitter<
-  EventName,
-  EventListener<Key, Data>
-> {
+class MemoryCache<Key = {}, Data = any> extends EventEmitter {
+  static EVENT_NAMES = ["ready", "set", "delete", "clear"] as const;
   static DEFAULT_CACHE_TIME = 5 * 60 * 1000;
   static DEFAULT_MAX_CACHE_TIME = Number.MAX_SAFE_INTEGER;
 
-  protected readonly records = new Map<Key, Record<Data>>();
-  protected maxCacheTime = MemoryCache.DEFAULT_MAX_CACHE_TIME;
-  protected defaultCacheTime = MemoryCache.DEFAULT_CACHE_TIME;
+  private readonly records = new Map<Key, Record<Data>>();
+  private maxCacheTime = MemoryCache.DEFAULT_MAX_CACHE_TIME;
+  private defaultCacheTime = MemoryCache.DEFAULT_CACHE_TIME;
 
-  protected setDeleteRecordTimer(key: Key, cacheTime: number) {
+  protected ready = true;
+
+  protected checkEventName(name: any): void {
+    if (!MemoryCache.EVENT_NAMES.includes(name)) {
+      throw new TypeError(
+        `Cache event name must be one of ${MemoryCache.EVENT_NAMES}.` +
+          ` Received: ${String(name)}.`
+      );
+    }
+  }
+
+  protected checkCacheKey(key: unknown) {
+    if (key == null) {
+      throw new TypeError(
+        `Cache key can't be null or undefined. Received: ${String(key)}.`
+      );
+    }
+  }
+
+  protected checkCacheData(data: unknown) {
+    if (data === undefined) {
+      throw new TypeError("Cache data can't be undefined.");
+    }
+  }
+
+  private setDeleteRecordTimer(key: Key, cacheTime: number) {
     let timer = 0;
-    if (cacheTime > 0 && cacheTime <= this.maxCacheTime) {
+    if (
+      cacheTime > 0 &&
+      cacheTime <= this.maxCacheTime &&
+      cacheTime < Number.MAX_SAFE_INTEGER
+    ) {
       timer = +setTimeout(() => {
         this.delete(key);
       }, cacheTime);
@@ -31,11 +55,21 @@ class MemoryCache<Key = {}, Data = any> extends EventEmitter<
     return timer;
   }
 
-  protected clearDeleteRecordTimer(key: Key) {
+  private clearDeleteRecordTimer(key: Key) {
     const record = this.records.get(key);
     if (record && record.deleteTimer) {
       clearTimeout(record.deleteTimer);
     }
+  }
+
+  isReady() {
+    return this.ready;
+  }
+
+  asReady() {
+    this.ready = true;
+    this.emit("ready");
+    return this;
   }
 
   getMaxCacheTime() {
@@ -56,33 +90,7 @@ class MemoryCache<Key = {}, Data = any> extends EventEmitter<
     return this;
   }
 
-  checkEventName(name: unknown): void {
-    if (name !== "set" && name !== "delete") {
-      throw new TypeError(
-        `Cache event name must be "set" or "delete". Received: ${String(name)}.`
-      );
-    }
-  }
-
-  checkCacheKey(key: unknown) {
-    if (key == null) {
-      throw new TypeError(
-        `Cache key can't be null or undefined. Received: ${String(key)}.`
-      );
-    }
-  }
-  checkCacheData(data: unknown) {
-    if (data === undefined) {
-      throw new TypeError("Cache data can't be undefined.");
-    }
-  }
-
-  getRecord(key: Key) {
-    this.checkCacheKey(key);
-    return this.records.get(key);
-  }
-
-  setRecord(
+  memorize(
     key: Key,
     data: Data,
     options: { cacheTime?: number; cacheTimestamp?: number } = {}
@@ -111,7 +119,6 @@ class MemoryCache<Key = {}, Data = any> extends EventEmitter<
     this.clearDeleteRecordTimer(key);
 
     const { cacheTime = this.defaultCacheTime } = options;
-
     if (cacheTime > 0) {
       this.records.set(key, {
         data,
@@ -127,18 +134,23 @@ class MemoryCache<Key = {}, Data = any> extends EventEmitter<
     return this;
   }
 
-  get(key: Key) {
-    this.checkCacheKey(key);
-    return this.records.get(key)?.data;
-  }
-
   has(key: Key) {
-    this.checkCacheKey(key);
     return this.records.has(key);
   }
 
+  get(key: Key) {
+    return this.records.get(key)?.data;
+  }
+
+  getCacheTime(key: Key) {
+    return this.records.get(key)?.cacheTime;
+  }
+
+  getCacheTimestamp(key: Key) {
+    return this.records.get(key)?.cacheTimestamp;
+  }
+
   delete(key: Key) {
-    this.checkCacheKey(key);
     const record = this.records.get(key);
     if (record) {
       this.clearDeleteRecordTimer(key);
@@ -157,6 +169,7 @@ class MemoryCache<Key = {}, Data = any> extends EventEmitter<
       }
       this.emit("delete", key, record.data);
     }
+    this.emit("clear");
     return this;
   }
 }

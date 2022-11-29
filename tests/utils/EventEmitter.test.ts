@@ -79,17 +79,10 @@ describe("utils/EventEmitter", () => {
     const invalidListener: any = null;
 
     expect(() => {
-      emitter.checkEventName(invalidName);
-    }).toThrow(TypeError);
-    expect(() => {
-      emitter.checkEventName("");
-    }).toThrow(TypeError);
-    expect(() => {
-      emitter.checkEventListener(invalidListener);
-    }).toThrow(TypeError);
-
-    expect(() => {
       emitter.on(invalidName, validListener);
+    }).toThrow(TypeError);
+    expect(() => {
+      emitter.on("", validListener);
     }).toThrow(TypeError);
     expect(() => {
       emitter.on(validName, invalidListener);
@@ -116,7 +109,6 @@ describe("utils/EventEmitter", () => {
     expect(() => {
       emitter.getListeners(invalidName);
     }).toThrow(TypeError);
-
     expect(() => {
       emitter.getListenersCount(invalidName);
     }).toThrow(TypeError);
