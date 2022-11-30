@@ -8,26 +8,15 @@ interface Record<D = any> {
 }
 
 class MemoryCache<Key = {}, Data = any> extends EventEmitter {
-  static EVENT_NAMES = ["ready", "set", "delete", "clear"] as const;
   static DEFAULT_CACHE_TIME = 5 * 60 * 1000;
   static DEFAULT_MAX_CACHE_TIME = Number.MAX_SAFE_INTEGER;
 
-  private readonly records = new Map<Key, Record<Data>>();
-  private maxCacheTime = MemoryCache.DEFAULT_MAX_CACHE_TIME;
-  private defaultCacheTime = MemoryCache.DEFAULT_CACHE_TIME;
+  _ready = true;
+  _records = new Map<Key, Record<Data>>();
+  _maxCacheTime = MemoryCache.DEFAULT_MAX_CACHE_TIME;
+  _defaultCacheTime = MemoryCache.DEFAULT_CACHE_TIME;
 
-  protected ready = true;
-
-  protected checkEventName(name: any): void {
-    if (!MemoryCache.EVENT_NAMES.includes(name)) {
-      throw new TypeError(
-        `Cache event name must be one of ${MemoryCache.EVENT_NAMES}.` +
-          ` Received: ${String(name)}.`
-      );
-    }
-  }
-
-  protected checkCacheKey(key: unknown) {
+  _checkCacheKey(key: unknown) {
     if (key == null) {
       throw new TypeError(
         `Cache key can't be null or undefined. Received: ${String(key)}.`
@@ -35,17 +24,17 @@ class MemoryCache<Key = {}, Data = any> extends EventEmitter {
     }
   }
 
-  protected checkCacheData(data: unknown) {
+  _checkCacheData(data: unknown) {
     if (data === undefined) {
       throw new TypeError("Cache data can't be undefined.");
     }
   }
 
-  private setDeleteRecordTimer(key: Key, cacheTime: number) {
+  _setDeleteRecordTimer(key: Key, cacheTime: number) {
     let timer = 0;
     if (
       cacheTime > 0 &&
-      cacheTime <= this.maxCacheTime &&
+      cacheTime <= this._maxCacheTime &&
       cacheTime < Number.MAX_SAFE_INTEGER
     ) {
       timer = +setTimeout(() => {
@@ -55,38 +44,38 @@ class MemoryCache<Key = {}, Data = any> extends EventEmitter {
     return timer;
   }
 
-  private clearDeleteRecordTimer(key: Key) {
-    const record = this.records.get(key);
+  _clearDeleteRecordTimer(key: Key) {
+    const record = this._records.get(key);
     if (record && record.deleteTimer) {
       clearTimeout(record.deleteTimer);
     }
   }
 
   isReady() {
-    return this.ready;
+    return this._ready;
   }
 
   asReady() {
-    this.ready = true;
+    this._ready = true;
     this.emit("ready");
     return this;
   }
 
   getMaxCacheTime() {
-    return this.maxCacheTime;
+    return this._maxCacheTime;
   }
 
   setMaxCacheTime(maxCacheTime: number) {
-    this.maxCacheTime = maxCacheTime;
+    this._maxCacheTime = maxCacheTime;
     return this;
   }
 
   getDefaultCacheTime() {
-    return this.defaultCacheTime;
+    return this._defaultCacheTime;
   }
 
   setDefaultCacheTime(defaultCacheTime: number) {
-    this.defaultCacheTime = defaultCacheTime;
+    this._defaultCacheTime = defaultCacheTime;
     return this;
   }
 
@@ -95,37 +84,39 @@ class MemoryCache<Key = {}, Data = any> extends EventEmitter {
     data: Data,
     options: { cacheTime?: number; cacheTimestamp?: number } = {}
   ) {
-    this.checkCacheKey(key);
-    this.checkCacheData(data);
-    this.clearDeleteRecordTimer(key);
+    this._checkCacheKey(key);
+    this._checkCacheData(data);
+    this._clearDeleteRecordTimer(key);
 
     const now = Date.now();
-    const { cacheTime = this.defaultCacheTime, cacheTimestamp = now } = options;
+    const { cacheTimestamp = now } = options;
+    const { cacheTime = this._defaultCacheTime } = options;
     const remainingTime = cacheTimestamp - now + cacheTime;
 
     if (remainingTime > 0) {
-      const deleteTimer = this.setDeleteRecordTimer(key, remainingTime);
-      this.records.set(key, { data, cacheTime, deleteTimer, cacheTimestamp });
+      const deleteTimer = this._setDeleteRecordTimer(key, remainingTime);
+      this._records.set(key, { data, cacheTime, deleteTimer, cacheTimestamp });
     } else {
-      this.records.delete(key);
+      this._records.delete(key);
     }
 
     return this;
   }
 
   set(key: Key, data: Data, options: { cacheTime?: number } = {}) {
-    this.checkCacheKey(key);
-    this.checkCacheData(data);
-    this.clearDeleteRecordTimer(key);
+    this._checkCacheKey(key);
+    this._checkCacheData(data);
+    this._clearDeleteRecordTimer(key);
 
-    const { cacheTime = this.defaultCacheTime } = options;
+    const { cacheTime = this._defaultCacheTime } = options;
     if (cacheTime > 0) {
-      this.records.set(key, {
+      this._records.set(key, {
         data,
         cacheTime,
-        deleteTimer: this.setDeleteRecordTimer(key, cacheTime),
+        deleteTimer: this._setDeleteRecordTimer(key, cacheTime),
         cacheTimestamp: Date.now(),
       });
+      this.for(key).emit("set", data);
       this.emit("set", key, data);
     } else {
       this.delete(key);
@@ -135,38 +126,40 @@ class MemoryCache<Key = {}, Data = any> extends EventEmitter {
   }
 
   has(key: Key) {
-    return this.records.has(key);
+    return this._records.has(key);
   }
 
   get(key: Key) {
-    return this.records.get(key)?.data;
+    return this._records.get(key)?.data;
   }
 
   getCacheTime(key: Key) {
-    return this.records.get(key)?.cacheTime;
+    return this._records.get(key)?.cacheTime;
   }
 
   getCacheTimestamp(key: Key) {
-    return this.records.get(key)?.cacheTimestamp;
+    return this._records.get(key)?.cacheTimestamp;
   }
 
   delete(key: Key) {
-    const record = this.records.get(key);
+    const record = this._records.get(key);
     if (record) {
-      this.clearDeleteRecordTimer(key);
-      this.records.delete(key);
+      this._clearDeleteRecordTimer(key);
+      this._records.delete(key);
+      this.for(key).emit("delete", record.data);
       this.emit("delete", key, record.data);
     }
     return this;
   }
 
   clear() {
-    const entries = this.records.entries();
-    this.records.clear();
+    const entries = this._records.entries();
+    this._records.clear();
     for (const [key, record] of entries) {
       if (record.deleteTimer) {
         clearTimeout(record.deleteTimer);
       }
+      this.for(key).emit("delete", record.data);
       this.emit("delete", key, record.data);
     }
     this.emit("clear");

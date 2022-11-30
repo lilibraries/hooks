@@ -1,95 +1,161 @@
 import isString from "lodash/isString";
 import isSymbol from "lodash/isSymbol";
 import isFunction from "lodash/isFunction";
+import getConstructorName from "./getConstructorName";
 
-type DefaultName = string | symbol;
-type DefaultListener = (...args: any[]) => void;
-type ListenerWrapper<T extends DefaultListener> = T & { __RAW_LISTENER__?: T };
+type Key = any;
+type Name = string | symbol;
+type Listener = (...args: any[]) => void;
+type ListenerWrapper = Listener & { __RAW_LISTENER__?: Listener };
 
-class EventEmitter<
-  Name extends DefaultName = DefaultName,
-  Listener extends DefaultListener = DefaultListener
-> {
+class EventEmitter {
   static DEFAULT_MAX_LISTENERS = 100;
 
-  private listeners: {
-    [name: PropertyKey]: ListenerWrapper<Listener>[] | undefined;
+  _forKey: Key;
+  _topEmitter: EventEmitter | null = null;
+  _parentEmitter: EventEmitter | null = null;
+
+  _emitters = new Map<Key, EventEmitter>();
+  _listeners: {
+    [name: PropertyKey]: ListenerWrapper[] | undefined;
   } = Object.create(null);
 
-  private maxListeners = EventEmitter.DEFAULT_MAX_LISTENERS;
-  protected readonly warnedMessages: { [message: string]: boolean } = {};
+  _maxListeners = EventEmitter.DEFAULT_MAX_LISTENERS;
+  _warnedMessages: { [message: string]: boolean } = {};
 
-  protected checkEventName(name: unknown) {
-    if (!isString(name) && !isSymbol(name)) {
-      throw new TypeError(
-        `Event name must be a string or a symbol. Received: ${typeof name}.`
-      );
-    }
-    if (name === "") {
-      throw new TypeError("Event name can not be an empty string.");
+  _checkEventName(name: unknown) {
+    if (this._topEmitter) {
+      this._topEmitter._checkEventName(name);
+    } else {
+      if (!isString(name) && !isSymbol(name)) {
+        throw new TypeError(
+          `Event name must be a string or a symbol. Received: ${typeof name}.`
+        );
+      }
+      if (name === "") {
+        throw new TypeError("Event name can not be an empty string.");
+      }
     }
   }
 
-  protected checkEventListener(listener: unknown) {
-    if (!isFunction(listener)) {
-      throw new TypeError(
-        `Event listener must be a function. Received: ${typeof listener}.`
-      );
+  _checkEventListener(listener: unknown) {
+    if (this._topEmitter) {
+      this._topEmitter._checkEventListener(listener);
+    } else {
+      if (!isFunction(listener)) {
+        throw new TypeError(
+          `Event listener must be a function. Received: ${typeof listener}.`
+        );
+      }
+    }
+  }
+
+  _attach() {
+    if (this._parentEmitter) {
+      const emitters = this._parentEmitter._emitters;
+      if (!emitters.has(this._forKey)) {
+        emitters.set(this._forKey, this);
+      }
+      this._parentEmitter._attach();
+    }
+  }
+
+  _prune() {
+    if (this._parentEmitter) {
+      if (!this._emitters.size && !this.getListenersCount()) {
+        this._parentEmitter._emitters.delete(this._forKey);
+        this._parentEmitter._prune();
+      }
+    }
+  }
+
+  _getWarnedMessages() {
+    if (this._topEmitter) {
+      return this._topEmitter._warnedMessages;
+    } else {
+      return this._warnedMessages;
     }
   }
 
   getMaxListeners() {
-    return this.maxListeners;
+    if (this._topEmitter) {
+      return this._topEmitter._maxListeners;
+    } else {
+      return this._maxListeners;
+    }
   }
 
   setMaxListeners(count: number) {
-    this.maxListeners = count;
+    if (this._topEmitter) {
+      this._topEmitter.setMaxListeners(count);
+    } else {
+      this._maxListeners = count;
+    }
     return this;
   }
 
-  on(name: Name, listener: Listener) {
-    this.checkEventName(name);
-    this.checkEventListener(listener);
+  for(key: Key) {
+    let emitter = this._emitters.get(key);
+    if (!emitter) {
+      emitter = new EventEmitter();
+      emitter._forKey = key;
+      emitter._topEmitter = this._topEmitter || this;
+      emitter._parentEmitter = this;
+    }
+    return emitter;
+  }
 
-    let listeners = this.listeners[name];
+  on(name: Name, listener: Listener) {
+    this._checkEventName(name);
+    this._checkEventListener(listener);
+
+    let listeners = this._listeners[name];
     if (listeners) {
       listeners.push(listener);
     } else {
-      listeners = this.listeners[name] = [listener];
+      listeners = this._listeners[name] = [listener];
     }
 
-    if (listeners.length > this.maxListeners) {
+    const maxListeners = this.getMaxListeners();
+    const warnedMessages = this._getWarnedMessages();
+
+    if (listeners.length > maxListeners) {
+      const ctorName = getConstructorName(this._topEmitter || this);
       const message =
-        `More than ${this.maxListeners} \`${String(name)}\`` +
-        ` events are listened to, which may lead to memory leaks.`;
-      if (!this.warnedMessages[message]) {
+        `More than ${maxListeners} \`${String(name)}\` ` +
+        `events are listened to \`${ctorName}\`` +
+        (this._topEmitter ? ` for \`${String(this._forKey)}\`` : "") +
+        `, which may lead to memory leaks.`;
+
+      if (!warnedMessages[message]) {
         console.warn(message);
-        this.warnedMessages[message] = true;
+        warnedMessages[message] = true;
       }
     }
 
+    this._attach();
     return this;
   }
 
   once(name: Name, listener: Listener) {
-    this.checkEventName(name);
-    this.checkEventListener(listener);
+    this._checkEventName(name);
+    this._checkEventListener(listener);
 
-    const wrapper = (...args: Parameters<Listener>[]) => {
+    const wrapper = (...args: any[]) => {
       this.off(name, wrapper.__RAW_LISTENER__);
       wrapper.__RAW_LISTENER__(...args);
     };
     wrapper.__RAW_LISTENER__ = listener;
 
-    this.on(name, wrapper as ListenerWrapper<Listener>);
+    this.on(name, wrapper);
     return this;
   }
 
   off(name: Name, listener: Listener) {
-    this.checkEventName(name);
-    this.checkEventListener(listener);
+    this._checkEventName(name);
+    this._checkEventListener(listener);
 
-    const listeners = this.listeners[name];
+    const listeners = this._listeners[name];
     if (listeners) {
       let position = -1;
       for (let i = listeners.length - 1; i >= 0; i--) {
@@ -105,17 +171,18 @@ class EventEmitter<
         listeners.splice(position, 1);
       }
       if (listeners.length === 0) {
-        delete this.listeners[name];
+        delete this._listeners[name];
       }
     }
 
+    this._prune();
     return this;
   }
 
   emit(name: Name, ...args: any[]) {
-    this.checkEventName(name);
+    this._checkEventName(name);
 
-    let listeners = this.listeners[name];
+    let listeners = this._listeners[name];
     if (listeners) {
       listeners = [...listeners];
       for (let i = 0; i < listeners.length; i++) {
@@ -132,39 +199,37 @@ class EventEmitter<
 
   getEventNames() {
     return [
-      ...Object.getOwnPropertyNames(this.listeners),
-      ...Object.getOwnPropertySymbols(this.listeners),
+      ...Object.getOwnPropertyNames(this._listeners),
+      ...Object.getOwnPropertySymbols(this._listeners),
     ];
   }
 
   getListeners(name: Name) {
-    this.checkEventName(name);
-    return (this.listeners[name] || []).map((listener) => {
+    this._checkEventName(name);
+    return (this._listeners[name] || []).map((listener) => {
       return listener.__RAW_LISTENER__ || listener;
     });
   }
 
   getListenersCount(name?: Name): number {
     let sum = 0;
-
     if (name !== undefined) {
-      this.checkEventName(name);
-      sum = this.listeners[name]?.length || 0;
+      this._checkEventName(name);
+      sum = this._listeners[name]?.length || 0;
     } else {
       this.getEventNames().forEach((name) => {
-        sum += this.listeners[name]?.length || 0;
+        sum += this._listeners[name]?.length || 0;
       });
     }
-
     return sum;
   }
 
   removeAllListeners(name?: Name) {
     if (name !== undefined) {
-      this.checkEventName(name);
-      delete this.listeners[name];
+      this._checkEventName(name);
+      delete this._listeners[name];
     } else {
-      this.listeners = Object.create(null);
+      this._listeners = Object.create(null);
     }
     return this;
   }
