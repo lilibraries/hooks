@@ -4,16 +4,27 @@ import usePersist from "./usePersist";
 import useMemoizedValue from "./useMemoizedValue";
 import { useCacheConfig } from "./configs/CacheConfig";
 
+interface CommonOptions<T> {
+  cacheTime?: number;
+  cacheSync?: boolean;
+  validate?: (value: T) => boolean;
+  onSet?: (value: T) => void;
+  onDelete?: (value: T) => void;
+}
+
 function useCache<T>(
   key: {},
-  options: {
-    defaultValue?: T;
-    cacheTime?: number;
-    cacheSync?: boolean;
-    validate?: (value: T) => boolean;
-    onSet?: (value: T) => void;
-    onDelete?: (value: T) => void;
-  } = {}
+  options: { defaultValue: T } & CommonOptions<T>
+): readonly [T, (newValue: T | undefined) => void];
+
+function useCache<T>(
+  key: {},
+  options?: { defaultValue?: T } & CommonOptions<T>
+): readonly [T | undefined, (newValue: T | undefined) => void];
+
+function useCache<T>(
+  key: {},
+  options: { defaultValue?: T } & CommonOptions<T> = {}
 ) {
   const config = useCacheConfig();
   const { cache } = config;
@@ -26,15 +37,15 @@ function useCache<T>(
   const subscribe = useCallback(
     (listener: () => void) => {
       if (cacheSync) {
-        cache.on("set", listener);
+        cache.for(key).on("set", listener);
         return () => {
-          cache.off("set", listener);
+          cache.for(key).off("set", listener);
         };
       } else {
         return () => {};
       }
     },
-    [cache, cacheSync]
+    [key, cache, cacheSync]
   );
   const getSnapshot = useCallback(
     () => {
@@ -64,39 +75,34 @@ function useCache<T>(
   const shouldHandleSet = !!onSet;
   const shouldHandleDelete = !!onDelete;
 
-  const handleSet = usePersist((cacheKey: any, data: T) => {
-    if (Object.is(cacheKey, key) && onSet) {
+  const handleSet = usePersist((data: T) => {
+    if (onSet) {
       onSet(data);
     }
   });
-  const handleDelete = usePersist((cacheKey: any, data: T) => {
-    if (Object.is(cacheKey, key) && onDelete) {
+  const handleDelete = usePersist((data: T) => {
+    if (onDelete) {
       onDelete(data);
     }
   });
 
-  useEffect(
-    () => {
-      if (shouldHandleSet) {
-        cache.on("set", handleSet);
-        return () => {
-          cache.off("set", handleSet);
-        };
-      }
-    },
-    [cache, shouldHandleSet] // eslint-disable-line
-  );
-  useEffect(
-    () => {
-      if (shouldHandleDelete) {
-        cache.on("delete", handleDelete);
-        return () => {
-          cache.off("delete", handleDelete);
-        };
-      }
-    },
-    [cache, shouldHandleSet] // eslint-disable-line
-  );
+  useEffect(() => {
+    if (shouldHandleSet) {
+      cache.for(key).on("set", handleSet);
+      return () => {
+        cache.for(key).off("set", handleSet);
+      };
+    }
+  }, [key, cache, shouldHandleSet, handleSet]);
+
+  useEffect(() => {
+    if (shouldHandleDelete) {
+      cache.for(key).on("delete", handleDelete);
+      return () => {
+        cache.for(key).off("delete", handleDelete);
+      };
+    }
+  }, [key, cache, shouldHandleDelete, handleDelete]);
 
   return [value, setCache] as const;
 }

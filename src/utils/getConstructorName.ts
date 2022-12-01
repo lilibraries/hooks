@@ -1,5 +1,9 @@
 function getConstructorName(instance: object): string {
-  return instance && instance.constructor && instance.constructor.name;
+  let name = instance && instance.constructor && instance.constructor.name;
+  if (typeof name === "string" && name) {
+    return name;
+  }
+  return Object.prototype.toString.call(instance).slice(8, -1);
 }
 
 export default getConstructorName;

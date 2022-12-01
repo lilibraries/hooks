@@ -1,10 +1,10 @@
 import React, {
   FC,
+  useRef,
   ReactNode,
   useContext,
   useCallback,
   createContext,
-  useRef,
 } from "react";
 import omit from "lodash/omit";
 import { useSyncExternalStore } from "use-sync-external-store/shim";
@@ -15,9 +15,12 @@ interface Cache {
   set(key: any, data: any, options?: { cacheTime?: number }): any;
   delete(key: any): any;
   isReady(): boolean;
-  once(name: "ready", listener: (...args: any[]) => any): any;
-  on(name: "set" | "delete", listener: (key: any, data: any) => any): any;
-  off(name: "ready" | "set" | "delete", listener: (...args: any[]) => any): any;
+  once(name: "ready", listener: () => void): any;
+  off(name: "ready", listener: () => void): any;
+  for(key: any): {
+    on: (name: "set" | "delete", listener: (data: any) => void) => any;
+    off: (name: "set" | "delete", listener: (data: any) => void) => any;
+  };
 }
 
 interface Value {
@@ -69,7 +72,7 @@ const CacheConfig: FC<Props> & {
   if (value.global && globalVar[GLOBAL_CACHE_ID]) {
     value.cache = globalVar[GLOBAL_CACHE_ID];
   }
-  if (value.cache === undefined) {
+  if (!value.cache) {
     if (!cacheRef.current) {
       cacheRef.current = new MemoryCache();
     }
