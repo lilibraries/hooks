@@ -12,18 +12,14 @@ function useEventListener<
   T extends EventTarget = EventTarget,
   E extends Event = Event
 >(
-  target: TargetCreator<T>,
+  target: Target<T>,
   eventName: string,
   listener: (event: E) => void,
   options?: boolean | { capture?: boolean; once?: boolean; passive?: boolean }
 ): void;
 
-type Target<T> = T | undefined | null;
-type TargetCreator<T> =
-  | Target<T>
-  | (() => Target<T>)
-  | React.RefObject<Target<T>>
-  | React.MutableRefObject<Target<T>>;
+type Nullable<T> = T | undefined | null;
+type Target<T> = Nullable<T> | (() => Nullable<T>) | { current: Nullable<T> };
 ```
 
 Params:

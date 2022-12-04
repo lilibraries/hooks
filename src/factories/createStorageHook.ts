@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useDebugValue, useEffect } from "react";
 import deepEqual from "fast-deep-equal";
 import isFunction from "lodash/isFunction";
 import useUpdate from "../useUpdate";
@@ -8,7 +8,7 @@ import useSafeState from "../useSafeState";
 import useEventListener from "../useEventListener";
 import useMemoizedValue from "../useMemoizedValue";
 
-interface CommonOptions<T> {
+export interface CommonOptions<T> {
   polling?: boolean;
   pollingInterval?: number;
   compare?: (x: any, y: any) => boolean;
@@ -127,6 +127,11 @@ function createStorageHook(storage: Storage | null) {
         setValue(defaultValue);
       }
     }, [defaultValue]);
+
+    useDebugValue(value);
+    useDebugValue(key, (key) => {
+      return "(raw) " + storage?.getItem(key);
+    });
 
     return [value, setStorage] as const;
   }

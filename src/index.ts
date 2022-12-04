@@ -1,4 +1,4 @@
-export { default as CacheConfig } from "./configs/CacheConfig";
+export { default as CacheConfig } from "./CacheConfig";
 export { default as useAnimation } from "./useAnimation";
 export { default as useCache } from "./useCache";
 export { default as useClickOutside } from "./useClickOutside";

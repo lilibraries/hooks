@@ -1,13 +1,13 @@
 import useLatestRef from "./useLatestRef";
 import useTargetEffect from "./useTargetEffect";
 import getTarget from "./utils/getTarget";
-import { TargetCreator } from "./utils/types";
+import { Target } from "./utils/types";
 
 function useClickOutside<E extends Event = Event>(
-  target: TargetCreator<Node> | TargetCreator<Node>[],
+  target: Target<Node> | Target<Node>[],
   listener: (event: E) => void,
   options?: {
-    container?: TargetCreator<Element>;
+    container?: Target<Element>;
     eventName?: string | string[];
   }
 ) {

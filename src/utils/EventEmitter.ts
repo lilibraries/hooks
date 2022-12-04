@@ -1,6 +1,7 @@
 import isString from "lodash/isString";
 import isSymbol from "lodash/isSymbol";
 import isFunction from "lodash/isFunction";
+import warning from "./warning";
 import getConstructorName from "./getConstructorName";
 
 type Key = any;
@@ -19,9 +20,7 @@ class EventEmitter {
   _listeners: {
     [name: PropertyKey]: ListenerWrapper[] | undefined;
   } = Object.create(null);
-
   _maxListeners = EventEmitter.DEFAULT_MAX_LISTENERS;
-  _warnedMessages: { [message: string]: boolean } = {};
 
   _checkEventName(name: unknown) {
     if (this._topEmitter) {
@@ -69,14 +68,6 @@ class EventEmitter {
     }
   }
 
-  _getWarnedMessages() {
-    if (this._topEmitter) {
-      return this._topEmitter._warnedMessages;
-    } else {
-      return this._warnedMessages;
-    }
-  }
-
   getMaxListeners() {
     if (this._topEmitter) {
       return this._topEmitter._maxListeners;
@@ -117,21 +108,17 @@ class EventEmitter {
     }
 
     const maxListeners = this.getMaxListeners();
-    const warnedMessages = this._getWarnedMessages();
-
-    if (listeners.length > maxListeners) {
-      const ctorName = getConstructorName(this._topEmitter || this);
-      const message =
-        `More than ${maxListeners} \`${String(name)}\` ` +
-        `events are listened to \`${ctorName}\`` +
-        (this._topEmitter ? ` for \`${String(this._forKey)}\`` : "") +
-        `, which may lead to memory leaks.`;
-
-      if (!warnedMessages[message]) {
-        console.warn(message);
-        warnedMessages[message] = true;
-      }
-    }
+    warning(
+      listeners.length > maxListeners,
+      "More than {maxListeners} `{name}` events are listened to `{ctorName}`{forMessage}, which may lead to memory leaks.",
+      {
+        name,
+        maxListeners,
+        ctorName: getConstructorName(this._topEmitter || this),
+        forMessage: this._topEmitter ? ` for \`${String(this._forKey)}\`` : "",
+      },
+      { deduplicated: true }
+    );
 
     this._attach();
     return this;

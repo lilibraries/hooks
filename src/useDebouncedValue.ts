@@ -1,3 +1,4 @@
+import { useDebugValue } from "react";
 import useUpdate from "./useUpdate";
 import usePersist from "./usePersist";
 import useSafeState from "./useSafeState";
@@ -24,6 +25,8 @@ function useDebouncedValue<T>(value: T, options?: number | DebounceOptions) {
   useUpdate(() => {
     updateDebouncedValue(value);
   }, [value]);
+
+  useDebugValue(debouncedValue);
 
   return [debouncedValue, { flush, cancel }] as const;
 }

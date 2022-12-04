@@ -1,3 +1,4 @@
+import { useDebugValue } from "react";
 import useUpdate from "./useUpdate";
 import usePersist from "./usePersist";
 import useSafeState from "./useSafeState";
@@ -24,6 +25,8 @@ function useThrottledValue<T>(value: T, options?: number | ThrottleOptions) {
   useUpdate(() => {
     updateThrottledValue(value);
   }, [value]);
+
+  useDebugValue(throttledValue);
 
   return [throttledValue, { flush, cancel }] as const;
 }

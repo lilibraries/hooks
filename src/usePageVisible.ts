@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useDebugValue, useState } from "react";
 import useEventListener from "./useEventListener";
 import inBrowser from "./utils/inBrowser";
 
@@ -22,6 +22,8 @@ function usePageVisible() {
       setVisible(isPageVisible());
     }
   );
+
+  useDebugValue(visible);
 
   return visible;
 }

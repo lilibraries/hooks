@@ -1,3 +1,4 @@
+import { useDebugValue } from "react";
 import useSafeState from "./useSafeState";
 import useEventListener from "./useEventListener";
 import inBrowser from "./utils/inBrowser";
@@ -17,6 +18,8 @@ function useOnline() {
 
   useEventListener(() => window, "online", listener);
   useEventListener(() => window, "offline", listener);
+
+  useDebugValue(online);
 
   return online;
 }

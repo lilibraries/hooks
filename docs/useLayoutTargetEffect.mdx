@@ -6,15 +6,11 @@ It's similar to [`useTargetEffect`](./useTargetEffect), except it uses [`useIsom
 function useLayoutTargetEffect(
   effect: React.EffectCallback,
   deps: React.DependencyList,
-  targets: TargetCreator<any>[]
+  targets: ReadonlyArray<Target<any>>
 ): void;
 
-type Target<T> = T | undefined | null;
-type TargetCreator<T> =
-  | Target<T>
-  | (() => Target<T>)
-  | React.RefObject<Target<T>>
-  | React.MutableRefObject<Target<T>>;
+type Nullable<T> = T | undefined | null;
+type Target<T> = Nullable<T> | (() => Nullable<T>) | { current: Nullable<T> };
 ```
 
 ## Example

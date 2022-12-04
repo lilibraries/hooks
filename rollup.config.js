@@ -4,6 +4,8 @@ const commonjs = require("@rollup/plugin-commonjs");
 const babel = require("@rollup/plugin-babel").babel;
 const terser = require("rollup-plugin-terser").terser;
 const license = require("rollup-plugin-license");
+const replace = require("@rollup/plugin-replace");
+const isProduction = process.env.NODE_ENV === "production";
 
 module.exports = {
   input: path.resolve(__dirname, "src/index.ts"),
@@ -20,19 +22,17 @@ module.exports = {
       babelHelpers: "runtime",
       extensions: [".ts", ".tsx"],
     }),
+    replace({
+      objectGuards: true,
+      preventAssignment: true,
+      "process.env.NODE_ENV": JSON.stringify(
+        isProduction ? "production" : "development"
+      ),
+    }),
   ],
   output: [
     {
-      file: "dist/umd/index.js",
-      format: "umd",
-      name: "@lilib/hooks",
-      globals: {
-        react: "React",
-        "react-dom": "ReactDOM",
-      },
-    },
-    {
-      file: "dist/umd/index.min.js",
+      file: isProduction ? "dist/umd/index.min.js" : "dist/umd/index.js",
       format: "umd",
       name: "@lilib/hooks",
       globals: {
@@ -40,19 +40,20 @@ module.exports = {
         "react-dom": "ReactDOM",
       },
       plugins: [
-        terser(),
-        license({
-          thirdParty: {
-            output: path.resolve(__dirname, "dist/umd/dependencies.txt"),
-            includePrivate: true,
-            allow: {
-              test: "MIT",
-              failOnUnlicensed: true,
-              failOnViolation: true,
+        isProduction && terser(),
+        isProduction &&
+          license({
+            thirdParty: {
+              output: path.resolve(__dirname, "dist/umd/dependencies.txt"),
+              includePrivate: true,
+              allow: {
+                test: "MIT",
+                failOnUnlicensed: true,
+                failOnViolation: true,
+              },
             },
-          },
-        }),
-      ],
+          }),
+      ].filter(Boolean),
     },
   ],
 };

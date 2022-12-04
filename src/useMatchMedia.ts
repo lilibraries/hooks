@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useDebugValue, useMemo, useState } from "react";
 import useUpdate from "./useUpdate";
 import useEventListener from "./useEventListener";
 import inBrowser from "./utils/inBrowser";
@@ -16,6 +16,8 @@ function useMatchMedia(query: string, defaultValue?: boolean) {
   useEventListener(media, "change", (event: MediaQueryListEvent) => {
     setMathes(event.matches);
   });
+
+  useDebugValue(query + " is " + matches);
 
   return matches;
 }

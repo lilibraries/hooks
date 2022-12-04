@@ -1,10 +1,11 @@
-import { useCallback, useEffect } from "react";
+import { useCallback, useDebugValue, useEffect } from "react";
 import { useSyncExternalStore } from "use-sync-external-store/shim";
 import usePersist from "./usePersist";
 import useMemoizedValue from "./useMemoizedValue";
-import { useCacheConfig } from "./configs/CacheConfig";
+import { Cache, useCacheConfig } from "./CacheConfig";
 
 interface CommonOptions<T> {
+  cache?: Cache;
   cacheTime?: number;
   cacheSync?: boolean;
   validate?: (value: T) => boolean;
@@ -27,10 +28,12 @@ function useCache<T>(
   options: { defaultValue?: T } & CommonOptions<T> = {}
 ) {
   const config = useCacheConfig();
-  const { cache } = config;
+
   const { validate, onSet, onDelete } = options;
   const { defaultValue: defaultValueOption } = options;
   const defaultValue = useMemoizedValue(defaultValueOption);
+
+  const cache = options.cache ?? config.cache;
   const cacheTime = options.cacheTime ?? config.cacheTime;
   const cacheSync = !!(options.cacheSync ?? config.cacheSync);
 
@@ -103,6 +106,8 @@ function useCache<T>(
       };
     }
   }, [key, cache, shouldHandleDelete, handleDelete]);
+
+  useDebugValue(value);
 
   return [value, setCache] as const;
 }

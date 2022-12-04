@@ -1,11 +1,9 @@
-import { RefObject, MutableRefObject } from "react";
+export type Nullable<T> = T | undefined | null;
 
-export type Target<T> = T | undefined | null;
-export type TargetCreator<T> =
-  | Target<T>
-  | (() => Target<T>)
-  | RefObject<Target<T>>
-  | MutableRefObject<Target<T>>;
+export type Target<T> =
+  | Nullable<T>
+  | (() => Nullable<T>)
+  | { current: Nullable<T> };
 
 export type PromiseResolve<T extends Promise<any>> = T extends Promise<infer P>
   ? P

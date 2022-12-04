@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useDebugValue, useEffect } from "react";
 import isFunction from "lodash/isFunction";
 import Cookies, { CookieAttributes } from "js-cookie";
 import useUpdate from "./useUpdate";
@@ -114,6 +114,11 @@ function useCookie(
       setValue(defaultValue);
     }
   }, [defaultValue]);
+
+  useDebugValue(value);
+  useDebugValue(name, (name) => {
+    return "(raw) " + Cookies.get(name);
+  });
 
   return [value, setCookie] as const;
 }

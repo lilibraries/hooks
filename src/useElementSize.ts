@@ -1,11 +1,12 @@
+import { useDebugValue } from "react";
 import ResizeObserver from "resize-observer-polyfill";
 import usePersist from "./usePersist";
 import useSafeState from "./useSafeState";
 import useLayoutTargetEffect from "./useLayoutTargetEffect";
 import getTarget from "./utils/getTarget";
-import { TargetCreator } from "./utils/types";
+import { Target } from "./utils/types";
 
-function useElementSize(target: TargetCreator<Element>) {
+function useElementSize(target: Target<Element>) {
   const [{ width, height }, setSize] = useSafeState(() => {
     const element = getTarget(target);
     if (element) {
@@ -40,6 +41,8 @@ function useElementSize(target: TargetCreator<Element>) {
     [],
     [target]
   );
+
+  useDebugValue({ width, height });
 
   return { width, height } as const;
 }

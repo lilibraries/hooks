@@ -5,12 +5,14 @@ import React, {
   useContext,
   useCallback,
   createContext,
+  useDebugValue,
 } from "react";
 import omit from "lodash/omit";
 import { useSyncExternalStore } from "use-sync-external-store/shim";
-import MemoryCache from "../utils/MemoryCache";
+import MemoryCache from "./utils/MemoryCache";
+import assignWithDefined from "./utils/assignWithDefined";
 
-interface Cache {
+export interface Cache {
   get(key: any): any;
   set(key: any, data: any, options?: { cacheTime?: number }): any;
   delete(key: any): any;
@@ -23,7 +25,7 @@ interface Cache {
   };
 }
 
-interface Value {
+interface CacheConfigValue {
   global: boolean;
   cache: Cache;
   cacheTime: number;
@@ -31,42 +33,38 @@ interface Value {
   fallback?: ReactNode;
 }
 
-interface Props extends Partial<Value> {
+interface CacheConfigProps extends Partial<CacheConfigValue> {
   inherit?: boolean;
   children?: ReactNode;
 }
 
 const globalVar: any = globalThis;
 const GLOBAL_CACHE_ID = "__LILIB_HOOKS_GLOBAL_CACHE__";
-const DEFAULT_CACHE_TIME = 5 * 60 * 1000;
 
-const CacheContext = createContext<Value>({
+const defaultValue = {
   global: false,
-  cache: new MemoryCache(),
-  cacheTime: DEFAULT_CACHE_TIME,
+  cacheTime: 5 * 60 * 1000,
   cacheSync: false,
+};
+
+const CacheContext = createContext<CacheConfigValue>({
+  ...defaultValue,
+  cache: new MemoryCache(),
 });
 export const useCacheConfig = () => useContext(CacheContext);
 
-const CacheConfig: FC<Props> & {
+const CacheConfig: FC<CacheConfigProps> & {
   Context: typeof CacheContext;
   useConfig: typeof useCacheConfig;
 } = (props) => {
   const config = useCacheConfig();
   const cacheRef = useRef<Cache>();
-  let value = omit(props, "inherit", "children") as Value;
+  let value = omit(props, "inherit", "children") as CacheConfigValue;
 
   if (props.inherit) {
-    value = { ...config, ...value };
-  }
-  if (value.global === undefined) {
-    value.global = false;
-  }
-  if (value.cacheTime === undefined) {
-    value.cacheTime = DEFAULT_CACHE_TIME;
-  }
-  if (value.cacheSync === undefined) {
-    value.cacheSync = false;
+    value = assignWithDefined({}, config, value);
+  } else {
+    value = assignWithDefined({}, defaultValue, value);
   }
 
   if (value.global && globalVar[GLOBAL_CACHE_ID]) {
@@ -100,6 +98,9 @@ const CacheConfig: FC<Props> & {
     return cache.isReady();
   }, [cache]);
   const ready = useSyncExternalStore(subscribe, getSnapshot);
+
+  useDebugValue(ready ? "Ready" : "Unready");
+  useDebugValue(value);
 
   return (
     <CacheContext.Provider value={value}>

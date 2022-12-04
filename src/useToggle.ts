@@ -1,3 +1,4 @@
+import { useDebugValue } from "react";
 import usePersist from "./usePersist";
 import useSafeState from "./useSafeState";
 
@@ -19,6 +20,8 @@ function useToggle(initialValue: boolean = false) {
   const toggleOff = usePersist(() => {
     setValue(false);
   });
+
+  useDebugValue(value);
 
   return [value, { toggle, toggleOn, toggleOff }] as const;
 }

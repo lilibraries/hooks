@@ -1,6 +1,52 @@
 import EventEmitter from "../../src/utils/EventEmitter";
 
 describe("utils/EventEmitter", () => {
+  it("has static property", () => {
+    expect(EventEmitter.DEFAULT_MAX_LISTENERS).toBeGreaterThan(0);
+  });
+
+  it("check event name and listener correctly", () => {
+    const emitter = new EventEmitter();
+
+    expect(() => {
+      emitter._checkEventName("string");
+      emitter._checkEventName(Symbol());
+      emitter._checkEventListener(() => {});
+    }).not.toThrow();
+
+    expect(() => {
+      emitter._checkEventName(undefined);
+    }).toThrowError(
+      "Event name must be a string or a symbol. Received: undefined."
+    );
+    expect(() => {
+      emitter._checkEventName("");
+    }).toThrowError("Event name can not be an empty string.");
+    expect(() => {
+      emitter._checkEventListener(undefined);
+    }).toThrowError("Event listener must be a function. Received: undefined.");
+
+    const validName = "event";
+    const validListener = () => {};
+    const invalidName: any = null;
+    const invalidListener: any = null;
+
+    [
+      () => emitter.on(invalidName, validListener),
+      () => emitter.on(validName, invalidListener),
+      () => emitter.off(invalidName, validListener),
+      () => emitter.off(validName, invalidListener),
+      () => emitter.once(invalidName, validListener),
+      () => emitter.once(validName, invalidListener),
+      () => emitter.emit(invalidName),
+      () => emitter.getListeners(invalidName),
+      () => emitter.getListenersCount(invalidName),
+      () => emitter.removeAllListeners(invalidName),
+    ].forEach((callback) => {
+      expect(callback).toThrow(TypeError);
+    });
+  });
+
   it("should emit callbacks correctly", () => {
     const baseMock = jest.fn();
     const onceMock = jest.fn();
@@ -70,55 +116,9 @@ describe("utils/EventEmitter", () => {
     expect(mock2).toBeCalledTimes(3);
   });
 
-  it("should check param type correctly", () => {
-    const emitter = new EventEmitter();
-
-    const validName = "name";
-    const validListener = () => {};
-    const invalidName: any = null;
-    const invalidListener: any = null;
-
-    expect(() => {
-      emitter.on(invalidName, validListener);
-    }).toThrow(TypeError);
-    expect(() => {
-      emitter.on("", validListener);
-    }).toThrow(TypeError);
-    expect(() => {
-      emitter.on(validName, invalidListener);
-    }).toThrow(TypeError);
-
-    expect(() => {
-      emitter.off(invalidName, validListener);
-    }).toThrow(TypeError);
-    expect(() => {
-      emitter.off(validName, invalidListener);
-    }).toThrow(TypeError);
-
-    expect(() => {
-      emitter.once(invalidName, validListener);
-    }).toThrow(TypeError);
-    expect(() => {
-      emitter.once(validName, invalidListener);
-    }).toThrow(TypeError);
-
-    expect(() => {
-      emitter.emit(invalidName);
-    }).toThrow(TypeError);
-
-    expect(() => {
-      emitter.getListeners(invalidName);
-    }).toThrow(TypeError);
-    expect(() => {
-      emitter.getListenersCount(invalidName);
-    }).toThrow(TypeError);
-  });
-
   it("should not throw an error when a event is not listened", () => {
-    const emitter = new EventEmitter();
-
     expect(() => {
-      emitter.emit("name", 1, 2, 3);
+      new EventEmitter().emit("name", 1, 2, 3);
     }).not.toThrow();
   });
 
@@ -137,14 +137,16 @@ describe("utils/EventEmitter", () => {
     }).not.toThrow();
     expect(mock).toBeCalledTimes(1);
     expect(error).toBeCalledTimes(1);
-
     error.mockReset();
   });
 
   it("should set maxListeners correctly", () => {
     const emitter = new EventEmitter();
-    const warn = jest.fn();
-    jest.spyOn(console, "warn").mockImplementation(warn);
+    let warnedMessage: string = "";
+    const warn = jest.fn().mockImplementation((message: string) => {
+      warnedMessage = message;
+    });
+    jest.spyOn(console, "error").mockImplementation(warn);
 
     expect(EventEmitter.DEFAULT_MAX_LISTENERS).toBe(100);
     expect(emitter.getMaxListeners()).toBe(EventEmitter.DEFAULT_MAX_LISTENERS);
@@ -158,6 +160,9 @@ describe("utils/EventEmitter", () => {
     i++;
     emitter.on("event", () => {});
     expect(warn).toBeCalledTimes(1);
+    expect(warnedMessage).toBe(
+      "Warning: More than 100 `event` events are listened to `EventEmitter`, which may lead to memory leaks."
+    );
 
     for (; i <= 110; i++) {
       emitter.on("event", () => {});
@@ -173,12 +178,14 @@ describe("utils/EventEmitter", () => {
     i++;
     emitter.on("event", () => {});
     expect(warn).toBeCalledTimes(2);
+    expect(warnedMessage).toBe(
+      "Warning: More than 200 `event` events are listened to `EventEmitter`, which may lead to memory leaks."
+    );
 
-    for (; i <= 210; i++) {
+    for (; i <= 300; i++) {
       emitter.on("event", () => {});
     }
     expect(warn).toBeCalledTimes(2);
-
     warn.mockReset();
   });
 
@@ -265,7 +272,64 @@ describe("utils/EventEmitter", () => {
     expect(emitter.once("event", () => {})).toBe(emitter);
     expect(emitter.off("event", () => {})).toBe(emitter);
     expect(emitter.emit("event")).toBe(emitter);
-    expect(emitter.removeAllListeners()).toBe(emitter);
     expect(emitter.setMaxListeners(10)).toBe(emitter);
+    expect(emitter.removeAllListeners()).toBe(emitter);
+  });
+
+  it("supports `for` method", () => {
+    const emitter = new EventEmitter();
+    const key = "key";
+    const subKey = () => {};
+    const listener = jest.fn();
+
+    emitter.for(key).on("event", listener);
+    emitter.for(key).for(subKey).on("event", listener);
+    const childEmitter = emitter._emitters.get(key);
+    const subChildEmitter = emitter._emitters.get(key)?._emitters.get(subKey);
+
+    expect(emitter._emitters.size).toBe(1);
+    expect(emitter._emitters.get(key)?._emitters.size).toBe(1);
+    expect(childEmitter).toBeInstanceOf(EventEmitter);
+    expect(subChildEmitter).toBeInstanceOf(EventEmitter);
+
+    expect(childEmitter?._forKey).toBe(key);
+    expect(childEmitter?._topEmitter).toBe(emitter);
+    expect(childEmitter?._parentEmitter).toBe(emitter);
+    expect(subChildEmitter?._forKey).toBe(subKey);
+    expect(subChildEmitter?._topEmitter).toBe(emitter);
+    expect(subChildEmitter?._parentEmitter).toBe(childEmitter);
+
+    emitter.for(key).emit("event");
+    expect(listener).toBeCalledTimes(1);
+    emitter.for(key).for(subKey).emit("event");
+    expect(listener).toBeCalledTimes(2);
+
+    emitter.for(key).for(subKey).off("event", listener);
+    expect(emitter._emitters.get(key)?._emitters.size).toBe(0);
+    emitter.for(key).off("event", listener);
+    expect(emitter._emitters.size).toBe(0);
+
+    emitter.for(key).emit("event");
+    expect(listener).toBeCalledTimes(2);
+    emitter.for(key).for(subKey).emit("event");
+    expect(listener).toBeCalledTimes(2);
+
+    subChildEmitter?.on("event", listener);
+    expect(emitter._emitters.size).toBe(1);
+    expect(emitter._emitters.get(key)?._emitters.size).toBe(1);
+    expect(emitter._emitters.get(key)).toBe(childEmitter);
+    expect(emitter._emitters.get(key)?._emitters.get(subKey)).toBe(
+      subChildEmitter
+    );
+
+    emitter.setMaxListeners(200);
+    expect(emitter.getMaxListeners()).toBe(200);
+    expect(childEmitter?.getMaxListeners()).toBe(200);
+    expect(subChildEmitter?.getMaxListeners()).toBe(200);
+
+    subChildEmitter?.setMaxListeners(300);
+    expect(emitter.getMaxListeners()).toBe(300);
+    expect(childEmitter?.getMaxListeners()).toBe(300);
+    expect(subChildEmitter?.getMaxListeners()).toBe(300);
   });
 });

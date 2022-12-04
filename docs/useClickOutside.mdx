@@ -9,20 +9,16 @@ Trigger a callback when clicking outside the target area.
 
 ```ts
 function useClickOutside<E extends Event = Event>(
-  target: TargetCreator<Node> | TargetCreator<Node>[],
+  target: Target<Node> | Target<Node>[],
   listener: (event: E) => void,
   options?: {
-    container?: TargetCreator<Element>;
+    container?: Target<Element>;
     eventName?: string | string[];
   }
 ): void;
 
-type Target<T> = T | undefined | null;
-type TargetCreator<T> =
-  | Target<T>
-  | (() => Target<T>)
-  | React.RefObject<Target<T>>
-  | React.MutableRefObject<Target<T>>;
+type Nullable<T> = T | undefined | null;
+type Target<T> = Nullable<T> | (() => Nullable<T>) | { current: Nullable<T> };
 ```
 
 - **`target`:** Target node or nodes.

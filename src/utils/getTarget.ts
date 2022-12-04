@@ -1,9 +1,9 @@
 import isObject from "lodash/isObject";
 import isFunction from "lodash/isFunction";
 import inBrowser from "./inBrowser";
-import { Target, TargetCreator } from "./types";
+import { Target, Nullable } from "./types";
 
-function getTarget<T>(target: TargetCreator<T>): Target<T> {
+function getTarget<T>(target: Target<T>): Nullable<T> {
   if (!inBrowser) {
     return null;
   }

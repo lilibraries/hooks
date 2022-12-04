@@ -56,8 +56,10 @@ class MemoryCache<Key = {}, Data = any> extends EventEmitter {
   }
 
   asReady() {
-    this._ready = true;
-    this.emit("ready");
+    if (!this._ready) {
+      this._ready = true;
+      this.emit("ready");
+    }
     return this;
   }
 
@@ -153,9 +155,9 @@ class MemoryCache<Key = {}, Data = any> extends EventEmitter {
   }
 
   clear() {
-    const entries = this._records.entries();
+    const records = new Map(this._records);
     this._records.clear();
-    for (const [key, record] of entries) {
+    for (const [key, record] of records) {
       if (record.deleteTimer) {
         clearTimeout(record.deleteTimer);
       }

@@ -3,13 +3,13 @@ import usePersist from "./usePersist";
 import useTargetEffect from "./useTargetEffect";
 import getTarget from "./utils/getTarget";
 import isEventTarget from "./utils/isEventTarget";
-import { TargetCreator } from "./utils/types";
+import { Target } from "./utils/types";
 
 function useEventListener<
   T extends EventTarget = EventTarget,
   E extends Event = Event
 >(
-  target: TargetCreator<T>,
+  target: Target<T>,
   eventName: string,
   listener: (event: E) => void,
   options?: boolean | AddEventListenerOptions

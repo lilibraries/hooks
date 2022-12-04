@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useDebugValue, useState } from "react";
 import useEventListener from "./useEventListener";
 import inBrowser from "./utils/inBrowser";
 
@@ -17,6 +17,8 @@ function useWindowSize() {
 
   useEventListener(() => window, "resize", listener);
   useEventListener(() => window, "orientationchange", listener);
+
+  useDebugValue({ width, height });
 
   return { width, height } as const;
 }
