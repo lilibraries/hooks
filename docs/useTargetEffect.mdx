@@ -6,11 +6,14 @@ This hook is similar to React.useEffect, but it has one more `targets` parameter
 function useTargetEffect(
   effect: React.EffectCallback,
   deps: React.DependencyList,
-  targets: ReadonlyArray<Target<any>>
+  targets: ReadonlyArray<EffectTarget<any>>
 ): void;
 
 type Nullable<T> = T | undefined | null;
-type Target<T> = Nullable<T> | (() => Nullable<T>) | { current: Nullable<T> };
+type EffectTarget<T> =
+  | Nullable<T>
+  | (() => Nullable<T>)
+  | { current: Nullable<T> };
 ```
 
 ## Example

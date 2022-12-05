@@ -8,13 +8,16 @@ Get DOM element size.
 ## API
 
 ```ts
-function useElementSize(target: Target<Element>): {
+function useElementSize(target: EffectTarget<Element>): {
   width: number | undefined;
   height: number | undefined;
 };
 
 type Nullable<T> = T | undefined | null;
-type Target<T> = Nullable<T> | (() => Nullable<T>) | { current: Nullable<T> };
+type EffectTarget<T> =
+  | Nullable<T>
+  | (() => Nullable<T>)
+  | { current: Nullable<T> };
 ```
 
 Params:

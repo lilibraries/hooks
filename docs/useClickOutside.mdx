@@ -9,16 +9,19 @@ Trigger a callback when clicking outside the target area.
 
 ```ts
 function useClickOutside<E extends Event = Event>(
-  target: Target<Node> | Target<Node>[],
+  target: EffectTarget<Node> | EffectTarget<Node>[],
   listener: (event: E) => void,
   options?: {
-    container?: Target<Element>;
+    container?: EffectTarget<Element>;
     eventName?: string | string[];
   }
 ): void;
 
 type Nullable<T> = T | undefined | null;
-type Target<T> = Nullable<T> | (() => Nullable<T>) | { current: Nullable<T> };
+type EffectTarget<T> =
+  | Nullable<T>
+  | (() => Nullable<T>)
+  | { current: Nullable<T> };
 ```
 
 - **`target`:** Target node or nodes.

@@ -12,14 +12,17 @@ function useEventListener<
   T extends EventTarget = EventTarget,
   E extends Event = Event
 >(
-  target: Target<T>,
+  target: EffectTarget<T>,
   eventName: string,
   listener: (event: E) => void,
   options?: boolean | { capture?: boolean; once?: boolean; passive?: boolean }
 ): void;
 
 type Nullable<T> = T | undefined | null;
-type Target<T> = Nullable<T> | (() => Nullable<T>) | { current: Nullable<T> };
+type EffectTarget<T> =
+  | Nullable<T>
+  | (() => Nullable<T>)
+  | { current: Nullable<T> };
 ```
 
 Params:
