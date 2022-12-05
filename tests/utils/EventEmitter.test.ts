@@ -142,9 +142,9 @@ describe("utils/EventEmitter", () => {
 
   it("should set maxListeners correctly", () => {
     const emitter = new EventEmitter();
-    let warnedMessage: string = "";
-    const warn = jest.fn().mockImplementation((message: string) => {
-      warnedMessage = message;
+    let error: Error = new Error();
+    const warn = jest.fn().mockImplementation((e: Error) => {
+      error = e;
     });
     jest.spyOn(console, "error").mockImplementation(warn);
 
@@ -160,8 +160,9 @@ describe("utils/EventEmitter", () => {
     i++;
     emitter.on("event", () => {});
     expect(warn).toBeCalledTimes(1);
-    expect(warnedMessage).toBe(
-      "Warning: More than 100 `event` events are listened to `EventEmitter`, which may lead to memory leaks."
+    expect(error.name).toBe("Warning");
+    expect(error.message).toBe(
+      "More than 100 `event` events are listened to `EventEmitter`, which may lead to memory leaks."
     );
 
     for (; i <= 110; i++) {
@@ -178,8 +179,9 @@ describe("utils/EventEmitter", () => {
     i++;
     emitter.on("event", () => {});
     expect(warn).toBeCalledTimes(2);
-    expect(warnedMessage).toBe(
-      "Warning: More than 200 `event` events are listened to `EventEmitter`, which may lead to memory leaks."
+    expect(error.name).toBe("Warning");
+    expect(error.message).toBe(
+      "More than 200 `event` events are listened to `EventEmitter`, which may lead to memory leaks."
     );
 
     for (; i <= 300; i++) {

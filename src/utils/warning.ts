@@ -1,28 +1,56 @@
 import isObject from "lodash/isObject";
+import mergeWithDefined from "./mergeWithDefined";
 
-interface Warning {
+interface Options {
+  label?: string;
+  scope?: string;
+  printer?: (error: Error) => void;
+  deduplicated?: boolean;
+  warnedMessagesMap?: { [message: string]: boolean };
+  captureStackTraceConstructor?: Function;
+}
+
+interface Warn {
   (
     condition: boolean,
     message: string,
     variables?: { [name: string]: unknown },
-    options?: { label?: string; deduplicated?: boolean }
+    options?: Options
   ): void;
 }
 
-const defaultOptions = {
-  label: "Warning: ",
-  deduplicated: false,
-};
+interface Warning extends Warn {
+  once: Warn;
+  deprecated: Warn;
+}
 
 let warning: Warning;
-if (process.env.NODE_ENV === "production") {
-  warning = () => {};
-} else {
-  const warned: { [message: string]: boolean } = {};
 
-  warning = (condition, message, variables, options) => {
+if (process.env.NODE_ENV === "production") {
+  const noop = () => {};
+  noop.once = () => {};
+  noop.deprecated = () => {};
+  warning = noop;
+} else {
+  const defaultOptions = {
+    label: "Warning",
+    printer: (error: Error) => {
+      console.error(error);
+    },
+    deduplicated: false,
+    warnedMessagesMap: {},
+  };
+
+  warning = ((condition, message, variables, options) => {
     if (condition) {
-      const { label, deduplicated } = { ...defaultOptions, ...options };
+      const {
+        label,
+        scope,
+        printer,
+        deduplicated,
+        warnedMessagesMap,
+        captureStackTraceConstructor,
+      } = mergeWithDefined(defaultOptions, options || {});
 
       if (isObject(variables)) {
         for (const name in variables) {
@@ -31,24 +59,69 @@ if (process.env.NODE_ENV === "production") {
           }
         }
       }
-      message = label + message;
+
+      class WarningError extends Error {
+        constructor(message?: string) {
+          super(message);
+          this.name = label + (scope ? `(${scope})` : "");
+          if (Error.captureStackTrace) {
+            Error.captureStackTrace(
+              this,
+              captureStackTraceConstructor || warning
+            );
+          }
+        }
+      }
 
       const print = () => {
-        console.error(message);
         try {
-          throw new Error(message);
-        } catch (e) {}
+          throw new WarningError(message);
+        } catch (error: unknown) {
+          printer(error as Error);
+        }
       };
 
       if (deduplicated) {
-        if (!warned[message]) {
+        let id = `${label}${scope ? `(${scope})` : ""}: ${message}`;
+        if (!warnedMessagesMap[id]) {
           print();
-          warned[message] = true;
+          warnedMessagesMap[id] = true;
         }
       } else {
         print();
       }
     }
+  }) as Warning;
+
+  warning.once = (condition, message, variables, options) => {
+    warning(
+      condition,
+      message,
+      variables,
+      mergeWithDefined(
+        {
+          deduplicated: true,
+          captureStackTraceConstructor: warning.once,
+        },
+        options || {}
+      )
+    );
+  };
+
+  warning.deprecated = (condition, message, variables, options) => {
+    warning(
+      condition,
+      message,
+      variables,
+      mergeWithDefined(
+        {
+          label: "Deprecated",
+          deduplicated: true,
+          captureStackTraceConstructor: warning.deprecated,
+        },
+        options || {}
+      )
+    );
   };
 }
 

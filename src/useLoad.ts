@@ -1,7 +1,7 @@
 import { DependencyList, useDebugValue } from "react";
 import usePersist from "./usePersist";
 import useSetState from "./useSetState";
-import assignWithDefined from "./utils/assignWithDefined";
+import mergeWithDefined from "./utils/mergeWithDefined";
 import { PromiseResolve } from "./utils/types";
 import { SharedOptions, useLoadConfig, LoadConfigValue } from "./LoadConfig";
 
@@ -73,11 +73,7 @@ function useLoad<Callback extends LoadCallback>(
     autoReloadOnPageShow,
     autoReloadOnWindowFocus,
     autoReloadOnNetworkReconnect,
-  } = assignWithDefined<LoadConfigValue & Options<Callback>>(
-    {},
-    config,
-    options
-  );
+  } = mergeWithDefined(config, options);
 
   const [state, setState] = useSetState<State<LoadData<Callback>>>(() => {
     const loading = !imperative;

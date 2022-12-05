@@ -1,14 +1,14 @@
 import { DependencyList, EffectCallback, useEffect, useRef } from "react";
 import useUnmount from "../useUnmount";
-import getTarget from "../utils/getTarget";
 import areArraysEqual from "../utils/areArraysEqual";
-import { Target, Nullable } from "../utils/types";
+import getEffectTarget from "../utils/getEffectTarget";
+import { Nullable, EffectTarget } from "../utils/types";
 
 function createTargetEffectHook(useHook: typeof useEffect) {
   return function (
     effect: EffectCallback,
     deps: DependencyList,
-    targets: ReadonlyArray<Target<any>>
+    targets: ReadonlyArray<EffectTarget<any>>
   ) {
     const mountedRef = useRef(false);
     const depsRef = useRef<DependencyList>([]);
@@ -20,7 +20,7 @@ function createTargetEffectHook(useHook: typeof useEffect) {
     }
 
     useHook(() => {
-      const deps2 = targets.map(getTarget);
+      const deps2 = targets.map(getEffectTarget);
 
       function create() {
         depsRef.current = deps;

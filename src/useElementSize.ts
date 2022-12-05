@@ -3,12 +3,12 @@ import ResizeObserver from "resize-observer-polyfill";
 import usePersist from "./usePersist";
 import useSafeState from "./useSafeState";
 import useLayoutTargetEffect from "./useLayoutTargetEffect";
-import getTarget from "./utils/getTarget";
-import { Target } from "./utils/types";
+import getEffectTarget from "./utils/getEffectTarget";
+import { EffectTarget } from "./utils/types";
 
-function useElementSize(target: Target<Element>) {
+function useElementSize(target: EffectTarget<Element>) {
   const [{ width, height }, setSize] = useSafeState(() => {
-    const element = getTarget(target);
+    const element = getEffectTarget(target);
     if (element) {
       const rect = element.getBoundingClientRect();
       return { width: rect.width, height: rect.height };
@@ -28,7 +28,7 @@ function useElementSize(target: Target<Element>) {
 
   useLayoutTargetEffect(
     () => {
-      const element = getTarget(target);
+      const element = getEffectTarget(target);
       if (!element) {
         return;
       }

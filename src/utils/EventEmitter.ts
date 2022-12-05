@@ -2,6 +2,7 @@ import isString from "lodash/isString";
 import isSymbol from "lodash/isSymbol";
 import isFunction from "lodash/isFunction";
 import warning from "./warning";
+import getDisplayName from "./getDisplayName";
 import getConstructorName from "./getConstructorName";
 
 type Key = any;
@@ -108,16 +109,17 @@ class EventEmitter {
     }
 
     const maxListeners = this.getMaxListeners();
-    warning(
+    warning.once(
       listeners.length > maxListeners,
       "More than {maxListeners} `{name}` events are listened to `{ctorName}`{forMessage}, which may lead to memory leaks.",
       {
         name,
         maxListeners,
         ctorName: getConstructorName(this._topEmitter || this),
-        forMessage: this._topEmitter ? ` for \`${String(this._forKey)}\`` : "",
-      },
-      { deduplicated: true }
+        forMessage: this._topEmitter
+          ? ` for \`${getDisplayName(this._forKey)}\``
+          : "",
+      }
     );
 
     this._attach();
@@ -218,6 +220,7 @@ class EventEmitter {
     } else {
       this._listeners = Object.create(null);
     }
+    this._prune();
     return this;
   }
 }

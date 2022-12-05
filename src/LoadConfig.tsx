@@ -6,7 +6,7 @@ import React, {
   useDebugValue,
 } from "react";
 import omit from "lodash/omit";
-import assignWithDefined from "./utils/assignWithDefined";
+import mergeWithDefined from "./utils/mergeWithDefined";
 
 export interface SharedOptions {
   retry?: boolean;
@@ -69,9 +69,9 @@ const LoadConfig: FC<LoadConfigProps> & {
   let value = omit(props, "inherit", "children") as LoadConfigValue;
 
   if (props.inherit) {
-    value = assignWithDefined({}, config, value);
+    value = mergeWithDefined(config, value);
   } else {
-    value = assignWithDefined({}, defaultValue, value);
+    value = mergeWithDefined(defaultValue, value);
   }
 
   useDebugValue(value);

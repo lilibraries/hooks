@@ -1,13 +1,13 @@
 import useLatestRef from "./useLatestRef";
 import useTargetEffect from "./useTargetEffect";
-import getTarget from "./utils/getTarget";
-import { Target } from "./utils/types";
+import getEffectTarget from "./utils/getEffectTarget";
+import { EffectTarget } from "./utils/types";
 
 function useClickOutside<E extends Event = Event>(
-  target: Target<Node> | Target<Node>[],
+  target: EffectTarget<Node> | EffectTarget<Node>[],
   listener: (event: E) => void,
   options?: {
-    container?: Target<Element>;
+    container?: EffectTarget<Element>;
     eventName?: string | string[];
   }
 ) {
@@ -19,7 +19,7 @@ function useClickOutside<E extends Event = Event>(
   useTargetEffect(
     () => {
       function handler(event: any) {
-        for (const element of targets.map(getTarget)) {
+        for (const element of targets.map(getEffectTarget)) {
           if (element && element.contains(event.target)) {
             return;
           }
@@ -27,7 +27,7 @@ function useClickOutside<E extends Event = Event>(
         listenerRef.current(event);
       }
 
-      const el = getTarget(container) || document;
+      const el = getEffectTarget(container) || document;
 
       for (const eventName of eventNames) {
         el.addEventListener(eventName, handler);

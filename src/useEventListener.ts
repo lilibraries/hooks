@@ -1,15 +1,15 @@
 import isObject from "lodash/isObject";
 import usePersist from "./usePersist";
 import useTargetEffect from "./useTargetEffect";
-import getTarget from "./utils/getTarget";
 import isEventTarget from "./utils/isEventTarget";
-import { Target } from "./utils/types";
+import getEffectTarget from "./utils/getEffectTarget";
+import { EffectTarget } from "./utils/types";
 
 function useEventListener<
   T extends EventTarget = EventTarget,
   E extends Event = Event
 >(
-  target: Target<T>,
+  target: EffectTarget<T>,
   eventName: string,
   listener: (event: E) => void,
   options?: boolean | AddEventListenerOptions
@@ -36,7 +36,7 @@ function useEventListener<
 
   useTargetEffect(
     () => {
-      const element = getTarget(target);
+      const element = getEffectTarget(target);
 
       if (isEventTarget(element)) {
         element.addEventListener(eventName, handler, {

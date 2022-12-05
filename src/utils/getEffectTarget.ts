@@ -1,9 +1,9 @@
 import isObject from "lodash/isObject";
 import isFunction from "lodash/isFunction";
 import inBrowser from "./inBrowser";
-import { Target, Nullable } from "./types";
+import { Nullable, EffectTarget } from "./types";
 
-function getTarget<T>(target: Target<T>): Nullable<T> {
+function getEffectTarget<T>(target: EffectTarget<T>): Nullable<T> {
   if (!inBrowser) {
     return null;
   }
@@ -16,4 +16,4 @@ function getTarget<T>(target: Target<T>): Nullable<T> {
   return target;
 }
 
-export default getTarget;
+export default getEffectTarget;

@@ -1,6 +1,6 @@
 import { useTargetEffect } from "@lilib/hooks";
 import renderHook from "./renderHook";
-import { Target } from "../../src/utils/types";
+import { EffectTarget } from "../../src/utils/types";
 
 function testTargetEffectHook(name: string, useHook: typeof useTargetEffect) {
   describe(name, () => {
@@ -41,7 +41,7 @@ function testTargetEffectHook(name: string, useHook: typeof useTargetEffect) {
     it("should deal with `targets` correctly", () => {
       const destroy = jest.fn();
       const create = jest.fn().mockReturnValue(destroy);
-      const { rerender, unmount } = renderHook<Target<any>[], void>(
+      const { rerender, unmount } = renderHook<EffectTarget<any>[], void>(
         (targets) => {
           useHook(create, [], targets);
         },

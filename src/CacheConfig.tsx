@@ -10,7 +10,7 @@ import React, {
 import omit from "lodash/omit";
 import { useSyncExternalStore } from "use-sync-external-store/shim";
 import MemoryCache from "./utils/MemoryCache";
-import assignWithDefined from "./utils/assignWithDefined";
+import mergeWithDefined from "./utils/mergeWithDefined";
 
 export interface Cache {
   get(key: any): any;
@@ -62,9 +62,9 @@ const CacheConfig: FC<CacheConfigProps> & {
   let value = omit(props, "inherit", "children") as CacheConfigValue;
 
   if (props.inherit) {
-    value = assignWithDefined({}, config, value);
+    value = mergeWithDefined(config, value);
   } else {
-    value = assignWithDefined({}, defaultValue, value);
+    value = mergeWithDefined(defaultValue, value);
   }
 
   if (value.global && globalVar[GLOBAL_CACHE_ID]) {
