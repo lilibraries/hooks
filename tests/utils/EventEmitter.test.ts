@@ -324,6 +324,10 @@ describe("utils/EventEmitter", () => {
       subChildEmitter
     );
 
+    subChildEmitter?.removeAllListeners();
+    expect(emitter._emitters.size).toBe(0);
+    expect(childEmitter?._emitters.size).toBe(0);
+
     emitter.setMaxListeners(200);
     expect(emitter.getMaxListeners()).toBe(200);
     expect(childEmitter?.getMaxListeners()).toBe(200);
