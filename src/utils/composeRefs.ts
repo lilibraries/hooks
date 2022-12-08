@@ -2,7 +2,7 @@ import { Ref, RefCallback, MutableRefObject } from "react";
 import isObject from "lodash/isObject";
 import isFunction from "lodash/isFunction";
 
-function mergeRefs<T>(...refs: Ref<T>[]): RefCallback<T> {
+function composeRefs<T>(...refs: Ref<T>[]): RefCallback<T> {
   return (instance: T) => {
     refs.forEach((ref) => {
       if (isFunction(ref)) {
@@ -14,4 +14,4 @@ function mergeRefs<T>(...refs: Ref<T>[]): RefCallback<T> {
   };
 }
 
-export default mergeRefs;
+export default composeRefs;

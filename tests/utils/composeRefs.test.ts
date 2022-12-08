@@ -1,13 +1,13 @@
-import mergeRefs from "../../src/utils/mergeRefs";
+import composeRefs from "../../src/utils/composeRefs";
 
-describe("utils/mergeRefs", () => {
-  it("should merge multiple refs", () => {
+describe("utils/composeRefs", () => {
+  it("should compose multiple refs correctly", () => {
     let ref1Value: any = undefined;
     const ref1 = (value: any) => {
       ref1Value = value;
     };
     const ref2 = { current: undefined };
-    const mergedRef = mergeRefs(ref1, ref2);
+    const mergedRef = composeRefs(ref1, ref2);
     mergedRef("value");
 
     expect(typeof mergedRef).toBe("function");

@@ -1,9 +1,9 @@
 import { createRef, useImperativeHandle } from "react";
-import { useMergedRef } from "@lilib/hooks";
+import { useComposedRef } from "@lilib/hooks";
 import renderHook from "./helpers/renderHook";
 
-describe("useMergedRef", () => {
-  it("should combine multiple refs into one", () => {
+describe("useComposedRef", () => {
+  it("should compose multiple refs into one", () => {
     const ref1 = createRef<any>();
     let ref2Value: any;
     const ref2 = (value: any) => {
@@ -11,8 +11,8 @@ describe("useMergedRef", () => {
     };
 
     renderHook(() => {
-      const mergedRef = useMergedRef(ref1, ref2);
-      useImperativeHandle(mergedRef, () => "value");
+      const composedRef = useComposedRef(ref1, ref2);
+      useImperativeHandle(composedRef, () => "value");
     });
 
     expect(ref1.current).toBe("value");

@@ -1,0 +1,23 @@
+This hook compose multiple refs into one. It's very useful when developing components.
+
+## API
+
+```ts
+function useComposedRef<T>(...refs: React.Ref<T>[]): React.RefCallback<T>;
+```
+
+## Example
+
+```tsx
+import React, { forwardRef, useRef } from "react";
+import { useComposedRef } from "@lilib/hooks";
+
+const Component = forwardRef<HTMLDivElement, any>((props, ref) => {
+  const domRef = useRef<HTMLDivElement>(null);
+  const composedRef = useComposedRef(domRef, ref);
+
+  // Do somthing.
+
+  return <div ref={composedRef}>...</div>;
+});
+```
