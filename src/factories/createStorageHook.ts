@@ -8,7 +8,8 @@ import useSafeState from "../useSafeState";
 import useEventListener from "../useEventListener";
 import useMemoizedValue from "../useMemoizedValue";
 
-export interface CommonOptions<T> {
+export interface StorageHookOptions<T> {
+  defaultValue?: T;
   polling?: boolean;
   pollingInterval?: number;
   compare?: (x: any, y: any) => boolean;
@@ -20,7 +21,7 @@ export interface CommonOptions<T> {
 function createStorageHook(storage: Storage | null) {
   function useStorage<T>(
     key: string,
-    options: { defaultValue: T } & CommonOptions<T>
+    options: StorageHookOptions<T> & { defaultValue: T }
   ): readonly [
     T,
     (value: T | undefined | ((prevValue: T) => T | undefined)) => void
@@ -28,7 +29,7 @@ function createStorageHook(storage: Storage | null) {
 
   function useStorage<T>(
     key: string,
-    options?: { defaultValue?: T } & CommonOptions<T>
+    options?: StorageHookOptions<T>
   ): readonly [
     T | undefined,
     (
@@ -36,10 +37,7 @@ function createStorageHook(storage: Storage | null) {
     ) => void
   ];
 
-  function useStorage<T>(
-    key: string,
-    options: { defaultValue?: T } & CommonOptions<T> = {}
-  ) {
+  function useStorage<T>(key: string, options?: StorageHookOptions<T>) {
     const {
       defaultValue: defaultValueOption,
       polling = false,
@@ -48,7 +46,7 @@ function createStorageHook(storage: Storage | null) {
       validate,
       serialize = JSON.stringify as (value: T) => string,
       deserialize = JSON.parse as (raw: string) => T,
-    } = options;
+    } = options || {};
     const defaultValue = useMemoizedValue(defaultValueOption, compare);
 
     function getStoredValue(): T | undefined {

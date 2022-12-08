@@ -3,12 +3,16 @@ import usePersist from "./usePersist";
 import useSetState from "./useSetState";
 import mergeWithDefined from "./utils/mergeWithDefined";
 import { PromiseResolve } from "./utils/types";
-import { SharedOptions, useLoadConfig, LoadConfigValue } from "./LoadConfig";
+import {
+  useLoadConfig,
+  LoadConfigValue,
+  LoadSharedOptions,
+} from "./configs/LoadConfig";
 
 export type LoadCallback = (...args: any[]) => Promise<any>;
 export type LoadData<T extends LoadCallback> = PromiseResolve<ReturnType<T>>;
 
-interface Options<Callback extends LoadCallback> extends SharedOptions {
+interface Options<Callback extends LoadCallback> extends LoadSharedOptions {
   key?: {};
   idle?: boolean;
   imperative?: boolean;

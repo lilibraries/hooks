@@ -1,8 +1,10 @@
 import { useCallback, useRef } from "react";
 import raf from "raf";
+import isNumber from "lodash/isNumber";
 import useUnmount from "./useUnmount";
 import usePersist from "./usePersist";
 import useLatestRef from "./useLatestRef";
+import warning from "./utils/warning";
 
 function useAnimation(
   callback: (percent: number) => void,
@@ -10,10 +12,10 @@ function useAnimation(
     | number
     | { duration: number; algorithm?: (percent: number) => number }
 ) {
-  let duration: number;
+  let duration: number = 0;
   let algorithm: (percent: number) => number;
 
-  if (typeof options === "number") {
+  if (isNumber(options)) {
     duration = options;
   } else if (options) {
     if (options.duration) {
@@ -24,12 +26,21 @@ function useAnimation(
     }
   }
 
-  const timerRef = useRef<number>();
-  const startTimeRef = useRef<number>();
+  if (process.env.NODE_ENV !== "production") {
+    warning(
+      !isNumber(duration) || !(duration > 0),
+      "You should provide a positive number as the duration.",
+      undefined,
+      { scope: "useAnimation" }
+    );
+  }
+
+  const timerRef = useRef(0);
+  const startTimeRef = useRef(0);
   const callbackRef = useLatestRef(callback);
 
   const step = usePersist((timestamp: number) => {
-    if (startTimeRef.current === undefined) {
+    if (!startTimeRef.current) {
       startTimeRef.current = timestamp;
     }
 
@@ -51,11 +62,11 @@ function useAnimation(
   });
 
   const cancel = useCallback(() => {
-    if (timerRef.current !== undefined) {
+    if (timerRef.current) {
       raf.cancel(timerRef.current);
-      timerRef.current = undefined;
+      timerRef.current = 0;
     }
-    startTimeRef.current = undefined;
+    startTimeRef.current = 0;
   }, []);
 
   const start = usePersist(() => {

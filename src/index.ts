@@ -1,4 +1,14 @@
-export { default as CacheConfig } from "./CacheConfig";
+export type {
+  CacheInterface,
+  CacheConfigValue,
+  CacheConfigProps,
+} from "./configs/CacheConfig";
+export type { LoadConfigValue, LoadConfigProps } from "./configs/LoadConfig";
+export type { StorageHookOptions } from "./factories/createStorageHook";
+
+export { default as CacheConfig } from "./configs/CacheConfig";
+export { default as LoadConfig } from "./configs/LoadConfig";
+
 export { default as useAnimation } from "./useAnimation";
 export { default as useCache } from "./useCache";
 export { default as useClickOutside } from "./useClickOutside";

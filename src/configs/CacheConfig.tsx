@@ -9,10 +9,10 @@ import React, {
 } from "react";
 import omit from "lodash/omit";
 import { useSyncExternalStore } from "use-sync-external-store/shim";
-import MemoryCache from "./utils/MemoryCache";
-import mergeWithDefined from "./utils/mergeWithDefined";
+import MemoryCache from "../utils/MemoryCache";
+import mergeWithDefined from "../utils/mergeWithDefined";
 
-export interface Cache {
+export interface CacheInterface {
   get(key: any): any;
   set(key: any, data: any, options?: { cacheTime?: number }): any;
   delete(key: any): any;
@@ -25,15 +25,15 @@ export interface Cache {
   };
 }
 
-interface CacheConfigValue {
+export interface CacheConfigValue {
   global: boolean;
-  cache: Cache;
+  cache: CacheInterface;
   cacheTime: number;
   cacheSync: boolean;
   fallback?: ReactNode;
 }
 
-interface CacheConfigProps extends Partial<CacheConfigValue> {
+export interface CacheConfigProps extends Partial<CacheConfigValue> {
   inherit?: boolean;
   children?: ReactNode;
 }
@@ -58,7 +58,7 @@ const CacheConfig: FC<CacheConfigProps> & {
   useConfig: typeof useCacheConfig;
 } = (props) => {
   const config = useCacheConfig();
-  const cacheRef = useRef<Cache>();
+  const cacheRef = useRef<CacheInterface>();
   let value = omit(props, "inherit", "children") as CacheConfigValue;
 
   if (props.inherit) {

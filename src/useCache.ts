@@ -2,10 +2,10 @@ import { useCallback, useDebugValue, useEffect } from "react";
 import { useSyncExternalStore } from "use-sync-external-store/shim";
 import usePersist from "./usePersist";
 import useMemoizedValue from "./useMemoizedValue";
-import { Cache, useCacheConfig } from "./CacheConfig";
+import { CacheInterface, useCacheConfig } from "./configs/CacheConfig";
 
 interface CommonOptions<T> {
-  cache?: Cache;
+  cache?: CacheInterface;
   cacheTime?: number;
   cacheSync?: boolean;
   validate?: (value: T) => boolean;

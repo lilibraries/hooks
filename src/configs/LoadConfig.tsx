@@ -6,9 +6,9 @@ import React, {
   useDebugValue,
 } from "react";
 import omit from "lodash/omit";
-import mergeWithDefined from "./utils/mergeWithDefined";
+import mergeWithDefined from "../utils/mergeWithDefined";
 
-export interface SharedOptions {
+export interface LoadSharedOptions {
   retry?: boolean;
   retryLimit?: number;
   retryInterval?: number | ((count: number) => number);
@@ -25,7 +25,7 @@ export interface SharedOptions {
   autoReloadOnNetworkReconnect?: boolean;
 }
 
-export interface LoadConfigValue extends Required<SharedOptions> {
+export interface LoadConfigValue extends Required<LoadSharedOptions> {
   global: boolean;
   onSuccess?: (data: any, key?: {}) => void;
   onFailure?: (error: any, key?: {}) => void;
@@ -35,7 +35,7 @@ export interface LoadConfigValue extends Required<SharedOptions> {
   handleFinally?: (key?: {}) => void;
 }
 
-interface LoadConfigProps extends Partial<LoadConfigValue> {
+export interface LoadConfigProps extends Partial<LoadConfigValue> {
   inherit?: boolean;
   children?: ReactNode;
 }
