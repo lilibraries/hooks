@@ -1,5 +1,5 @@
 import { useDebugValue, useEffect } from "react";
-import deepEqual from "fast-deep-equal";
+import isEqual from "lodash/isEqual";
 import isFunction from "lodash/isFunction";
 import useUpdate from "../useUpdate";
 import usePersist from "../usePersist";
@@ -44,7 +44,7 @@ function createStorageHook(storage: Storage | null) {
       defaultValue: defaultValueOption,
       polling = false,
       pollingInterval = 100,
-      compare = deepEqual,
+      compare = isEqual,
       validate,
       serialize = JSON.stringify as (value: T) => string,
       deserialize = JSON.parse as (raw: string) => T,

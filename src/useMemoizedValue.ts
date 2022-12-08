@@ -1,10 +1,10 @@
 import { useDebugValue, useRef } from "react";
-import deepEqual from "fast-deep-equal";
+import isEqual from "lodash/isEqual";
 import useMountedRef from "./useMountedRef";
 
 function useMemoizedValue<T>(
   value: T,
-  compare: (x: any, y: any) => boolean = deepEqual
+  compare: (x: any, y: any) => boolean = isEqual
 ): T {
   const resultRef = useRef(value);
   const mountedRef = useMountedRef();
