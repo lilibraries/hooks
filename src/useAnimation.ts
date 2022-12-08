@@ -30,7 +30,6 @@ function useAnimation(
     warning(
       !isNumber(duration) || !(duration > 0),
       "You should provide a positive number as the duration.",
-      undefined,
       { scope: "useAnimation" }
     );
   }

@@ -1,27 +1,23 @@
 import isObject from "lodash/isObject";
 import mergeWithDefined from "./mergeWithDefined";
 
-interface Options {
+export interface WarningOptions {
   label?: string;
   scope?: string;
   printer?: (error: Error) => void;
+  variables?: { [name: string]: unknown };
   deduplicated?: boolean;
   warnedMessagesMap?: { [message: string]: boolean };
   captureStackTraceConstructor?: Function;
 }
 
-interface Warn {
-  (
-    condition: boolean,
-    message: string,
-    variables?: { [name: string]: unknown },
-    options?: Options
-  ): void;
+interface WarningFunction {
+  (condition: boolean, message: string, options?: WarningOptions): void;
 }
 
-interface Warning extends Warn {
-  once: Warn;
-  deprecated: Warn;
+interface Warning extends WarningFunction {
+  once: WarningFunction;
+  deprecated: WarningFunction;
 }
 
 let warning: Warning;
@@ -41,12 +37,13 @@ if (process.env.NODE_ENV === "production") {
     warnedMessagesMap: {},
   };
 
-  warning = ((condition, message, variables, options) => {
+  warning = ((condition, message, options) => {
     if (condition) {
       const {
         label,
         scope,
         printer,
+        variables,
         deduplicated,
         warnedMessagesMap,
         captureStackTraceConstructor,
@@ -93,11 +90,10 @@ if (process.env.NODE_ENV === "production") {
     }
   }) as Warning;
 
-  warning.once = (condition, message, variables, options) => {
+  warning.once = (condition, message, options) => {
     warning(
       condition,
       message,
-      variables,
       mergeWithDefined(
         {
           deduplicated: true,
@@ -108,11 +104,10 @@ if (process.env.NODE_ENV === "production") {
     );
   };
 
-  warning.deprecated = (condition, message, variables, options) => {
+  warning.deprecated = (condition, message, options) => {
     warning(
       condition,
       message,
-      variables,
       mergeWithDefined(
         {
           label: "Deprecated",

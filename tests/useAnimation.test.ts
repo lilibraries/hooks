@@ -197,4 +197,28 @@ describe("useAnimation", () => {
     });
     expect(result.current.percentage).toBeCloseTo(2);
   });
+
+  it("should warn when put a non-positive number as the duration", () => {
+    const { useAnimation } = require("@lilib/hooks");
+
+    let errors: Error[] = [];
+    const warn = jest.fn().mockImplementation((error: Error) => {
+      errors.push(error);
+    });
+    jest.spyOn(console, "error").mockImplementation(warn);
+
+    renderHook(() => useAnimation(() => {}));
+    renderHook(() => useAnimation(() => {}, 0));
+    renderHook(() => useAnimation(() => {}, -1));
+    renderHook(() => useAnimation(() => {}, NaN));
+
+    errors.forEach((error) => {
+      expect(error.name).toBe("Warning(useAnimation)");
+      expect(error.message).toBe(
+        "You should provide a positive number as the duration."
+      );
+    });
+
+    warn.mockReset();
+  });
 });

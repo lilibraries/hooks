@@ -160,9 +160,9 @@ describe("utils/EventEmitter", () => {
     i++;
     emitter.on("event", () => {});
     expect(warn).toBeCalledTimes(1);
-    expect(error.name).toBe("Warning");
+    expect(error.name).toBe("Warning(EventEmitter)");
     expect(error.message).toBe(
-      "More than 100 `event` events are listened to `EventEmitter`, which may lead to memory leaks."
+      "Listened to more than 100 `event` events, which may lead to memory leaks."
     );
 
     for (; i <= 110; i++) {
@@ -179,15 +179,30 @@ describe("utils/EventEmitter", () => {
     i++;
     emitter.on("event", () => {});
     expect(warn).toBeCalledTimes(2);
-    expect(error.name).toBe("Warning");
+    expect(error.name).toBe("Warning(EventEmitter)");
     expect(error.message).toBe(
-      "More than 200 `event` events are listened to `EventEmitter`, which may lead to memory leaks."
+      "Listened to more than 200 `event` events, which may lead to memory leaks."
     );
 
     for (; i <= 300; i++) {
       emitter.on("event", () => {});
     }
     expect(warn).toBeCalledTimes(2);
+
+    emitter.setMaxListeners(10);
+    for (i = 1; i <= 20; i++) {
+      emitter
+        .for("key1")
+        .for("key2")
+        .for("key3")
+        .on("event", () => {});
+    }
+    expect(warn).toBeCalledTimes(3);
+    expect(error.name).toBe("Warning(EventEmitter)");
+    expect(error.message).toBe(
+      "Listened to more than 10 `event` events for `key1 > key2 > key3`, which may lead to memory leaks."
+    );
+
     warn.mockReset();
   });
 

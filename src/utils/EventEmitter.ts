@@ -108,19 +108,33 @@ class EventEmitter {
       listeners = this._listeners[name] = [listener];
     }
 
-    const maxListeners = this.getMaxListeners();
-    warning.once(
-      listeners.length > maxListeners,
-      "More than {maxListeners} `{name}` events are listened to `{ctorName}`{forMessage}, which may lead to memory leaks.",
-      {
-        name,
-        maxListeners,
-        ctorName: getConstructorName(this._topEmitter || this),
-        forMessage: this._topEmitter
-          ? ` for \`${getDisplayName(this._forKey)}\``
-          : "",
+    if (process.env.NODE_ENV !== "production") {
+      const maxListeners = this.getMaxListeners();
+      const forKeys = [];
+
+      let current = this as EventEmitter;
+      while (current._parentEmitter) {
+        forKeys.unshift(current._forKey);
+        current = current._parentEmitter;
       }
-    );
+
+      let forMessage = "";
+      if (forKeys.length) {
+        forMessage = forKeys.map(getDisplayName).join(" > ");
+      }
+      if (forMessage) {
+        forMessage = ` for \`${forMessage}\``;
+      }
+
+      warning.once(
+        listeners.length > maxListeners,
+        "Listened to more than {maxListeners} `{name}` events{forMessage}, which may lead to memory leaks.",
+        {
+          scope: getConstructorName(this._topEmitter || this),
+          variables: { name, maxListeners, forMessage },
+        }
+      );
+    }
 
     this._attach();
     return this;

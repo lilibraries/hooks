@@ -24,28 +24,30 @@ describe("utils/warning", () => {
 
   it("supports variables", () => {
     warning(true, "{var1} {var2} {var3}", {
-      var1: "normal",
-      var2: 100,
-      var3: Symbol("label"),
+      variables: {
+        var1: "normal",
+        var2: 100,
+        var3: Symbol("label"),
+      },
     });
     expect(error.message).toBe("normal 100 Symbol(label)");
   });
 
   it("supports label option", () => {
-    warning(true, "message", undefined);
+    warning(true, "message");
     expect(error.name).toBe("Warning");
-    warning(true, "message", undefined, { label: "CustomLabel" });
+    warning(true, "message", { label: "CustomLabel" });
     expect(error.name).toBe("CustomLabel");
   });
 
   it("supports scope option", () => {
-    warning(true, "message", undefined, { scope: "Component" });
+    warning(true, "message", { scope: "Component" });
     expect(error.name).toBe("Warning(Component)");
   });
 
   it("supports printer option", () => {
     const printer = jest.fn();
-    warning(true, "message", undefined, { printer });
+    warning(true, "message", { printer });
     expect(warn).toBeCalledTimes(0);
     expect(printer).toBeCalledTimes(1);
   });
@@ -55,19 +57,19 @@ describe("utils/warning", () => {
     expect(warn).toBeCalledTimes(1);
     warning(true, "deduplicated");
     expect(warn).toBeCalledTimes(2);
-    warning(true, "deduplicated", undefined, { deduplicated: true });
+    warning(true, "deduplicated", { deduplicated: true });
     expect(warn).toBeCalledTimes(3);
-    warning(true, "deduplicated", undefined, { deduplicated: true });
+    warning(true, "deduplicated", { deduplicated: true });
     expect(warn).toBeCalledTimes(3);
   });
 
   it("supports warnedMessagesMap option", () => {
     const obj = {};
-    warning(true, "message", undefined, {
+    warning(true, "message", {
       deduplicated: true,
       warnedMessagesMap: obj,
     });
-    warning(true, "other message", undefined, {
+    warning(true, "other message", {
       deduplicated: true,
       warnedMessagesMap: obj,
     });
@@ -79,7 +81,7 @@ describe("utils/warning", () => {
 
   it("supports captureStackTraceConstructor option", () => {
     function testPrintFunction(capture?: true) {
-      warning(true, "message", undefined, {
+      warning(true, "message", {
         captureStackTraceConstructor: capture ? test : undefined,
       });
     }

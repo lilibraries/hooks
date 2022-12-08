@@ -277,9 +277,9 @@ describe("utils/MemoryCache", () => {
     expect(warn).toBeCalledTimes(0);
     cache.for(key).on("set", () => {});
     expect(warn).toBeCalledTimes(1);
-    expect(error.name).toBe("Warning");
+    expect(error.name).toBe("Warning(MemoryCache)");
     expect(error.message).toBe(
-      "More than 10 `set` events are listened to `MemoryCache` for `Symbol(key)`, which may lead to memory leaks."
+      "Listened to more than 10 `set` events for `Symbol(key)`, which may lead to memory leaks."
     );
     warn.mockReset();
   });
