@@ -2,7 +2,7 @@ import { useRef } from "react";
 import useUnmount from "./useUnmount";
 import usePersist from "./usePersist";
 
-function useTimeout(callback: () => void, delay?: number) {
+function useTimeout(callback: () => void, timeout?: number) {
   const handler = usePersist(callback);
   const timerRef = useRef<ReturnType<typeof setTimeout>>();
 
@@ -15,7 +15,7 @@ function useTimeout(callback: () => void, delay?: number) {
 
   const start = usePersist(() => {
     cancel();
-    timerRef.current = setTimeout(handler, delay);
+    timerRef.current = setTimeout(handler, timeout);
   });
 
   useUnmount(cancel);

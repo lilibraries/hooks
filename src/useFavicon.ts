@@ -4,6 +4,11 @@ import usePreviousRef from "./usePreviousRef";
 import inBrowser from "./utils/inBrowser";
 import getUrlExtname from "./utils/getUrlExtname";
 
+export interface FaviconHookOptions {
+  mime?: string;
+  restore?: boolean;
+}
+
 const mimes = {
   gif: "image/gif",
   png: "image/png",
@@ -22,10 +27,7 @@ function getLink() {
   }
 }
 
-function useFavicon(
-  href: string | null,
-  options?: { mime?: string; restore?: boolean }
-) {
+function useFavicon(href: string | null, options?: FaviconHookOptions) {
   const { mime, restore } = options || {};
   const prevHrefRef = usePreviousRef(href);
 

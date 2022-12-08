@@ -3,16 +3,13 @@ import usePersist from "./usePersist";
 import useSetState from "./useSetState";
 import mergeWithDefined from "./utils/mergeWithDefined";
 import { PromiseResolve } from "./utils/types";
-import {
-  useLoadConfig,
-  LoadConfigValue,
-  LoadSharedOptions,
-} from "./configs/LoadConfig";
+import { useLoadConfig, LoadSharedOptions } from "./configs/LoadConfig";
 
 export type LoadCallback = (...args: any[]) => Promise<any>;
 export type LoadData<T extends LoadCallback> = PromiseResolve<ReturnType<T>>;
 
-interface Options<Callback extends LoadCallback> extends LoadSharedOptions {
+export interface LoadHookOptions<Callback extends LoadCallback>
+  extends LoadSharedOptions {
   key?: {};
   idle?: boolean;
   imperative?: boolean;
@@ -52,7 +49,7 @@ interface State<Data> {
 function useLoad<Callback extends LoadCallback>(
   callback: Callback,
   deps: DependencyList,
-  options: Options<Callback> = {}
+  options: LoadHookOptions<Callback> = {}
 ): Readonly<Results<Callback>> {
   const config = useLoadConfig();
   const {

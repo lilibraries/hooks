@@ -4,7 +4,8 @@ import usePersist from "./usePersist";
 import useMemoizedValue from "./useMemoizedValue";
 import { CacheInterface, useCacheConfig } from "./configs/CacheConfig";
 
-interface CommonOptions<T> {
+export interface CacheHookOptions<T> {
+  defaultValue?: T;
   cache?: CacheInterface;
   cacheTime?: number;
   cacheSync?: boolean;
@@ -15,18 +16,15 @@ interface CommonOptions<T> {
 
 function useCache<T>(
   key: {},
-  options: { defaultValue: T } & CommonOptions<T>
+  options: CacheHookOptions<T> & { defaultValue: T }
 ): readonly [T, (newValue: T | undefined) => void];
 
 function useCache<T>(
   key: {},
-  options?: { defaultValue?: T } & CommonOptions<T>
+  options?: CacheHookOptions<T>
 ): readonly [T | undefined, (newValue: T | undefined) => void];
 
-function useCache<T>(
-  key: {},
-  options: { defaultValue?: T } & CommonOptions<T> = {}
-) {
+function useCache<T>(key: {}, options: CacheHookOptions<T> = {}) {
   const config = useCacheConfig();
 
   const { validate, onSet, onDelete } = options;

@@ -6,11 +6,14 @@ import usePersist from "./usePersist";
 import useLatestRef from "./useLatestRef";
 import warning from "./utils/warning";
 
+export interface AnimationHookOptions {
+  duration: number;
+  algorithm?: (percent: number) => number;
+}
+
 function useAnimation(
   callback: (percent: number) => void,
-  options:
-    | number
-    | { duration: number; algorithm?: (percent: number) => number }
+  options: number | AnimationHookOptions
 ) {
   let duration: number = 0;
   let algorithm: (percent: number) => number;

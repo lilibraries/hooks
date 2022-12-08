@@ -4,7 +4,26 @@ export type {
   CacheConfigProps,
 } from "./configs/CacheConfig";
 export type { LoadConfigValue, LoadConfigProps } from "./configs/LoadConfig";
-export type { StorageHookOptions } from "./factories/createStorageHook";
+export type {
+  StorageHookOptions as LocalStorageHookOptions,
+  StorageHookOptions as SessionStorageHookOptions,
+} from "./factories/createStorageHook";
+export type { AnimationHookOptions } from "./useAnimation";
+export type { CacheHookOptions } from "./useCache";
+export type { ClickOutsideHookOptions } from "./useClickOutside";
+export type { CookieHookOptions } from "./useCookie";
+export type {
+  DebounceOptions as DebounceHookOptions,
+  DebounceOptions as DebouncedValueHookOptions,
+} from "./useDebounce";
+export type { FaviconHookOptions } from "./useFavicon";
+export type { LoadCallback, LoadData, LoadHookOptions } from "./useLoad";
+export type { SubmitHookOptions } from "./useSubmit";
+export type {
+  ThrottleOptions as ThrottleHookOptions,
+  ThrottleOptions as ThrottledValueHookOptions,
+} from "./useThrottle";
+export type { TitleHookOptions } from "./useTitle";
 
 export { default as CacheConfig } from "./configs/CacheConfig";
 export { default as LoadConfig } from "./configs/LoadConfig";

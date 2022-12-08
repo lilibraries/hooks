@@ -6,7 +6,8 @@ import usePersist from "./usePersist";
 import useInterval from "./useInterval";
 import useSafeState from "./useSafeState";
 
-interface CommonOptions {
+export interface CookieHookOptions {
+  defaultValue?: string;
   polling?: boolean;
   pollingInterval?: number;
   validate?: (value: string) => boolean;
@@ -14,7 +15,7 @@ interface CommonOptions {
 
 function useCookie(
   name: string,
-  options: { defaultValue: string } & CommonOptions
+  options: CookieHookOptions & { defaultValue: string }
 ): readonly [
   string,
   (
@@ -25,7 +26,7 @@ function useCookie(
 
 function useCookie(
   name: string,
-  options?: { defaultValue?: string } & CommonOptions
+  options?: CookieHookOptions
 ): readonly [
   string | undefined,
   (
@@ -37,16 +38,13 @@ function useCookie(
   ) => void
 ];
 
-function useCookie(
-  name: string,
-  options: { defaultValue?: string } & CommonOptions = {}
-) {
+function useCookie(name: string, options?: CookieHookOptions) {
   const {
     defaultValue,
     polling = false,
     pollingInterval = 100,
     validate,
-  } = options;
+  } = options || {};
 
   function getCookie() {
     const cookie = Cookies.get(name);

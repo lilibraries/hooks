@@ -3,13 +3,15 @@ import useTargetEffect from "./useTargetEffect";
 import getEffectTarget from "./utils/getEffectTarget";
 import { EffectTarget } from "./utils/types";
 
+export interface ClickOutsideHookOptions {
+  container?: EffectTarget<Element>;
+  eventName?: string | string[];
+}
+
 function useClickOutside<E extends Event = Event>(
   target: EffectTarget<Node> | EffectTarget<Node>[],
   listener: (event: E) => void,
-  options?: {
-    container?: EffectTarget<Element>;
-    eventName?: string | string[];
-  }
+  options?: ClickOutsideHookOptions
 ) {
   const targets = Array.isArray(target) ? target : [target];
   const { container, eventName = "mousedown" } = options || {};

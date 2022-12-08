@@ -3,7 +3,11 @@ import useUnmount from "./useUnmount";
 import usePreviousRef from "./usePreviousRef";
 import inBrowser from "./utils/inBrowser";
 
-function useTitle(title: string | null, options?: { restore?: boolean }) {
+export interface TitleHookOptions {
+  restore?: boolean;
+}
+
+function useTitle(title: string | null, options?: TitleHookOptions) {
   const oldTitleRef = useRef(inBrowser ? document.title : "");
   const prevTitleRef = usePreviousRef(title);
 
