@@ -3,7 +3,9 @@ It returns the same function identifier no matter whether the `callback` paramet
 ## API
 
 ```ts
-function usePersist<T extends (...args: any[]) => any>(callback: T): T;
+function usePersist<T extends (...args: any[]) => any>(
+  callback: T
+): (...args: Parameters<T>) => ReturnType<T>;
 ```
 
 ## Example
