@@ -1,6 +1,15 @@
-import { DependencyList, useDebugValue } from "react";
+import "requestidlecallback";
+import { DependencyList, useDebugValue, useEffect, useRef } from "react";
+import isObject from "lodash/isObject";
+import isFunction from "lodash/isFunction";
 import usePersist from "./usePersist";
+import useUnmount from "./useUnmount";
 import useSetState from "./useSetState";
+import useThrottle from "./useThrottle";
+import useMountedRef from "./useMountedRef";
+import useUnmountedRef from "./useUnmountedRef";
+import { isPageVisible } from "./usePageVisible";
+import warning from "./utils/warning";
 import mergeWithDefined from "./utils/mergeWithDefined";
 import { PromiseResolve } from "./utils/types";
 import { useLoadConfig, LoadSharedOptions } from "./configs/LoadConfig";
@@ -11,14 +20,14 @@ export type LoadData<T extends LoadCallback> = PromiseResolve<ReturnType<T>>;
 export interface LoadHookOptions<Callback extends LoadCallback>
   extends LoadSharedOptions {
   key?: {};
-  idle?: boolean;
+  idle?: boolean | IdleRequestOptions;
   imperative?: boolean;
   independent?: boolean;
   fallback?: Callback;
   initialData?: LoadData<Callback>;
   defaultParams?: Parameters<Callback>;
   onSuccess?: (data: LoadData<Callback>) => void;
-  onFailure?: (error: any) => void;
+  onFailure?: (error: unknown) => void;
   onFinally?: () => void;
 }
 
@@ -28,7 +37,7 @@ interface Results<Callback extends LoadCallback> {
   loading: boolean;
   reloading: boolean;
   initializing: boolean;
-  load: Callback;
+  load: (...params: Parameters<Callback>) => ReturnType<Callback>;
   reload: () => void;
   update: (
     newData:
@@ -40,7 +49,7 @@ interface Results<Callback extends LoadCallback> {
 
 interface State<Data> {
   data: Data | undefined;
-  error: any;
+  error: unknown;
   loading: boolean;
   reloading: boolean;
   initializing: boolean;
@@ -48,15 +57,15 @@ interface State<Data> {
 
 function useLoad<Callback extends LoadCallback>(
   callback: Callback,
-  deps: DependencyList,
+  deps: DependencyList = [],
   options: LoadHookOptions<Callback> = {}
 ): Readonly<Results<Callback>> {
   const config = useLoadConfig();
   const {
-    key,
+    key, // TODO:
     idle,
     imperative,
-    independent,
+    independent, // TODO:
     fallback,
     initialData,
     defaultParams,
@@ -79,7 +88,6 @@ function useLoad<Callback extends LoadCallback>(
   const [state, setState] = useSetState<State<LoadData<Callback>>>(() => {
     const loading = !imperative;
     const hasData = initialData !== undefined;
-
     return {
       data: initialData,
       error: null,
@@ -89,16 +97,277 @@ function useLoad<Callback extends LoadCallback>(
     };
   });
 
-  const load = usePersist(function (this: any, ...args: Parameters<Callback>) {
-    return callback.apply(this, args);
-  } as Callback);
+  const idRef = useRef(0);
+  const paramsRef = useRef<Parameters<Callback>>();
+  const idleTimerRef = useRef(0);
+  const retryTimerRef = useRef(0);
+  const pollingTimerRef = useRef(0);
+  const allowAutoReloadRef = useRef(false);
+  const mountedRef = useMountedRef();
+  const unmountedRef = useUnmountedRef();
 
-  const reload = usePersist(() => {});
+  const load = usePersist((...params: Parameters<Callback>) => {
+    paramsRef.current = params;
+    allowAutoReloadRef.current = true;
+    const id = ++idRef.current;
+    clearTimeout(retryTimerRef.current);
+    clearTimeout(pollingTimerRef.current);
+    cancelAutoReload();
+    cancelIdleCallback(idleTimerRef.current);
 
-  const update = usePersist(() => {});
+    if (!mountedRef.current) {
+      return new Promise(() => {}) as ReturnType<Callback>;
+    }
 
-  const cancel = usePersist(() => {});
+    if (!state.loading) {
+      setState({
+        loading: true,
+        reloading: state.data !== undefined,
+        initializing: state.data === undefined,
+      });
+    }
 
+    const handleFinally = () => {
+      if (options.onFinally) {
+        options.onFinally();
+      } else if (config.onFinally) {
+        config.onFinally(key);
+      }
+      if (config.handleFinally) {
+        config.handleFinally(key);
+      }
+      if (allowAutoReloadRef.current) {
+        if (isPageVisible()) {
+          if (polling) {
+            pollingTimerRef.current = +setTimeout(() => {
+              if (id === idRef.current) {
+                reload();
+              }
+            }, pollingInterval);
+          }
+        } else {
+          if (pollingInPageHiding) {
+            pollingTimerRef.current = +setTimeout(() => {
+              if (id === idRef.current) {
+                reload();
+              }
+            }, pollingIntervalInPageHiding);
+          }
+        }
+      }
+    };
+
+    const handleSuccess = (data: LoadData<Callback>) => {
+      if (id !== idRef.current) {
+        return new Promise(() => {});
+      }
+      setState({
+        data,
+        error: null,
+        loading: false,
+        reloading: false,
+        initializing: false,
+      });
+      if (options.onSuccess) {
+        options.onSuccess(data);
+      } else if (config.onSuccess) {
+        config.onSuccess(data, key);
+      }
+      if (config.handleSuccess) {
+        config.handleSuccess(data, key);
+      }
+      handleFinally();
+      return data;
+    };
+
+    const handleFailure = (error: unknown) => {
+      if (id !== idRef.current) {
+        return new Promise(() => {});
+      }
+      setState({
+        error,
+        loading: false,
+        reloading: false,
+        initializing: false,
+      });
+      if (options.onFailure) {
+        options.onFailure(error);
+      } else if (config.onFailure) {
+        config.onFailure(error, key);
+      }
+      if (config.handleFailure) {
+        config.handleFailure(error, key);
+      }
+      handleFinally();
+      throw error;
+    };
+
+    return new Promise<LoadData<Callback>>((resolve, reject) => {
+      let retryCount = 0;
+      let fallbackInvoked = false;
+      let fallbackRetryCount = 0;
+
+      const handleReject = (error: unknown) => {
+        if (id !== idRef.current) {
+          return;
+        }
+        if (retry && ++retryCount <= retryLimit) {
+          const delay = isFunction(retryInterval)
+            ? retryInterval(retryCount)
+            : retryInterval;
+          if (delay > 0) {
+            retryTimerRef.current = +setTimeout(() => {
+              if (id === idRef.current) {
+                callback(...params).then(resolve, handleReject);
+              }
+            }, delay);
+          } else {
+            callback(...params).then(resolve, handleReject);
+          }
+        } else if (fallback && !fallbackInvoked) {
+          fallbackInvoked = true;
+          fallback(...params).then(resolve, handleReject);
+        } else if (
+          fallback &&
+          fallbackInvoked &&
+          fallbackRetry &&
+          ++fallbackRetryCount <= fallbackRetryLimit
+        ) {
+          const delay = isFunction(fallbackRetryInterval)
+            ? fallbackRetryInterval(fallbackRetryCount)
+            : fallbackRetryInterval;
+          if (delay > 0) {
+            retryTimerRef.current = +setTimeout(() => {
+              if (id === idRef.current) {
+                fallback(...params).then(resolve, handleReject);
+              }
+            }, delay);
+          } else {
+            fallback(...params).then(resolve, handleReject);
+          }
+        } else {
+          reject(error);
+        }
+      };
+
+      if (idle) {
+        idleTimerRef.current = requestIdleCallback(
+          () => {
+            if (id === idRef.current) {
+              callback(...params).then(resolve, handleReject);
+            }
+          },
+          isObject(idle) ? idle : undefined
+        );
+      } else {
+        callback(...params).then(resolve, handleReject);
+      }
+    }).then(handleSuccess, handleFailure) as ReturnType<Callback>;
+  });
+
+  const reload = usePersist(() => {
+    const params = paramsRef.current || defaultParams;
+    if (process.env.NODE_ENV !== "production") {
+      warning(
+        params === undefined,
+        "You should provide params by setting `defaultParams` option or calling the `load(...params)` method.",
+        { scope: "useLoad" }
+      );
+    }
+    if (params) {
+      load(...params);
+    } else {
+      // @ts-ignore
+      load();
+    }
+  });
+
+  const update = usePersist(
+    (
+      newData:
+        | LoadData<Callback>
+        | ((prevData?: LoadData<Callback>) => LoadData<Callback>)
+    ) => {
+      setState((prevState) => ({
+        data: isFunction(newData) ? newData(prevState.data) : newData,
+      }));
+    }
+  );
+
+  const cancel = usePersist(() => {
+    idRef.current++;
+    allowAutoReloadRef.current = false;
+    clearTimeout(retryTimerRef.current);
+    clearTimeout(pollingTimerRef.current);
+    cancelAutoReload();
+    cancelIdleCallback(idleTimerRef.current);
+    if (!unmountedRef.current && state.loading) {
+      setState({ loading: false, reloading: false, initializing: false });
+    }
+  });
+
+  const [autoReload, { cancel: cancelAutoReload }] = useThrottle(reload, {
+    wait: autoReloadWaitTime,
+    leading: true,
+    trailing: false,
+  });
+  const handleAutoReload = usePersist(() => {
+    if (allowAutoReloadRef.current && !state.loading) {
+      autoReload();
+    }
+  });
+
+  useEffect(
+    () => {
+      if (autoReloadOnPageShow) {
+        const listener = () => {
+          if (isPageVisible()) {
+            handleAutoReload();
+          }
+        };
+        document.addEventListener("visibilitychange", listener);
+        return () => {
+          document.removeEventListener("visibilitychange", listener);
+        };
+      }
+    },
+    [autoReloadOnPageShow] // eslint-disable-line
+  );
+
+  useEffect(
+    () => {
+      if (autoReloadOnWindowFocus) {
+        window.addEventListener("focus", handleAutoReload);
+        return () => {
+          window.removeEventListener("focus", handleAutoReload);
+        };
+      }
+    },
+    [autoReloadOnWindowFocus] // eslint-disable-line
+  );
+
+  useEffect(
+    () => {
+      if (autoReloadOnNetworkReconnect) {
+        window.addEventListener("online", handleAutoReload);
+        return () => {
+          window.removeEventListener("online", handleAutoReload);
+        };
+      }
+    },
+    [autoReloadOnNetworkReconnect] // eslint-disable-line
+  );
+
+  useEffect(
+    () => {
+      if (!imperative) {
+        reload();
+      }
+    },
+    deps // eslint-disable-line
+  );
+
+  useUnmount(cancel);
   useDebugValue(state);
 
   return { ...state, load, reload, update, cancel } as const;

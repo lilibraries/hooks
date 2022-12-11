@@ -2,18 +2,12 @@ import { useDebugValue, useState } from "react";
 import useEventListener from "./useEventListener";
 import inBrowser from "./utils/inBrowser";
 
-function isPageVisible() {
-  return document.visibilityState === "visible";
+export function isPageVisible() {
+  return inBrowser ? document.visibilityState === "visible" : true;
 }
 
 function usePageVisible() {
-  const [visible, setVisible] = useState(() => {
-    if (inBrowser) {
-      return isPageVisible();
-    } else {
-      return true;
-    }
-  });
+  const [visible, setVisible] = useState(isPageVisible);
 
   useEventListener(
     () => document,

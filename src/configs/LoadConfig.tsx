@@ -28,10 +28,10 @@ export interface LoadSharedOptions {
 export interface LoadConfigValue extends Required<LoadSharedOptions> {
   global: boolean;
   onSuccess?: (data: any, key?: {}) => void;
-  onFailure?: (error: any, key?: {}) => void;
+  onFailure?: (error: unknown, key?: {}) => void;
   onFinally?: (key?: {}) => void;
   handleSuccess?: (data: any, key?: {}) => void;
-  handleFailure?: (error: any, key?: {}) => void;
+  handleFailure?: (error: unknown, key?: {}) => void;
   handleFinally?: (key?: {}) => void;
 }
 
