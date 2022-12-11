@@ -1,30 +1,10 @@
+import "requestidlecallback";
 import { useRef } from "react";
 import usePersist from "./usePersist";
 import useUnmount from "./useUnmount";
 import useLatestRef from "./useLatestRef";
 
-const hasNative =
-  typeof window !== "undefined" &&
-  !!window.requestIdleCallback &&
-  !!window.cancelIdleCallback;
-
-const requestIdleCallback = (callback: () => void) => {
-  if (hasNative) {
-    return window.requestIdleCallback(callback);
-  } else {
-    return +setTimeout(callback, 1);
-  }
-};
-
-const cancelIdleCallback = (id: number) => {
-  if (hasNative) {
-    window.cancelIdleCallback(id);
-  } else {
-    clearTimeout(id);
-  }
-};
-
-function useIdle(callback: () => void) {
+function useIdle(callback: () => void, options?: IdleRequestOptions) {
   const timerRef = useRef<number>();
   const callbackRef = useLatestRef(callback);
 
@@ -39,7 +19,7 @@ function useIdle(callback: () => void) {
     cancel();
     timerRef.current = requestIdleCallback(() => {
       callbackRef.current();
-    });
+    }, options);
   });
 
   useUnmount(cancel);
