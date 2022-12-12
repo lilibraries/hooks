@@ -6,6 +6,7 @@ import usePersist from "./usePersist";
 import useUnmount from "./useUnmount";
 import useSetState from "./useSetState";
 import useThrottle from "./useThrottle";
+import useLatestRef from "./useLatestRef";
 import useMountedRef from "./useMountedRef";
 import useUnmountedRef from "./useUnmountedRef";
 import { isPageVisible } from "./usePageVisible";
@@ -60,7 +61,7 @@ function useLoad<Callback extends LoadCallback>(
   deps: DependencyList = [],
   options: LoadHookOptions<Callback> = {}
 ): Readonly<Results<Callback>> {
-  const config = useLoadConfig();
+  const { store, ...config } = useLoadConfig();
   const {
     key, // TODO:
     idle,
@@ -105,6 +106,41 @@ function useLoad<Callback extends LoadCallback>(
   const allowAutoReloadRef = useRef(false);
   const mountedRef = useMountedRef();
   const unmountedRef = useUnmountedRef();
+  const callbackRef = useLatestRef(callback);
+  const fallbackRef = useLatestRef(fallback);
+
+  const triggerSuccess = usePersist((data: LoadData<Callback>, key?: {}) => {
+    if (options.onSuccess) {
+      options.onSuccess(data);
+    } else if (config.onSuccess) {
+      config.onSuccess(data, key);
+    }
+    if (config.handleSuccess) {
+      config.handleSuccess(data, key);
+    }
+  });
+
+  const triggerFailure = usePersist((error: unknown, key?: {}) => {
+    if (options.onFailure) {
+      options.onFailure(error);
+    } else if (config.onFailure) {
+      config.onFailure(error, key);
+    }
+    if (config.handleFailure) {
+      config.handleFailure(error, key);
+    }
+  });
+
+  const triggerFinally = usePersist((key?: {}) => {
+    if (options.onFinally) {
+      options.onFinally();
+    } else if (config.onFinally) {
+      config.onFinally(key);
+    }
+    if (config.handleFinally) {
+      config.handleFinally(key);
+    }
+  });
 
   const load = usePersist((...params: Parameters<Callback>) => {
     paramsRef.current = params;
@@ -128,14 +164,7 @@ function useLoad<Callback extends LoadCallback>(
     }
 
     const handleFinally = () => {
-      if (options.onFinally) {
-        options.onFinally();
-      } else if (config.onFinally) {
-        config.onFinally(key);
-      }
-      if (config.handleFinally) {
-        config.handleFinally(key);
-      }
+      triggerFinally(key);
       if (allowAutoReloadRef.current) {
         if (isPageVisible()) {
           if (polling) {
@@ -168,14 +197,7 @@ function useLoad<Callback extends LoadCallback>(
         reloading: false,
         initializing: false,
       });
-      if (options.onSuccess) {
-        options.onSuccess(data);
-      } else if (config.onSuccess) {
-        config.onSuccess(data, key);
-      }
-      if (config.handleSuccess) {
-        config.handleSuccess(data, key);
-      }
+      triggerSuccess(data, key);
       handleFinally();
       return data;
     };
@@ -190,14 +212,7 @@ function useLoad<Callback extends LoadCallback>(
         reloading: false,
         initializing: false,
       });
-      if (options.onFailure) {
-        options.onFailure(error);
-      } else if (config.onFailure) {
-        config.onFailure(error, key);
-      }
-      if (config.handleFailure) {
-        config.handleFailure(error, key);
-      }
+      triggerFailure(error, key);
       handleFinally();
       throw error;
     };
@@ -218,17 +233,17 @@ function useLoad<Callback extends LoadCallback>(
           if (delay > 0) {
             retryTimerRef.current = +setTimeout(() => {
               if (id === idRef.current) {
-                callback(...params).then(resolve, handleReject);
+                callbackRef.current(...params).then(resolve, handleReject);
               }
             }, delay);
           } else {
-            callback(...params).then(resolve, handleReject);
+            callbackRef.current(...params).then(resolve, handleReject);
           }
-        } else if (fallback && !fallbackInvoked) {
+        } else if (fallbackRef.current && !fallbackInvoked) {
           fallbackInvoked = true;
-          fallback(...params).then(resolve, handleReject);
+          fallbackRef.current(...params).then(resolve, handleReject);
         } else if (
-          fallback &&
+          fallbackRef.current &&
           fallbackInvoked &&
           fallbackRetry &&
           ++fallbackRetryCount <= fallbackRetryLimit
@@ -239,11 +254,15 @@ function useLoad<Callback extends LoadCallback>(
           if (delay > 0) {
             retryTimerRef.current = +setTimeout(() => {
               if (id === idRef.current) {
-                fallback(...params).then(resolve, handleReject);
+                if (fallbackRef.current) {
+                  fallbackRef.current(...params).then(resolve, handleReject);
+                } else {
+                  reject(error);
+                }
               }
             }, delay);
           } else {
-            fallback(...params).then(resolve, handleReject);
+            fallbackRef.current(...params).then(resolve, handleReject);
           }
         } else {
           reject(error);
@@ -254,13 +273,13 @@ function useLoad<Callback extends LoadCallback>(
         idleTimerRef.current = requestIdleCallback(
           () => {
             if (id === idRef.current) {
-              callback(...params).then(resolve, handleReject);
+              callbackRef.current(...params).then(resolve, handleReject);
             }
           },
           isObject(idle) ? idle : undefined
         );
       } else {
-        callback(...params).then(resolve, handleReject);
+        callbackRef.current(...params).then(resolve, handleReject);
       }
     }).then(handleSuccess, handleFailure) as ReturnType<Callback>;
   });
@@ -306,23 +325,21 @@ function useLoad<Callback extends LoadCallback>(
     }
   });
 
-  const [autoReload, { cancel: cancelAutoReload }] = useThrottle(reload, {
-    wait: autoReloadWaitTime,
-    leading: true,
-    trailing: false,
-  });
-  const handleAutoReload = usePersist(() => {
-    if (allowAutoReloadRef.current && !state.loading) {
-      autoReload();
-    }
-  });
+  const [autoReload, { cancel: cancelAutoReload }] = useThrottle(
+    () => {
+      if (allowAutoReloadRef.current && !state.loading) {
+        reload();
+      }
+    },
+    { wait: autoReloadWaitTime, leading: true, trailing: false }
+  );
 
   useEffect(
     () => {
       if (autoReloadOnPageShow) {
         const listener = () => {
           if (isPageVisible()) {
-            handleAutoReload();
+            autoReload();
           }
         };
         document.addEventListener("visibilitychange", listener);
@@ -337,9 +354,9 @@ function useLoad<Callback extends LoadCallback>(
   useEffect(
     () => {
       if (autoReloadOnWindowFocus) {
-        window.addEventListener("focus", handleAutoReload);
+        window.addEventListener("focus", autoReload);
         return () => {
-          window.removeEventListener("focus", handleAutoReload);
+          window.removeEventListener("focus", autoReload);
         };
       }
     },
@@ -349,14 +366,23 @@ function useLoad<Callback extends LoadCallback>(
   useEffect(
     () => {
       if (autoReloadOnNetworkReconnect) {
-        window.addEventListener("online", handleAutoReload);
+        window.addEventListener("online", autoReload);
         return () => {
-          window.removeEventListener("online", handleAutoReload);
+          window.removeEventListener("online", autoReload);
         };
       }
     },
     [autoReloadOnNetworkReconnect] // eslint-disable-line
   );
+
+  useEffect(() => {
+    if (key != null) {
+      store.addReloader(key, reload);
+      return () => {
+        store.removeReloader(key, reload);
+      };
+    }
+  }, [key, store, reload]);
 
   useEffect(
     () => {

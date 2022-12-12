@@ -1,12 +1,52 @@
 import React, {
   FC,
+  useRef,
   ReactNode,
   useContext,
   createContext,
   useDebugValue,
 } from "react";
 import omit from "lodash/omit";
+import EventEmitter from "../utils/EventEmitter";
 import mergeWithDefined from "../utils/mergeWithDefined";
+
+export class LoadStore extends EventEmitter {
+  _reloaders = new Map<any, (() => void)[]>();
+
+  addReloader(key: any, reloader: () => void) {
+    const reloaders = this._reloaders.get(key);
+    if (reloaders) {
+      if (!reloaders.includes(reloader)) {
+        reloaders.push(reloader);
+      }
+    } else {
+      this._reloaders.set(key, [reloader]);
+    }
+  }
+
+  removeReloader(key: any, reloader: () => void) {
+    const reloaders = this._reloaders.get(key);
+    if (reloaders) {
+      let position = -1;
+      for (let i = reloaders.length - 1; i >= 0; i--) {
+        if (reloaders[i] === reloader) {
+          position = i;
+          break;
+        }
+      }
+      if (position >= 0) {
+        reloaders.splice(position, 1);
+      }
+      if (!reloaders.length) {
+        this._reloaders.delete(key);
+      }
+    }
+  }
+
+  getReloaders(key: any) {
+    return this._reloaders.get(key) || [];
+  }
+}
 
 export interface LoadSharedOptions {
   retry?: boolean;
@@ -27,6 +67,7 @@ export interface LoadSharedOptions {
 
 export interface LoadConfigValue extends Required<LoadSharedOptions> {
   global: boolean;
+  store: LoadStore;
   onSuccess?: (data: any, key?: {}) => void;
   onFailure?: (error: unknown, key?: {}) => void;
   onFinally?: (key?: {}) => void;
@@ -35,12 +76,16 @@ export interface LoadConfigValue extends Required<LoadSharedOptions> {
   handleFinally?: (key?: {}) => void;
 }
 
-export interface LoadConfigProps extends Partial<LoadConfigValue> {
+export interface LoadConfigProps
+  extends Omit<Partial<LoadConfigValue>, "store"> {
   inherit?: boolean;
   children?: ReactNode;
 }
 
-const defaultValue: LoadConfigValue = {
+const globalVar: any = globalThis;
+const GLOBAL_LOAD_STORE_ID = "__LILIB_HOOKS_GLOBAL_LOAD_STORE__";
+
+const defaultValue = {
   global: false,
   retry: false,
   retryLimit: 3,
@@ -58,7 +103,10 @@ const defaultValue: LoadConfigValue = {
   autoReloadOnNetworkReconnect: false,
 };
 
-const LoadContext = createContext<LoadConfigValue>(defaultValue);
+const LoadContext = createContext<LoadConfigValue>({
+  ...defaultValue,
+  store: new LoadStore(),
+});
 export const useLoadConfig = () => useContext(LoadContext);
 
 const LoadConfig: FC<LoadConfigProps> & {
@@ -66,12 +114,26 @@ const LoadConfig: FC<LoadConfigProps> & {
   useConfig: typeof useLoadConfig;
 } = (props) => {
   const config = useLoadConfig();
+  const storeRef = useRef<LoadStore>();
   let value = omit(props, "inherit", "children") as LoadConfigValue;
 
   if (props.inherit) {
     value = mergeWithDefined(config, value);
   } else {
     value = mergeWithDefined(defaultValue, value);
+  }
+
+  if (value.global && globalVar[GLOBAL_LOAD_STORE_ID]) {
+    value.store = globalVar[GLOBAL_LOAD_STORE_ID];
+  }
+  if (!value.store) {
+    if (!storeRef.current) {
+      storeRef.current = new LoadStore();
+    }
+    value.store = storeRef.current;
+  }
+  if (value.global && !globalVar[GLOBAL_LOAD_STORE_ID]) {
+    globalVar[GLOBAL_LOAD_STORE_ID] = value.store;
   }
 
   useDebugValue(value);
