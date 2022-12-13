@@ -7,71 +7,34 @@ import React, {
   useDebugValue,
 } from "react";
 import omit from "lodash/omit";
-import EventEmitter from "../utils/EventEmitter";
+import LoadStore from "../utils/LoadStore";
 import mergeWithDefined from "../utils/mergeWithDefined";
 
-export class LoadStore extends EventEmitter {
-  _loading = new Map<any, Function>();
-  _reloaders = new Map<any, Function[]>();
-
-  isLoading(key: any, loader?: Function) {
-    if (loader) {
-      return this._loading.get(key) === loader;
-    } else {
-      return this._loading.has(key);
-    }
-  }
-
-  addLoading(key: any, loader: Function) {
-    this._loading.set(key, loader);
-  }
-
-  removeLoading(key: any, loader?: Function) {
-    if (loader) {
-      if (this._loading.get(key) === loader) {
-        this._loading.delete(key);
-      }
-    } else {
-      this._loading.delete(key);
-    }
-  }
-
-  getReloaders(key: any) {
-    return this._reloaders.get(key) || [];
-  }
-
-  addReloader(key: any, reloader: Function) {
-    const reloaders = this._reloaders.get(key);
-    if (reloaders) {
-      if (!reloaders.includes(reloader)) {
-        reloaders.push(reloader);
-      }
-    } else {
-      this._reloaders.set(key, [reloader]);
-    }
-  }
-
-  removeReloader(key: any, reloader: Function) {
-    const reloaders = this._reloaders.get(key);
-    if (reloaders) {
-      let position = -1;
-      for (let i = reloaders.length - 1; i >= 0; i--) {
-        if (reloaders[i] === reloader) {
-          position = i;
-          break;
-        }
-      }
-      if (position >= 0) {
-        reloaders.splice(position, 1);
-      }
-      if (!reloaders.length) {
-        this._reloaders.delete(key);
-      }
-    }
-  }
+export interface LoadStoreInterface {
+  isLoading(key: any, loader?: Function): boolean;
+  addLoading(key: any, loader: Function): any;
+  removeLoading(key: any, loader?: Function): any;
+  getReloaders(key: any): Function[];
+  addReloader(key: any, reloader: Function): any;
+  removeReloader(key: any, reloader: Function): any;
+  getTimestamp(loader: Function): number | undefined;
+  recordTimestamp(loader: Function): any;
+  for(key: any): {
+    on(name: "cancel", listener: () => void): any;
+    on(name: "success", listener: (data: any) => void): any;
+    on(name: "failure", listener: (error: any) => void): any;
+    off(name: "cancel", listener: () => void): any;
+    off(name: "success", listener: (data: any) => void): any;
+    off(name: "failure", listener: (error: any) => void): any;
+    emit(name: "cancel"): any;
+    emit(name: "success", data: any): any;
+    emit(name: "failure", error: any): any;
+  };
 }
 
 export interface LoadSharedOptions {
+  cacheTime?: number;
+  staleTime?: number;
   retry?: boolean;
   retryLimit?: number;
   retryInterval?: number | ((count: number) => number);
@@ -90,12 +53,12 @@ export interface LoadSharedOptions {
 
 export interface LoadConfigValue extends Required<LoadSharedOptions> {
   global: boolean;
-  store: LoadStore;
+  store: LoadStoreInterface;
   onSuccess?: (data: any, key?: {}) => void;
-  onFailure?: (error: unknown, key?: {}) => void;
+  onFailure?: (error: any, key?: {}) => void;
   onFinally?: (key?: {}) => void;
   handleSuccess?: (data: any, key?: {}) => void;
-  handleFailure?: (error: unknown, key?: {}) => void;
+  handleFailure?: (error: any, key?: {}) => void;
   handleFinally?: (key?: {}) => void;
 }
 
@@ -110,6 +73,8 @@ const GLOBAL_LOAD_STORE_ID = "__LILIB_HOOKS_GLOBAL_LOAD_STORE__";
 
 const defaultValue = {
   global: false,
+  cacheTime: 5 * 60 * 1000,
+  staleTime: 0,
   retry: false,
   retryLimit: 3,
   retryInterval: 0,
@@ -120,7 +85,7 @@ const defaultValue = {
   pollingInterval: 30 * 1000,
   pollingInPageHiding: false,
   pollingIntervalInPageHiding: 60 * 1000,
-  autoReloadWaitTime: 5 * 1000,
+  autoReloadWaitTime: 10 * 1000,
   autoReloadOnPageShow: false,
   autoReloadOnWindowFocus: false,
   autoReloadOnNetworkReconnect: false,
@@ -137,7 +102,7 @@ const LoadConfig: FC<LoadConfigProps> & {
   useConfig: typeof useLoadConfig;
 } = (props) => {
   const config = useLoadConfig();
-  const storeRef = useRef<LoadStore>();
+  const storeRef = useRef<LoadStoreInterface>();
   let value = omit(props, "inherit", "children") as LoadConfigValue;
 
   if (props.inherit) {

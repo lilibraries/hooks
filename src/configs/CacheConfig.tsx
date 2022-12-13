@@ -13,6 +13,7 @@ import MemoryCache from "../utils/MemoryCache";
 import mergeWithDefined from "../utils/mergeWithDefined";
 
 export interface CacheInterface {
+  has(key: any): boolean;
   get(key: any): any;
   set(key: any, data: any, options?: { cacheTime?: number }): any;
   delete(key: any): any;
@@ -20,8 +21,8 @@ export interface CacheInterface {
   once(name: "ready", listener: () => void): any;
   off(name: "ready", listener: () => void): any;
   for(key: any): {
-    on: (name: "set" | "delete", listener: (data: any) => void) => any;
-    off: (name: "set" | "delete", listener: (data: any) => void) => any;
+    on(name: "set" | "delete", listener: (data: any) => void): any;
+    off(name: "set" | "delete", listener: (data: any) => void): any;
   };
 }
 

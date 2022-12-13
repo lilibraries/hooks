@@ -3,7 +3,11 @@ export type {
   CacheConfigValue,
   CacheConfigProps,
 } from "./configs/CacheConfig";
-export type { LoadConfigValue, LoadConfigProps } from "./configs/LoadConfig";
+export type {
+  LoadConfigValue,
+  LoadConfigProps,
+  LoadStoreInterface,
+} from "./configs/LoadConfig";
 export type {
   StorageHookOptions as LocalStorageHookOptions,
   StorageHookOptions as SessionStorageHookOptions,

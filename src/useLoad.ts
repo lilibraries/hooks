@@ -2,6 +2,7 @@ import "requestidlecallback";
 import { DependencyList, useDebugValue, useEffect, useRef } from "react";
 import isObject from "lodash/isObject";
 import isFunction from "lodash/isFunction";
+import useUpdate from "./useUpdate";
 import usePersist from "./usePersist";
 import useUnmount from "./useUnmount";
 import useSetState from "./useSetState";
@@ -13,6 +14,7 @@ import warning from "./utils/warning";
 import isPageVisible from "./utils/isPageVisible";
 import mergeWithDefined from "./utils/mergeWithDefined";
 import { PromiseResolve } from "./utils/types";
+import { useCacheConfig } from "./configs/CacheConfig";
 import { useLoadConfig, LoadSharedOptions } from "./configs/LoadConfig";
 
 export type LoadCallback = (...args: any[]) => Promise<any>;
@@ -25,16 +27,18 @@ export interface LoadHookOptions<Callback extends LoadCallback>
   imperative?: boolean;
   independent?: boolean;
   fallback?: Callback;
-  initialData?: LoadData<Callback>;
+  validate?: (data: any) => boolean;
+  defaultData?: LoadData<Callback>;
   defaultParams?: Parameters<Callback>;
+  cacheKey?: {};
   onSuccess?: (data: LoadData<Callback>) => void;
-  onFailure?: (error: unknown) => void;
+  onFailure?: (error: any) => void;
   onFinally?: () => void;
 }
 
 interface Results<Callback extends LoadCallback> {
   data: LoadData<Callback> | undefined;
-  error: unknown;
+  error: any;
   loading: boolean;
   reloading: boolean;
   initializing: boolean;
@@ -50,7 +54,7 @@ interface Results<Callback extends LoadCallback> {
 
 interface State<Data> {
   data: Data | undefined;
-  error: unknown;
+  error: any;
   loading: boolean;
   reloading: boolean;
   initializing: boolean;
@@ -58,18 +62,36 @@ interface State<Data> {
 
 function useLoad<Callback extends LoadCallback>(
   callback: Callback,
+  deps: DependencyList,
+  options: LoadHookOptions<Callback> & { defaultData: LoadData<Callback> }
+): Readonly<Results<Callback> & { data: LoadData<Callback> }>;
+
+function useLoad<Callback extends LoadCallback>(
+  callback: Callback,
+  deps?: DependencyList,
+  options?: LoadHookOptions<Callback>
+): Readonly<Results<Callback>>;
+
+function useLoad<Callback extends LoadCallback>(
+  callback: Callback,
   deps: DependencyList = [],
   options: LoadHookOptions<Callback> = {}
-): Readonly<Results<Callback>> {
+) {
+  const { cache } = useCacheConfig();
   const { store, ...config } = useLoadConfig();
+
   const {
     key,
     idle,
     imperative,
     independent,
     fallback,
-    initialData,
+    validate,
+    defaultData,
     defaultParams,
+    cacheKey,
+    cacheTime,
+    staleTime,
     retry,
     retryLimit,
     retryInterval,
@@ -88,8 +110,17 @@ function useLoad<Callback extends LoadCallback>(
   const isAssociated = key != null && !independent;
 
   const [state, setState] = useSetState<State<LoadData<Callback>>>(() => {
+    let initialData = defaultData;
+    if (cacheKey && cache.has(cacheKey)) {
+      const cachedData = cache.get(cacheKey);
+      if (!validate || validate(cachedData)) {
+        initialData = cachedData;
+      }
+    }
+
     const loading = !imperative;
     const hasData = initialData !== undefined;
+
     return {
       data: initialData,
       error: null,
@@ -99,26 +130,30 @@ function useLoad<Callback extends LoadCallback>(
     };
   });
 
-  const idRef = useRef(0);
-  const paramsRef = useRef<Parameters<Callback>>();
-  const idleTimerRef = useRef(0);
-  const retryTimerRef = useRef(0);
-  const pollingTimerRef = useRef(0);
-  const canceledRef = useRef(true);
   const mountedRef = useMountedRef();
   const unmountedRef = useUnmountedRef();
   const callbackRef = useLatestRef(callback);
   const fallbackRef = useLatestRef(fallback);
+
+  const idleTimerRef = useRef(0);
+  const retryTimerRef = useRef(0);
+  const pollingTimerRef = useRef(0);
+
+  const idRef = useRef(0);
+  const paramsRef = useRef<Parameters<Callback>>();
+  const canceledRef = useRef(true);
   const loadingRef = useRef<{ key: any; store: typeof store }>();
   const unlistenRef = useRef<() => void>();
 
   const clearPending = usePersist(() => {
     idRef.current++;
     canceledRef.current = true;
+
     clearTimeout(retryTimerRef.current);
     clearTimeout(pollingTimerRef.current);
     cancelAutoReload();
     cancelIdleCallback(idleTimerRef.current);
+
     if (loadingRef.current) {
       const { key, store } = loadingRef.current;
       if (store.isLoading(key, load)) {
@@ -127,6 +162,7 @@ function useLoad<Callback extends LoadCallback>(
       }
       loadingRef.current = undefined;
     }
+
     if (unlistenRef.current) {
       unlistenRef.current();
       unlistenRef.current = undefined;
@@ -144,7 +180,7 @@ function useLoad<Callback extends LoadCallback>(
     }
   });
 
-  const triggerFailure = usePersist((error: unknown, key?: {}) => {
+  const triggerFailure = usePersist((error: any, key?: {}) => {
     if (options.onFailure) {
       options.onFailure(error);
     } else if (config.onFailure) {
@@ -172,12 +208,35 @@ function useLoad<Callback extends LoadCallback>(
     canceledRef.current = false;
 
     if (!mountedRef.current) {
+      if (process.env.NODE_ENV !== "production") {
+        warning(
+          true,
+          "You should not load data before the component is mounted.",
+          { scope: "useLoad" }
+        );
+      }
       return new Promise(() => {}) as ReturnType<Callback>;
+    }
+
+    if (staleTime > 0 && state.error == null && state.data !== undefined) {
+      const timestamp = store.getTimestamp(load);
+      if (timestamp && Date.now() - timestamp <= staleTime) {
+        if (state.loading) {
+          setState({ loading: false, reloading: false, initializing: false });
+        }
+        return new Promise((resolve) => {
+          resolve(state.data);
+        });
+      }
     }
 
     if (isAssociated && !store.isLoading(key)) {
       store.addLoading(key, load);
       loadingRef.current = { key, store };
+    }
+
+    if (cacheKey != null && cache.has(cacheKey)) {
+      // TODO: use cached data.
     }
 
     if (!state.loading) {
@@ -234,7 +293,7 @@ function useLoad<Callback extends LoadCallback>(
             resolve(data);
           }
         };
-        const handleReject = (error: unknown) => {
+        const handleReject = (error: any) => {
           unlisten();
           if (!isCanceled()) {
             reject(error);
@@ -273,7 +332,7 @@ function useLoad<Callback extends LoadCallback>(
       let fallbackInvoked = false;
       let fallbackRetryCount = 0;
 
-      const handleReject = (error: unknown) => {
+      const handleReject = (error: any) => {
         if (isCanceled()) {
           return;
         }
@@ -337,7 +396,10 @@ function useLoad<Callback extends LoadCallback>(
         if (isCanceled()) {
           return new Promise(() => {});
         }
-        const isCurrentLoading = store.isLoading(key, load);
+        if (isAssociated && store.isLoading(key, load)) {
+          store.for(key).emit("success", data);
+          store.removeLoading(key, load);
+        }
         setState({
           data,
           error: null,
@@ -346,10 +408,6 @@ function useLoad<Callback extends LoadCallback>(
           initializing: false,
         });
         triggerSuccess(data, key);
-        if (isAssociated && isCurrentLoading) {
-          store.for(key).emit("success", data);
-          store.removeLoading(key, load);
-        }
         triggerFinally(key);
         checkPolling();
         return data;
@@ -359,7 +417,10 @@ function useLoad<Callback extends LoadCallback>(
         if (isCanceled()) {
           return new Promise(() => {});
         }
-        const isCurrentLoading = store.isLoading(key, load);
+        if (isAssociated && store.isLoading(key, load)) {
+          store.for(key).emit("failure", error);
+          store.removeLoading(key, load);
+        }
         setState({
           error,
           loading: false,
@@ -367,10 +428,6 @@ function useLoad<Callback extends LoadCallback>(
           initializing: false,
         });
         triggerFailure(error, key);
-        if (isAssociated && isCurrentLoading) {
-          store.for(key).emit("failure", error);
-          store.removeLoading(key, load);
-        }
         triggerFinally(key);
         checkPolling();
         throw error;
@@ -382,7 +439,7 @@ function useLoad<Callback extends LoadCallback>(
     const params = paramsRef.current || defaultParams;
     if (process.env.NODE_ENV !== "production") {
       warning(
-        params === undefined,
+        !!callback.length && params === undefined,
         "You should provide params by setting `defaultParams` option or calling the `load(...params)` method.",
         { scope: "useLoad" }
       );
@@ -424,10 +481,16 @@ function useLoad<Callback extends LoadCallback>(
   );
 
   useEffect(() => {
-    if (autoReloadOnPageShow) {
+    if (autoReloadOnPageShow || polling || pollingInPageHiding) {
       const listener = () => {
         if (isPageVisible()) {
-          autoReload();
+          if (autoReloadOnPageShow || polling) {
+            autoReload();
+          }
+        } else {
+          if (pollingInPageHiding) {
+            autoReload();
+          }
         }
       };
       document.addEventListener("visibilitychange", listener);
@@ -435,7 +498,7 @@ function useLoad<Callback extends LoadCallback>(
         document.removeEventListener("visibilitychange", listener);
       };
     }
-  }, [autoReloadOnPageShow, autoReload]);
+  }, [autoReloadOnPageShow, polling, pollingInPageHiding, autoReload]);
 
   useEffect(() => {
     if (autoReloadOnWindowFocus) {
@@ -468,7 +531,7 @@ function useLoad<Callback extends LoadCallback>(
           });
         }
       };
-      const handleFailure = (error: unknown) => {
+      const handleFailure = (error: any) => {
         if (!store.isLoading(key, load)) {
           setState({
             error,
@@ -504,6 +567,16 @@ function useLoad<Callback extends LoadCallback>(
     },
     deps // eslint-disable-line
   );
+
+  useUpdate(() => {
+    if (process.env.NODE_ENV !== "production") {
+      warning(
+        true,
+        "You should provide an immutable value for the `key` option.",
+        { scope: "useLoad" }
+      );
+    }
+  }, [key]);
 
   useUnmount(cancel);
   useDebugValue(state);
