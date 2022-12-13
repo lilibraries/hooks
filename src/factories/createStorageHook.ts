@@ -13,7 +13,7 @@ export interface StorageHookOptions<T> {
   polling?: boolean;
   pollingInterval?: number;
   compare?: (x: any, y: any) => boolean;
-  validate?: (value: T) => boolean;
+  validate?: (value: any) => boolean;
   serialize?: (value: T) => string;
   deserialize?: (raw: string) => T;
 }
