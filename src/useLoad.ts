@@ -9,8 +9,8 @@ import useThrottle from "./useThrottle";
 import useLatestRef from "./useLatestRef";
 import useMountedRef from "./useMountedRef";
 import useUnmountedRef from "./useUnmountedRef";
-import { isPageVisible } from "./usePageVisible";
 import warning from "./utils/warning";
+import isPageVisible from "./utils/isPageVisible";
 import mergeWithDefined from "./utils/mergeWithDefined";
 import { PromiseResolve } from "./utils/types";
 import { useLoadConfig, LoadSharedOptions } from "./configs/LoadConfig";
@@ -63,10 +63,10 @@ function useLoad<Callback extends LoadCallback>(
 ): Readonly<Results<Callback>> {
   const { store, ...config } = useLoadConfig();
   const {
-    key, // TODO:
+    key,
     idle,
     imperative,
-    independent, // TODO:
+    independent,
     fallback,
     initialData,
     defaultParams,
@@ -85,6 +85,7 @@ function useLoad<Callback extends LoadCallback>(
     autoReloadOnWindowFocus,
     autoReloadOnNetworkReconnect,
   } = mergeWithDefined(config, options);
+  const isAssociated = key != null && !independent;
 
   const [state, setState] = useSetState<State<LoadData<Callback>>>(() => {
     const loading = !imperative;
@@ -103,11 +104,34 @@ function useLoad<Callback extends LoadCallback>(
   const idleTimerRef = useRef(0);
   const retryTimerRef = useRef(0);
   const pollingTimerRef = useRef(0);
-  const allowAutoReloadRef = useRef(false);
+  const canceledRef = useRef(true);
   const mountedRef = useMountedRef();
   const unmountedRef = useUnmountedRef();
   const callbackRef = useLatestRef(callback);
   const fallbackRef = useLatestRef(fallback);
+  const loadingRef = useRef<{ key: any; store: typeof store }>();
+  const unlistenRef = useRef<() => void>();
+
+  const clearPending = usePersist(() => {
+    idRef.current++;
+    canceledRef.current = true;
+    clearTimeout(retryTimerRef.current);
+    clearTimeout(pollingTimerRef.current);
+    cancelAutoReload();
+    cancelIdleCallback(idleTimerRef.current);
+    if (loadingRef.current) {
+      const { key, store } = loadingRef.current;
+      if (store.isLoading(key, load)) {
+        store.for(key).emit("cancel");
+        store.removeLoading(key, load);
+      }
+      loadingRef.current = undefined;
+    }
+    if (unlistenRef.current) {
+      unlistenRef.current();
+      unlistenRef.current = undefined;
+    }
+  });
 
   const triggerSuccess = usePersist((data: LoadData<Callback>, key?: {}) => {
     if (options.onSuccess) {
@@ -143,16 +167,17 @@ function useLoad<Callback extends LoadCallback>(
   });
 
   const load = usePersist((...params: Parameters<Callback>) => {
+    clearPending();
     paramsRef.current = params;
-    allowAutoReloadRef.current = true;
-    const id = ++idRef.current;
-    clearTimeout(retryTimerRef.current);
-    clearTimeout(pollingTimerRef.current);
-    cancelAutoReload();
-    cancelIdleCallback(idleTimerRef.current);
+    canceledRef.current = false;
 
     if (!mountedRef.current) {
       return new Promise(() => {}) as ReturnType<Callback>;
+    }
+
+    if (isAssociated && !store.isLoading(key)) {
+      store.addLoading(key, load);
+      loadingRef.current = { key, store };
     }
 
     if (!state.loading) {
@@ -163,13 +188,15 @@ function useLoad<Callback extends LoadCallback>(
       });
     }
 
-    const handleFinally = () => {
-      triggerFinally(key);
-      if (allowAutoReloadRef.current) {
+    const id = idRef.current;
+    const isCanceled = () => id !== idRef.current;
+
+    const checkPolling = () => {
+      if (!canceledRef.current) {
         if (isPageVisible()) {
           if (polling) {
             pollingTimerRef.current = +setTimeout(() => {
-              if (id === idRef.current) {
+              if (!isCanceled()) {
                 reload();
               }
             }, pollingInterval);
@@ -177,7 +204,7 @@ function useLoad<Callback extends LoadCallback>(
         } else {
           if (pollingInPageHiding) {
             pollingTimerRef.current = +setTimeout(() => {
-              if (id === idRef.current) {
+              if (!isCanceled()) {
                 reload();
               }
             }, pollingIntervalInPageHiding);
@@ -186,36 +213,60 @@ function useLoad<Callback extends LoadCallback>(
       }
     };
 
-    const handleSuccess = (data: LoadData<Callback>) => {
-      if (id !== idRef.current) {
-        return new Promise(() => {});
-      }
-      setState({
-        data,
-        error: null,
-        loading: false,
-        reloading: false,
-        initializing: false,
-      });
-      triggerSuccess(data, key);
-      handleFinally();
-      return data;
-    };
+    if (isAssociated && !store.isLoading(key, load)) {
+      return new Promise<LoadData<Callback>>((resolve, reject) => {
+        const unlisten = () => {
+          unlistenRef.current = undefined;
+          store.for(key).off("cancel", handleCancel);
+          store.for(key).off("failure", handleReject);
+          store.for(key).off("success", handleResolve);
+        };
 
-    const handleFailure = (error: unknown) => {
-      if (id !== idRef.current) {
-        return new Promise(() => {});
-      }
-      setState({
-        error,
-        loading: false,
-        reloading: false,
-        initializing: false,
-      });
-      triggerFailure(error, key);
-      handleFinally();
-      throw error;
-    };
+        const handleCancel = () => {
+          unlisten();
+          if (!isCanceled()) {
+            reload();
+          }
+        };
+        const handleResolve = (data: LoadData<Callback>) => {
+          unlisten();
+          if (!isCanceled()) {
+            resolve(data);
+          }
+        };
+        const handleReject = (error: unknown) => {
+          unlisten();
+          if (!isCanceled()) {
+            reject(error);
+          }
+        };
+
+        unlistenRef.current = unlisten;
+        store.for(key).on("cancel", handleCancel);
+        store.for(key).on("failure", handleReject);
+        store.for(key).on("success", handleResolve);
+      }).then(
+        (data) => {
+          if (isCanceled()) {
+            return new Promise(() => {});
+          }
+          triggerSuccess(data, key);
+          triggerFinally(key);
+          checkPolling();
+          return data;
+        },
+
+        (error) => {
+          if (isCanceled()) {
+            return new Promise(() => {});
+          }
+          triggerFailure(error, key);
+          triggerFinally(key);
+          checkPolling();
+          throw error;
+        }
+      ) as ReturnType<Callback>;
+    }
 
     return new Promise<LoadData<Callback>>((resolve, reject) => {
       let retryCount = 0;
@@ -223,7 +274,7 @@ function useLoad<Callback extends LoadCallback>(
       let fallbackRetryCount = 0;
 
       const handleReject = (error: unknown) => {
-        if (id !== idRef.current) {
+        if (isCanceled()) {
           return;
         }
         if (retry && ++retryCount <= retryLimit) {
@@ -232,7 +283,7 @@ function useLoad<Callback extends LoadCallback>(
             : retryInterval;
           if (delay > 0) {
             retryTimerRef.current = +setTimeout(() => {
-              if (id === idRef.current) {
+              if (!isCanceled()) {
                 callbackRef.current(...params).then(resolve, handleReject);
               }
             }, delay);
@@ -253,7 +304,7 @@ function useLoad<Callback extends LoadCallback>(
             : fallbackRetryInterval;
           if (delay > 0) {
             retryTimerRef.current = +setTimeout(() => {
-              if (id === idRef.current) {
+              if (!isCanceled()) {
                 if (fallbackRef.current) {
                   fallbackRef.current(...params).then(resolve, handleReject);
                 } else {
@@ -272,7 +323,7 @@ function useLoad<Callback extends LoadCallback>(
       if (idle) {
         idleTimerRef.current = requestIdleCallback(
           () => {
-            if (id === idRef.current) {
+            if (!isCanceled()) {
               callbackRef.current(...params).then(resolve, handleReject);
             }
           },
@@ -281,7 +332,50 @@ function useLoad<Callback extends LoadCallback>(
       } else {
         callbackRef.current(...params).then(resolve, handleReject);
       }
-    }).then(handleSuccess, handleFailure) as ReturnType<Callback>;
+    }).then(
+      (data) => {
+        if (isCanceled()) {
+          return new Promise(() => {});
+        }
+        const isCurrentLoading = store.isLoading(key, load);
+        setState({
+          data,
+          error: null,
+          loading: false,
+          reloading: false,
+          initializing: false,
+        });
+        triggerSuccess(data, key);
+        if (isAssociated && isCurrentLoading) {
+          store.for(key).emit("success", data);
+          store.removeLoading(key, load);
+        }
+        triggerFinally(key);
+        checkPolling();
+        return data;
+      },
+
+      (error) => {
+        if (isCanceled()) {
+          return new Promise(() => {});
+        }
+        const isCurrentLoading = store.isLoading(key, load);
+        setState({
+          error,
+          loading: false,
+          reloading: false,
+          initializing: false,
+        });
+        triggerFailure(error, key);
+        if (isAssociated && isCurrentLoading) {
+          store.for(key).emit("failure", error);
+          store.removeLoading(key, load);
+        }
+        triggerFinally(key);
+        checkPolling();
+        throw error;
+      }
+    ) as ReturnType<Callback>;
   });
 
   const reload = usePersist(() => {
@@ -314,12 +408,7 @@ function useLoad<Callback extends LoadCallback>(
   );
 
   const cancel = usePersist(() => {
-    idRef.current++;
-    allowAutoReloadRef.current = false;
-    clearTimeout(retryTimerRef.current);
-    clearTimeout(pollingTimerRef.current);
-    cancelAutoReload();
-    cancelIdleCallback(idleTimerRef.current);
+    clearPending();
     if (!unmountedRef.current && state.loading) {
       setState({ loading: false, reloading: false, initializing: false });
     }
@@ -327,53 +416,76 @@ function useLoad<Callback extends LoadCallback>(
 
   const [autoReload, { cancel: cancelAutoReload }] = useThrottle(
     () => {
-      if (allowAutoReloadRef.current && !state.loading) {
+      if (!canceledRef.current && !state.loading) {
         reload();
       }
     },
     { wait: autoReloadWaitTime, leading: true, trailing: false }
   );
 
-  useEffect(
-    () => {
-      if (autoReloadOnPageShow) {
-        const listener = () => {
-          if (isPageVisible()) {
-            autoReload();
-          }
-        };
-        document.addEventListener("visibilitychange", listener);
-        return () => {
-          document.removeEventListener("visibilitychange", listener);
-        };
-      }
-    },
-    [autoReloadOnPageShow] // eslint-disable-line
-  );
+  useEffect(() => {
+    if (autoReloadOnPageShow) {
+      const listener = () => {
+        if (isPageVisible()) {
+          autoReload();
+        }
+      };
+      document.addEventListener("visibilitychange", listener);
+      return () => {
+        document.removeEventListener("visibilitychange", listener);
+      };
+    }
+  }, [autoReloadOnPageShow, autoReload]);
 
-  useEffect(
-    () => {
-      if (autoReloadOnWindowFocus) {
-        window.addEventListener("focus", autoReload);
-        return () => {
-          window.removeEventListener("focus", autoReload);
-        };
-      }
-    },
-    [autoReloadOnWindowFocus] // eslint-disable-line
-  );
+  useEffect(() => {
+    if (autoReloadOnWindowFocus) {
+      window.addEventListener("focus", autoReload);
+      return () => {
+        window.removeEventListener("focus", autoReload);
+      };
+    }
+  }, [autoReloadOnWindowFocus, autoReload]);
 
-  useEffect(
-    () => {
-      if (autoReloadOnNetworkReconnect) {
-        window.addEventListener("online", autoReload);
-        return () => {
-          window.removeEventListener("online", autoReload);
-        };
-      }
-    },
-    [autoReloadOnNetworkReconnect] // eslint-disable-line
-  );
+  useEffect(() => {
+    if (autoReloadOnNetworkReconnect) {
+      window.addEventListener("online", autoReload);
+      return () => {
+        window.removeEventListener("online", autoReload);
+      };
+    }
+  }, [autoReloadOnNetworkReconnect, autoReload]);
+
+  useEffect(() => {
+    if (isAssociated) {
+      const handleSuccess = (data: LoadData<Callback>) => {
+        if (!store.isLoading(key, load)) {
+          setState({
+            data,
+            error: null,
+            loading: false,
+            reloading: false,
+            initializing: false,
+          });
+        }
+      };
+      const handleFailure = (error: unknown) => {
+        if (!store.isLoading(key, load)) {
+          setState({
+            error,
+            loading: false,
+            reloading: false,
+            initializing: false,
+          });
+        }
+      };
+      store.for(key).on("success", handleSuccess);
+      store.for(key).on("failure", handleFailure);
+      return () => {
+        store.for(key).off("success", handleSuccess);
+        store.for(key).off("failure", handleFailure);
+      };
+    }
+  }, [key, isAssociated, store, load, setState]);
 
   useEffect(() => {
     if (key != null) {

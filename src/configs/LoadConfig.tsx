@@ -11,9 +11,36 @@ import EventEmitter from "../utils/EventEmitter";
 import mergeWithDefined from "../utils/mergeWithDefined";
 
 export class LoadStore extends EventEmitter {
-  _reloaders = new Map<any, (() => void)[]>();
+  _loading = new Map<any, Function>();
+  _reloaders = new Map<any, Function[]>();
 
-  addReloader(key: any, reloader: () => void) {
+  isLoading(key: any, loader?: Function) {
+    if (loader) {
+      return this._loading.get(key) === loader;
+    } else {
+      return this._loading.has(key);
+    }
+  }
+
+  addLoading(key: any, loader: Function) {
+    this._loading.set(key, loader);
+  }
+
+  removeLoading(key: any, loader?: Function) {
+    if (loader) {
+      if (this._loading.get(key) === loader) {
+        this._loading.delete(key);
+      }
+    } else {
+      this._loading.delete(key);
+    }
+  }
+
+  getReloaders(key: any) {
+    return this._reloaders.get(key) || [];
+  }
+
+  addReloader(key: any, reloader: Function) {
     const reloaders = this._reloaders.get(key);
     if (reloaders) {
       if (!reloaders.includes(reloader)) {
@@ -24,7 +51,7 @@ export class LoadStore extends EventEmitter {
     }
   }
 
-  removeReloader(key: any, reloader: () => void) {
+  removeReloader(key: any, reloader: Function) {
     const reloaders = this._reloaders.get(key);
     if (reloaders) {
       let position = -1;
@@ -41,10 +68,6 @@ export class LoadStore extends EventEmitter {
         this._reloaders.delete(key);
       }
     }
-  }
-
-  getReloaders(key: any) {
-    return this._reloaders.get(key) || [];
   }
 }
 
