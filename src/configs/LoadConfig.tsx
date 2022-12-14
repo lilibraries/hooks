@@ -7,18 +7,89 @@ import React, {
   useDebugValue,
 } from "react";
 import omit from "lodash/omit";
-import LoadStore from "../utils/LoadStore";
+import EventEmitter from "../utils/EventEmitter";
 import mergeWithDefined from "../utils/mergeWithDefined";
+
+class LoadStore extends EventEmitter {
+  _loadings = new Map<any, Function>();
+  _reloaders = new Map<any, Function[]>();
+  _timestamps = new Map<Function, number>();
+
+  isLoading(key: any, loader?: Function) {
+    if (loader) {
+      return this._loadings.get(key) === loader;
+    } else {
+      return this._loadings.has(key);
+    }
+  }
+
+  setLoading(key: any, loader: Function) {
+    this._loadings.set(key, loader);
+  }
+
+  deleteLoading(key: any, loader?: Function) {
+    if (loader) {
+      if (this._loadings.get(key) === loader) {
+        this._loadings.delete(key);
+      }
+    } else {
+      this._loadings.delete(key);
+    }
+  }
+
+  getReloaders(key: any) {
+    return this._reloaders.get(key) || [];
+  }
+
+  addReloader(key: any, reloader: Function) {
+    const reloaders = this._reloaders.get(key);
+    if (reloaders) {
+      if (!reloaders.includes(reloader)) {
+        reloaders.push(reloader);
+      }
+    } else {
+      this._reloaders.set(key, [reloader]);
+    }
+  }
+
+  removeReloader(key: any, reloader: Function) {
+    const reloaders = this._reloaders.get(key);
+    if (reloaders) {
+      const lastIndex = reloaders.lastIndexOf(reloader);
+      if (lastIndex >= 0) {
+        reloaders.splice(lastIndex, 1);
+      }
+      if (!reloaders.length) {
+        this._reloaders.delete(key);
+      }
+    }
+  }
+
+  getTimestamp(loader: Function) {
+    return this._timestamps.get(loader);
+  }
+
+  setTimestamp(loader: Function) {
+    this._timestamps.set(loader, Date.now());
+  }
+
+  deleteTimestamp(loader: Function) {
+    if (this._timestamps.has(loader)) {
+      this._timestamps.delete(loader);
+    }
+  }
+}
 
 export interface LoadStoreInterface {
   isLoading(key: any, loader?: Function): boolean;
-  addLoading(key: any, loader: Function): any;
-  removeLoading(key: any, loader?: Function): any;
+  setLoading(key: any, loader: Function): any;
+  deleteLoading(key: any, loader?: Function): any;
   getReloaders(key: any): Function[];
   addReloader(key: any, reloader: Function): any;
   removeReloader(key: any, reloader: Function): any;
   getTimestamp(loader: Function): number | undefined;
-  recordTimestamp(loader: Function): any;
+  setTimestamp(loader: Function): any;
+  deleteTimestamp(loader: Function): any;
   for(key: any): {
     on(name: "cancel", listener: () => void): any;
     on(name: "success", listener: (data: any) => void): any;
