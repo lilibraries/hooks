@@ -27,7 +27,7 @@ export interface LoadHookOptions<Callback extends LoadCallback>
   imperative?: boolean;
   independent?: boolean;
   fallback?: Callback;
-  defaultData?: LoadData<Callback>;
+  initialData?: LoadData<Callback>;
   defaultParams?: Parameters<Callback>;
   cacheKey?: {};
   cacheValidate?: (data: any) => boolean;
@@ -64,7 +64,7 @@ interface State<Data> {
 function useLoad<Callback extends LoadCallback>(
   callback: Callback,
   deps: DependencyList,
-  options: LoadHookOptions<Callback> & { defaultData: LoadData<Callback> }
+  options: LoadHookOptions<Callback> & { initialData: LoadData<Callback> }
 ): Readonly<Results<Callback> & { data: LoadData<Callback> }>;
 
 function useLoad<Callback extends LoadCallback>(
@@ -87,7 +87,7 @@ function useLoad<Callback extends LoadCallback>(
     imperative,
     independent,
     fallback,
-    defaultData,
+    initialData,
     defaultParams,
     cacheKey,
     cacheTime,
@@ -114,22 +114,22 @@ function useLoad<Callback extends LoadCallback>(
     if (cacheKey != null && cache.has(cacheKey)) {
       const cachedData = cache.get(cacheKey) as LoadData<Callback>;
       if (cacheValidate) {
-        return cacheValidate(cachedData) ? cachedData : defaultData;
+        return cacheValidate(cachedData) ? cachedData : initialData;
       } else {
         return cachedData;
       }
     } else {
-      return defaultData;
+      return initialData;
     }
   });
 
   const [state, setState] = useSetState<State<LoadData<Callback>>>(() => {
     const loading = !imperative;
-    const initialData = cacheKey != null ? getCachedData() : defaultData;
-    const hasData = initialData !== undefined;
+    const data = cacheKey != null ? getCachedData() : initialData;
+    const hasData = data !== undefined;
 
     return {
-      data: initialData,
+      data,
       error: null,
       loading,
       reloading: loading && hasData,
