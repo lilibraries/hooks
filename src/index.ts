@@ -22,6 +22,7 @@ export type {
 } from "./useDebounce";
 export type { FaviconHookOptions } from "./useFavicon";
 export type { LoadCallback, LoadData, LoadHookOptions } from "./useLoad";
+export type { ReloadHookOptions } from "./useReload";
 export type { SubmitHookOptions } from "./useSubmit";
 export type {
   ThrottleOptions as ThrottleHookOptions,
