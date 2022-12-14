@@ -27,10 +27,10 @@ export interface LoadHookOptions<Callback extends LoadCallback>
   imperative?: boolean;
   independent?: boolean;
   fallback?: Callback;
-  validate?: (data: any) => boolean;
   defaultData?: LoadData<Callback>;
   defaultParams?: Parameters<Callback>;
   cacheKey?: {};
+  cacheValidate?: (data: any) => boolean;
   onSuccess?: (data: LoadData<Callback>) => void;
   onFailure?: (error: any) => void;
   onFinally?: () => void;
@@ -86,11 +86,11 @@ function useLoad<Callback extends LoadCallback>(
     imperative,
     independent,
     fallback,
-    validate,
     defaultData,
     defaultParams,
     cacheKey,
     cacheTime,
+    cacheValidate,
     staleTime,
     retry,
     retryLimit,
@@ -109,16 +109,22 @@ function useLoad<Callback extends LoadCallback>(
   } = mergeWithDefined(config, options);
   const isAssociated = key != null && !independent;
 
-  const [state, setState] = useSetState<State<LoadData<Callback>>>(() => {
-    let initialData = defaultData;
-    if (cacheKey && cache.has(cacheKey)) {
-      const cachedData = cache.get(cacheKey);
-      if (!validate || validate(cachedData)) {
-        initialData = cachedData;
+  const getCachedData = usePersist(() => {
+    if (cacheKey != null && cache.has(cacheKey)) {
+      const cachedData = cache.get(cacheKey) as LoadData<Callback>;
+      if (cacheValidate) {
+        return cacheValidate(cachedData) ? cachedData : defaultData;
+      } else {
+        return cachedData;
       }
+    } else {
+      return defaultData;
     }
+  });
 
+  const [state, setState] = useSetState<State<LoadData<Callback>>>(() => {
     const loading = !imperative;
+    const initialData = cacheKey != null ? getCachedData() : defaultData;
     const hasData = initialData !== undefined;
 
     return {
@@ -135,19 +141,22 @@ function useLoad<Callback extends LoadCallback>(
   const callbackRef = useLatestRef(callback);
   const fallbackRef = useLatestRef(fallback);
 
+  const idRef = useRef(0);
+  const readyRef = useRef(false);
+  const paramsRef = useRef<Parameters<Callback>>();
+  const loadingRef = useRef<{
+    key: any;
+    load: Function;
+    store: typeof store;
+  }>();
+  const unlistenRef = useRef<() => void>();
   const idleTimerRef = useRef(0);
   const retryTimerRef = useRef(0);
   const pollingTimerRef = useRef(0);
 
-  const idRef = useRef(0);
-  const paramsRef = useRef<Parameters<Callback>>();
-  const canceledRef = useRef(true);
-  const loadingRef = useRef<{ key: any; store: typeof store }>();
-  const unlistenRef = useRef<() => void>();
-
   const clearPending = usePersist(() => {
     idRef.current++;
-    canceledRef.current = true;
+    readyRef.current = false;
 
     clearTimeout(retryTimerRef.current);
     clearTimeout(pollingTimerRef.current);
@@ -157,8 +166,8 @@ function useLoad<Callback extends LoadCallback>(
     if (loadingRef.current) {
       const { key, store } = loadingRef.current;
       if (store.isLoading(key, load)) {
+        store.deleteLoading(key, load);
         store.for(key).emit("cancel");
-        store.removeLoading(key, load);
       }
       loadingRef.current = undefined;
     }
@@ -204,8 +213,8 @@ function useLoad<Callback extends LoadCallback>(
 
   const load = usePersist((...params: Parameters<Callback>) => {
     clearPending();
+    readyRef.current = true;
     paramsRef.current = params;
-    canceledRef.current = false;
 
     if (!mountedRef.current) {
       if (process.env.NODE_ENV !== "production") {
@@ -231,15 +240,24 @@ function useLoad<Callback extends LoadCallback>(
     }
 
     if (isAssociated && !store.isLoading(key)) {
-      store.addLoading(key, load);
-      loadingRef.current = { key, store };
+      store.setLoading(key, load);
+      loadingRef.current = { key, load, store };
     }
 
-    if (cacheKey != null && cache.has(cacheKey)) {
-      // TODO: use cached data.
-    }
-
-    if (!state.loading) {
+    let cachedData;
+    if (
+      state.data === undefined &&
+      cacheKey != null &&
+      cache.has(cacheKey) &&
+      (cachedData = getCachedData())
+    ) {
+      setState({
+        data: cachedData,
+        loading: true,
+        reloading: true,
+        initializing: false,
+      });
+    } else if (!state.loading) {
       setState({
         loading: true,
         reloading: state.data !== undefined,
@@ -251,7 +269,7 @@ function useLoad<Callback extends LoadCallback>(
     const isCanceled = () => id !== idRef.current;
 
     const checkPolling = () => {
-      if (!canceledRef.current) {
+      if (readyRef.current) {
         if (isPageVisible()) {
           if (polling) {
             pollingTimerRef.current = +setTimeout(() => {
@@ -272,7 +290,7 @@ function useLoad<Callback extends LoadCallback>(
       }
     };
 
-    if (isAssociated && !store.isLoading(key, load)) {
+    if (isAssociated && store.isLoading(key) && !store.isLoading(key, load)) {
       return new Promise<LoadData<Callback>>((resolve, reject) => {
         const unlisten = () => {
           unlistenRef.current = undefined;
@@ -396,9 +414,16 @@ function useLoad<Callback extends LoadCallback>(
         if (isCanceled()) {
           return new Promise(() => {});
         }
+        if (staleTime > 0) {
+          store.setTimestamp(load);
+        }
+        if (cacheKey != null) {
+          cache.set(cacheKey, data, { cacheTime });
+        }
         if (isAssociated && store.isLoading(key, load)) {
+          store.deleteLoading(key, load);
           store.for(key).emit("success", data);
-          store.removeLoading(key, load);
+          loadingRef.current = undefined;
         }
         setState({
           data,
@@ -418,8 +443,9 @@ function useLoad<Callback extends LoadCallback>(
           return new Promise(() => {});
         }
         if (isAssociated && store.isLoading(key, load)) {
+          store.deleteLoading(key, load);
           store.for(key).emit("failure", error);
-          store.removeLoading(key, load);
+          loadingRef.current = undefined;
         }
         setState({
           error,
@@ -473,7 +499,7 @@ function useLoad<Callback extends LoadCallback>(
 
   const [autoReload, { cancel: cancelAutoReload }] = useThrottle(
     () => {
-      if (!canceledRef.current && !state.loading) {
+      if (readyRef.current && !state.loading) {
         reload();
       }
     },
@@ -521,7 +547,10 @@ function useLoad<Callback extends LoadCallback>(
   useEffect(() => {
     if (isAssociated) {
       const handleSuccess = (data: LoadData<Callback>) => {
-        if (!store.isLoading(key, load)) {
+        if (!loadingRef.current || loadingRef.current.load !== load) {
+          if (staleTime > 0) {
+            store.setTimestamp(load);
+          }
           setState({
             data,
             error: null,
@@ -532,7 +561,7 @@ function useLoad<Callback extends LoadCallback>(
         }
       };
       const handleFailure = (error: any) => {
-        if (!store.isLoading(key, load)) {
+        if (!loadingRef.current || loadingRef.current.load !== load) {
           setState({
             error,
             loading: false,
@@ -548,7 +577,7 @@ function useLoad<Callback extends LoadCallback>(
         store.for(key).off("failure", handleFailure);
       };
     }
-  }, [key, isAssociated, store, load, setState]);
+  }, [key, isAssociated, store, load, staleTime, setState]);
 
   useEffect(() => {
     if (key != null) {
@@ -558,6 +587,12 @@ function useLoad<Callback extends LoadCallback>(
       };
     }
   }, [key, store, reload]);
+
+  useEffect(() => {
+    return () => {
+      store.deleteTimestamp(load);
+    };
+  }, [store, load]);
 
   useEffect(
     () => {
