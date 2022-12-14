@@ -43,7 +43,8 @@ interface Results<Callback extends LoadCallback> {
   reloading: boolean;
   initializing: boolean;
   load: (...params: Parameters<Callback>) => ReturnType<Callback>;
-  reload: () => void;
+  force: (...params: Parameters<Callback>) => ReturnType<Callback>;
+  reload: (options?: { force?: boolean }) => void;
   update: (
     newData:
       | LoadData<Callback>
@@ -76,7 +77,7 @@ function useLoad<Callback extends LoadCallback>(
   callback: Callback,
   deps: DependencyList = [],
   options: LoadHookOptions<Callback> = {}
-) {
+): Readonly<Results<Callback>> {
   const { cache } = useCacheConfig();
   const { store, ...config } = useLoadConfig();
 
@@ -143,6 +144,7 @@ function useLoad<Callback extends LoadCallback>(
 
   const idRef = useRef(0);
   const readyRef = useRef(false);
+  const forceRef = useRef(false);
   const paramsRef = useRef<Parameters<Callback>>();
   const loadingRef = useRef<{
     key: any;
@@ -157,6 +159,7 @@ function useLoad<Callback extends LoadCallback>(
   const clearPending = usePersist(() => {
     idRef.current++;
     readyRef.current = false;
+    forceRef.current = false;
 
     clearTimeout(retryTimerRef.current);
     clearTimeout(pollingTimerRef.current);
@@ -216,6 +219,12 @@ function useLoad<Callback extends LoadCallback>(
     readyRef.current = true;
     paramsRef.current = params;
 
+    let force = forceRef.current;
+    if (force) {
+      store.deleteTimestamp(load);
+      forceRef.current = false;
+    }
+
     if (!mountedRef.current) {
       if (process.env.NODE_ENV !== "production") {
         warning(
@@ -227,7 +236,12 @@ function useLoad<Callback extends LoadCallback>(
       return new Promise(() => {}) as ReturnType<Callback>;
     }
 
-    if (staleTime > 0 && state.error == null && state.data !== undefined) {
+    if (
+      !force &&
+      staleTime > 0 &&
+      state.error == null &&
+      state.data !== undefined
+    ) {
       const timestamp = store.getTimestamp(load);
       if (timestamp && Date.now() - timestamp <= staleTime) {
         if (state.loading) {
@@ -235,7 +249,7 @@ function useLoad<Callback extends LoadCallback>(
         }
         return new Promise((resolve) => {
           resolve(state.data);
-        });
+        }) as ReturnType<Callback>;
       }
     }
 
@@ -461,7 +475,12 @@ function useLoad<Callback extends LoadCallback>(
     ) as ReturnType<Callback>;
   });
 
-  const reload = usePersist(() => {
+  const force = usePersist((...params: Parameters<Callback>) => {
+    forceRef.current = true;
+    return load(...params);
+  });
+
+  const reload = usePersist((options?: { force?: boolean }) => {
     const params = paramsRef.current || defaultParams;
     if (process.env.NODE_ENV !== "production") {
       warning(
@@ -470,6 +489,7 @@ function useLoad<Callback extends LoadCallback>(
         { scope: "useLoad" }
       );
     }
+    forceRef.current = !!options && !!options.force;
     if (params) {
       load(...params);
     } else {
@@ -616,7 +636,7 @@ function useLoad<Callback extends LoadCallback>(
   useUnmount(cancel);
   useDebugValue(state);
 
-  return { ...state, load, reload, update, cancel } as const;
+  return { ...state, load, force, reload, update, cancel } as const;
 }
 
 export default useLoad;
