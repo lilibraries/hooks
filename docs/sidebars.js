@@ -20,6 +20,7 @@ module.exports = {
       type: "category",
       label: "States",
       items: [
+        "useCache",
         "useToggle",
         "useSetState",
         "useSafeState",
@@ -72,6 +73,16 @@ module.exports = {
         "useLocalStorage",
         "useSessionStorage",
       ],
+    },
+    {
+      type: "category",
+      label: "Requests",
+      items: ["useLoad", "useReload", "useSubmit"],
+    },
+    {
+      type: "category",
+      label: "Configs",
+      items: ["LoadConfig", "CacheConfig"],
     },
     "CHANGELOG",
   ],

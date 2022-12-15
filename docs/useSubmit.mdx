@@ -1,0 +1,31 @@
+## API
+
+```ts
+type PromiseResolve<T extends Promise<any>> = T extends Promise<infer P>
+  ? P
+  : never;
+type LoadCallback = (...args: any[]) => Promise<any>;
+type LoadData<T extends LoadCallback> = PromiseResolve<ReturnType<T>>;
+
+function useSubmit<Callback extends LoadCallback>(
+  callback: Callback,
+  options?: {
+    idle?: boolean;
+    fallback?: Callback;
+
+    retry?: boolean;
+    retryLimit?: number;
+    retryInterval?: number | ((count: number) => number);
+    fallbackRetry?: boolean;
+    fallbackRetryLimit?: number;
+    fallbackRetryInterval?: number | ((count: number) => number);
+
+    onSuccess?: (data: Data) => void;
+    onFailure?: (error: any) => void;
+    onFinally?: () => void;
+  }
+): {
+  submit: (...params: Parameters<Callback>) => ReturnType<Callback>;
+  submitting: boolean;
+};
+```

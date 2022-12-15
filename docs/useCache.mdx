@@ -1,0 +1,30 @@
+## API
+
+```ts
+function useCache<T>(
+  key: {},
+  options?: {
+    defaultValue?: T;
+    cache?: CacheInterface;
+    cacheTime?: number;
+    cacheSync?: boolean;
+    validate?: (value: any) => boolean;
+    onSet?: (value: any) => void;
+    onDelete?: (value: any) => void;
+  }
+): [value: T | undefined, setCache: (newValue: T | undefined) => void];
+
+interface CacheInterface {
+  has(key: any): boolean;
+  get(key: any): any;
+  set(key: any, data: any, options?: { cacheTime?: number }): any;
+  delete(key: any): any;
+  isReady(): boolean;
+  once(name: "ready", listener: () => void): any;
+  off(name: "ready", listener: () => void): any;
+  for(key: any): {
+    on(name: "set" | "delete", listener: (data: any) => void): any;
+    off(name: "set" | "delete", listener: (data: any) => void): any;
+  };
+}
+```

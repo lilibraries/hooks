@@ -1,0 +1,68 @@
+## API
+
+```ts
+type PromiseResolve<T extends Promise<any>> = T extends Promise<infer P>
+  ? P
+  : never;
+type LoadCallback = (...args: any[]) => Promise<any>;
+type LoadData<T extends LoadCallback> = PromiseResolve<ReturnType<T>>;
+
+function useLoad<Callback extends LoadCallback>(
+  callback: Callback,
+  deps?: React.DependencyList,
+  options?: {
+    key?: {};
+
+    idle?: boolean | { timeout?: number };
+    imperative?: boolean;
+    independent?: boolean;
+
+    fallback?: Callback;
+    initialData?: LoadData<Callback>;
+    defaultParams?: Parameters<Callback>;
+
+    cacheKey?: {};
+    cacheTime?: number;
+    cacheValidate?: (data: any) => boolean;
+    staleTime?: number;
+
+    retry?: boolean;
+    retryLimit?: number;
+    retryInterval?: number | ((count: number) => number);
+    fallbackRetry?: boolean;
+    fallbackRetryLimit?: number;
+    fallbackRetryInterval?: number | ((count: number) => number);
+
+    polling?: boolean;
+    pollingInterval?: number;
+    pollingInPageHiding?: boolean;
+    pollingIntervalInPageHiding?: number;
+
+    autoReloadWaitTime?: number;
+    autoReloadOnPageShow?: boolean;
+    autoReloadOnWindowFocus?: boolean;
+    autoReloadOnNetworkReconnect?: boolean;
+
+    onSuccess?: (data: LoadData<Callback>) => void;
+    onFailure?: (error: any) => void;
+    onFinally?: () => void;
+  }
+): {
+  data: LoadData<Callback> | undefined;
+  error: any;
+  loading: boolean;
+  reloading: boolean;
+  initializing: boolean;
+
+  load: (...params: Parameters<Callback>) => ReturnType<Callback>;
+  force: (...params: Parameters<Callback>) => ReturnType<Callback>;
+  reload: (options?: { force?: boolean }) => void;
+  cancel: () => void;
+
+  update: (
+    newData:
+      | LoadData<Callback>
+      | ((prevData?: LoadData<Callback>) => LoadData<Callback>)
+  ) => void;
+};
+```
