@@ -9,9 +9,9 @@ export interface CacheHookOptions<T> {
   cache?: CacheInterface;
   cacheTime?: number;
   cacheSync?: boolean;
-  validate?: (value: T) => boolean;
-  onSet?: (value: T) => void;
-  onDelete?: (value: T) => void;
+  validate?: (value: any) => boolean;
+  onSet?: (value: any) => void;
+  onDelete?: (value: any) => void;
 }
 
 function useCache<T>(
