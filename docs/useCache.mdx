@@ -1,3 +1,5 @@
+Cache data for a certain period of time. And you can synchronize data in different components. The [LoadConfig](./LoadConfig) component can set some default options for this hook.
+
 ## API
 
 ```ts
@@ -28,3 +30,20 @@ interface CacheInterface {
   };
 }
 ```
+
+Params:
+
+- **`key`:** Cache key. It can be any type except `null` and `undefined`.
+- **`options`:** Options object.
+  - **`options.defaultValue`:** Default value when the cache value does not exist.
+  - **`options.cache`:** Cache instance. Use memory cache by default. You can pass an instance that implements the `CacheInterface`.
+  - **`options.cacheTime`:** Cache time, in milliseconds. Default is 5 minutes. You can set a permanent cache by setting this option greater than or equal to `Number.MAX_SAFE_INTEGER`, like `Infinity`.
+  - **`options.cacheSync`:** Synchronize data when calling the `setCache` method. Default is `false`.
+  - **`options.validate`:** Validate the cache value. If it returns falsy, the `defaultValue` will be used.
+  - **`options.onSet`:** Data set event. The `value` param will not be validated by `validate` function.
+  - **`options.onDelete`:** Data delete event (cache time expired or `setCache(undefined)` is called). The `value` param will not be validated by `validate` function.
+
+Results:
+
+- **`value`:** Cache value or default value.
+- **`setCache`:** The function to set cache. It the data param is `undefined`, the cache will be deleted.
