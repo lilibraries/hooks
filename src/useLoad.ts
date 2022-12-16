@@ -51,14 +51,13 @@ interface Results<Callback extends LoadCallback> {
       | ((prevData?: LoadData<Callback>) => LoadData<Callback>)
   ) => void;
   cancel: () => void;
+  _reset_for_submit_you_should_not_use_: () => void;
 }
 
 interface State<Data> {
   data: Data | undefined;
   error: any;
   loading: boolean;
-  reloading: boolean;
-  initializing: boolean;
 }
 
 function useLoad<Callback extends LoadCallback>(
@@ -123,19 +122,11 @@ function useLoad<Callback extends LoadCallback>(
     }
   });
 
-  const [state, setState] = useSetState<State<LoadData<Callback>>>(() => {
-    const loading = !imperative;
-    const data = cacheKey != null ? getCachedData() : initialData;
-    const hasData = data !== undefined;
-
-    return {
-      data,
-      error: null,
-      loading,
-      reloading: loading && hasData,
-      initializing: loading && !hasData,
-    };
-  });
+  const [state, setState] = useSetState<State<LoadData<Callback>>>(() => ({
+    data: cacheKey != null ? getCachedData() : initialData,
+    error: null,
+    loading: !imperative,
+  }));
 
   const mountedRef = useMountedRef();
   const unmountedRef = useUnmountedRef();
@@ -245,7 +236,7 @@ function useLoad<Callback extends LoadCallback>(
       const timestamp = store.getTimestamp(load);
       if (timestamp && Date.now() - timestamp <= staleTime) {
         if (state.loading) {
-          setState({ loading: false, reloading: false, initializing: false });
+          setState({ loading: false });
         }
         return new Promise((resolve) => {
           resolve(state.data);
@@ -265,18 +256,9 @@ function useLoad<Callback extends LoadCallback>(
       cache.has(cacheKey) &&
       (cachedData = getCachedData())
     ) {
-      setState({
-        data: cachedData,
-        loading: true,
-        reloading: true,
-        initializing: false,
-      });
+      setState({ data: cachedData, loading: true });
     } else if (!state.loading) {
-      setState({
-        loading: true,
-        reloading: state.data !== undefined,
-        initializing: state.data === undefined,
-      });
+      setState({ loading: true });
     }
 
     const id = idRef.current;
@@ -439,13 +421,7 @@ function useLoad<Callback extends LoadCallback>(
           store.for(key).emit("success", data);
           loadingRef.current = undefined;
         }
-        setState({
-          data,
-          error: null,
-          loading: false,
-          reloading: false,
-          initializing: false,
-        });
+        setState({ data, error: null, loading: false });
         triggerSuccess(data, key);
         triggerFinally(key);
         checkPolling();
@@ -461,12 +437,7 @@ function useLoad<Callback extends LoadCallback>(
           store.for(key).emit("failure", error);
           loadingRef.current = undefined;
         }
-        setState({
-          error,
-          loading: false,
-          reloading: false,
-          initializing: false,
-        });
+        setState({ error, loading: false });
         triggerFailure(error, key);
         triggerFinally(key);
         checkPolling();
@@ -510,10 +481,14 @@ function useLoad<Callback extends LoadCallback>(
     }
   );
 
+  const reset = usePersist(() => {
+    setState({ data: undefined, error: null });
+  });
+
   const cancel = usePersist(() => {
     clearPending();
     if (!unmountedRef.current && state.loading) {
-      setState({ loading: false, reloading: false, initializing: false });
+      setState({ loading: false });
     }
   });
 
@@ -571,23 +546,12 @@ function useLoad<Callback extends LoadCallback>(
           if (staleTime > 0) {
             store.setTimestamp(load);
           }
-          setState({
-            data,
-            error: null,
-            loading: false,
-            reloading: false,
-            initializing: false,
-          });
+          setState({ data, error: null, loading: false });
         }
       };
       const handleFailure = (error: any) => {
         if (!loadingRef.current || loadingRef.current.load !== load) {
-          setState({
-            error,
-            loading: false,
-            reloading: false,
-            initializing: false,
-          });
+          setState({ error, loading: false });
         }
       };
       store.for(key).on("success", handleSuccess);
@@ -636,7 +600,17 @@ function useLoad<Callback extends LoadCallback>(
   useUnmount(cancel);
   useDebugValue(state);
 
-  return { ...state, load, force, reload, update, cancel } as const;
+  return {
+    load,
+    force,
+    reload,
+    update,
+    cancel,
+    ...state,
+    reloading: state.loading && state.data !== undefined,
+    initializing: state.loading && state.data === undefined,
+    _reset_for_submit_you_should_not_use_: reset,
+  } as const;
 }
 
 export default useLoad;
