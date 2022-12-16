@@ -1,14 +1,14 @@
-import { useCallback, useDebugValue, useEffect } from "react";
-import { useSyncExternalStore } from "use-sync-external-store/shim";
+import { useDebugValue, useEffect } from "react";
+import useUpdate from "./useUpdate";
 import usePersist from "./usePersist";
-import useMemoizedValue from "./useMemoizedValue";
+import useSafeState from "./useSafeState";
 import { CacheInterface, useCacheConfig } from "./configs/CacheConfig";
 
 export interface CacheHookOptions<T> {
   defaultValue?: T;
   cache?: CacheInterface;
   cacheTime?: number;
-  cacheSync?: boolean;
+  cacheSync?: boolean | { set?: boolean; delete?: boolean };
   validate?: (value: any) => boolean;
   onSet?: (value: any) => void;
   onDelete?: (value: any) => void;
@@ -26,45 +26,37 @@ function useCache<T>(
 
 function useCache<T>(key: {}, options: CacheHookOptions<T> = {}) {
   const config = useCacheConfig();
-
-  const { validate, onSet, onDelete } = options;
-  const { defaultValue: defaultValueOption } = options;
-  const defaultValue = useMemoizedValue(defaultValueOption);
+  const { defaultValue, validate, onSet, onDelete } = options;
 
   const cache = options.cache ?? config.cache;
   const cacheTime = options.cacheTime ?? config.cacheTime;
-  const cacheSync = !!(options.cacheSync ?? config.cacheSync);
+  const cacheSync = options.cacheSync ?? config.cacheSync;
 
-  const subscribe = useCallback(
-    (listener: () => void) => {
-      if (cacheSync) {
-        cache.for(key).on("set", listener);
-        return () => {
-          cache.for(key).off("set", listener);
-        };
-      } else {
-        return () => {};
-      }
-    },
-    [key, cache, cacheSync]
-  );
-  const getSnapshot = useCallback(
-    () => {
-      const cachedData = cache.get(key) as T | undefined;
-      if (cachedData !== undefined) {
-        if (validate) {
-          return validate(cachedData) ? cachedData : defaultValue;
-        } else {
-          return cachedData;
-        }
-      } else {
-        return defaultValue;
-      }
-    },
-    [cache, key, defaultValue] // eslint-disable-line
-  );
+  let cacheSyncOnSet = false;
+  let cacheSyncOnDelete = false;
 
-  const value = useSyncExternalStore(subscribe, getSnapshot);
+  if (cacheSync === true) {
+    cacheSyncOnSet = true;
+    cacheSyncOnDelete = true;
+  } else if (cacheSync) {
+    cacheSyncOnSet = !!cacheSync.set;
+    cacheSyncOnDelete = !!cacheSync.delete;
+  }
+
+  const getCachedData = () => {
+    const cachedData = cache.get(key);
+    if (cachedData !== undefined) {
+      if (validate) {
+        return validate(cachedData) ? cachedData : defaultValue;
+      } else {
+        return cachedData;
+      }
+    } else {
+      return defaultValue;
+    }
+  };
+
+  const [value, setValue] = useSafeState(getCachedData);
   const setCache = usePersist((newValue: T | undefined) => {
     if (newValue === undefined) {
       cache.delete(key);
@@ -73,15 +65,21 @@ function useCache<T>(key: {}, options: CacheHookOptions<T> = {}) {
     }
   });
 
-  const shouldHandleSet = !!onSet;
-  const shouldHandleDelete = !!onDelete;
+  const shouldHandleSet = !!onSet || cacheSyncOnSet;
+  const shouldHandleDelete = !!onDelete || cacheSyncOnDelete;
 
   const handleSet = usePersist((data: T) => {
+    if (cacheSyncOnSet) {
+      setValue(getCachedData());
+    }
     if (onSet) {
       onSet(data);
     }
   });
   const handleDelete = usePersist((data: T) => {
+    if (cacheSyncOnDelete) {
+      setValue(getCachedData());
+    }
     if (onDelete) {
       onDelete(data);
     }
@@ -104,6 +102,10 @@ function useCache<T>(key: {}, options: CacheHookOptions<T> = {}) {
       };
     }
   }, [key, cache, shouldHandleDelete, handleDelete]);
+
+  useUpdate(() => {
+    setValue(getCachedData());
+  }, [key, cache]);
 
   useDebugValue(value);
 
