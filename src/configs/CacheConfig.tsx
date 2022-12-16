@@ -30,7 +30,7 @@ export interface CacheConfigValue {
   global: boolean;
   cache: CacheInterface;
   cacheTime: number;
-  cacheSync: boolean;
+  cacheSync: boolean | { set?: boolean; delete?: boolean };
   fallback?: ReactNode;
 }
 
