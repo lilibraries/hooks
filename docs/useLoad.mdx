@@ -1,3 +1,5 @@
+Load async data. Usually used for network requests. It accepts a `callback` function as the first parameter, and the `callback` function must return a promise object. You can use [`LoadConfig`](./LoadConfig) component to set some default options for this hook.
+
 ## API
 
 ```ts
@@ -66,3 +68,50 @@ function useLoad<Callback extends LoadCallback>(
   ) => void;
 };
 ```
+
+Params:
+
+- **`callback`:** A function returns a promise object. It is automatically called after the component is mounted by default.
+- **`deps`:** Auto reload dependency list. Default is an empty array. It's not working when the `imperative` option is `true`.
+- **`options`:** Options object.
+  - **`options.key`:** An identifier that can be any data type except `null` and `undefined`. By default, if multiple requests for the same key appear on the page, only first one request will be sent, and other requests will get data by listening to internal events. You can prevent the default behavior by setting the `independent` option to `true`. Another function of the `key` option is that it can be used with [`useReload`](./useReload) hook.
+  - **`options.idle`:** Run callback during the browser's idle periods. You can set an object contains a `timeout` property to limit the max waiting time.
+  - **`options.imperative`:** Run callback manually through the returned `load` or `force` function, rather than automatically after the component is mounted.
+  - **`options.independent`:** Set this option to `ture`, event if the `key` are the same, request callbacks in the page are independent and all of them will be executed.
+  - **`options.fallback`:** When the `callback` function reject an error and the count of retries has been exhausted, the `fallback` function will be called.
+  - **`options.initialData`:** Initial data. Used when no cache or request is loading.
+  - **`options.defaultParams`:** The default parameter array set for `callback` and `fallback`.
+  - **`options.cacheKey`:** Cache key. It can be any type except `null` and `undefined`.
+  - **`options.cacheTime`:** Cache time, in milliseconds. Default is 5 minutes. You can set a permanent cache by setting this option greater than or equal to `Number.MAX_SAFE_INTEGER`, for example `Infinity`.
+  - **`options.cacheValidate`:** Validate the cache value. If it returns falsy, the `initialData` will be used.
+  - **`options.staleTime`:** Stale time, in milliseconds. Default is `0`. In the `staleTime`period, the data is considered fresh. Calling the`load(...params)`and`reload()`methods or auto reloading has no effect. You can ignore the`staleTime`option by calling the`force(...params)`or`reload({ force: true })` methods.
+  - **`options.retry`:** Enable retry callback. Default is `false`.
+  - **`options.retryLimit`:** Callback retry limit. Default is `3`.
+  - **`options.retryInterval`:** Callback retry interval. Default is `0`. You can set a function that returns a number value for this option, for example `(count) => Math.pow(2, count)`.
+  - **`options.fallbackRetry`:** Enable retry fallback. Default is `false`.
+  - **`options.fallbackRetryLimit`:** Fallback retry limit. Default is `3`.
+  - **`options.fallbackRetryInterval`:** Fallback retry interval. It also can be a function.
+  - **`options.polling`:** Enable polling when page visible. Default is `false`.
+  - **`options.pollingInterval`:** Polling internal when page visible, in milliseconds. Default is `30000`.
+  - **`options.pollingInPageHiding`:** Enable polling when page hidden. Default is `false`. This option is not associated with `polling` option.
+  - **`options.pollingIntervalInPageHiding`:** Polling internal when page hidden, in milliseconds. Default is `60000`.
+  - **`options.autoReloadWaitTime`:** Throttle wait time on auto reload, in milliseconds. Default is `10000`.
+  - **`options.autoReloadOnPageShow`:** Enable auto reload on page show. Default is `false`.
+  - **`options.autoReloadOnWindowFocus`:** Enable auto reload on window focus. Default is `false`.
+  - **`options.autoReloadOnNetworkReconnect`:** Enable auto reload on network reconnect. Default is `false`.
+  - **`options.onSuccess`:** Success event.
+  - **`options.onFailure`:** Failure event.
+  - **`options.onFinally`:** Finally event.
+
+Results:
+
+- **`data`:** Resolved data. Initial value is `undefined` when the `initialData` is not specified.
+- **`error`:** Rejected error. Initial value is `null`.
+- **`loading`:** Loading state. Initial value is opposite to the `imperative` option.
+- **`reloading`:** Equal to `loading && data !== undefined`. Provided for convenience.
+- **`initializing`:** Equal to `loading && data === undefined`. Provided for convenience.
+- **`load`:** Load function. Used in the same way as the `callback`.
+- **`force`:** Similar to `load` function, but it ignores the `staleTime` option.
+- **`reload`:** Reload function. When the `force` option is set to `true`, the `staleTime` option will be ignored.
+- **`cancel`:** Cancel everything, including executing request, polling, automatic loading, etc.
+- **`update`:** Update the `data`.

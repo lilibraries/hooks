@@ -1,3 +1,5 @@
+This hook returns a function to reload requests. It shares the context of [`LoadConfig`](./LoadConfig) with [`useLoad`](./useLoad).
+
 ## API
 
 ```ts
@@ -6,3 +8,13 @@ function useReload(
   options?: { force?: boolean }
 ): (params?: { force?: boolean }) => void;
 ```
+
+Params:
+
+- **`key`:** The key set in `useLoad`.
+- **`options`:** Options object.
+  - **`options.force`:** Force relaod, ignore the `staleTime` option set in `useLoad`.
+
+Results:
+
+- A function to reload all of the requests. It alse accpets a `force` option.

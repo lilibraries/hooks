@@ -1,4 +1,13 @@
-Cache data for a certain period of time. And you can synchronize data in different components. The [LoadConfig](./LoadConfig) component can set some default options for this hook.
+import CodeBlock from "@theme/CodeBlock";
+import ExampleBlock from "./components/ExampleBlock";
+import BasicExample from "./examples/UseCacheBasic";
+import CacheSyncExample from "./examples/UseCacheSync";
+import CacheTimeExample from "./examples/UseCacheTime";
+import BasicExampleCode from "!!raw-loader!./examples/UseCacheBasic";
+import CacheSyncExampleCode from "!!raw-loader!./examples/UseCacheSync";
+import CacheTimeExampleCode from "!!raw-loader!./examples/UseCacheTime";
+
+Cache data for a certain period of time. And you can synchronize data in different components. The [`CacheConfig`](./CacheConfig) component can set some default options for this hook.
 
 ## API
 
@@ -9,7 +18,7 @@ function useCache<T>(
     defaultValue?: T;
     cache?: CacheInterface;
     cacheTime?: number;
-    cacheSync?: boolean;
+    cacheSync?: boolean | { set?: boolean; delete?: boolean };
     validate?: (value: any) => boolean;
     onSet?: (value: any) => void;
     onDelete?: (value: any) => void;
@@ -37,13 +46,42 @@ Params:
 - **`options`:** Options object.
   - **`options.defaultValue`:** Default value when the cache value does not exist.
   - **`options.cache`:** Cache instance. Use memory cache by default. You can pass an instance that implements the `CacheInterface`.
-  - **`options.cacheTime`:** Cache time, in milliseconds. Default is 5 minutes. You can set a permanent cache by setting this option greater than or equal to `Number.MAX_SAFE_INTEGER`, like `Infinity`.
-  - **`options.cacheSync`:** Synchronize data when calling the `setCache` method. Default is `false`.
+  - **`options.cacheTime`:** Cache time, in milliseconds. Default is 5 minutes. You can set a permanent cache by setting this option greater than or equal to `Number.MAX_SAFE_INTEGER`, for example `Infinity`.
+  - **`options.cacheSync`:** Synchronize data on set and/or delete data. Default is `false`. It can be an object to synchronize data in different events.
+    - **`options.cacheSync.set`:** Synchronize data on set cache.
+    - **`options.cacheSync.delete`:** Synchronize data on delete cache or when cache time expires.
   - **`options.validate`:** Validate the cache value. If it returns falsy, the `defaultValue` will be used.
-  - **`options.onSet`:** Data set event. The `value` param will not be validated by `validate` function.
-  - **`options.onDelete`:** Data delete event (cache time expired or `setCache(undefined)` is called). The `value` param will not be validated by `validate` function.
+  - **`options.onSet`:** Data set event. The `value` param will not be validated by the `validate` function.
+  - **`options.onDelete`:** Data delete event (cache time expired or `setCache(undefined)` called). The `value` param will not be validated by the `validate` function.
 
 Results:
 
 - **`value`:** Cache value or default value.
-- **`setCache`:** The function to set cache. It the data param is `undefined`, the cache will be deleted.
+- **`setCache`:** The function to set cache. It the `newValue` param is `undefined`, the cache will be deleted.
+
+## Examples
+
+### Basic
+
+You can input some text, jump to other page, and then go back to this page to see the effect.
+
+<ExampleBlock>
+  <BasicExample />
+</ExampleBlock>
+<CodeBlock language="tsx">{BasicExampleCode}</CodeBlock>
+
+### Synchronization
+
+<ExampleBlock>
+  <CacheSyncExample />
+</ExampleBlock>
+<CodeBlock language="tsx">{CacheSyncExampleCode}</CodeBlock>
+
+### Set cache time
+
+The cache data will be deleted after 3 seconds (default is 5 minutes).
+
+<ExampleBlock>
+  <CacheTimeExample />
+</ExampleBlock>
+<CodeBlock language="tsx">{CacheTimeExampleCode}</CodeBlock>
