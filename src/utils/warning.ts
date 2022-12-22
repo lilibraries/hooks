@@ -4,11 +4,10 @@ import mergeWithDefined from "./mergeWithDefined";
 export interface WarningOptions {
   label?: string;
   scope?: string;
-  printer?: (error: Error) => void;
+  printer?: (message: string) => void;
   variables?: { [name: string]: unknown };
   deduplicated?: boolean;
-  warnedMessagesMap?: { [message: string]: boolean };
-  captureStackTraceConstructor?: Function;
+  warnedMessages?: { [message: string]: boolean };
 }
 
 interface WarningFunction {
@@ -30,24 +29,17 @@ if (process.env.NODE_ENV === "production") {
 } else {
   const defaultOptions = {
     label: "Warning",
-    printer: (error: Error) => {
-      console.error(error);
+    printer: (message: string) => {
+      console.error(message);
     },
     deduplicated: false,
-    warnedMessagesMap: {},
+    warnedMessages: {},
   };
 
   warning = ((condition, message, options) => {
     if (condition) {
-      const {
-        label,
-        scope,
-        printer,
-        variables,
-        deduplicated,
-        warnedMessagesMap,
-        captureStackTraceConstructor,
-      } = mergeWithDefined(defaultOptions, options || {});
+      const { label, scope, printer, variables, deduplicated, warnedMessages } =
+        mergeWithDefined(defaultOptions, options || {});
 
       if (isObject(variables)) {
         for (const name in variables) {
@@ -56,33 +48,19 @@ if (process.env.NODE_ENV === "production") {
           }
         }
       }
-
-      class WarningError extends Error {
-        constructor(message?: string) {
-          super(message);
-          this.name = label + (scope ? `(${scope})` : "");
-          if (Error.captureStackTrace) {
-            Error.captureStackTrace(
-              this,
-              captureStackTraceConstructor || warning
-            );
-          }
-        }
-      }
+      message = `${label}${scope ? `(${scope})` : ""}: ${message}`;
 
       const print = () => {
+        printer(message);
         try {
-          throw new WarningError(message);
-        } catch (error: unknown) {
-          printer(error as Error);
-        }
+          throw new Error(message);
+        } catch (e) {}
       };
 
       if (deduplicated) {
-        let id = `${label}${scope ? `(${scope})` : ""}: ${message}`;
-        if (!warnedMessagesMap[id]) {
+        if (!warnedMessages[message]) {
           print();
-          warnedMessagesMap[id] = true;
+          warnedMessages[message] = true;
         }
       } else {
         print();
@@ -94,13 +72,7 @@ if (process.env.NODE_ENV === "production") {
     warning(
       condition,
       message,
-      mergeWithDefined(
-        {
-          deduplicated: true,
-          captureStackTraceConstructor: warning.once,
-        },
-        options || {}
-      )
+      mergeWithDefined({ deduplicated: true }, options || {})
     );
   };
 
@@ -112,7 +84,6 @@ if (process.env.NODE_ENV === "production") {
         {
           label: "Deprecated",
           deduplicated: true,
-          captureStackTraceConstructor: warning.deprecated,
         },
         options || {}
       )
