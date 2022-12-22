@@ -1,3 +1,8 @@
+import CodeBlock from "@theme/CodeBlock";
+import ExampleBlock from "./components/ExampleBlock";
+import Example from "./examples/UseReload";
+import ExampleCode from "!!raw-loader!./examples/UseReload";
+
 This hook returns a function to reload requests. It shares the context of [`LoadConfig`](./LoadConfig) with [`useLoad`](./useLoad).
 
 ## API
@@ -13,8 +18,15 @@ Params:
 
 - **`key`:** The key set in `useLoad`.
 - **`options`:** Options object.
-  - **`options.force`:** Force relaod, ignore the `staleTime` option set in `useLoad`.
+  - **`options.force`:** Force reload, ignore the `staleTime` option set in `useLoad`.
 
 Results:
 
-- A function to reload all of the requests. It alse accpets a `force` option.
+- A function to reload all of the requests. It also accpets a `force` option.
+
+## Example
+
+<ExampleBlock>
+  <Example />
+</ExampleBlock>
+<CodeBlock language="tsx">{ExampleCode}</CodeBlock>

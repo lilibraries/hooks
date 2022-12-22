@@ -1,3 +1,36 @@
+import CodeBlock from "@theme/CodeBlock";
+import ExampleBlock from "./components/ExampleBlock";
+import BasicExample from "./examples/UseLoadBasic";
+import DependencyExample from "./examples/UseLoadDependency";
+import LoadKeyExample from "./examples/UseLoadKey";
+import ImperativeExample from "./examples/UseLoadImperative";
+import IndependentExample from "./examples/UseLoadIndependent";
+import ParamsExample from "./examples/UseLoadParams";
+import FallbackExample from "./examples/UseLoadFallback";
+import CachingExample from "./examples/UseLoadCaching";
+import StaleExample from "./examples/UseLoadStale";
+import RetriesExample from "./examples/UseLoadRetries";
+import PollingExample from "./examples/UseLoadPolling";
+import AutoReloadExample from "./examples/UseLoadAutoReload";
+import EventsExample from "./examples/UseLoadEvents";
+import PrefetchExample from "./examples/UseLoadPrefetch";
+import InfiniteListExample from "./examples/UseLoadInfiniteList";
+import BasicExampleCode from "!!raw-loader!./examples/UseLoadBasic";
+import DependencyExampleCode from "!!raw-loader!./examples/UseLoadDependency";
+import LoadKeyExampleCode from "!!raw-loader!./examples/UseLoadKey";
+import ImperativeExampleCode from "!!raw-loader!./examples/UseLoadImperative";
+import IndependentExampleCode from "!!raw-loader!./examples/UseLoadIndependent";
+import ParamsExampleCode from "!!raw-loader!./examples/UseLoadParams";
+import FallbackExampleCode from "!!raw-loader!./examples/UseLoadFallback";
+import CachingExampleCode from "!!raw-loader!./examples/UseLoadCaching";
+import StaleExampleCode from "!!raw-loader!./examples/UseLoadStale";
+import RetriesExampleCode from "!!raw-loader!./examples/UseLoadRetries";
+import PollingExampleCode from "!!raw-loader!./examples/UseLoadPolling";
+import AutoReloadExampleCode from "!!raw-loader!./examples/UseLoadAutoReload";
+import EventsExampleCode from "!!raw-loader!./examples/UseLoadEvents";
+import PrefetchExampleCode from "!!raw-loader!./examples/UseLoadPrefetch";
+import InfiniteListExampleCode from "!!raw-loader!./examples/UseLoadInfiniteList";
+
 Load async data. Usually used for network requests. It accepts a `callback` function as the first parameter, and the `callback` function must return a promise object. You can use [`LoadConfig`](./LoadConfig) component to set some default options for this hook.
 
 ## API
@@ -76,15 +109,15 @@ Params:
 - **`options`:** Options object.
   - **`options.key`:** An identifier that can be any data type except `null` and `undefined`. By default, if multiple requests for the same key appear on the page, only first one request will be sent, and other requests will get data by listening to internal events. You can prevent the default behavior by setting the `independent` option to `true`. Another function of the `key` option is that it can be used with [`useReload`](./useReload) hook.
   - **`options.idle`:** Run callback during the browser's idle periods. You can set an object contains a `timeout` property to limit the max waiting time.
-  - **`options.imperative`:** Run callback manually through the returned `load` or `force` function, rather than automatically after the component is mounted.
+  - **`options.imperative`:** Run callback manually by calling the `load` or `force` function, rather than automatically after the component is mounted.
   - **`options.independent`:** Set this option to `ture`, event if the `key` are the same, request callbacks in the page are independent and all of them will be executed.
   - **`options.fallback`:** When the `callback` function reject an error and the count of retries has been exhausted, the `fallback` function will be called.
   - **`options.initialData`:** Initial data. Used when no cache or request is loading.
   - **`options.defaultParams`:** The default parameter array set for `callback` and `fallback`.
-  - **`options.cacheKey`:** Cache key. It can be any type except `null` and `undefined`.
+  - **`options.cacheKey`:** Cache key to enable caching. It can be any type except `null` and `undefined`. This hook uses the same cache instance as the [`useCache`](./useCache), so you can use `useCache` hook to get data cached by this hook, or set cache data for this hook.
   - **`options.cacheTime`:** Cache time, in milliseconds. Default is 5 minutes. You can set a permanent cache by setting this option greater than or equal to `Number.MAX_SAFE_INTEGER`, for example `Infinity`.
   - **`options.cacheValidate`:** Validate the cache value. If it returns falsy, the `initialData` will be used.
-  - **`options.staleTime`:** Stale time, in milliseconds. Default is `0`. In the `staleTime`period, the data is considered fresh. Calling the`load(...params)`and`reload()`methods or auto reloading has no effect. You can ignore the`staleTime`option by calling the`force(...params)`or`reload({ force: true })` methods.
+  - **`options.staleTime`:** Stale time, in milliseconds. Default is `0`. In the `staleTime` period, the data is considered fresh. Calling the `load(...params)` and `reload()` methods or auto reloading has no effect. You can ignore the `staleTime` option by calling the `force(...params)` or `reload({ force: true })` methods.
   - **`options.retry`:** Enable retry callback. Default is `false`.
   - **`options.retryLimit`:** Callback retry limit. Default is `3`.
   - **`options.retryInterval`:** Callback retry interval. Default is `0`. You can set a function that returns a number value for this option, for example `(count) => Math.pow(2, count)`.
@@ -115,3 +148,110 @@ Results:
 - **`reload`:** Reload function. When the `force` option is set to `true`, the `staleTime` option will be ignored.
 - **`cancel`:** Cancel everything, including executing request, polling, automatic loading, etc.
 - **`update`:** Update the `data`.
+
+## Examples
+
+### Basic
+
+<ExampleBlock>
+  <BasicExample />
+</ExampleBlock>
+<CodeBlock language="tsx">{BasicExampleCode}</CodeBlock>
+
+### Dependency list
+
+<ExampleBlock>
+  <DependencyExample />
+</ExampleBlock>
+<CodeBlock language="tsx">{DependencyExampleCode}</CodeBlock>
+
+### Imperative (Manual)
+
+<ExampleBlock>
+  <ImperativeExample />
+</ExampleBlock>
+<CodeBlock language="tsx">{ImperativeExampleCode}</CodeBlock>
+
+### Load key
+
+<ExampleBlock>
+  <LoadKeyExample />
+</ExampleBlock>
+<CodeBlock language="tsx">{LoadKeyExampleCode}</CodeBlock>
+
+### Independent
+
+<ExampleBlock>
+  <IndependentExample />
+</ExampleBlock>
+<CodeBlock language="tsx">{IndependentExampleCode}</CodeBlock>
+
+### Load params
+
+<ExampleBlock>
+  <ParamsExample />
+</ExampleBlock>
+<CodeBlock language="tsx">{ParamsExampleCode}</CodeBlock>
+
+### Fallback
+
+<ExampleBlock>
+  <FallbackExample />
+</ExampleBlock>
+<CodeBlock language="tsx">{FallbackExampleCode}</CodeBlock>
+
+### Caching
+
+<ExampleBlock>
+  <CachingExample />
+</ExampleBlock>
+<CodeBlock language="tsx">{CachingExampleCode}</CodeBlock>
+
+### Stale time
+
+<ExampleBlock>
+  <StaleExample />
+</ExampleBlock>
+<CodeBlock language="tsx">{StaleExampleCode}</CodeBlock>
+
+### Retries
+
+<ExampleBlock>
+  <RetriesExample />
+</ExampleBlock>
+<CodeBlock language="tsx">{RetriesExampleCode}</CodeBlock>
+
+### Polling
+
+<ExampleBlock>
+  <PollingExample />
+</ExampleBlock>
+<CodeBlock language="tsx">{PollingExampleCode}</CodeBlock>
+
+### Auto reload
+
+<ExampleBlock>
+  <AutoReloadExample />
+</ExampleBlock>
+<CodeBlock language="tsx">{AutoReloadExampleCode}</CodeBlock>
+
+### Events
+
+<ExampleBlock>
+  <EventsExample />
+</ExampleBlock>
+<CodeBlock language="tsx">{EventsExampleCode}</CodeBlock>
+
+### Prefetch
+
+<ExampleBlock>
+  <PrefetchExample />
+</ExampleBlock>
+<CodeBlock language="tsx">{PrefetchExampleCode}</CodeBlock>
+
+### Infinite list
+
+<ExampleBlock>
+  <InfiniteListExample />
+</ExampleBlock>
+<CodeBlock language="tsx">{InfiniteListExampleCode}</CodeBlock>

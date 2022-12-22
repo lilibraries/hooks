@@ -1,0 +1,64 @@
+Config component for [`useLoad`](./useLoad), [`useReload`](./useReload) and [`useSubmit`](./useSubmit).
+
+## API
+
+```tsx
+import React from "react";
+import { LoadConfig } from "@lilib/hooks";
+import App from "./App";
+
+function Root() {
+  return (
+    <LoadConfig {...}>
+      <App />
+    </LoadConfig>
+  );
+}
+```
+
+### Props
+
+| Property                         | Type                                    | Description                             | Default  |
+| -------------------------------- | --------------------------------------- | --------------------------------------- | -------- |
+| **global**                       | `boolean`                               | Use global instance                     | `false`  |
+| **inherit**                      | `boolean`                               | Inherit parent config                   | `false`  |
+| **cacheTime**                    | `number`                                | Cache time                              | `300000` |
+| **staleTime**                    | `number`                                | Stale time                              | `0`      |
+| **retry**                        | `boolean`                               | Enable retry                            | `false`  |
+| **retryLimit**                   | `number`                                | Callback retry limit                    | `3`      |
+| **retryInterval**                | `number` \| `(count: number) => number` | Callback retry interval                 | `0`      |
+| **fallbackRetry**                | `boolean`                               | Enable retry fallback                   | `false`  |
+| **fallbackRetryLimit**           | `number`                                | Fallback retry limit                    | `3`      |
+| **fallbackRetryInterval**        | `number` \| `(count: number) => number` | Fallback retry interval                 | `0`      |
+| **polling**                      | `boolean`                               | Enable polling when page visible        | `false`  |
+| **pollingInterval**              | `number`                                | Polling internal when page visible      | `30000`  |
+| **pollingInPageHiding**          | `boolean`                               | Enable polling when page hidden         | `false`  |
+| **pollingIntervalInPageHiding**  | `number`                                | Polling internal when page hidden       | `60000`  |
+| **autoReloadWaitTime**           | `number`                                | Throttle wait time on auto reload       | `10000`  |
+| **autoReloadOnPageShow**         | `boolean`                               | Enable auto reload on page show         | `false`  |
+| **autoReloadOnWindowFocus**      | `boolean`                               | Enable auto reload on window focus      | `false`  |
+| **autoReloadOnNetworkReconnect** | `boolean`                               | Enable auto reload on network reconnect | `false`  |
+| **onSuccess**                    | `(data: any, key?: {}) => void`         | Default success event                   | -        |
+| **onFailure**                    | `(error: any, key?: {}) => void`        | Default failure event                   | -        |
+| **onFinally**                    | `(key?: {}) => void`                    | Default finally event                   | -        |
+| **handleSuccess**                | `(data: any, key?: {}) => void`         | Handle success event                    | -        |
+| **handleFailure**                | `(error: any, key?: {}) => void`        | Handle failure event                    | -        |
+| **handleFinally**                | `(key?: {}) => void`                    | Handle finally event                    | -        |
+
+### LoadConfig.Context
+
+A React context object that can be used in class component.
+
+### LoadConfig.useConfig
+
+A hook returns a config object.
+
+```ts
+import React from "react";
+import { LoadConfig } from "@lilib/hooks";
+
+function Example() {
+  const config = LoadConfig.useConfig();
+  ...
+}
+```

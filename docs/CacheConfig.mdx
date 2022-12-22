@@ -1,1 +1,64 @@
+Config component for [`useCache`](./useCache). The [`useLoad`](./useLoad) hook use the cache instance configured by `CacheConfig`.
+
 ## API
+
+```tsx
+import React from "react";
+import { CacheConfig } from "@lilib/hooks";
+import App from "./App";
+
+function Root() {
+  return (
+    <CacheConfig {...}>
+      <App />
+    </CacheConfig>
+  );
+}
+```
+
+### Props
+
+| Property      | Type                                               | Description                                    | Default     |
+| ------------- | -------------------------------------------------- | ---------------------------------------------- | ----------- |
+| **global**    | `boolean`                                          | Use global instance                            | `false`     |
+| **inherit**   | `boolean`                                          | Inherit parent config                          | `false`     |
+| **cache**     | [CacheInterface](#cacheinterface)                  | A cache instance implements the CacheInterface | MemoryCache |
+| **cacheTime** | `number`                                           | Default cache time                             | `300000`    |
+| **cacheSync** | `boolean` \| `{ set?: boolean; delete?: boolean }` | Sync cache data                                | `false`     |
+| **fallback**  | `ReactNode`                                        | Fallback ui when cache is not ready            | -           |
+
+### CacheInterface
+
+```ts
+interface CacheInterface {
+  has(key: any): boolean;
+  get(key: any): any;
+  set(key: any, data: any, options?: { cacheTime?: number }): any;
+  delete(key: any): any;
+  isReady(): boolean;
+  once(name: "ready", listener: () => void): any;
+  off(name: "ready", listener: () => void): any;
+  for(key: any): {
+    on(name: "set" | "delete", listener: (data: any) => void): any;
+    off(name: "set" | "delete", listener: (data: any) => void): any;
+  };
+}
+```
+
+### CacheConfig.Context
+
+A React context object that can be used in class component.
+
+### CacheConfig.useConfig
+
+A hook returns a config object.
+
+```ts
+import React from "react";
+import { CacheConfig } from "@lilib/hooks";
+
+function Example() {
+  const config = CacheConfig.useConfig();
+  ...
+}
+```

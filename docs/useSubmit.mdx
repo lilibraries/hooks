@@ -1,3 +1,8 @@
+import CodeBlock from "@theme/CodeBlock";
+import ExampleBlock from "./components/ExampleBlock";
+import Example from "./examples/UseSubmit";
+import ExampleCode from "!!raw-loader!./examples/UseSubmit";
+
 This hook is based on [`useLoad`](./useLoad). It reduces many functions for convenience, and it only supports a few options. Specially, it will never execute automatically. This hook is usually used for network requests such as creating, updating and deleting, but not reading. The [`LoadConfig`](./LoadConfig) component can only set some of the options listed below for this hook.
 
 ## API
@@ -27,11 +32,8 @@ function useSubmit<Callback extends LoadCallback>(
     onFinally?: () => void;
   }
 ): {
-  data: LoadData<Callback> | undefined;
-  error: any;
   submitting: boolean;
   submit: (...params: Parameters<Callback>) => ReturnType<Callback>;
-  reset: () => void;
 };
 ```
 
@@ -53,8 +55,12 @@ Params:
 
 Results:
 
-- **`data`:** Resolved data. Initial value is `undefined`.
-- **`error`:** Rejected error. Initial value is `null`.
 - **`submitting`:** Submitting state. Initial value is `false`.
 - **`submit`:** Submit function. Used in the same way as the `callback`.
-- **`reset`:** Reset `data` to `undefined` and `error` to `null`.
+
+## Example
+
+<ExampleBlock>
+  <Example />
+</ExampleBlock>
+<CodeBlock language="tsx">{ExampleCode}</CodeBlock>
