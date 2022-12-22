@@ -2,6 +2,7 @@ import { useDebugValue, useEffect } from "react";
 import useUpdate from "./useUpdate";
 import usePersist from "./usePersist";
 import useSafeState from "./useSafeState";
+import warning from "./utils/warning";
 import { CacheInterface, useCacheConfig } from "./configs/CacheConfig";
 
 export interface CacheHookOptions<T> {
@@ -106,6 +107,16 @@ function useCache<T>(key: {}, options: CacheHookOptions<T> = {}) {
   useUpdate(() => {
     setValue(getCachedData());
   }, [key, cache]);
+
+  useUpdate(() => {
+    if (process.env.NODE_ENV !== "production") {
+      warning(
+        true,
+        "You should provide an immutable value for the `key` option.",
+        { scope: "useCache" }
+      );
+    }
+  }, [key]);
 
   useDebugValue(value);
 
