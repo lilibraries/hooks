@@ -51,7 +51,6 @@ interface Results<Callback extends LoadCallback> {
       | ((prevData?: LoadData<Callback>) => LoadData<Callback>)
   ) => void;
   cancel: () => void;
-  _reset_for_submit_you_should_not_use_: () => void;
 }
 
 interface State<Data> {
@@ -150,7 +149,6 @@ function useLoad<Callback extends LoadCallback>(
   const clearPending = usePersist(() => {
     idRef.current++;
     readyRef.current = false;
-    forceRef.current = false;
 
     clearTimeout(retryTimerRef.current);
     clearTimeout(pollingTimerRef.current);
@@ -481,12 +479,9 @@ function useLoad<Callback extends LoadCallback>(
     }
   );
 
-  const reset = usePersist(() => {
-    setState({ data: undefined, error: null });
-  });
-
   const cancel = usePersist(() => {
     clearPending();
+    forceRef.current = false;
     if (!unmountedRef.current && state.loading) {
       setState({ loading: false });
     }
@@ -609,7 +604,6 @@ function useLoad<Callback extends LoadCallback>(
     ...state,
     reloading: state.loading && state.data !== undefined,
     initializing: state.loading && state.data === undefined,
-    _reset_for_submit_you_should_not_use_: reset,
   } as const;
 }
 

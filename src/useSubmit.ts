@@ -33,18 +33,12 @@ function useSubmit<Callback extends LoadCallback>(
   callback: Callback,
   options?: SubmitHookOptions<Callback, LoadData<Callback>>
 ) {
-  const {
-    data,
-    error,
-    force: submit,
-    loading: submitting,
-    _reset_for_submit_you_should_not_use_: reset,
-  } = useLoad(callback, [], {
+  const { force: submit, loading: submitting } = useLoad(callback, [], {
     ...options,
     ...defaultOptions,
   });
 
-  return { data, error, submitting, submit, reset } as const;
+  return { submit, submitting } as const;
 }
 
 export default useSubmit;

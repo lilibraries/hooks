@@ -51,6 +51,7 @@ export { default as useLatestRef } from "./useLatestRef";
 export { default as useLayoutMount } from "./useLayoutMount";
 export { default as useLayoutTargetEffect } from "./useLayoutTargetEffect";
 export { default as useLayoutUpdate } from "./useLayoutUpdate";
+export { default as useLoad } from "./useLoad";
 export { default as useLocalStorage } from "./useLocalStorage";
 export { default as useMatchMedia } from "./useMatchMedia";
 export { default as useMemoizedValue } from "./useMemoizedValue";

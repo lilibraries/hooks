@@ -8,7 +8,12 @@ describe("@lilib/hooks", () => {
     .map((name) => path.basename(name, path.extname(name)))
     .filter((name) => name.startsWith("use"));
 
-  names.forEach((name) => {
+  const configs = fs
+    .readdirSync(path.resolve(__dirname, "../src/configs"))
+    .map((name) => path.basename(name, path.extname(name)))
+    .filter((name) => name.endsWith("Config"));
+
+  [...names, ...configs].forEach((name) => {
     it(`should export ${name}`, () => {
       expect(typeof hooks[name as keyof typeof hooks]).toBe("function");
     });
