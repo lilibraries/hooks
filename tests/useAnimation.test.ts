@@ -201,9 +201,9 @@ describe("useAnimation", () => {
   it("should warn when put a non-positive number as the duration", () => {
     const { useAnimation } = require("@lilib/hooks");
 
-    let errors: Error[] = [];
-    const warn = jest.fn().mockImplementation((error: Error) => {
-      errors.push(error);
+    let messages: string[] = [];
+    const warn = jest.fn().mockImplementation((message: string) => {
+      messages.push(message);
     });
     jest.spyOn(console, "error").mockImplementation(warn);
 
@@ -212,10 +212,9 @@ describe("useAnimation", () => {
     renderHook(() => useAnimation(() => {}, -1));
     renderHook(() => useAnimation(() => {}, NaN));
 
-    errors.forEach((error) => {
-      expect(error.name).toBe("Warning(useAnimation)");
-      expect(error.message).toBe(
-        "You should provide a positive number as the duration."
+    messages.forEach((message) => {
+      expect(message).toBe(
+        "Warning(useAnimation): You should provide a positive number as the duration."
       );
     });
 

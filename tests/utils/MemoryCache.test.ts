@@ -263,9 +263,9 @@ describe("utils/MemoryCache", () => {
     const cache = new MemoryCache();
     cache.setMaxListeners(10);
 
-    let error: Error = new Error();
-    const warn = jest.fn().mockImplementation((e: Error) => {
-      error = e;
+    let message: string = "";
+    const warn = jest.fn().mockImplementation((m: string) => {
+      message = m;
     });
     jest.spyOn(console, "error").mockImplementation(warn);
 
@@ -277,9 +277,8 @@ describe("utils/MemoryCache", () => {
     expect(warn).toBeCalledTimes(0);
     cache.for(key).on("set", () => {});
     expect(warn).toBeCalledTimes(1);
-    expect(error.name).toBe("Warning(MemoryCache)");
-    expect(error.message).toBe(
-      "Listened to more than 10 `set` events for `Symbol(key)`, which may lead to memory leaks."
+    expect(message).toBe(
+      "Warning(MemoryCache): Listened to more than 10 `set` events for `Symbol(key)`, which may lead to memory leaks."
     );
     warn.mockReset();
   });
