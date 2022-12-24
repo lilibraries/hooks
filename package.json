@@ -46,7 +46,7 @@
     "dist:umd": "cross-env NODE_ENV=development rollup --config && cross-env NODE_ENV=production rollup --config",
     "dist:types": "tsc -p ./tsconfig.build.json",
     "gh-pages": "npm run build && gh-pages -d build",
-    "release": "npm run lint && npm run test:all && npm run dist && npm run build && standard-version -n -i docs/CHANGELOG.md && npm publish"
+    "release": "npm run lint && npm run test:all && npm run dist && standard-version -n -i docs/CHANGELOG.md && npm publish"
   },
   "peerDependencies": {
     "react": "^16.8.0 || ^17.0.0 || ^18.0.0",
