@@ -45,7 +45,11 @@ describe("useReload", () => {
     );
     const { result, rerender } = renderHook(
       ({ force }) => {
-        useLoad(callback, [], { key: "force-reload-key", staleTime: 1000 });
+        useLoad(callback, [], {
+          key: "force-reload-key",
+          cacheKey: "cache-key",
+          staleTime: 1000,
+        });
         return useReload("force-reload-key", { force });
       },
       { initialProps: { force: false } }
