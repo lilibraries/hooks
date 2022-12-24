@@ -1,6 +1,6 @@
 import { useDebugValue, useState } from "react";
+import { inBrowser } from "@lilib/utils";
 import useEventListener from "./useEventListener";
-import inBrowser from "./utils/inBrowser";
 
 function useWindowSize() {
   const [{ width, height }, setState] = useState(() => {

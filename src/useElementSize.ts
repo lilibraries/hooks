@@ -1,10 +1,9 @@
 import { useDebugValue } from "react";
 import ResizeObserver from "resize-observer-polyfill";
+import { EffectTarget, getEffectTarget } from "@lilib/utils";
 import usePersist from "./usePersist";
 import useSafeState from "./useSafeState";
 import useLayoutTargetEffect from "./useLayoutTargetEffect";
-import getEffectTarget from "./utils/getEffectTarget";
-import { EffectTarget } from "./utils/types";
 
 function useElementSize(target: EffectTarget<Element>) {
   const [{ width, height }, setSize] = useSafeState(() => {

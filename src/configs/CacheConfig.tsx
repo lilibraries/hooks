@@ -9,8 +9,7 @@ import React, {
 } from "react";
 import omit from "lodash/omit";
 import { useSyncExternalStore } from "use-sync-external-store/shim";
-import MemoryCache from "../utils/MemoryCache";
-import mergeWithDefined from "../utils/mergeWithDefined";
+import { MemoryCache, mergeWithDefined } from "@lilib/utils";
 
 export interface CacheInterface {
   has(key: any): boolean;

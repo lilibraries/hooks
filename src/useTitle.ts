@@ -1,7 +1,7 @@
 import { useRef } from "react";
+import { inBrowser } from "@lilib/utils";
 import useUnmount from "./useUnmount";
 import usePreviousRef from "./usePreviousRef";
-import inBrowser from "./utils/inBrowser";
 
 export interface TitleHookOptions {
   restore?: boolean;

@@ -1,8 +1,7 @@
 import { useMemo } from "react";
+import { inBrowser, getUrlExtname } from "@lilib/utils";
 import useUnmount from "./useUnmount";
 import usePreviousRef from "./usePreviousRef";
-import inBrowser from "./utils/inBrowser";
-import getUrlExtname from "./utils/getUrlExtname";
 
 export interface FaviconHookOptions {
   mime?: string;

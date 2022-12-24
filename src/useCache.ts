@@ -1,8 +1,8 @@
 import { useDebugValue, useEffect } from "react";
+import { warning } from "@lilib/utils";
 import useUpdate from "./useUpdate";
 import usePersist from "./usePersist";
 import useSafeState from "./useSafeState";
-import warning from "./utils/warning";
 import { CacheInterface, useCacheConfig } from "./configs/CacheConfig";
 
 export interface CacheHookOptions<T> {

@@ -2,6 +2,12 @@ import "requestidlecallback";
 import { DependencyList, useDebugValue, useEffect, useRef } from "react";
 import isObject from "lodash/isObject";
 import isFunction from "lodash/isFunction";
+import {
+  warning,
+  isPageVisible,
+  PromiseResolve,
+  mergeWithDefined,
+} from "@lilib/utils";
 import useUpdate from "./useUpdate";
 import usePersist from "./usePersist";
 import useUnmount from "./useUnmount";
@@ -10,10 +16,6 @@ import useThrottle from "./useThrottle";
 import useLatestRef from "./useLatestRef";
 import useMountedRef from "./useMountedRef";
 import useUnmountedRef from "./useUnmountedRef";
-import warning from "./utils/warning";
-import isPageVisible from "./utils/isPageVisible";
-import mergeWithDefined from "./utils/mergeWithDefined";
-import { PromiseResolve } from "./utils/types";
 import { useCacheConfig } from "./configs/CacheConfig";
 import { useLoadConfig, LoadSharedOptions } from "./configs/LoadConfig";
 

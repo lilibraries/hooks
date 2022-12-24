@@ -1,9 +1,7 @@
 import isObject from "lodash/isObject";
+import { EffectTarget, isEventTarget, getEffectTarget } from "@lilib/utils";
 import usePersist from "./usePersist";
 import useTargetEffect from "./useTargetEffect";
-import isEventTarget from "./utils/isEventTarget";
-import getEffectTarget from "./utils/getEffectTarget";
-import { EffectTarget } from "./utils/types";
 
 function useEventListener<
   T extends EventTarget = EventTarget,

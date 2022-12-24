@@ -7,8 +7,7 @@ import React, {
   useDebugValue,
 } from "react";
 import omit from "lodash/omit";
-import EventEmitter from "../utils/EventEmitter";
-import mergeWithDefined from "../utils/mergeWithDefined";
+import { EventEmitter, mergeWithDefined } from "@lilib/utils";
 
 class LoadStore extends EventEmitter {
   _loadings = new Map<any, Function>();

@@ -1,7 +1,7 @@
 import { useDebugValue } from "react";
+import { inBrowser } from "@lilib/utils";
 import useSafeState from "./useSafeState";
 import useEventListener from "./useEventListener";
-import inBrowser from "./utils/inBrowser";
 
 function useOnline() {
   const [online, setOnline] = useSafeState(() => {

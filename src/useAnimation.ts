@@ -1,10 +1,10 @@
 import { useCallback, useRef } from "react";
 import raf from "raf";
 import isNumber from "lodash/isNumber";
+import { warning } from "@lilib/utils";
 import useUnmount from "./useUnmount";
 import usePersist from "./usePersist";
 import useLatestRef from "./useLatestRef";
-import warning from "./utils/warning";
 
 export interface AnimationHookOptions {
   duration: number;

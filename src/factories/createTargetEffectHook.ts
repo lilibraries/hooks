@@ -1,8 +1,11 @@
 import { DependencyList, EffectCallback, useEffect, useRef } from "react";
+import {
+  Nullable,
+  EffectTarget,
+  areArraysEqual,
+  getEffectTarget,
+} from "@lilib/utils";
 import useUnmount from "../useUnmount";
-import areArraysEqual from "../utils/areArraysEqual";
-import getEffectTarget from "../utils/getEffectTarget";
-import { Nullable, EffectTarget } from "../utils/types";
 
 function createTargetEffectHook(useHook: typeof useEffect) {
   return function (

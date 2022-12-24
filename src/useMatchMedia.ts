@@ -1,7 +1,7 @@
 import { useDebugValue, useMemo, useState } from "react";
+import { inBrowser } from "@lilib/utils";
 import useUpdate from "./useUpdate";
 import useEventListener from "./useEventListener";
-import inBrowser from "./utils/inBrowser";
 
 function useMatchMedia(query: string, defaultValue?: boolean) {
   const media = useMemo(() => {

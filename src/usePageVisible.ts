@@ -1,6 +1,6 @@
 import { useDebugValue, useState } from "react";
+import { isPageVisible } from "@lilib/utils";
 import useEventListener from "./useEventListener";
-import isPageVisible from "./utils/isPageVisible";
 
 function usePageVisible() {
   const [visible, setVisible] = useState(isPageVisible);

@@ -54,6 +54,7 @@
   },
   "dependencies": {
     "@babel/runtime-corejs3": "^7.18.3",
+    "@lilib/utils": "^1.0.0",
     "@types/js-cookie": "^3.0.2",
     "@types/lodash": "^4.14.190",
     "@types/raf": "^3.4.0",

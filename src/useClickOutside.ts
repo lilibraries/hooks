@@ -1,7 +1,6 @@
+import { EffectTarget, getEffectTarget } from "@lilib/utils";
 import useLatestRef from "./useLatestRef";
 import useTargetEffect from "./useTargetEffect";
-import getEffectTarget from "./utils/getEffectTarget";
-import { EffectTarget } from "./utils/types";
 
 export interface ClickOutsideHookOptions {
   container?: EffectTarget<Element>;
