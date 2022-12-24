@@ -4,10 +4,9 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### [0.3.1](https://github.com/lilibraries/hooks/compare/v0.3.0...v0.3.1) (2022-12-24)
 
-
 ### Bug Fixes
 
-* **useLoad:** `staleTime` option must be used together with `cacheKey` option ([27ff50c](https://github.com/lilibraries/hooks/commit/27ff50c90d8204a33a916e705862b3c554ca76ff))
+- `useLoad`: `staleTime` option must be used together with `cacheKey` option ([27ff50c](https://github.com/lilibraries/hooks/commit/27ff50c90d8204a33a916e705862b3c554ca76ff))
 
 ## [0.3.0](https://github.com/lilibraries/hooks/compare/v0.2.1...v0.3.0) (2022-12-22)
 
