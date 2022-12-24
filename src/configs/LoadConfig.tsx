@@ -12,7 +12,6 @@ import { EventEmitter, mergeWithDefined } from "@lilib/utils";
 class LoadStore extends EventEmitter {
   _loadings = new Map<any, Function>();
   _reloaders = new Map<any, Function[]>();
-  _timestamps = new Map<Function, number>();
 
   isLoading(key: any, loader?: Function) {
     if (loader) {
@@ -63,20 +62,6 @@ class LoadStore extends EventEmitter {
       }
     }
   }
-
-  getTimestamp(loader: Function) {
-    return this._timestamps.get(loader);
-  }
-
-  setTimestamp(loader: Function) {
-    this._timestamps.set(loader, Date.now());
-  }
-
-  deleteTimestamp(loader: Function) {
-    if (this._timestamps.has(loader)) {
-      this._timestamps.delete(loader);
-    }
-  }
 }
 
 export interface LoadStoreInterface {
@@ -86,9 +71,6 @@ export interface LoadStoreInterface {
   getReloaders(key: any): Function[];
   addReloader(key: any, reloader: Function): any;
   removeReloader(key: any, reloader: Function): any;
-  getTimestamp(loader: Function): number | undefined;
-  setTimestamp(loader: Function): any;
-  deleteTimestamp(loader: Function): any;
   for(key: any): {
     on(name: "cancel", listener: () => void): any;
     on(name: "success", listener: (data: any) => void): any;

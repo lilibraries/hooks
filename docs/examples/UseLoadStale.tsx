@@ -12,6 +12,7 @@ const getNumber = () => {
 function Example() {
   const { data, loading, load, force } = useLoad(getNumber, [], {
     imperative: true,
+    cacheKey: "load-stale-time",
     staleTime: 5000,
   });
 

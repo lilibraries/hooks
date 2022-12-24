@@ -91,8 +91,8 @@ function useLoad<Callback extends LoadCallback>(
     defaultParams,
     cacheKey,
     cacheTime,
-    cacheValidate,
     staleTime,
+    cacheValidate,
     retry,
     retryLimit,
     retryInterval,
@@ -124,7 +124,7 @@ function useLoad<Callback extends LoadCallback>(
   });
 
   const [state, setState] = useSetState<State<LoadData<Callback>>>(() => ({
-    data: cacheKey != null ? getCachedData() : initialData,
+    data: getCachedData(),
     error: null,
     loading: !imperative,
   }));
@@ -212,7 +212,6 @@ function useLoad<Callback extends LoadCallback>(
 
     let force = forceRef.current;
     if (force) {
-      store.deleteTimestamp(load);
       forceRef.current = false;
     }
 
@@ -230,16 +229,26 @@ function useLoad<Callback extends LoadCallback>(
     if (
       !force &&
       staleTime > 0 &&
-      state.error == null &&
-      state.data !== undefined
+      cacheKey != null &&
+      cache.has(cacheKey) &&
+      state.error == null
     ) {
-      const timestamp = store.getTimestamp(load);
-      if (timestamp && Date.now() - timestamp <= staleTime) {
-        if (state.loading) {
+      let cachedData;
+      const timestamp = cache.getCacheTimestamp(cacheKey);
+      if (
+        timestamp &&
+        Date.now() - timestamp <= staleTime &&
+        (state.data !== undefined ||
+          (cachedData = getCachedData()) !== undefined)
+      ) {
+        const data = state.data !== undefined ? state.data : cachedData;
+        if (state.data === undefined) {
+          setState({ data: cachedData, loading: false });
+        } else if (state.loading) {
           setState({ loading: false });
         }
         return new Promise((resolve) => {
-          resolve(state.data);
+          resolve(data);
         }) as ReturnType<Callback>;
       }
     }
@@ -254,7 +263,7 @@ function useLoad<Callback extends LoadCallback>(
       state.data === undefined &&
       cacheKey != null &&
       cache.has(cacheKey) &&
-      (cachedData = getCachedData())
+      (cachedData = getCachedData()) !== undefined
     ) {
       setState({ data: cachedData, loading: true });
     } else if (!state.loading) {
@@ -410,9 +419,6 @@ function useLoad<Callback extends LoadCallback>(
         if (isCanceled()) {
           return new Promise(() => {});
         }
-        if (staleTime > 0) {
-          store.setTimestamp(load);
-        }
         if (cacheKey != null) {
           cache.set(cacheKey, data, { cacheTime });
         }
@@ -540,9 +546,6 @@ function useLoad<Callback extends LoadCallback>(
     if (isAssociated) {
       const handleSuccess = (data: LoadData<Callback>) => {
         if (!loadingRef.current || loadingRef.current.load !== load) {
-          if (staleTime > 0) {
-            store.setTimestamp(load);
-          }
           setState({ data, error: null, loading: false });
         }
       };
@@ -568,12 +571,6 @@ function useLoad<Callback extends LoadCallback>(
       };
     }
   }, [key, store, reload]);
-
-  useEffect(() => {
-    return () => {
-      store.deleteTimestamp(load);
-    };
-  }, [store, load]);
 
   useEffect(
     () => {

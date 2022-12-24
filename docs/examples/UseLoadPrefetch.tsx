@@ -22,6 +22,7 @@ function Example() {
   const { data, loading, load } = useLoad(getNumber, [], {
     imperative: true,
     cacheKey: "load-prefetch",
+    staleTime: Infinity,
   });
 
   return (

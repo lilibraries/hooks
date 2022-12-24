@@ -14,6 +14,7 @@ import { MemoryCache, mergeWithDefined } from "@lilib/utils";
 export interface CacheInterface {
   has(key: any): boolean;
   get(key: any): any;
+  getCacheTimestamp(key: any): number | undefined;
   set(key: any, data: any, options?: { cacheTime?: number }): any;
   delete(key: any): any;
   isReady(): boolean;

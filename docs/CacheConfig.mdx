@@ -18,14 +18,14 @@ function Root() {
 
 ### Props
 
-| Property      | Type                                               | Description                                    | Default     |
-| ------------- | -------------------------------------------------- | ---------------------------------------------- | ----------- |
-| **global**    | `boolean`                                          | Use global instance                            | `false`     |
-| **inherit**   | `boolean`                                          | Inherit parent config                          | `false`     |
-| **cache**     | [CacheInterface](#cacheinterface)                  | A cache instance implements the CacheInterface | MemoryCache |
-| **cacheTime** | `number`                                           | Default cache time                             | `300000`    |
-| **cacheSync** | `boolean` \| `{ set?: boolean; delete?: boolean }` | Sync cache data                                | `false`     |
-| **fallback**  | `ReactNode`                                        | Fallback ui when cache is not ready            | -           |
+| Property      | Type                                               | Description                                    | Default                                                        |
+| ------------- | -------------------------------------------------- | ---------------------------------------------- | -------------------------------------------------------------- |
+| **global**    | `boolean`                                          | Use global cache instance                      | `false`                                                        |
+| **inherit**   | `boolean`                                          | Inherit parent config                          | `false`                                                        |
+| **cache**     | [CacheInterface](#cacheinterface)                  | A cache instance implements the CacheInterface | [MemoryCache](https://lilibraries.github.io/utils/MemoryCache) |
+| **cacheTime** | `number`                                           | Default cache time                             | `300000`                                                       |
+| **cacheSync** | `boolean` \| `{ set?: boolean; delete?: boolean }` | Sync cache data                                | `false`                                                        |
+| **fallback**  | `ReactNode`                                        | Fallback ui when cache is not ready            | -                                                              |
 
 ### CacheInterface
 
@@ -33,6 +33,7 @@ function Root() {
 interface CacheInterface {
   has(key: any): boolean;
   get(key: any): any;
+  getCacheTimestamp(key: any): number | undefined;
   set(key: any, data: any, options?: { cacheTime?: number }): any;
   delete(key: any): any;
   isReady(): boolean;

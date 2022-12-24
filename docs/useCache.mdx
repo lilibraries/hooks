@@ -28,6 +28,7 @@ function useCache<T>(
 interface CacheInterface {
   has(key: any): boolean;
   get(key: any): any;
+  getCacheTimestamp(key: any): number | undefined;
   set(key: any, data: any, options?: { cacheTime?: number }): any;
   delete(key: any): any;
   isReady(): boolean;
@@ -45,7 +46,7 @@ Params:
 - **`key`:** Cache key. It can be any type except `null` and `undefined`.
 - **`options`:** Options object.
   - **`options.defaultValue`:** Default value when the cache value does not exist.
-  - **`options.cache`:** Cache instance. Use memory cache by default. You can pass an instance that implements the `CacheInterface`.
+  - **`options.cache`:** Cache instance. Use [MemoryCache](https://lilibraries.github.io/utils/MemoryCache) by default. You can pass an instance that implements the `CacheInterface`.
   - **`options.cacheTime`:** Cache time, in milliseconds. Default is 5 minutes. You can set a permanent cache by setting this option greater than or equal to `Number.MAX_SAFE_INTEGER`, for example `Infinity`.
   - **`options.cacheSync`:** Synchronize data on set and/or delete data. Default is `false`. It can be an object to synchronize data in different events.
     - **`options.cacheSync.set`:** Synchronize data on set cache.

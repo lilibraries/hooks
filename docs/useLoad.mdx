@@ -58,8 +58,8 @@ function useLoad<Callback extends LoadCallback>(
 
     cacheKey?: {};
     cacheTime?: number;
-    cacheValidate?: (data: any) => boolean;
     staleTime?: number;
+    cacheValidate?: (data: any) => boolean;
 
     retry?: boolean;
     retryLimit?: number;
@@ -114,10 +114,10 @@ Params:
   - **`options.fallback`:** When the `callback` function reject an error and the count of retries has been exhausted, the `fallback` function will be called.
   - **`options.initialData`:** Initial data. Used when no cache or request is loading.
   - **`options.defaultParams`:** The default parameter array set for `callback` and `fallback`.
-  - **`options.cacheKey`:** Cache key to enable caching. It can be any type except `null` and `undefined`. This hook uses the same cache instance as the [`useCache`](./useCache), so you can use `useCache` hook to get data cached by this hook, or set cache data for this hook.
+  - **`options.cacheKey`:** Cache key to enable caching. It can be any type except `null` and `undefined`. This hook uses the same cache instance as [`useCache`](./useCache), so you can use `useCache` hook to get data cached by this hook, or set cache data for this hook.
   - **`options.cacheTime`:** Cache time, in milliseconds. Default is 5 minutes. You can set a permanent cache by setting this option greater than or equal to `Number.MAX_SAFE_INTEGER`, for example `Infinity`.
+  - **`options.staleTime`:** Stale time, in milliseconds. Default is `0`. It must be used with `cacheKey`. In the `staleTime` period, the data is considered fresh. Calling `load(...params)`, `reload()` or auto reloading has no effect. You can ignore the `staleTime` option by calling `force(...params)` or `reload({ force: true })` methods.
   - **`options.cacheValidate`:** Validate the cache value. If it returns falsy, the `initialData` will be used.
-  - **`options.staleTime`:** Stale time, in milliseconds. Default is `0`. In the `staleTime` period, the data is considered fresh. Calling the `load(...params)` and `reload()` methods or auto reloading has no effect. You can ignore the `staleTime` option by calling the `force(...params)` or `reload({ force: true })` methods.
   - **`options.retry`:** Enable retry callback. Default is `false`.
   - **`options.retryLimit`:** Callback retry limit. Default is `3`.
   - **`options.retryInterval`:** Callback retry interval. Default is `0`. You can set a function that returns a number value for this option, for example `(count) => Math.pow(2, count)`.
@@ -208,6 +208,8 @@ Results:
 <CodeBlock language="tsx">{CachingExampleCode}</CodeBlock>
 
 ### Stale time
+
+`staleTime` must be used with `cacheKey`.
 
 <ExampleBlock>
   <StaleExample />
