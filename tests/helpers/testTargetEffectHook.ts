@@ -1,6 +1,6 @@
+import { EffectTarget } from "@lilib/utils";
 import { useTargetEffect } from "@lilib/hooks";
 import renderHook from "./renderHook";
-import { EffectTarget } from "../../src/utils/types";
 
 function testTargetEffectHook(name: string, useHook: typeof useTargetEffect) {
   describe(name, () => {

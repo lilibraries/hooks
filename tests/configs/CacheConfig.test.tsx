@@ -61,6 +61,9 @@ describe("CacheConfig", () => {
         return true;
       },
       get() {},
+      getCacheTimestamp() {
+        return Date.now();
+      },
       set() {},
       delete() {},
       isReady() {
