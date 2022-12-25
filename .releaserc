@@ -12,15 +12,6 @@
       }
     ],
     "@semantic-release/npm",
-    "@semantic-release/git",
-    [
-      "@semantic-release/github",
-      {
-        "assets": [
-          "dist/umd/index.js",
-          "dist/umd/index.min.js"
-        ]
-      }
-    ]
+    "@semantic-release/git"
   ]
 }
