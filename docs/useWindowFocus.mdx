@@ -1,0 +1,19 @@
+import CodeBlock from "@theme/CodeBlock";
+import ExampleBlock from "./components/ExampleBlock";
+import Example from "./examples/UseWindowFocus";
+import ExampleCode from "!!raw-loader!./examples/UseWindowFocus";
+
+Detect whether the `window` is focus. In a non browser environment, it always returns `false`.
+
+## API
+
+```ts
+function useWindowFocus(): boolean;
+```
+
+## Example
+
+<ExampleBlock>
+  <Example />
+</ExampleBlock>
+<CodeBlock language="tsx">{ExampleCode}</CodeBlock>

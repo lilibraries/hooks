@@ -84,4 +84,5 @@ export { default as useToggle } from "./useToggle";
 export { default as useUnmount } from "./useUnmount";
 export { default as useUnmountedRef } from "./useUnmountedRef";
 export { default as useUpdate } from "./useUpdate";
+export { default as useWindowFocus } from "./useWindowFocus";
 export { default as useWindowSize } from "./useWindowSize";

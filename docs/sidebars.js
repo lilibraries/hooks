@@ -65,6 +65,7 @@ module.exports = {
         "useOnline",
         "useDarkMode",
         "usePageVisible",
+        "useWindowFocus",
         "useMatchMedia",
         "useWindowSize",
         "useElementSize",
