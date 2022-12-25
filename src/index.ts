@@ -48,6 +48,7 @@ export { default as useElementSize } from "./useElementSize";
 export { default as useEventListener } from "./useEventListener";
 export { default as useFavicon } from "./useFavicon";
 export { default as useIdle } from "./useIdle";
+export { default as useIntersecting } from "./useIntersecting";
 export { default as useIntersectionObserver } from "./useIntersectionObserver";
 export { default as useInterval } from "./useInterval";
 export { default as useIsomorphicLayoutEffect } from "./useIsomorphicLayoutEffect";

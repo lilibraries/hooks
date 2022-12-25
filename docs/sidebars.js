@@ -68,6 +68,7 @@ module.exports = {
         "useMatchMedia",
         "useWindowSize",
         "useElementSize",
+        "useIntersecting",
         "useClickOutside",
         "useEventListener",
         "useResizeObserver",
