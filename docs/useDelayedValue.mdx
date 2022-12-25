@@ -1,0 +1,38 @@
+import CodeBlock from "@theme/CodeBlock";
+import ExampleBlock from "./components/ExampleBlock";
+import Example from "./examples/UseDelayedValue";
+import ExampleCode from "!!raw-loader!./examples/UseDelayedValue";
+
+Delay update a value.
+
+## API
+
+```ts
+function useDelayedValue<T>(
+  value: T,
+  options:
+    | number
+    | {
+        delay: number;
+        include?: (value: any) => boolean;
+        compare?: (x: any, y: any) => boolean;
+      }
+): T;
+```
+
+Params:
+
+- **`value`:** The value will be delayed.
+- **`options`:** Accepts a positive number as the delay time or an object as the options.
+  - **`options.delay`:** Delay time, in milliseconds. It must be a positive number.
+  - **`options.include`:** A function that filters value to be delayed. Any value is delayed by default.
+  - **`options.compare`:** It is used to compare whether two values are equal to determine whether to update the value. Default is `Object.is`.
+
+## Example
+
+The following example will show `"Loading..."` after 500ms when you click the `Toggle` button.
+
+<ExampleBlock>
+  <Example />
+</ExampleBlock>
+<CodeBlock language="tsx">{ExampleCode}</CodeBlock>

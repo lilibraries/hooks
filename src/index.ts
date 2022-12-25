@@ -20,6 +20,7 @@ export type {
   DebounceOptions as DebounceHookOptions,
   DebounceOptions as DebouncedValueHookOptions,
 } from "./useDebounce";
+export type { DelayedValueHookOptions } from "./useDelayedValue";
 export type { FaviconHookOptions } from "./useFavicon";
 export type { LoadCallback, LoadData, LoadHookOptions } from "./useLoad";
 export type { ReloadHookOptions } from "./useReload";
@@ -41,6 +42,7 @@ export { default as useCookie } from "./useCookie";
 export { default as useDarkMode } from "./useDarkMode";
 export { default as useDebounce } from "./useDebounce";
 export { default as useDebouncedValue } from "./useDebouncedValue";
+export { default as useDelayedValue } from "./useDelayedValue";
 export { default as useElementSize } from "./useElementSize";
 export { default as useEventListener } from "./useEventListener";
 export { default as useFavicon } from "./useFavicon";
