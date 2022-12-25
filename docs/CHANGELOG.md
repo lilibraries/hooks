@@ -1,6 +1,8 @@
-# [1.0.0](https://github.com/lilibraries/hooks/compare/v0.3.1...v1.0.0) (2022-12-25)
+# Changelog
 
-### Features
+## [1.0.0](https://github.com/lilibraries/hooks/compare/v0.3.1...v1.0.0) (2022-12-25)
+
+#### Features
 
 - add `useDelayedValue` ([ca99f25](https://github.com/lilibraries/hooks/commit/ca99f2538e56a3eaf59f05401f4a2ceb8ca85670))
 - add `useIntersecting` ([5e97891](https://github.com/lilibraries/hooks/commit/5e978917ae7560bf9c5ccd9def200b666fb4c6b9))
@@ -8,15 +10,15 @@
 - add `useResizeObserver` ([2019610](https://github.com/lilibraries/hooks/commit/201961043bda7fe8d0bb85c64d463f6e5c890712))
 - add `useWindowFocus` ([2e3f28f](https://github.com/lilibraries/hooks/commit/2e3f28fe6ccd5356cdba81a68070f7344f95d77e))
 
-## [0.3.1](https://github.com/lilibraries/hooks/compare/v0.3.0...v0.3.1) (2022-12-24)
+### [0.3.1](https://github.com/lilibraries/hooks/compare/v0.3.0...v0.3.1) (2022-12-24)
 
-### Bug Fixes
+#### Bug Fixes
 
 - `useLoad`: `staleTime` option must be used together with `cacheKey` option ([27ff50c](https://github.com/lilibraries/hooks/commit/27ff50c90d8204a33a916e705862b3c554ca76ff))
 
-# [0.3.0](https://github.com/lilibraries/hooks/compare/v0.2.1...v0.3.0) (2022-12-22)
+## [0.3.0](https://github.com/lilibraries/hooks/compare/v0.2.1...v0.3.0) (2022-12-22)
 
-### ⚠ BREAKING CHANGES
+#### BREAKING CHANGES
 
 - rename `useClickAway` to `useClickOutside`
 - `useWindowSize` and `useElementSize` remove default size
@@ -24,7 +26,7 @@
 - delete `useControllableState`
 - don't export utils
 
-### Features
+#### Features
 
 - add `useSubmit` ([e07d484](https://github.com/lilibraries/hooks/commit/e07d484053cacec0593e86da0133be02fd16e405))
 - add `useReload` ([95e4066](https://github.com/lilibraries/hooks/commit/95e406674bbdab0f2a43bc664095513994df4799))
@@ -37,21 +39,21 @@
 - `useLocalStorage`, `useSessionStorage`: add `compare` and `validate` options ([d9ca582](https://github.com/lilibraries/hooks/commit/d9ca582d3bafaa39b39c6d20d42cdf693d56d526))
 - `useMemoizedValue`: add `compare` param ([0b7a0b8](https://github.com/lilibraries/hooks/commit/0b7a0b87a31326fb5ecaf522391accbc05c240b1))
 
-### Bug Fixes
+#### Bug Fixes
 
 - `useFavicon`(TS): add `null` type for the `href` parameter ([6d0c28f](https://github.com/lilibraries/hooks/commit/6d0c28f75b18f193ba964ba51503b3e8224b3ce9))
 - `usePersist`(TS): fix return type ([ea3d882](https://github.com/lilibraries/hooks/commit/ea3d8824b102f520de8c3c667c3196addda83eea))
 - `useTitle`(TS): add `null` type for the `title` parameter ([30cea47](https://github.com/lilibraries/hooks/commit/30cea4727b3d5c37a142f2065c4c067bf422b317))
 
-## [0.2.1](https://github.com/lilibraries/hooks/compare/v0.2.0...v0.2.1) (2022-06-28)
+### [0.2.1](https://github.com/lilibraries/hooks/compare/v0.2.0...v0.2.1) (2022-06-28)
 
-### Bug Fixes
+#### Bug Fixes
 
 - support React 18 StrictMode ([262aed1](https://github.com/lilibraries/hooks/commit/262aed1dc031877b6c3d34212b37b3d1163ed5e7))
 
-# [0.2.0](https://github.com/lilibraries/hooks/compare/v0.1.1...v0.2.0) (2022-06-27)
+## [0.2.0](https://github.com/lilibraries/hooks/compare/v0.1.1...v0.2.0) (2022-06-27)
 
-### ⚠ BREAKING CHANGES
+#### BREAKING CHANGES
 
 - delete `useNextFrame` ([e4638dd](https://github.com/lilibraries/hooks/commit/e4638dd9555d048449159bc4cfe48e70e0ad0aef))
 - delete `useCreate` ([a12b8a8](https://github.com/lilibraries/hooks/commit/a12b8a8f79a81b36520dabde5e26bf545611a674))
@@ -64,7 +66,7 @@
 - `useCookie`: change params and results ([a494fd8](https://github.com/lilibraries/hooks/commit/a494fd86a14c4d276d6782a604c3879289b0de72))
 - `useLocalStorage`, `useSessionStorage`: change params and results ([e3b247a](https://github.com/lilibraries/hooks/commit/e3b247a66b4eab7168a5485cdc5d99c7da4f689b))
 
-### Features
+#### Features
 
 - add `useClickAway` ([264bcaf](https://github.com/lilibraries/hooks/commit/264bcaf6432fa78ddbe62e34a250d5f04c94478e))
 - add `useControllableState` ([01cce08](https://github.com/lilibraries/hooks/commit/01cce081e222c3c3bf14a7b47f6891cc1ea54427))
@@ -79,18 +81,18 @@
 - add `useTargetEffect` and `useLayoutTargetEffect` ([1993e24](https://github.com/lilibraries/hooks/commit/1993e24459707591a5f0b299d3fd3ab154e07bb5))
 - add `useUnmountedRef` ([5e1cae8](https://github.com/lilibraries/hooks/commit/5e1cae8aeb6ec3c83d95c190cdf027d293997be7))
 
-### Bug Fixes
+#### Bug Fixes
 
 - `useTimeout`: should not automatically set timer when the `delay` param is updated ([86c98d0](https://github.com/lilibraries/hooks/commit/86c98d06a8a4a0b834149c820bae4e3d7c10e489))
 
-## [0.1.1](https://github.com/lilibraries/hooks/compare/v0.1.0...v0.1.1) (2021-03-30)
+### [0.1.1](https://github.com/lilibraries/hooks/compare/v0.1.0...v0.1.1) (2021-03-30)
 
-### Bug Fixes
+#### Bug Fixes
 
 - `useIdle`: fix SSR issue ([b877eea](https://github.com/lilibraries/hooks/commit/b877eeae71a970d340dd0840e614463a47ee98b4))
 
-# [0.1.0](https://github.com/lilibraries/hooks/compare/2df17e87a4640318274ca3f4fc8b7f5fa9b031e9...v0.1.0) (2021-03-29)
+## [0.1.0](https://github.com/lilibraries/hooks/compare/2df17e87a4640318274ca3f4fc8b7f5fa9b031e9...v0.1.0) (2021-03-29)
 
-### Features
+#### Features
 
 - initial commit ([2df17e8](https://github.com/lilibraries/hooks/commit/2df17e87a4640318274ca3f4fc8b7f5fa9b031e9))
