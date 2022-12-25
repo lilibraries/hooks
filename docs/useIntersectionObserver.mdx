@@ -1,0 +1,39 @@
+import CodeBlock from "@theme/CodeBlock";
+import ExampleBlock from "./components/ExampleBlock";
+import Example from "./examples/UseIntersectionObserver";
+import ExampleCode from "!!raw-loader!./examples/UseIntersectionObserver";
+
+Observe whether two elements intersect.
+
+## API
+
+```ts
+function useIntersectionObserver(
+  target: EffectTarget<Element>,
+  listener: (entries: IntersectionObserverEntry[]) => void,
+  options?: {
+    root?: EffectTarget<Element | Document>;
+    rootMargin?: string;
+    threshold?: number | number[];
+  }
+): void;
+
+type Nullable<T> = T | undefined | null;
+type EffectTarget<T> =
+  | Nullable<T>
+  | (() => Nullable<T>)
+  | { current: Nullable<T> };
+```
+
+Params:
+
+- **`target`:** Observe target.
+- **`listener`:** Listener function.
+- **`options`:** See [IntersectionObserver](https://developer.mozilla.org/en-US/docs/Web/API/IntersectionObserver/IntersectionObserver) options.
+
+## Example
+
+<ExampleBlock>
+  <Example />
+</ExampleBlock>
+<CodeBlock language="tsx">{ExampleCode}</CodeBlock>

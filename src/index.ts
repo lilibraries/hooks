@@ -22,6 +22,7 @@ export type {
 } from "./useDebounce";
 export type { DelayedValueHookOptions } from "./useDelayedValue";
 export type { FaviconHookOptions } from "./useFavicon";
+export type { IntersectionObserverHookOptions } from "./useIntersectionObserver";
 export type { LoadCallback, LoadData, LoadHookOptions } from "./useLoad";
 export type { ReloadHookOptions } from "./useReload";
 export type { SubmitHookOptions } from "./useSubmit";
@@ -47,6 +48,7 @@ export { default as useElementSize } from "./useElementSize";
 export { default as useEventListener } from "./useEventListener";
 export { default as useFavicon } from "./useFavicon";
 export { default as useIdle } from "./useIdle";
+export { default as useIntersectionObserver } from "./useIntersectionObserver";
 export { default as useInterval } from "./useInterval";
 export { default as useIsomorphicLayoutEffect } from "./useIsomorphicLayoutEffect";
 export { default as useLatestRef } from "./useLatestRef";
