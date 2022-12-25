@@ -1,12 +1,20 @@
-# Changelog
+# [1.0.0](https://github.com/lilibraries/hooks/compare/v0.3.1...v1.0.0) (2022-12-25)
 
-### [0.3.1](https://github.com/lilibraries/hooks/compare/v0.3.0...v0.3.1) (2022-12-24)
+### Features
+
+- add `useDelayedValue` ([ca99f25](https://github.com/lilibraries/hooks/commit/ca99f2538e56a3eaf59f05401f4a2ceb8ca85670))
+- add `useIntersecting` ([5e97891](https://github.com/lilibraries/hooks/commit/5e978917ae7560bf9c5ccd9def200b666fb4c6b9))
+- add `useIntersectionObserver` ([18a430a](https://github.com/lilibraries/hooks/commit/18a430a795edfc4858cf7d2a760508722d4b7c8d))
+- add `useResizeObserver` ([2019610](https://github.com/lilibraries/hooks/commit/201961043bda7fe8d0bb85c64d463f6e5c890712))
+- add `useWindowFocus` ([2e3f28f](https://github.com/lilibraries/hooks/commit/2e3f28fe6ccd5356cdba81a68070f7344f95d77e))
+
+## [0.3.1](https://github.com/lilibraries/hooks/compare/v0.3.0...v0.3.1) (2022-12-24)
 
 ### Bug Fixes
 
 - `useLoad`: `staleTime` option must be used together with `cacheKey` option ([27ff50c](https://github.com/lilibraries/hooks/commit/27ff50c90d8204a33a916e705862b3c554ca76ff))
 
-## [0.3.0](https://github.com/lilibraries/hooks/compare/v0.2.1...v0.3.0) (2022-12-22)
+# [0.3.0](https://github.com/lilibraries/hooks/compare/v0.2.1...v0.3.0) (2022-12-22)
 
 ### ⚠ BREAKING CHANGES
 
@@ -35,13 +43,13 @@
 - `usePersist`(TS): fix return type ([ea3d882](https://github.com/lilibraries/hooks/commit/ea3d8824b102f520de8c3c667c3196addda83eea))
 - `useTitle`(TS): add `null` type for the `title` parameter ([30cea47](https://github.com/lilibraries/hooks/commit/30cea4727b3d5c37a142f2065c4c067bf422b317))
 
-### [0.2.1](https://github.com/lilibraries/hooks/compare/v0.2.0...v0.2.1) (2022-06-28)
+## [0.2.1](https://github.com/lilibraries/hooks/compare/v0.2.0...v0.2.1) (2022-06-28)
 
 ### Bug Fixes
 
 - support React 18 StrictMode ([262aed1](https://github.com/lilibraries/hooks/commit/262aed1dc031877b6c3d34212b37b3d1163ed5e7))
 
-## [0.2.0](https://github.com/lilibraries/hooks/compare/v0.1.1...v0.2.0) (2022-06-27)
+# [0.2.0](https://github.com/lilibraries/hooks/compare/v0.1.1...v0.2.0) (2022-06-27)
 
 ### ⚠ BREAKING CHANGES
 
@@ -75,13 +83,13 @@
 
 - `useTimeout`: should not automatically set timer when the `delay` param is updated ([86c98d0](https://github.com/lilibraries/hooks/commit/86c98d06a8a4a0b834149c820bae4e3d7c10e489))
 
-### [0.1.1](https://github.com/lilibraries/hooks/compare/v0.1.0...v0.1.1) (2021-03-30)
+## [0.1.1](https://github.com/lilibraries/hooks/compare/v0.1.0...v0.1.1) (2021-03-30)
 
 ### Bug Fixes
 
 - `useIdle`: fix SSR issue ([b877eea](https://github.com/lilibraries/hooks/commit/b877eeae71a970d340dd0840e614463a47ee98b4))
 
-## [0.1.0](https://github.com/lilibraries/hooks/compare/2df17e87a4640318274ca3f4fc8b7f5fa9b031e9...v0.1.0) (2021-03-29)
+# [0.1.0](https://github.com/lilibraries/hooks/compare/2df17e87a4640318274ca3f4fc8b7f5fa9b031e9...v0.1.0) (2021-03-29)
 
 ### Features
 
