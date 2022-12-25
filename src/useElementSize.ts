@@ -1,9 +1,7 @@
 import { useDebugValue } from "react";
-import ResizeObserver from "resize-observer-polyfill";
 import { EffectTarget, getEffectTarget } from "@lilib/utils";
-import usePersist from "./usePersist";
 import useSafeState from "./useSafeState";
-import useLayoutTargetEffect from "./useLayoutTargetEffect";
+import useResizeObserver from "./useResizeObserver";
 
 function useElementSize(target: EffectTarget<Element>) {
   const [{ width, height }, setSize] = useSafeState(() => {
@@ -16,7 +14,7 @@ function useElementSize(target: EffectTarget<Element>) {
     }
   });
 
-  const handler = usePersist((entries: ResizeObserverEntry[]) => {
+  useResizeObserver(target, (entries: ResizeObserverEntry[]) => {
     if (entries[0]) {
       const rect = entries[0].target.getBoundingClientRect();
       if (rect.width !== width || rect.height !== height) {
@@ -24,22 +22,6 @@ function useElementSize(target: EffectTarget<Element>) {
       }
     }
   });
-
-  useLayoutTargetEffect(
-    () => {
-      const element = getEffectTarget(target);
-      if (!element) {
-        return;
-      }
-      const observer = new ResizeObserver(handler);
-      observer.observe(element);
-      return () => {
-        observer.disconnect();
-      };
-    },
-    [],
-    [target]
-  );
 
   useDebugValue({ width, height });
 

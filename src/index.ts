@@ -67,6 +67,7 @@ export { default as usePreviousRef } from "./usePreviousRef";
 export { default as useRaf } from "./useRaf";
 export { default as useReload } from "./useReload";
 export { default as useRerender } from "./useRerender";
+export { default as useResizeObserver } from "./useResizeObserver";
 export { default as useSafeState } from "./useSafeState";
 export { default as useSessionStorage } from "./useSessionStorage";
 export { default as useSetState } from "./useSetState";

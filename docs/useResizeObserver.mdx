@@ -1,0 +1,28 @@
+import CodeBlock from "@theme/CodeBlock";
+import ExampleBlock from "./components/ExampleBlock";
+import Example from "./examples/UseResizeObserver";
+import ExampleCode from "!!raw-loader!./examples/UseResizeObserver";
+
+Observe a element size changing.
+
+## API
+
+```ts
+function useResizeObserver(
+  target: EffectTarget<Element>,
+  listener: (entries: ResizeObserverEntry[]) => void
+): void;
+
+type Nullable<T> = T | undefined | null;
+type EffectTarget<T> =
+  | Nullable<T>
+  | (() => Nullable<T>)
+  | { current: Nullable<T> };
+```
+
+## Example
+
+<ExampleBlock>
+  <Example />
+</ExampleBlock>
+<CodeBlock language="tsx">{ExampleCode}</CodeBlock>

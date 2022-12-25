@@ -70,6 +70,7 @@ module.exports = {
         "useElementSize",
         "useClickOutside",
         "useEventListener",
+        "useResizeObserver",
         "useCookie",
         "useLocalStorage",
         "useSessionStorage",
