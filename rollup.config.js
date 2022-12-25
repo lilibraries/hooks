@@ -45,12 +45,6 @@ module.exports = {
           license({
             thirdParty: {
               output: path.resolve(__dirname, "dist/umd/dependencies.txt"),
-              includePrivate: true,
-              allow: {
-                test: "MIT",
-                failOnUnlicensed: true,
-                failOnViolation: true,
-              },
             },
           }),
       ].filter(Boolean),
