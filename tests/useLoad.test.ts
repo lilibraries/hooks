@@ -244,22 +244,34 @@ describe("useLoad", () => {
       })
     );
 
-    jest.advanceTimersByTime(2000);
+    act(() => {
+      jest.advanceTimersByTime(2000);
+      jest.runOnlyPendingTimers();
+    });
     await waitFor(() => {
       expect(callback).toBeCalledTimes(1);
     });
 
-    jest.advanceTimersByTime(2000);
+    act(() => {
+      jest.advanceTimersByTime(2000);
+      jest.runOnlyPendingTimers();
+    });
     await waitFor(() => {
       expect(callback).toBeCalledTimes(2);
     });
 
-    jest.advanceTimersByTime(2000);
+    act(() => {
+      jest.advanceTimersByTime(2000);
+      jest.runOnlyPendingTimers();
+    });
     await waitFor(() => {
       expect(callback).toBeCalledTimes(3);
     });
 
     expect(result.current.data).toBe("done");
+    act(() => {
+      jest.runOnlyPendingTimers();
+    });
     unmount();
   });
 
