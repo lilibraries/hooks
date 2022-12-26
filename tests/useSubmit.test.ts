@@ -34,11 +34,13 @@ describe("useSubmit", () => {
     let data: any;
     const callback = jest.fn().mockImplementation(() => {
       return new Promise((resolve, reject) => {
-        if (++count === 6) {
-          resolve("done");
-        } else {
-          reject(new Error("message"));
-        }
+        setTimeout(() => {
+          if (++count >= 6) {
+            resolve("done");
+          } else {
+            reject(new Error("error"));
+          }
+        }, 1000);
       });
     });
 
@@ -47,7 +49,7 @@ describe("useSubmit", () => {
         fallback: callback,
         retry: true,
         fallbackRetry: true,
-        onSuccess: (d) => {
+        onSuccess(d) {
           data = d;
         },
       })
@@ -57,10 +59,33 @@ describe("useSubmit", () => {
       result.current.submit();
     });
 
-    await waitFor(() => {
-      expect(callback).toBeCalledTimes(6);
-      expect(data).toBe("done");
+    act(() => {
+      jest.advanceTimersByTime(1000);
     });
+    await waitFor(() => Promise.resolve());
+    act(() => {
+      jest.advanceTimersByTime(1000);
+    });
+    await waitFor(() => Promise.resolve());
+    act(() => {
+      jest.advanceTimersByTime(1000);
+    });
+    await waitFor(() => Promise.resolve());
+    act(() => {
+      jest.advanceTimersByTime(1000);
+    });
+    await waitFor(() => Promise.resolve());
+    act(() => {
+      jest.advanceTimersByTime(1000);
+    });
+    await waitFor(() => Promise.resolve());
+    act(() => {
+      jest.advanceTimersByTime(1000);
+    });
+    await waitFor(() => Promise.resolve());
+
+    expect(callback).toBeCalledTimes(6);
+    expect(data).toBe("done");
 
     unmount();
   });

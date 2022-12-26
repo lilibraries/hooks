@@ -13,37 +13,47 @@ describe("useReload", () => {
     jest.useRealTimers();
   });
 
-  it("should reload correctly", () => {
+  it("should reload correctly", async () => {
     const callback1 = jest.fn().mockImplementation(() => new Promise(() => {}));
     const callback2 = jest.fn().mockImplementation(() => new Promise(() => {}));
 
-    const { result } = renderHook(() => {
+    const { result, unmount } = renderHook(() => {
       useLoad(callback1, [], { key: "reload-key", independent: true });
       useLoad(callback2, [], { key: "reload-key", independent: true });
       return useReload("reload-key");
     });
 
+    act(() => {
+      jest.runOnlyPendingTimers();
+    });
+    await waitFor(() => Promise.resolve());
     expect(callback1).toBeCalledTimes(1);
     expect(callback2).toBeCalledTimes(1);
 
     act(() => {
       result.current();
     });
-
+    act(() => {
+      jest.runOnlyPendingTimers();
+    });
+    await waitFor(() => Promise.resolve());
     expect(callback1).toBeCalledTimes(2);
     expect(callback2).toBeCalledTimes(2);
+
+    unmount();
   });
 
   it("support force option", async () => {
+    let promise: Promise<any>;
     const callback = jest.fn().mockImplementation(
       () =>
-        new Promise((resolve) => {
+        (promise = new Promise((resolve) => {
           setTimeout(() => {
             resolve("done");
           }, 1000);
-        })
+        }))
     );
-    const { result, rerender } = renderHook(
+    const { result, rerender, unmount } = renderHook(
       ({ force }) => {
         useLoad(callback, [], {
           key: "force-reload-key",
@@ -55,42 +65,49 @@ describe("useReload", () => {
       { initialProps: { force: false } }
     );
 
-    jest.runOnlyPendingTimers();
-    await waitFor(() => {
-      expect(callback).toBeCalledTimes(1);
+    act(() => {
+      jest.runOnlyPendingTimers();
     });
+    await waitFor(() => promise);
+    expect(callback).toBeCalledTimes(1);
 
     act(() => {
       result.current();
     });
-    jest.runOnlyPendingTimers();
-    await waitFor(() => {
-      expect(callback).toBeCalledTimes(1);
+    act(() => {
+      jest.runOnlyPendingTimers();
     });
+    await waitFor(() => promise);
+    expect(callback).toBeCalledTimes(1);
 
     act(() => {
       result.current({ force: true });
     });
-    jest.runOnlyPendingTimers();
-    await waitFor(() => {
-      expect(callback).toBeCalledTimes(2);
+    act(() => {
+      jest.runOnlyPendingTimers();
     });
+    await waitFor(() => promise);
+    expect(callback).toBeCalledTimes(2);
 
     act(() => {
       result.current();
     });
-    jest.runOnlyPendingTimers();
-    await waitFor(() => {
-      expect(callback).toBeCalledTimes(2);
+    act(() => {
+      jest.runOnlyPendingTimers();
     });
+    await waitFor(() => promise);
+    expect(callback).toBeCalledTimes(2);
 
     rerender({ force: true });
     act(() => {
       result.current();
     });
-    jest.runOnlyPendingTimers();
-    await waitFor(() => {
-      expect(callback).toBeCalledTimes(3);
+    act(() => {
+      jest.runOnlyPendingTimers();
     });
+    await waitFor(() => promise);
+    expect(callback).toBeCalledTimes(3);
+
+    unmount();
   });
 });
