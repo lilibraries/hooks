@@ -9,7 +9,7 @@ import React, {
 } from "react";
 import omit from "lodash/omit";
 import { useSyncExternalStore } from "use-sync-external-store/shim";
-import { MemoryCache, mergeWithDefined } from "@lilib/utils";
+import { inBrowser, MemoryCache, mergeWithDefined } from "@lilib/utils";
 
 export interface CacheInterface {
   has(key: any): boolean;
@@ -39,7 +39,6 @@ export interface CacheConfigProps extends Partial<CacheConfigValue> {
   children?: ReactNode;
 }
 
-const globalVar: any = globalThis;
 const GLOBAL_CACHE_ID = "__LILIB_HOOKS_GLOBAL_CACHE__";
 
 const defaultValue = {
@@ -68,8 +67,8 @@ const CacheConfig: FC<CacheConfigProps> & {
     value = mergeWithDefined(defaultValue, value);
   }
 
-  if (value.global && globalVar[GLOBAL_CACHE_ID]) {
-    value.cache = globalVar[GLOBAL_CACHE_ID];
+  if (value.global && inBrowser && (window as any)[GLOBAL_CACHE_ID]) {
+    value.cache = (window as any)[GLOBAL_CACHE_ID];
   }
   if (!value.cache) {
     if (!cacheRef.current) {
@@ -77,8 +76,8 @@ const CacheConfig: FC<CacheConfigProps> & {
     }
     value.cache = cacheRef.current;
   }
-  if (value.global && !globalVar[GLOBAL_CACHE_ID]) {
-    globalVar[GLOBAL_CACHE_ID] = value.cache;
+  if (value.global && inBrowser && !(window as any)[GLOBAL_CACHE_ID]) {
+    (window as any)[GLOBAL_CACHE_ID] = value.cache;
   }
 
   const cache = value.cache;

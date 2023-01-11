@@ -7,7 +7,7 @@ import React, {
   useDebugValue,
 } from "react";
 import omit from "lodash/omit";
-import { EventEmitter, mergeWithDefined } from "@lilib/utils";
+import { EventEmitter, inBrowser, mergeWithDefined } from "@lilib/utils";
 
 class LoadStore extends EventEmitter {
   _loadings = new Map<any, Function>();
@@ -120,7 +120,6 @@ export interface LoadConfigProps
   children?: ReactNode;
 }
 
-const globalVar: any = globalThis;
 const GLOBAL_LOAD_STORE_ID = "__LILIB_HOOKS_GLOBAL_LOAD_STORE__";
 
 const defaultValue = {
@@ -163,8 +162,8 @@ const LoadConfig: FC<LoadConfigProps> & {
     value = mergeWithDefined(defaultValue, value);
   }
 
-  if (value.global && globalVar[GLOBAL_LOAD_STORE_ID]) {
-    value.store = globalVar[GLOBAL_LOAD_STORE_ID];
+  if (value.global && inBrowser && (window as any)[GLOBAL_LOAD_STORE_ID]) {
+    value.store = (window as any)[GLOBAL_LOAD_STORE_ID];
   }
   if (!value.store) {
     if (!storeRef.current) {
@@ -172,8 +171,8 @@ const LoadConfig: FC<LoadConfigProps> & {
     }
     value.store = storeRef.current;
   }
-  if (value.global && !globalVar[GLOBAL_LOAD_STORE_ID]) {
-    globalVar[GLOBAL_LOAD_STORE_ID] = value.store;
+  if (value.global && inBrowser && !(window as any)[GLOBAL_LOAD_STORE_ID]) {
+    (window as any)[GLOBAL_LOAD_STORE_ID] = value.store;
   }
 
   useDebugValue(value);
