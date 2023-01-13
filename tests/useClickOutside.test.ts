@@ -53,4 +53,14 @@ describe("useClickOutside", () => {
     document.body.click();
     expect(mock).toBeCalledTimes(1);
   });
+
+  it("should not listen events when no target set", () => {
+    const mock = jest.fn();
+    renderHook(() => {
+      useClickOutside(null, mock, { container, eventName: "click" });
+    });
+
+    container.click();
+    expect(mock).not.toBeCalled();
+  });
 });

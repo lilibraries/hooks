@@ -19,8 +19,14 @@ function useClickOutside<E extends Event = Event>(
 
   useTargetEffect(
     () => {
+      const targetElements = targets.map(getEffectTarget).filter(Boolean);
+
+      if (!targetElements.length) {
+        return;
+      }
+
       function handler(event: any) {
-        for (const element of targets.map(getEffectTarget)) {
+        for (const element of targetElements) {
           if (element && element.contains(event.target)) {
             return;
           }
@@ -28,15 +34,15 @@ function useClickOutside<E extends Event = Event>(
         listenerRef.current(event);
       }
 
-      const el = getEffectTarget(container) || document;
+      const containerElement = getEffectTarget(container) || document;
 
       for (const eventName of eventNames) {
-        el.addEventListener(eventName, handler);
+        containerElement.addEventListener(eventName, handler);
       }
 
       return () => {
         for (const eventName of eventNames) {
-          el.removeEventListener(eventName, handler);
+          containerElement.removeEventListener(eventName, handler);
         }
       };
     },
