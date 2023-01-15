@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.0.1](https://github.com/lilibraries/hooks/compare/v1.0.0...v1.0.1) (2023-01-15)
+
+#### Bug Fixes
+
+- **LoadConfig,CacheConfig:** do not set global variables in SSR ([3719786](https://github.com/lilibraries/hooks/commit/3719786dd919ab20daa4e83c14e040f223a02fe2))
+- **useClickOutside:** do not listen to events when no target specified ([4ac2c3f](https://github.com/lilibraries/hooks/commit/4ac2c3f7c4001c728332ed8732eeb520ddaf6165))
+
 ## [1.0.0](https://github.com/lilibraries/hooks/compare/v0.3.1...v1.0.0) (2022-12-25)
 
 #### Features
