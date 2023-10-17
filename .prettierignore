@@ -1,3 +1,4 @@
 dist
 build
 .docusaurus
+docs/CHANGELOG.md
