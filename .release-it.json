@@ -1,0 +1,16 @@
+{
+  "git": {
+    "commitMessage": "chore(release): ${version}"
+  },
+  "hooks": {
+    "before:init": ["npm run lint", "npm run test:all", "npm run dist"],
+    "after:release": "echo Successfully released ${name} v${version} to ${repo.repository}."
+  },
+  "plugins": {
+    "@release-it/conventional-changelog": {
+      "preset": "angular",
+      "infile": "docs/CHANGELOG.md",
+      "header": "# Changelog"
+    }
+  }
+}
