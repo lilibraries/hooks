@@ -37,7 +37,7 @@ function useIntersectionObserver(
         observer.disconnect();
       };
     },
-    [rootMargin, JSON.stringify(threshold)],
+    [rootMargin, threshold ? threshold.toString() : "0"],
     [root, target]
   );
 }
