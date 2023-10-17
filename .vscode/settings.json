@@ -5,16 +5,12 @@
   "files.trimTrailingWhitespace": true,
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": true,
-    "source.fixAll.stylelint": false
+    "source.fixAll.eslint": true
   },
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "javascript.validate.enable": false,
   "typescript.tsdk": "node_modules/typescript/lib",
   "eslint.format.enable": true,
   "prettier.requireConfig": true,
-  "prettier.useEditorConfig": false,
-  "[json]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  }
+  "prettier.useEditorConfig": false
 }
