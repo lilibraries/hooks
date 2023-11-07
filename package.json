@@ -1,7 +1,7 @@
 {
   "name": "@lilib/hooks",
   "version": "1.0.3",
-  "description": "React hook library",
+  "description": "React hook library.",
   "keywords": [
     "react",
     "hooks"
@@ -34,10 +34,10 @@
     "start": "docusaurus start",
     "build": "docusaurus build",
     "test": "jest",
-    "test:16": "npm i --no-save --legacy-peer-deps react@16 react-dom@16 @testing-library/react@12 @testing-library/react-hooks@7 && jest",
-    "test:17": "npm i --no-save --legacy-peer-deps react@17 react-dom@17 @testing-library/react@12 @testing-library/react-hooks@7 && jest",
-    "test:18": "npm i --no-save --legacy-peer-deps react@18 react-dom@18 @testing-library/react@13 && jest",
-    "test:all": "npm run test:16 && npm run test:17 && npm run test:18 && npm install",
+    "test:16": "node scripts/checkGitIsClean.mjs && pnpm add react@16 react-dom@16 @testing-library/react@12 @testing-library/react-hooks@7 && jest && node scripts/cleanGit.mjs && pnpm i",
+    "test:17": "node scripts/checkGitIsClean.mjs && pnpm add react@17 react-dom@17 @testing-library/react@12 @testing-library/react-hooks@7 && jest && node scripts/cleanGit.mjs && pnpm i",
+    "test:18": "node scripts/checkGitIsClean.mjs && pnpm add react@18 react-dom@18 @testing-library/react@13 && jest && node scripts/cleanGit.mjs && pnpm i",
+    "test:all": "npm run test:16 && npm run test:17 && npm run test:18",
     "lint": "tsc -p tsconfig.json --noEmit && eslint . --ext .jsx,.js,.ts,.tsx && prettier --check . --loglevel warn",
     "lint:fix": "tsc -p tsconfig.json --noEmit && eslint . --ext .jsx,.js,.ts,.tsx --fix && prettier --write . --loglevel warn",
     "dist": "rimraf dist && concurrently --kill-others-on-fail npm:dist:*",
@@ -101,6 +101,7 @@
     "eslint": "^8.0.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-config-react-app": "^7.0.0",
+    "execa": "^8.0.1",
     "gh-pages": "^4.0.0",
     "husky": "^8.0.1",
     "jest": "^27.4.7",
