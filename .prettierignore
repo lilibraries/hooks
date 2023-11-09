@@ -1,5 +1,5 @@
 dist
 build
 .docusaurus
-docs/CHANGELOG.md
+CHANGELOG.md
 pnpm-lock.yaml

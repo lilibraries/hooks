@@ -89,6 +89,5 @@ module.exports = {
       label: "Configs",
       items: ["LoadConfig", "CacheConfig"],
     },
-    "CHANGELOG",
   ],
 };

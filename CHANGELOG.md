@@ -2,20 +2,24 @@
 
 ## [1.0.3](https://github.com/lilibraries/hooks/compare/v1.0.2...v1.0.3) (2023-10-17)
 
-Bump.
+Bump version.
 
 ## [1.0.2](https://github.com/lilibraries/hooks/compare/v1.0.1...v1.0.2) (2023-10-17)
 
-Bump.
+Bump version.
+
+**Note:** This version was accidentally unpublished, please use ^1.0.3 instead.
 
 ## [1.0.1](https://github.com/lilibraries/hooks/compare/v1.0.0...v1.0.1) (2023-01-15)
+
+**Note:** This version was accidentally unpublished, please use ^1.0.3 instead.
 
 ### Bug Fixes
 
 - **LoadConfig,CacheConfig:** do not set global variables in SSR ([3719786](https://github.com/lilibraries/hooks/commit/3719786dd919ab20daa4e83c14e040f223a02fe2))
 - **useClickOutside:** do not listen to events when no target specified ([4ac2c3f](https://github.com/lilibraries/hooks/commit/4ac2c3f7c4001c728332ed8732eeb520ddaf6165))
 
-# [1.0.0](https://github.com/lilibraries/hooks/compare/v0.3.1...v1.0.0) (2022-12-25)
+## [1.0.0](https://github.com/lilibraries/hooks/compare/v0.3.1...v1.0.0) (2022-12-25)
 
 ### Features
 
@@ -29,9 +33,9 @@ Bump.
 
 ### Bug Fixes
 
-- `useLoad`: `staleTime` option must be used together with `cacheKey` option ([27ff50c](https://github.com/lilibraries/hooks/commit/27ff50c90d8204a33a916e705862b3c554ca76ff))
+- **useLoad**: `staleTime` option must be used together with `cacheKey` option ([27ff50c](https://github.com/lilibraries/hooks/commit/27ff50c90d8204a33a916e705862b3c554ca76ff))
 
-# [0.3.0](https://github.com/lilibraries/hooks/compare/v0.2.1...v0.3.0) (2022-12-22)
+## [0.3.0](https://github.com/lilibraries/hooks/compare/v0.2.1...v0.3.0) (2022-12-22)
 
 ### BREAKING CHANGES
 
@@ -49,16 +53,16 @@ Bump.
 - add `LoadConfig` ([f9bfaf7](https://github.com/lilibraries/hooks/commit/f9bfaf7c1d2a96cc91c75b1c5b4b3797c7b189c9))
 - add `useCache` ([7842938](https://github.com/lilibraries/hooks/commit/7842938f4d6e6e8110933ad228555a20c94b303b))
 - add `CacheConfig` ([e225f14](https://github.com/lilibraries/hooks/commit/e225f14ccf7db8df4777a10198577d66f4d648e3))
-- `useCookie`: add `validate` option ([9b4e7f2](https://github.com/lilibraries/hooks/commit/9b4e7f2bba04cdd6c92dca6eb60d8760824c5a9d))
-- `useIdle`: support `timeout` option ([336e684](https://github.com/lilibraries/hooks/commit/336e68464a61e45be077db610696ee7b5d825400))
-- `useLocalStorage`, `useSessionStorage`: add `compare` and `validate` options ([d9ca582](https://github.com/lilibraries/hooks/commit/d9ca582d3bafaa39b39c6d20d42cdf693d56d526))
-- `useMemoizedValue`: add `compare` param ([0b7a0b8](https://github.com/lilibraries/hooks/commit/0b7a0b87a31326fb5ecaf522391accbc05c240b1))
+- **useCookie**: add `validate` option ([9b4e7f2](https://github.com/lilibraries/hooks/commit/9b4e7f2bba04cdd6c92dca6eb60d8760824c5a9d))
+- **useIdle**: support `timeout` option ([336e684](https://github.com/lilibraries/hooks/commit/336e68464a61e45be077db610696ee7b5d825400))
+- **useLocalStorage,useSessionStorage**: add `compare` and `validate` options ([d9ca582](https://github.com/lilibraries/hooks/commit/d9ca582d3bafaa39b39c6d20d42cdf693d56d526))
+- **useMemoizedValue**: add `compare` param ([0b7a0b8](https://github.com/lilibraries/hooks/commit/0b7a0b87a31326fb5ecaf522391accbc05c240b1))
 
 ### Bug Fixes
 
-- `useFavicon`(TS): add `null` type for the `href` parameter ([6d0c28f](https://github.com/lilibraries/hooks/commit/6d0c28f75b18f193ba964ba51503b3e8224b3ce9))
-- `usePersist`(TS): fix return type ([ea3d882](https://github.com/lilibraries/hooks/commit/ea3d8824b102f520de8c3c667c3196addda83eea))
-- `useTitle`(TS): add `null` type for the `title` parameter ([30cea47](https://github.com/lilibraries/hooks/commit/30cea4727b3d5c37a142f2065c4c067bf422b317))
+- **useFavicon**: add `null` type for the `href` parameter ([6d0c28f](https://github.com/lilibraries/hooks/commit/6d0c28f75b18f193ba964ba51503b3e8224b3ce9))
+- **usePersist**: fix return type ([ea3d882](https://github.com/lilibraries/hooks/commit/ea3d8824b102f520de8c3c667c3196addda83eea))
+- **useTitle**: add `null` type for the `title` parameter ([30cea47](https://github.com/lilibraries/hooks/commit/30cea4727b3d5c37a142f2065c4c067bf422b317))
 
 ## [0.2.1](https://github.com/lilibraries/hooks/compare/v0.2.0...v0.2.1) (2022-06-28)
 
@@ -66,7 +70,7 @@ Bump.
 
 - support React 18 StrictMode ([262aed1](https://github.com/lilibraries/hooks/commit/262aed1dc031877b6c3d34212b37b3d1163ed5e7))
 
-# [0.2.0](https://github.com/lilibraries/hooks/compare/v0.1.1...v0.2.0) (2022-06-27)
+## [0.2.0](https://github.com/lilibraries/hooks/compare/v0.1.1...v0.2.0) (2022-06-27)
 
 ### BREAKING CHANGES
 
@@ -78,8 +82,8 @@ Bump.
 - rename `useUpdateLayoutEffect` to `useLayoutUpdate` ([3ae0f1f](https://github.com/lilibraries/hooks/commit/3ae0f1fa0b53a362d762e003c943e0acc82dafbf))
 - rename `useDebounced` to `useDebouncedValue` ([99157fd](https://github.com/lilibraries/hooks/commit/99157fd0b7749711352fcc845a1fbe8b8919b9eb))
 - rename `useThrottled` to `useThrottledValue` ([7e3bd0b](https://github.com/lilibraries/hooks/commit/7e3bd0ba5becb601e7d938c7862b0443e4a7bd4c))
-- `useCookie`: change params and results ([a494fd8](https://github.com/lilibraries/hooks/commit/a494fd86a14c4d276d6782a604c3879289b0de72))
-- `useLocalStorage`, `useSessionStorage`: change params and results ([e3b247a](https://github.com/lilibraries/hooks/commit/e3b247a66b4eab7168a5485cdc5d99c7da4f689b))
+- **useCookie**: change params and results ([a494fd8](https://github.com/lilibraries/hooks/commit/a494fd86a14c4d276d6782a604c3879289b0de72))
+- **useLocalStorage,useSessionStorage**: change params and results ([e3b247a](https://github.com/lilibraries/hooks/commit/e3b247a66b4eab7168a5485cdc5d99c7da4f689b))
 
 ### Features
 
@@ -98,16 +102,10 @@ Bump.
 
 ### Bug Fixes
 
-- `useTimeout`: should not automatically set timer when the `delay` param is updated ([86c98d0](https://github.com/lilibraries/hooks/commit/86c98d06a8a4a0b834149c820bae4e3d7c10e489))
+- **useTimeout**: should not automatically set timer when the `delay` param is updated ([86c98d0](https://github.com/lilibraries/hooks/commit/86c98d06a8a4a0b834149c820bae4e3d7c10e489))
 
 ## [0.1.1](https://github.com/lilibraries/hooks/compare/v0.1.0...v0.1.1) (2021-03-30)
 
 ### Bug Fixes
 
-- `useIdle`: fix SSR issue ([b877eea](https://github.com/lilibraries/hooks/commit/b877eeae71a970d340dd0840e614463a47ee98b4))
-
-# [0.1.0](https://github.com/lilibraries/hooks/compare/2df17e87a4640318274ca3f4fc8b7f5fa9b031e9...v0.1.0) (2021-03-29)
-
-### Features
-
-- initial commit ([2df17e8](https://github.com/lilibraries/hooks/commit/2df17e87a4640318274ca3f4fc8b7f5fa9b031e9))
+- **useIdle**: fix SSR issue ([b877eea](https://github.com/lilibraries/hooks/commit/b877eeae71a970d340dd0840e614463a47ee98b4))

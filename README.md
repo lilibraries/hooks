@@ -6,7 +6,7 @@ React hook library.
 
 - Supports React 16.8+, 17+ and 18+.
 - Supports SSR.
-- Supports React [StrictMode](https://reactjs.org/docs/strict-mode.html).
+- Supports React StrictMode.
 - Supports network requests.
 - Provides 50+ hooks.
 
@@ -14,6 +14,10 @@ React hook library.
 
 ```shell
 npm install --save @lilib/hooks
+# Or
+yarn add @lilib/hooks
+# Or
+pnpm add @lilib/hooks
 ```
 
 ## Example
@@ -23,9 +27,9 @@ import React from "react";
 import { useLoad } from "@lilib/hooks";
 
 function Example() {
-  const {data, error, loading} = useLoad(() => {
-    return fetch('/users/0').then(response => response.json())
-  })
+  const { data, error, loading } = useLoad(() => {
+    return fetch("/users/0").then((response) => response.json());
+  });
   ...
 }
 ```
@@ -99,13 +103,7 @@ https://lilibraries.github.io/hooks/
         </a>
       </td>
       <td>
-        It's similar to
-        <a href="https://lilibraries.github.io/hooks/useMount">
-          <code>useMount</code>
-        </a>
-        , except it uses <a href="https://lilibraries.github.io/hooks/useIsomorphicLayoutEffect">
-          <code>useIsomorphicLayoutEffect</code>
-        </a> internally.
+        It's similar to <code>useMount</code>, except it uses <code>useIsomorphicLayoutEffect</code> internally.
       </td>
     </tr>
     <tr>
@@ -115,13 +113,7 @@ https://lilibraries.github.io/hooks/
         </a>
       </td>
       <td>
-        It's similar to
-        <a href="https://lilibraries.github.io/hooks/useUpdate">
-          <code>useUpdate</code>
-        </a>
-        , except it uses <a href="https://lilibraries.github.io/hooks/useIsomorphicLayoutEffect">
-          <code>useIsomorphicLayoutEffect</code>
-        </a> internally.
+        It's similar to <code>useUpdate</code>, except it uses <code>useIsomorphicLayoutEffect</code> internally.
       </td>
     </tr>
     <tr>
@@ -131,13 +123,7 @@ https://lilibraries.github.io/hooks/
         </a>
       </td>
       <td>
-        It's similar to
-        <a href="https://lilibraries.github.io/hooks/useTargetEffect">
-          <code>useTargetEffect</code>
-        </a>
-        , except it uses <a href="https://lilibraries.github.io/hooks/useIsomorphicLayoutEffect">
-          <code>useIsomorphicLayoutEffect</code>
-        </a> internally.
+        It's similar to <code>useTargetEffect</code>, except it uses <code>useIsomorphicLayoutEffect</code> internally.
       </td>
     </tr>
     <tr>
@@ -195,7 +181,7 @@ https://lilibraries.github.io/hooks/
           <code>useDelayedValue</code>
         </a>
       </td>
-      <td>Delay update a value.</td>
+      <td>Delay updating a value.</td>
     </tr>
     <tr>
       <td>
@@ -506,7 +492,7 @@ https://lilibraries.github.io/hooks/
           <code>useReload</code>
         </a>
       </td>
-      <td>Reload requests</td>
+      <td>Reload async data.</td>
     </tr>
     <tr>
       <td>
@@ -514,7 +500,7 @@ https://lilibraries.github.io/hooks/
           <code>useSubmit</code>
         </a>
       </td>
-      <td>Submit network requests</td>
+      <td>Submit network requests.</td>
     </tr>
     <tr>
       <td rowspan="2">Configs</td>
@@ -523,7 +509,7 @@ https://lilibraries.github.io/hooks/
           <code>LoadConfig</code>
         </a>
       </td>
-      <td>Provide default options for request hooks.</td>
+      <td>Config component of request hooks.</td>
     </tr>
     <tr>
       <td>
@@ -532,14 +518,15 @@ https://lilibraries.github.io/hooks/
         </a>
       </td>
       <td>
-        Config for
-        <a href="https://lilibraries.github.io/hooks/useCache">
-          <code>useCache</code>
-        </a>
+        Config component of <code>useCache</code>.
       </td>
     </tr>
   </tbody>
 </table>
+
+## Changelog
+
+https://github.com/lilibraries/hooks/blob/master/CHANGELOG.md
 
 ## License
 

@@ -3,13 +3,13 @@
     "commitMessage": "chore(release): ${version}"
   },
   "hooks": {
-    "before:init": ["npm run lint", "npm run test", "npm run dist"],
-    "after:release": "echo Successfully released ${name} v${version} to ${repo.repository}."
+    "before:init": ["npm run lint", "npm run test:all", "npm run dist"],
+    "after:release": "echo Successfully released ${name}@${version}."
   },
   "plugins": {
     "@release-it/conventional-changelog": {
       "preset": "conventionalcommits",
-      "infile": "docs/CHANGELOG.md",
+      "infile": "CHANGELOG.md",
       "header": "# Changelog"
     }
   }
