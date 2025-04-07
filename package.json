@@ -36,7 +36,7 @@
     "test": "jest",
     "test:16": "node scripts/checkGitIsClean.mjs && pnpm add react@16 react-dom@16 @testing-library/react@12 @testing-library/react-hooks@7 && jest && node scripts/cleanGit.mjs && pnpm i",
     "test:17": "node scripts/checkGitIsClean.mjs && pnpm add react@17 react-dom@17 @testing-library/react@12 @testing-library/react-hooks@7 && jest && node scripts/cleanGit.mjs && pnpm i",
-    "test:18": "node scripts/checkGitIsClean.mjs && pnpm add react@18 react-dom@18 @testing-library/react@13 && jest && node scripts/cleanGit.mjs && pnpm i",
+    "test:18": "node scripts/checkGitIsClean.mjs && pnpm add react@18 react-dom@18 @testing-library/react@16 && jest && node scripts/cleanGit.mjs && pnpm i",
     "test:19": "node scripts/checkGitIsClean.mjs && pnpm add react@19 react-dom@19 @testing-library/react@16 && jest && node scripts/cleanGit.mjs && pnpm i",
     "test:all": "npm run test:16 && npm run test:17 && npm run test:18 && npm run test:19",
     "lint": "tsc -p tsconfig.json --noEmit && eslint . --ext .jsx,.js,.ts,.tsx && prettier --check . --loglevel warn",

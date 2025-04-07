@@ -1,5 +1,5 @@
 import { useState } from "react";
-import act from "./helpers/act";
+import { act } from "@testing-library/react";
 import renderHook from "./helpers/renderHook";
 import FakeTimers, { InstalledClock } from "@sinonjs/fake-timers";
 

@@ -1,6 +1,6 @@
 import Cookies from "js-cookie";
 import { useCookie } from "@lilib/hooks";
-import act from "./helpers/act";
+import { act } from "@testing-library/react";
 import renderHook from "./helpers/renderHook";
 
 describe("useCookie", () => {

@@ -1,6 +1,5 @@
 import { useSubmit } from "@lilib/hooks";
-import { waitFor } from "@testing-library/react";
-import act from "./helpers/act";
+import { act, waitFor } from "@testing-library/react";
 import renderHook from "./helpers/renderHook";
 
 describe("useSubmit", () => {
