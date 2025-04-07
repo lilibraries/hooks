@@ -37,7 +37,8 @@
     "test:16": "node scripts/checkGitIsClean.mjs && pnpm add react@16 react-dom@16 @testing-library/react@12 @testing-library/react-hooks@7 && jest && node scripts/cleanGit.mjs && pnpm i",
     "test:17": "node scripts/checkGitIsClean.mjs && pnpm add react@17 react-dom@17 @testing-library/react@12 @testing-library/react-hooks@7 && jest && node scripts/cleanGit.mjs && pnpm i",
     "test:18": "node scripts/checkGitIsClean.mjs && pnpm add react@18 react-dom@18 @testing-library/react@13 && jest && node scripts/cleanGit.mjs && pnpm i",
-    "test:all": "npm run test:16 && npm run test:17 && npm run test:18",
+    "test:19": "node scripts/checkGitIsClean.mjs && pnpm add react@19 react-dom@19 @testing-library/react@16 && jest && node scripts/cleanGit.mjs && pnpm i",
+    "test:all": "npm run test:16 && npm run test:17 && npm run test:18 && npm run test:19",
     "lint": "tsc -p tsconfig.json --noEmit && eslint . --ext .jsx,.js,.ts,.tsx && prettier --check . --loglevel warn",
     "lint:fix": "tsc -p tsconfig.json --noEmit && eslint . --ext .jsx,.js,.ts,.tsx --fix && prettier --write . --loglevel warn",
     "dist": "rimraf dist && concurrently --kill-others-on-fail npm:dist:*",
@@ -49,8 +50,8 @@
     "release": "HUSKY=0 release-it"
   },
   "peerDependencies": {
-    "react": "^16.8.0 || ^17.0.0 || ^18.0.0",
-    "react-dom": "^16.8.0 || ^17.0.0 || ^18.0.0"
+    "react": "^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0",
+    "react-dom": "^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0"
   },
   "dependencies": {
     "@babel/runtime-corejs3": "^7.18.3",
