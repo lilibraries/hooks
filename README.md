@@ -4,10 +4,10 @@ React hook library.
 
 ## Features
 
-- Supports React 16.8+, 17+ and 18+.
+- Supports React 16.8+, 17+, 18+ and 19+.
 - Supports SSR.
 - Supports React StrictMode.
-- Supports network requests.
+- Supports loading async data.
 - Provides 50+ hooks.
 
 ## Install
