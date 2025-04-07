@@ -1,5 +1,5 @@
 import { useDebounce } from "@lilib/hooks";
-import { act } from "react-dom/test-utils";
+import act from "./helpers/act";
 import renderHook from "./helpers/renderHook";
 import FakeTimers, { InstalledClock } from "@sinonjs/fake-timers";
 

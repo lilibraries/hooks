@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { CacheConfig, useLoad } from "@lilib/hooks";
 import { waitFor } from "@testing-library/react";
+import act from "./helpers/act";
 import renderHook from "./helpers/renderHook";
-import { act } from "react-dom/test-utils";
 
 describe("useLoad", () => {
   let promise: Promise<any> | null = null;
