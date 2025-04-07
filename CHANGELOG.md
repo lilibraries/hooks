@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0](https://github.com/lilibraries/hooks/compare/v1.0.3...v1.1.0) (2025-04-07)
+
+
+### Features
+
+* support React 19 ([1fa893f](https://github.com/lilibraries/hooks/commit/1fa893f208e7786f4ef6d46a2eae8ba889a22798))
+
 ## [1.0.3](https://github.com/lilibraries/hooks/compare/v1.0.2...v1.0.3) (2023-10-17)
 
 Bump version.
