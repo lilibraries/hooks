@@ -3,31 +3,25 @@ import ExampleBlock from "./components/ExampleBlock";
 import Example from "./examples/UseIntersectionObserver";
 import ExampleCode from "!!raw-loader!./examples/UseIntersectionObserver";
 
-Observe whether two elements intersect.
+Observe when an element's intersection with another element or the viewport changes.
 
 ## API
 
 ```ts
 function useIntersectionObserver(
-  target: EffectTarget<Element>,
+  target: Element | React.RefObject<Element | null>,
   listener: (entries: IntersectionObserverEntry[]) => void,
   options?: {
-    root?: EffectTarget<Element | Document>;
+    root?: Element | Document | React.RefObject<Element | Document | null>;
     rootMargin?: string;
     threshold?: number | number[];
-  }
+  },
 ): void;
-
-type Nullable<T> = T | undefined | null;
-type EffectTarget<T> =
-  | Nullable<T>
-  | (() => Nullable<T>)
-  | { current: Nullable<T> };
 ```
 
 Params:
 
-- **`target`:** Observe target.
+- **`target`:** A DOM element to observe, or a ref object that references it.
 - **`listener`:** Listener function.
 - **`options`:** See [IntersectionObserver](https://developer.mozilla.org/en-US/docs/Web/API/IntersectionObserver/IntersectionObserver) options.
 
