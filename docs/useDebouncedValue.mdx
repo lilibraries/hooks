@@ -10,15 +10,13 @@ Debounce a value.
 ```ts
 function useDebouncedValue<T>(
   value: T,
-  options?:
-    | number
-    | { wait: number; maxWait?: number; leading?: boolean; trailing?: boolean }
+  options?: number | { wait?: number; maxWait?: number; leading?: boolean; trailing?: boolean },
 ): [
   debouncedValue: T,
   actions: {
     flush: (finalValue?: T) => void;
     cancel: () => void;
-  }
+  },
 ];
 ```
 
@@ -35,7 +33,7 @@ Results:
 
 - **`debouncedValue`:** Debounced value.
 - **`actions`:** Actions object.
-  - **`actions.flush`:** Flush funciton. The `finalValue` will be returned as `debouncedValue` if it is specified.
+  - **`actions.flush`:** Flush function. The `finalValue` will be returned as `debouncedValue` if it is specified.
   - **`actions.cancel`:** Cancel debounce timer.
 
 ## Example
