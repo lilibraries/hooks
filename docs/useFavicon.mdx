@@ -3,18 +3,15 @@ Set document favicon.
 ## API
 
 ```ts
-function useFavicon(
-  href: string | null,
-  options?: { mime?: string; restore?: boolean }
-): void;
+function useFavicon(href: string | null, options?: { mime?: string; restore?: boolean }): void;
 ```
 
 Params:
 
-- **`href`:** Required favicon url. If it is `null`, do nothing.
+- **`href`:** The favicon URL. If it is `null`, do nothing.
 - **`options`:** Options object.
-  - **`options.mime`:** Specify the MIME type. Get automatically according to the `href` extname (support `.png`, `.gif` and `.ico`).
-  - **`options.restore`:** Restore old favicon on the component unmount.
+  - **`options.mime`:** Specify the MIME type. It is inferred from the `href` extname by default (support `.png`, `.gif`, `.jpg`, `.jpeg`, `.svg`, `.webp` and `.ico`).
+  - **`options.restore`:** Whether to restore the original favicon on the component unmount.
 
 ## Example
 
