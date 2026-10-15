@@ -8,21 +8,15 @@ Get DOM element size.
 ## API
 
 ```ts
-function useElementSize(target: EffectTarget<Element>): {
+function useElementSize(target: Element | React.RefObject<Element | null>): {
   width: number | undefined;
   height: number | undefined;
 };
-
-type Nullable<T> = T | undefined | null;
-type EffectTarget<T> =
-  | Nullable<T>
-  | (() => Nullable<T>)
-  | { current: Nullable<T> };
 ```
 
 Params:
 
-- **`target`:** A DOM element. It can be `undefined`, `null`, a DOM element, a ref object references a DOM element, or a function returns a DOM element.
+- **`target`:** A DOM element, or a ref object that references a DOM element.
 
 Results:
 
