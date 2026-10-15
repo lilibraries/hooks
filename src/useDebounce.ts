@@ -1,27 +1,38 @@
 import { useMemo, useRef } from "react";
-import isObject from "lodash/isObject";
+
 import debounce from "lodash/debounce";
+import isNumber from "lodash/isNumber";
+import isObject from "lodash/isObject";
+
+import useLatestRef from "./useLatestRef";
 import usePersist from "./usePersist";
 import useUnmount from "./useUnmount";
-import useLatestRef from "./useLatestRef";
 
-export interface DebounceOptions {
+export interface UseDebounceOptions {
   wait?: number;
   maxWait?: number;
   leading?: boolean;
   trailing?: boolean;
 }
 
-function useDebounce<T extends (...args: any[]) => any>(
-  callback: T,
-  options?: number | DebounceOptions
-) {
+/**
+ * Use a debounced callback.
+ *
+ * @param callback The callback to debounce.
+ * @param options The debounce wait time (milliseconds), or an options object.
+ * @param options.wait The debounce wait time (milliseconds).
+ * @param options.maxWait The maximum wait time (milliseconds).
+ * @param options.leading Whether to invoke at the start.
+ * @param options.trailing Whether to invoke at the end.
+ * @returns Returns a `[debounced, { flush, cancel }]` tuple.
+ */
+function useDebounce<T extends (...args: any[]) => any>(callback: T, options?: number | UseDebounceOptions) {
   let wait = 0;
   let maxWait = Infinity;
   let leading = false;
   let trailing = true;
 
-  if (typeof options === "number") {
+  if (isNumber(options)) {
     wait = options;
   } else if (isObject(options)) {
     if (options.wait !== undefined) {
@@ -39,27 +50,28 @@ function useDebounce<T extends (...args: any[]) => any>(
   }
 
   const callbackRef = useLatestRef(callback);
-  const debouncedRef = useRef<ReturnType<typeof debounce>>();
+  const debouncedRef = useRef<ReturnType<typeof debounce> | undefined>(undefined);
 
+  // Rebuild the debounced function when debounce options change; useMemo (rather
+  // than useEffect) ensures calls to `debounced` within the same render already
+  // use the new function.
+  // Flush the old function before rebuilding to run its pending call immediately
+  // and avoid leftover timers.
   useMemo(
     () => {
       debouncedRef.current?.flush();
       debouncedRef.current = debounce(
-        function (...args: Parameters<T>) {
-          // @ts-ignore
+        function (this: any, ...args: Parameters<T>) {
           return callbackRef.current.apply(this, args);
         },
         wait,
-        { maxWait, leading, trailing }
+        { maxWait, leading, trailing },
       );
     },
-    [wait, maxWait, leading, trailing] // eslint-disable-line
+    [wait, maxWait, leading, trailing], // eslint-disable-line
   );
 
-  const debounced = usePersist(function (
-    ...args: Parameters<T>
-  ): ReturnType<T> | undefined {
-    // @ts-ignore
+  const debounced = usePersist(function (this: any, ...args: Parameters<T>): ReturnType<T> | undefined {
     return debouncedRef.current?.apply(this, args);
   });
 
