@@ -1,15 +1,19 @@
 import { useRef } from "react";
-import useMountedRef from "./useMountedRef";
 
+/**
+ * Return a ref object whose `current` property points to the value from the previous update (kept while the value is unchanged), `undefined` on the first render.
+ *
+ * @param value The current value.
+ * @returns Returns a ref object.
+ */
 function usePreviousRef<T>(value: T) {
-  const mountedRef = useMountedRef();
-  const latestRef = useRef(value);
-  const previousRef = useRef<T>();
+  const currentRef = useRef(value);
+  const previousRef = useRef<T | undefined>(undefined);
 
-  if (mountedRef.current) {
-    previousRef.current = latestRef.current;
+  if (value !== currentRef.current) {
+    previousRef.current = currentRef.current;
+    currentRef.current = value;
   }
-  latestRef.current = value;
 
   return previousRef;
 }
