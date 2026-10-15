@@ -1,4 +1,4 @@
-Return a ref object whose `.current` property is assigned to latest updated value.
+Return a ref object whose `.current` property always points to the latest value. It is typically used to read the latest value inside long-lived callbacks (timers, event listeners) to avoid stale closures.
 
 ## API
 
