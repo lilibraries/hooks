@@ -1,9 +1,9 @@
-This hook compose multiple refs into one. It's very useful when developing components.
+This hook composes multiple refs into one. Ref objects, ref callbacks and `undefined` are all accepted, which makes it very useful when developing components.
 
 ## API
 
 ```ts
-function useComposedRef<T>(...refs: React.Ref<T>[]): React.RefCallback<T>;
+function useComposedRef<T>(...refs: (React.Ref<T> | undefined)[]): React.RefCallback<T>;
 ```
 
 ## Example
@@ -16,7 +16,7 @@ const Component = forwardRef<HTMLDivElement, any>((props, ref) => {
   const domRef = useRef<HTMLDivElement>(null);
   const composedRef = useComposedRef(domRef, ref);
 
-  // Do somthing.
+  // Do something.
 
   return <div ref={composedRef}>...</div>;
 });
