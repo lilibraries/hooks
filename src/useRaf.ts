@@ -1,11 +1,19 @@
 import { useRef } from "react";
-import raf from "raf";
-import useUnmount from "./useUnmount";
-import usePersist from "./usePersist";
-import useLatestRef from "./useLatestRef";
 
+import raf from "raf";
+
+import useLatestRef from "./useLatestRef";
+import usePersist from "./usePersist";
+import useUnmount from "./useUnmount";
+
+/**
+ * Invoke a callback before the browser repaints, via `requestAnimationFrame`.
+ *
+ * @param callback The callback invoked before the browser repaints.
+ * @returns Returns a `[start, cancel]` tuple.
+ */
 function useRaf(callback: () => void) {
-  const timerRef = useRef<number>();
+  const timerRef = useRef<number | undefined>(undefined);
   const callbackRef = useLatestRef(callback);
 
   const cancel = usePersist(() => {
