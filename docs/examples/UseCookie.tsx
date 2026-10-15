@@ -10,9 +10,7 @@ function Example() {
   return (
     <>
       <div>
-        <button onClick={() => setCookie(Math.random().toString())}>
-          Set random cookie
-        </button>{" "}
+        <button onClick={() => setCookie(Math.random().toString())}>Set random cookie</button>{" "}
         <button onClick={() => setCookie(undefined)}>Remove</button>
       </div>
       <div>Cookie value: {value}</div>

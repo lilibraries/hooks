@@ -21,9 +21,7 @@ function Example() {
 
   return (
     <div>
-      <button onClick={() => submit()}>
-        {submitting ? "Submitting" : "Submit"}
-      </button>
+      <button onClick={() => submit()}>{submitting ? "Submitting" : "Submit"}</button>
       Number: {data} {loading ? "(Loading...)" : ""}
     </div>
   );

@@ -15,7 +15,7 @@ function Example() {
         setIntersecting(false);
       }
     },
-    { root: rootRef, threshold: 1 }
+    { root: rootRef, threshold: 1 },
   );
 
   return (

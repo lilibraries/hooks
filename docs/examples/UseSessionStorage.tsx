@@ -10,9 +10,7 @@ function Example() {
   return (
     <>
       <div>
-        <button onClick={() => setSessionStorage(Math.random().toString())}>
-          Set random value
-        </button>{" "}
+        <button onClick={() => setSessionStorage(Math.random().toString())}>Set random value</button>{" "}
         <button onClick={() => setSessionStorage(undefined)}>Remove</button>
       </div>
       <div>The value is: {value}</div>

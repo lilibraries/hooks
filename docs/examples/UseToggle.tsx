@@ -6,8 +6,7 @@ function Example() {
 
   return (
     <>
-      <button onClick={() => toggle()}>Toggle</button>{" "}
-      <button onClick={toggleOn}>Toggle on</button>{" "}
+      <button onClick={() => toggle()}>Toggle</button> <button onClick={toggleOn}>Toggle on</button>{" "}
       <button onClick={toggleOff}>Toggle off</button> {`Value: ${value}`}
     </>
   );
