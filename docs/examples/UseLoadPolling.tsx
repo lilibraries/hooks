@@ -3,7 +3,7 @@ import { useLoad } from "@lilib/hooks";
 
 let count = 0;
 const getCount = () => {
-  return new Promise((resolve) => {
+  return new Promise<number>((resolve) => {
     setTimeout(() => {
       resolve(++count);
     }, 1000);

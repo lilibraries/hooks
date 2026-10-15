@@ -1,57 +1,96 @@
 import "requestidlecallback";
-import { DependencyList, useDebugValue, useEffect, useRef } from "react";
-import isObject from "lodash/isObject";
+
+import { useDebugValue, useEffect, useRef, type DependencyList } from "react";
+
 import isFunction from "lodash/isFunction";
-import {
-  warning,
-  isPageVisible,
-  PromiseResolve,
-  mergeWithDefined,
-} from "@lilib/utils";
-import useUpdate from "./useUpdate";
-import usePersist from "./usePersist";
-import useUnmount from "./useUnmount";
-import useSetState from "./useSetState";
-import useThrottle from "./useThrottle";
+import isObject from "lodash/isObject";
+import warning from "warning";
+
+import getLoadStore from "./utils/getLoadStore";
 import useLatestRef from "./useLatestRef";
 import useMountedRef from "./useMountedRef";
+import usePersist from "./usePersist";
+import useSetState from "./useSetState";
+import useThrottle from "./useThrottle";
+import useUnmount from "./useUnmount";
 import useUnmountedRef from "./useUnmountedRef";
-import { useCacheConfig } from "./configs/CacheConfig";
-import { useLoadConfig, LoadSharedOptions } from "./configs/LoadConfig";
+import useUpdate from "./useUpdate";
+import isPageVisible from "./utils/isPageVisible";
+import mergeDefined from "./utils/mergeDefined";
+import type { AnyFunction } from "./utils/types";
 
 export type LoadCallback = (...args: any[]) => Promise<any>;
-export type LoadData<T extends LoadCallback> = PromiseResolve<ReturnType<T>>;
+export type LoadData<T extends LoadCallback> = Awaited<ReturnType<T>>;
 
-export interface LoadHookOptions<Callback extends LoadCallback>
-  extends LoadSharedOptions {
-  key?: {};
+interface UseLoadOptions<Callback extends LoadCallback> {
+  /** A shared key. Multiple `useLoad` instances with the same `key` merge duplicate requests and share the loaded result, and can all be reloaded together via `useReload(key)`. Note: `key` must be an immutable value; changing it triggers a warning and may corrupt shared state. */
+  key?: NonNullable<unknown>;
+  /** Whether to run the load while the browser is idle (via `requestIdleCallback`) to avoid blocking rendering. Pass `true` or an idle-callback options object. */
   idle?: boolean | IdleRequestOptions;
+  /** Whether to trigger loading manually. When `true`, nothing loads on mount; call `load` explicitly. */
   imperative?: boolean;
+  /** Whether the request is independent. When `true`, duplicate requests are not merged even if `key` is set (each instance fires its own), but `useReload(key)` can still reload it. */
   independent?: boolean;
+  /** A fallback loader invoked when the primary loader still fails after retries are exhausted; usually points to an alternate data source. */
   fallback?: Callback;
+  /** Initial data. When set, `data` starts with this value and the returned `data` type no longer includes `undefined`. */
   initialData?: LoadData<Callback>;
+  /** Default params. Used by the first load or by `reload` when no params have been passed via `load(...params)` yet. */
   defaultParams?: Parameters<Callback>;
-  cacheKey?: {};
-  cacheValidate?: (data: any) => boolean;
+  /** Whether to automatically retry on failure (at most `retryLimit` times). Pass a function to decide per failure: it receives the error and returns whether to retry. */
+  retry?: boolean | ((error: any) => boolean);
+  /** Maximum number of automatic retries, defaults to 3. */
+  retryLimit?: number;
+  /** The wait before a retry (milliseconds). A number or a function computing it from the retry number. Defaults to exponential growth: the `count`-th retry waits 2^(count-1) × 1000 ms. */
+  retryInterval?: number | ((count: number) => number);
+  /** Whether to keep retrying the fallback function itself after it fails too. Pass a function to decide per failure: it receives the error and returns whether to retry. */
+  fallbackRetry?: boolean | ((error: any) => boolean);
+  /** Maximum retries for the fallback function, defaults to 3. */
+  fallbackRetryLimit?: number;
+  /** The wait before retrying the fallback function (milliseconds). A number or a function. Defaults to exponential growth: the `count`-th retry waits 2^(count-1) × 1000 ms. */
+  fallbackRetryInterval?: number | ((count: number) => number);
+  /** Whether to enable polling. After each request settles (success or failure), waits `pollingInterval` before reloading automatically, until cancelled. */
+  polling?: boolean;
+  /** The polling interval (milliseconds), defaults to 30000. */
+  pollingInterval?: number;
+  /** Whether to keep polling while the page is hidden. */
+  pollingInPageHidden?: boolean;
+  /** The polling interval while the page is hidden (milliseconds), defaults to 60000. */
+  pollingIntervalInPageHidden?: number;
+  /** Throttle time for automatic reloads (milliseconds): among consecutive triggers only the first runs, later triggers within the window are ignored. Defaults to 10000. */
+  autoReloadWaitTime?: number;
+  /** Whether to automatically reload when the page becomes visible again. */
+  autoReloadOnPageShow?: boolean;
+  /** Whether to automatically reload when the window regains focus. */
+  autoReloadOnWindowFocus?: boolean;
+  /** Whether to automatically reload when the network recovers (online event). */
+  autoReloadOnNetworkReconnect?: boolean;
+  /** Called on success with the loaded data. */
   onSuccess?: (data: LoadData<Callback>) => void;
+  /** Called on failure with the error object. */
   onFailure?: (error: any) => void;
+  /** Called when loading settles (success or failure). */
   onFinally?: () => void;
 }
 
 interface Results<Callback extends LoadCallback> {
+  /** The loaded data; `undefined` until a load has succeeded. */
   data: LoadData<Callback> | undefined;
+  /** The error of the most recent failure, `null` on success. */
   error: any;
+  /** Whether a load is in progress (includes the initial load and reloads). */
   loading: boolean;
+  /** Whether this is a reload with existing data (`loading` and `data` already present). */
   reloading: boolean;
+  /** Whether this is the initial load (`loading` with no data yet). */
   initializing: boolean;
+  /** Manual load function: its params are passed to `callback` as is and it returns a Promise (resolves with the data on success, rejects with the error on failure). Note: calling it before the component mounts returns a Promise that never settles, so do not call it during `useLayoutEffect`. */
   load: (...params: Parameters<Callback>) => ReturnType<Callback>;
-  force: (...params: Parameters<Callback>) => ReturnType<Callback>;
-  reload: (options?: { force?: boolean }) => void;
-  update: (
-    newData:
-      | LoadData<Callback>
-      | ((prevData?: LoadData<Callback>) => LoadData<Callback>)
-  ) => void;
+  /** Reload function: cancels the in-flight request (including retries, polling, etc.) first, then reloads with the params from the most recent `load` call (or `defaultParams` if none were ever passed). */
+  reload: () => void;
+  /** Local update function: mutates `data` directly (no request), accepts a new value or a function computed from the old value. */
+  update: (newData: LoadData<Callback> | ((prevData?: LoadData<Callback>) => LoadData<Callback>)) => void;
+  /** Cancel function: aborts the current load and stops all pending tasks such as retries and polling. The Promise returned by the cancelled `load` stays pending forever (neither resolves nor rejects). */
   cancel: () => void;
 }
 
@@ -61,25 +100,69 @@ interface State<Data> {
   loading: boolean;
 }
 
+/** Exponentially growing retry wait time (milliseconds): the `count`-th retry waits 2^(count-1) × 1000 ms. So the 1st retry waits 1 second, the 2nd 2 seconds, the 3rd 4 seconds, and so on. */
+function getRetryInterval(count: number) {
+  return Math.pow(2, count - 1) * 1000;
+}
+
+/** Resolve a retry option against the error of the current failure: a boolean means "always"/"never", a function decides per error and returns whether to retry. */
+function resolveRetryOption(option: boolean | ((error: any) => boolean), error: any) {
+  return isFunction(option) ? option(error) : option;
+}
+
+const defaultLoadOptions = {
+  retry: false,
+  retryLimit: 3,
+  retryInterval: getRetryInterval,
+  fallbackRetry: false,
+  fallbackRetryLimit: 3,
+  fallbackRetryInterval: getRetryInterval,
+  polling: false,
+  pollingInterval: 30 * 1000,
+  pollingInPageHidden: false,
+  pollingIntervalInPageHidden: 60 * 1000,
+  autoReloadWaitTime: 10 * 1000,
+  autoReloadOnPageShow: false,
+  autoReloadOnWindowFocus: false,
+  autoReloadOnNetworkReconnect: false,
+};
+
+/**
+ * Load asynchronous data, typically for network requests. `callback` must return a Promise.
+ *
+ * Key features:
+ * - Shared loading: multiple instances with the same `key` merge duplicate requests and share results
+ * - Failure retry (`retry`) and failure fallback (`fallback`)
+ * - Polling (`polling`)
+ * - Automatic reload when the page becomes visible / the window gains focus / the network recovers
+ * - Loading during browser idle time (`idle`)
+ *
+ * Loads automatically after mount by default (and again when `deps` change);
+ * set `options.imperative` to `true` to trigger loading manually via `load` instead.
+ *
+ * @param callback The loader; its params are forwarded by `load`, must return a Promise; the resolved value becomes `data`.
+ * @param deps The dependency array; any change triggers an automatic reload; defaults to `[]` (load once after mount).
+ * @param options The options object, see `UseLoadOptions`.
+ * @returns Returns { load, reload, update, cancel, data, error, loading, reloading, initializing }.
+ */
 function useLoad<Callback extends LoadCallback>(
   callback: Callback,
   deps: DependencyList,
-  options: LoadHookOptions<Callback> & { initialData: LoadData<Callback> }
+  options: UseLoadOptions<Callback> & { initialData: LoadData<Callback> },
 ): Readonly<Results<Callback> & { data: LoadData<Callback> }>;
 
 function useLoad<Callback extends LoadCallback>(
   callback: Callback,
   deps?: DependencyList,
-  options?: LoadHookOptions<Callback>
+  options?: UseLoadOptions<Callback>,
 ): Readonly<Results<Callback>>;
 
 function useLoad<Callback extends LoadCallback>(
   callback: Callback,
   deps: DependencyList = [],
-  options: LoadHookOptions<Callback> = {}
+  options: UseLoadOptions<Callback> = {},
 ): Readonly<Results<Callback>> {
-  const { cache } = useCacheConfig();
-  const { store, ...config } = useLoadConfig();
+  const store = getLoadStore();
 
   const {
     key,
@@ -89,10 +172,6 @@ function useLoad<Callback extends LoadCallback>(
     fallback,
     initialData,
     defaultParams,
-    cacheKey,
-    cacheTime,
-    staleTime,
-    cacheValidate,
     retry,
     retryLimit,
     retryInterval,
@@ -101,30 +180,17 @@ function useLoad<Callback extends LoadCallback>(
     fallbackRetryInterval,
     polling,
     pollingInterval,
-    pollingInPageHiding,
-    pollingIntervalInPageHiding,
+    pollingInPageHidden,
+    pollingIntervalInPageHidden,
     autoReloadWaitTime,
     autoReloadOnPageShow,
     autoReloadOnWindowFocus,
     autoReloadOnNetworkReconnect,
-  } = mergeWithDefined(config, options);
+  } = mergeDefined(defaultLoadOptions, options);
   const isAssociated = key != null && !independent;
 
-  const getCachedData = usePersist(() => {
-    if (cacheKey != null && cache.has(cacheKey)) {
-      const cachedData = cache.get(cacheKey) as LoadData<Callback>;
-      if (cacheValidate) {
-        return cacheValidate(cachedData) ? cachedData : initialData;
-      } else {
-        return cachedData;
-      }
-    } else {
-      return initialData;
-    }
-  });
-
   const [state, setState] = useSetState<State<LoadData<Callback>>>(() => ({
-    data: getCachedData(),
+    data: initialData,
     error: null,
     loading: !imperative,
   }));
@@ -134,31 +200,42 @@ function useLoad<Callback extends LoadCallback>(
   const callbackRef = useLatestRef(callback);
   const fallbackRef = useLatestRef(fallback);
 
+  /** Request token: incremented whenever a new request starts or is cancelled, so old requests can detect staleness via `isCanceled()` */
   const idRef = useRef(0);
+  /** Whether `load()` has started at least once: polling and automatic reloads are allowed only when `true` */
   const readyRef = useRef(false);
-  const forceRef = useRef(false);
-  const paramsRef = useRef<Parameters<Callback>>();
-  const loadingRef = useRef<{
-    key: any;
-    load: Function;
-    store: typeof store;
-  }>();
-  const unlistenRef = useRef<() => void>();
+  const paramsRef = useRef<Parameters<Callback> | undefined>(undefined);
+  const loadingRef = useRef<{ key: NonNullable<unknown>; load: AnyFunction; store: typeof store } | undefined>(
+    undefined,
+  );
+  const unlistenRef = useRef<(() => void) | undefined>(undefined);
   const idleTimerRef = useRef(0);
   const retryTimerRef = useRef(0);
   const pollingTimerRef = useRef(0);
+  const reloadRef = useRef<(() => void) | undefined>(undefined);
+  const loadRef = useRef<((...params: Parameters<Callback>) => ReturnType<Callback>) | undefined>(undefined);
 
+  // leading and non-trailing: among consecutive triggers (e.g. rapid visibility toggles) only the first runs, later triggers within autoReloadWaitTime are ignored
+  const [autoReload] = useThrottle(
+    () => {
+      if (readyRef.current && !state.loading) {
+        reloadRef.current?.();
+      }
+    },
+    { wait: autoReloadWaitTime, leading: true, trailing: false },
+  );
+
+  // Terminate all pending tasks of this instance: the in-flight request, retry/polling timers, the idle callback, and the shared-request listeners
   const clearPending = usePersist(() => {
     idRef.current++;
     readyRef.current = false;
 
     clearTimeout(retryTimerRef.current);
     clearTimeout(pollingTimerRef.current);
-    cancelAutoReload();
     cancelIdleCallback(idleTimerRef.current);
 
     if (loadingRef.current) {
-      const { key, store } = loadingRef.current;
+      const { key, load, store } = loadingRef.current;
       if (store.isLoading(key, load)) {
         store.deleteLoading(key, load);
         store.for(key).emit("cancel");
@@ -172,130 +249,74 @@ function useLoad<Callback extends LoadCallback>(
     }
   });
 
-  const triggerSuccess = usePersist((data: LoadData<Callback>, key?: {}) => {
+  const triggerSuccess = usePersist((data: LoadData<Callback>) => {
     if (options.onSuccess) {
       options.onSuccess(data);
-    } else if (config.onSuccess) {
-      config.onSuccess(data, key);
-    }
-    if (config.handleSuccess) {
-      config.handleSuccess(data, key);
     }
   });
 
-  const triggerFailure = usePersist((error: any, key?: {}) => {
+  const triggerFailure = usePersist((error: any) => {
     if (options.onFailure) {
       options.onFailure(error);
-    } else if (config.onFailure) {
-      config.onFailure(error, key);
-    }
-    if (config.handleFailure) {
-      config.handleFailure(error, key);
     }
   });
 
-  const triggerFinally = usePersist((key?: {}) => {
+  const triggerFinally = usePersist(() => {
     if (options.onFinally) {
       options.onFinally();
-    } else if (config.onFinally) {
-      config.onFinally(key);
-    }
-    if (config.handleFinally) {
-      config.handleFinally(key);
     }
   });
 
   const load = usePersist((...params: Parameters<Callback>) => {
+    // loadRef.current is assigned during render (see loadRef.current = load below) and `load` only runs when called by the user, so the `!` (non-null assertion) is safe here.
+    const currentLoad = loadRef.current!;
+
     clearPending();
     readyRef.current = true;
     paramsRef.current = params;
 
-    let force = forceRef.current;
-    if (force) {
-      forceRef.current = false;
-    }
-
     if (!mountedRef.current) {
-      if (process.env.NODE_ENV !== "production") {
-        warning(
-          true,
-          "You should not load data before the component is mounted.",
-          { scope: "useLoad" }
-        );
-      }
+      warning(false, "[useLoad] You should not load data before the component is mounted.");
       return new Promise(() => {}) as ReturnType<Callback>;
     }
 
-    if (
-      !force &&
-      staleTime > 0 &&
-      cacheKey != null &&
-      cache.has(cacheKey) &&
-      state.error == null
-    ) {
-      let cachedData;
-      const timestamp = cache.getCacheTimestamp(cacheKey);
-      if (
-        timestamp &&
-        Date.now() - timestamp <= staleTime &&
-        (state.data !== undefined ||
-          (cachedData = getCachedData()) !== undefined)
-      ) {
-        const data = state.data !== undefined ? state.data : cachedData;
-        if (state.data === undefined) {
-          setState({ data: cachedData, loading: false });
-        } else if (state.loading) {
-          setState({ loading: false });
-        }
-        return new Promise((resolve) => {
-          resolve(data);
-        }) as ReturnType<Callback>;
-      }
-    }
-
     if (isAssociated && !store.isLoading(key)) {
-      store.setLoading(key, load);
-      loadingRef.current = { key, load, store };
+      store.setLoading(key, currentLoad);
+      loadingRef.current = { key, load: currentLoad, store };
     }
 
-    let cachedData;
-    if (
-      state.data === undefined &&
-      cacheKey != null &&
-      cache.has(cacheKey) &&
-      (cachedData = getCachedData()) !== undefined
-    ) {
-      setState({ data: cachedData, loading: true });
-    } else if (!state.loading) {
+    if (!state.loading) {
       setState({ loading: true });
     }
 
     const id = idRef.current;
     const isCanceled = () => id !== idRef.current;
 
+    // Schedule the next poll after a request settles: pollingInterval while the page is visible, the hidden interval when hidden and pollingInPageHidden is enabled
     const checkPolling = () => {
       if (readyRef.current) {
         if (isPageVisible()) {
           if (polling) {
             pollingTimerRef.current = +setTimeout(() => {
               if (!isCanceled()) {
-                reload();
+                reloadRef.current?.();
               }
             }, pollingInterval);
           }
         } else {
-          if (pollingInPageHiding) {
+          if (pollingInPageHidden) {
             pollingTimerRef.current = +setTimeout(() => {
               if (!isCanceled()) {
-                reload();
+                reloadRef.current?.();
               }
-            }, pollingIntervalInPageHiding);
+            }, pollingIntervalInPageHidden);
           }
         }
       }
     };
 
-    if (isAssociated && store.isLoading(key) && !store.isLoading(key, load)) {
+    // Another instance is already loading the same key: merge the request and wait for its result instead of firing a duplicate.
+    if (isAssociated && store.isLoading(key) && !store.isLoading(key, currentLoad)) {
       return new Promise<LoadData<Callback>>((resolve, reject) => {
         const unlisten = () => {
           unlistenRef.current = undefined;
@@ -307,7 +328,7 @@ function useLoad<Callback extends LoadCallback>(
         const handleCancel = () => {
           unlisten();
           if (!isCanceled()) {
-            reload();
+            reloadRef.current?.();
           }
         };
         const handleResolve = (data: LoadData<Callback>) => {
@@ -332,8 +353,8 @@ function useLoad<Callback extends LoadCallback>(
           if (isCanceled()) {
             return new Promise(() => {});
           }
-          triggerSuccess(data, key);
-          triggerFinally(key);
+          triggerSuccess(data);
+          triggerFinally();
           checkPolling();
           return data;
         },
@@ -342,11 +363,11 @@ function useLoad<Callback extends LoadCallback>(
           if (isCanceled()) {
             return new Promise(() => {});
           }
-          triggerFailure(error, key);
-          triggerFinally(key);
+          triggerFailure(error);
+          triggerFinally();
           checkPolling();
           throw error;
-        }
+        },
       ) as ReturnType<Callback>;
     }
 
@@ -359,10 +380,10 @@ function useLoad<Callback extends LoadCallback>(
         if (isCanceled()) {
           return;
         }
-        if (retry && ++retryCount <= retryLimit) {
-          const delay = isFunction(retryInterval)
-            ? retryInterval(retryCount)
-            : retryInterval;
+        // Failure handling order: retry the primary loader -> then try the fallback function -> optionally retry the fallback after it fails -> finally reject
+        // `retry`/`fallbackRetry` accept a boolean or a function receiving the error and returning whether to retry; once the fallback has been invoked the primary loader is never retried again
+        if (!fallbackInvoked && resolveRetryOption(retry, error) && ++retryCount <= retryLimit) {
+          const delay = isFunction(retryInterval) ? retryInterval(retryCount) : retryInterval;
           if (delay > 0) {
             retryTimerRef.current = +setTimeout(() => {
               if (!isCanceled()) {
@@ -378,7 +399,7 @@ function useLoad<Callback extends LoadCallback>(
         } else if (
           fallbackRef.current &&
           fallbackInvoked &&
-          fallbackRetry &&
+          resolveRetryOption(fallbackRetry, error) &&
           ++fallbackRetryCount <= fallbackRetryLimit
         ) {
           const delay = isFunction(fallbackRetryInterval)
@@ -409,7 +430,7 @@ function useLoad<Callback extends LoadCallback>(
               callbackRef.current(...params).then(resolve, handleReject);
             }
           },
-          isObject(idle) ? idle : undefined
+          isObject(idle) ? idle : undefined,
         );
       } else {
         callbackRef.current(...params).then(resolve, handleReject);
@@ -419,17 +440,14 @@ function useLoad<Callback extends LoadCallback>(
         if (isCanceled()) {
           return new Promise(() => {});
         }
-        if (cacheKey != null) {
-          cache.set(cacheKey, data, { cacheTime });
-        }
-        if (isAssociated && store.isLoading(key, load)) {
-          store.deleteLoading(key, load);
+        if (isAssociated && store.isLoading(key, currentLoad)) {
+          store.deleteLoading(key, currentLoad);
           store.for(key).emit("success", data);
           loadingRef.current = undefined;
         }
         setState({ data, error: null, loading: false });
-        triggerSuccess(data, key);
-        triggerFinally(key);
+        triggerSuccess(data);
+        triggerFinally();
         checkPolling();
         return data;
       },
@@ -438,81 +456,60 @@ function useLoad<Callback extends LoadCallback>(
         if (isCanceled()) {
           return new Promise(() => {});
         }
-        if (isAssociated && store.isLoading(key, load)) {
-          store.deleteLoading(key, load);
+        if (isAssociated && store.isLoading(key, currentLoad)) {
+          store.deleteLoading(key, currentLoad);
           store.for(key).emit("failure", error);
           loadingRef.current = undefined;
         }
         setState({ error, loading: false });
-        triggerFailure(error, key);
-        triggerFinally(key);
+        triggerFailure(error);
+        triggerFinally();
         checkPolling();
         throw error;
-      }
+      },
     ) as ReturnType<Callback>;
   });
 
-  const force = usePersist((...params: Parameters<Callback>) => {
-    forceRef.current = true;
-    return load(...params);
-  });
+  loadRef.current = load;
 
-  const reload = usePersist((options?: { force?: boolean }) => {
+  const reload = usePersist(() => {
     const params = paramsRef.current || defaultParams;
-    if (process.env.NODE_ENV !== "production") {
-      warning(
-        !!callback.length && params === undefined,
-        "You should provide params by setting `defaultParams` option or calling the `load(...params)` method.",
-        { scope: "useLoad" }
-      );
-    }
-    forceRef.current = !!options && !!options.force;
+    warning(
+      !callback.length || params !== undefined,
+      "[useLoad] You should provide params by setting `defaultParams` option or calling the `load(...params)` method.",
+    );
     if (params) {
       load(...params);
     } else {
-      // @ts-ignore
-      load();
+      load(...([] as unknown as Parameters<Callback>));
     }
   });
 
-  const update = usePersist(
-    (
-      newData:
-        | LoadData<Callback>
-        | ((prevData?: LoadData<Callback>) => LoadData<Callback>)
-    ) => {
-      setState((prevState) => ({
-        data: isFunction(newData) ? newData(prevState.data) : newData,
-      }));
-    }
-  );
+  reloadRef.current = reload;
+
+  const update = usePersist((newData: LoadData<Callback> | ((prevData?: LoadData<Callback>) => LoadData<Callback>)) => {
+    setState((prevState) => ({
+      data: isFunction(newData) ? newData(prevState.data) : newData,
+    }));
+  });
 
   const cancel = usePersist(() => {
     clearPending();
-    forceRef.current = false;
     if (!unmountedRef.current && state.loading) {
       setState({ loading: false });
     }
   });
 
-  const [autoReload, { cancel: cancelAutoReload }] = useThrottle(
-    () => {
-      if (readyRef.current && !state.loading) {
-        reload();
-      }
-    },
-    { wait: autoReloadWaitTime, leading: true, trailing: false }
-  );
-
+  // Reload automatically on page visibility changes per the options
   useEffect(() => {
-    if (autoReloadOnPageShow || polling || pollingInPageHiding) {
+    if (autoReloadOnPageShow || polling || pollingInPageHidden) {
       const listener = () => {
         if (isPageVisible()) {
           if (autoReloadOnPageShow || polling) {
             autoReload();
           }
         } else {
-          if (pollingInPageHiding) {
+          if (pollingInPageHidden) {
             autoReload();
           }
         }
@@ -522,8 +519,9 @@ function useLoad<Callback extends LoadCallback>(
         document.removeEventListener("visibilitychange", listener);
       };
     }
-  }, [autoReloadOnPageShow, polling, pollingInPageHiding, autoReload]);
+  }, [autoReloadOnPageShow, polling, pollingInPageHidden, autoReload]);
 
+  // Automatically reload when the window regains focus
   useEffect(() => {
     if (autoReloadOnWindowFocus) {
       window.addEventListener("focus", autoReload);
@@ -533,6 +531,7 @@ function useLoad<Callback extends LoadCallback>(
     }
   }, [autoReloadOnWindowFocus, autoReload]);
 
+  // Automatically reload when the network recovers (online event)
   useEffect(() => {
     if (autoReloadOnNetworkReconnect) {
       window.addEventListener("online", autoReload);
@@ -542,6 +541,7 @@ function useLoad<Callback extends LoadCallback>(
     }
   }, [autoReloadOnNetworkReconnect, autoReload]);
 
+  // Listen to other instances under the same key and sync their results to this instance; requests fired by this instance itself are handled inside load(), so they are excluded here via loadingRef
   useEffect(() => {
     if (isAssociated) {
       const handleSuccess = (data: LoadData<Callback>) => {
@@ -561,7 +561,7 @@ function useLoad<Callback extends LoadCallback>(
         store.for(key).off("failure", handleFailure);
       };
     }
-  }, [key, isAssociated, store, load, staleTime, setState]);
+  }, [key, isAssociated, store, load, setState]);
 
   useEffect(() => {
     if (key != null) {
@@ -578,17 +578,12 @@ function useLoad<Callback extends LoadCallback>(
         reload();
       }
     },
-    deps // eslint-disable-line
+    deps, // eslint-disable-line
   );
 
+  // `key` must be immutable (see UseLoadOptions.key); warn when it changes to avoid corrupting shared state
   useUpdate(() => {
-    if (process.env.NODE_ENV !== "production") {
-      warning(
-        true,
-        "You should provide an immutable value for the `key` option.",
-        { scope: "useLoad" }
-      );
-    }
+    warning(false, "[useLoad] You should provide an immutable value for the `key` option.");
   }, [key]);
 
   useUnmount(cancel);
@@ -596,7 +591,6 @@ function useLoad<Callback extends LoadCallback>(
 
   return {
     load,
-    force,
     reload,
     update,
     cancel,

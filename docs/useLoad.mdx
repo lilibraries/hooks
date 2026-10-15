@@ -7,13 +7,10 @@ import ImperativeExample from "./examples/UseLoadImperative";
 import IndependentExample from "./examples/UseLoadIndependent";
 import ParamsExample from "./examples/UseLoadParams";
 import FallbackExample from "./examples/UseLoadFallback";
-import CachingExample from "./examples/UseLoadCaching";
-import StaleExample from "./examples/UseLoadStale";
 import RetriesExample from "./examples/UseLoadRetries";
 import PollingExample from "./examples/UseLoadPolling";
 import AutoReloadExample from "./examples/UseLoadAutoReload";
 import EventsExample from "./examples/UseLoadEvents";
-import PrefetchExample from "./examples/UseLoadPrefetch";
 import InfiniteListExample from "./examples/UseLoadInfiniteList";
 import BasicExampleCode from "!!raw-loader!./examples/UseLoadBasic";
 import DependencyExampleCode from "!!raw-loader!./examples/UseLoadDependency";
@@ -22,23 +19,18 @@ import ImperativeExampleCode from "!!raw-loader!./examples/UseLoadImperative";
 import IndependentExampleCode from "!!raw-loader!./examples/UseLoadIndependent";
 import ParamsExampleCode from "!!raw-loader!./examples/UseLoadParams";
 import FallbackExampleCode from "!!raw-loader!./examples/UseLoadFallback";
-import CachingExampleCode from "!!raw-loader!./examples/UseLoadCaching";
-import StaleExampleCode from "!!raw-loader!./examples/UseLoadStale";
 import RetriesExampleCode from "!!raw-loader!./examples/UseLoadRetries";
 import PollingExampleCode from "!!raw-loader!./examples/UseLoadPolling";
 import AutoReloadExampleCode from "!!raw-loader!./examples/UseLoadAutoReload";
 import EventsExampleCode from "!!raw-loader!./examples/UseLoadEvents";
-import PrefetchExampleCode from "!!raw-loader!./examples/UseLoadPrefetch";
 import InfiniteListExampleCode from "!!raw-loader!./examples/UseLoadInfiniteList";
 
-Load async data. Usually used for network requests. It accepts a `callback` function as the first parameter, and the `callback` function must return a promise object. You can use [`LoadConfig`](./LoadConfig) component to set some default options for this hook.
+Load async data, typically for network requests. The `callback` function must return a promise. Loads automatically after mount by default (and again when `deps` change); set the `imperative` option to `true` to trigger loading manually via `load` instead.
 
 ## API
 
 ```ts
-type PromiseResolve<T extends Promise<any>> = T extends Promise<infer P>
-  ? P
-  : never;
+type PromiseResolve<T extends Promise<any>> = T extends Promise<infer P> ? P : never;
 type LoadCallback = (...args: any[]) => Promise<any>;
 type LoadData<T extends LoadCallback> = PromiseResolve<ReturnType<T>>;
 
@@ -48,7 +40,7 @@ function useLoad<Callback extends LoadCallback>(
   options?: {
     key?: {};
 
-    idle?: boolean | { timeout?: number };
+    idle?: boolean | IdleRequestOptions;
     imperative?: boolean;
     independent?: boolean;
 
@@ -56,22 +48,17 @@ function useLoad<Callback extends LoadCallback>(
     initialData?: LoadData<Callback>;
     defaultParams?: Parameters<Callback>;
 
-    cacheKey?: {};
-    cacheTime?: number;
-    staleTime?: number;
-    cacheValidate?: (data: any) => boolean;
-
-    retry?: boolean;
+    retry?: boolean | ((error: any) => boolean);
     retryLimit?: number;
     retryInterval?: number | ((count: number) => number);
-    fallbackRetry?: boolean;
+    fallbackRetry?: boolean | ((error: any) => boolean);
     fallbackRetryLimit?: number;
     fallbackRetryInterval?: number | ((count: number) => number);
 
     polling?: boolean;
     pollingInterval?: number;
-    pollingInPageHiding?: boolean;
-    pollingIntervalInPageHiding?: number;
+    pollingInPageHidden?: boolean;
+    pollingIntervalInPageHidden?: number;
 
     autoReloadWaitTime?: number;
     autoReloadOnPageShow?: boolean;
@@ -81,7 +68,7 @@ function useLoad<Callback extends LoadCallback>(
     onSuccess?: (data: LoadData<Callback>) => void;
     onFailure?: (error: any) => void;
     onFinally?: () => void;
-  }
+  },
 ): {
   data: LoadData<Callback> | undefined;
   error: any;
@@ -90,44 +77,35 @@ function useLoad<Callback extends LoadCallback>(
   initializing: boolean;
 
   load: (...params: Parameters<Callback>) => ReturnType<Callback>;
-  force: (...params: Parameters<Callback>) => ReturnType<Callback>;
-  reload: (options?: { force?: boolean }) => void;
+  reload: () => void;
   cancel: () => void;
 
-  update: (
-    newData:
-      | LoadData<Callback>
-      | ((prevData?: LoadData<Callback>) => LoadData<Callback>)
-  ) => void;
+  update: (newData: LoadData<Callback> | ((prevData?: LoadData<Callback>) => LoadData<Callback>)) => void;
 };
 ```
 
 Params:
 
-- **`callback`:** A function returns a promise object. It is automatically called after the component is mounted by default.
-- **`deps`:** Auto reload dependency list. Default is an empty array. It's not working when the `imperative` option is `true`.
+- **`callback`:** A function that returns a promise. It is automatically called after the component is mounted by default.
+- **`deps`:** Auto reload dependency list. Default is an empty array. It doesn't work when the `imperative` option is `true`.
 - **`options`:** Options object.
-  - **`options.key`:** An identifier that can be any data type except `null` and `undefined`. By default, if multiple requests for the same key appear on the page, only first one request will be sent, and other requests will get data by listening to internal events. You can prevent the default behavior by setting the `independent` option to `true`. Another function of the `key` option is that it can be used with [`useReload`](./useReload) hook.
-  - **`options.idle`:** Run callback during the browser's idle periods. You can set an object contains a `timeout` property to limit the max waiting time.
-  - **`options.imperative`:** Run callback manually by calling the `load` or `force` function, rather than automatically after the component is mounted.
-  - **`options.independent`:** Set this option to `ture`, event if the `key` are the same, request callbacks in the page are independent and all of them will be executed.
-  - **`options.fallback`:** When the `callback` function reject an error and the count of retries has been exhausted, the `fallback` function will be called.
-  - **`options.initialData`:** Initial data. Used when no cache or request is loading.
-  - **`options.defaultParams`:** The default parameter array set for `callback` and `fallback`.
-  - **`options.cacheKey`:** Cache key to enable caching. It can be any type except `null` and `undefined`. This hook uses the same cache instance as [`useCache`](./useCache), so you can use `useCache` hook to get data cached by this hook, or set cache data for this hook.
-  - **`options.cacheTime`:** Cache time, in milliseconds. Default is 5 minutes. You can set a permanent cache by setting this option greater than or equal to `Number.MAX_SAFE_INTEGER`, for example `Infinity`.
-  - **`options.staleTime`:** Stale time, in milliseconds. Default is `0`. It must be used with `cacheKey`. In the `staleTime` period, the data is considered fresh. Calling `load(...params)`, `reload()` or auto reloading has no effect. You can ignore the `staleTime` option by calling `force(...params)` or `reload({ force: true })` methods.
-  - **`options.cacheValidate`:** Validate the cache value. If it returns falsy, the `initialData` will be used.
-  - **`options.retry`:** Enable retry callback. Default is `false`.
+  - **`options.key`:** A shared key that can be any data type except `null` and `undefined`, and must be immutable. By default, if multiple requests for the same key appear on the page, only the first one will be sent, and the others will get the data by listening to internal events. You can prevent the default behavior by setting the `independent` option to `true`. Another use of the `key` option is reloading all associated requests together with the [`useReload`](./useReload) hook.
+  - **`options.idle`:** Run the callback during the browser's idle periods. You can pass an `IdleRequestOptions` object to limit the max waiting time.
+  - **`options.imperative`:** Run the callback manually by calling the `load` function, rather than automatically after the component is mounted.
+  - **`options.independent`:** Set this option to `true`, even if the `key` are the same, request callbacks in the page are independent and all of them will be executed.
+  - **`options.fallback`:** When the `callback` function rejects an error and the count of retries has been exhausted, the `fallback` function will be called. Usually used for an alternate data source.
+  - **`options.initialData`:** Initial data. Used when no request has resolved yet.
+  - **`options.defaultParams`:** The default parameter array set for `callback` and `fallback`. Used by the first load, or by `reload` when no params have been passed via `load(...params)` yet.
+  - **`options.retry`:** Enable retrying the callback. Default is `false`. It can be a function that receives the error and returns whether to retry.
   - **`options.retryLimit`:** Callback retry limit. Default is `3`.
-  - **`options.retryInterval`:** Callback retry interval. Default is `0`. You can set a function that returns a number value for this option, for example `(count) => Math.pow(2, count)`.
-  - **`options.fallbackRetry`:** Enable retry fallback. Default is `false`.
+  - **`options.retryInterval`:** Callback retry interval, in milliseconds. Defaults to exponential growth: the `count`-th retry waits 2^(count-1) × 1000 ms. You can set a function that returns a number value for this option, for example `(count) => Math.pow(2, count)`.
+  - **`options.fallbackRetry`:** Enable retrying the fallback function after it fails too. Default is `false`. It can be a function that receives the error and returns whether to retry.
   - **`options.fallbackRetryLimit`:** Fallback retry limit. Default is `3`.
-  - **`options.fallbackRetryInterval`:** Fallback retry interval. It also can be a function.
-  - **`options.polling`:** Enable polling when page visible. Default is `false`.
-  - **`options.pollingInterval`:** Polling internal when page visible, in milliseconds. Default is `30000`.
-  - **`options.pollingInPageHiding`:** Enable polling when page hidden. Default is `false`. This option is not associated with `polling` option.
-  - **`options.pollingIntervalInPageHiding`:** Polling internal when page hidden, in milliseconds. Default is `60000`.
+  - **`options.fallbackRetryInterval`:** Fallback retry interval, in milliseconds. Defaults to exponential growth like `retryInterval`. It can also be a function.
+  - **`options.polling`:** Enable polling when the page is visible. Default is `false`.
+  - **`options.pollingInterval`:** Polling interval when the page is visible, in milliseconds. Default is `30000`.
+  - **`options.pollingInPageHidden`:** Enable polling when the page is hidden. Default is `false`. This option is not associated with the `polling` option.
+  - **`options.pollingIntervalInPageHidden`:** Polling interval when the page is hidden, in milliseconds. Default is `60000`.
   - **`options.autoReloadWaitTime`:** Throttle wait time on auto reload, in milliseconds. Default is `10000`.
   - **`options.autoReloadOnPageShow`:** Enable auto reload on page show. Default is `false`.
   - **`options.autoReloadOnWindowFocus`:** Enable auto reload on window focus. Default is `false`.
@@ -143,11 +121,10 @@ Results:
 - **`loading`:** Loading state. Initial value is opposite to the `imperative` option.
 - **`reloading`:** Equal to `loading && data !== undefined`. Provided for convenience.
 - **`initializing`:** Equal to `loading && data === undefined`. Provided for convenience.
-- **`load`:** Load function. Used in the same way as the `callback`.
-- **`force`:** Similar to `load` function, but it ignores the `staleTime` option.
-- **`reload`:** Reload function. When the `force` option is set to `true`, the `staleTime` option will be ignored.
-- **`cancel`:** Cancel everything, including executing request, polling, automatic loading, etc.
-- **`update`:** Update the `data`.
+- **`load`:** Load function. Used in the same way as the `callback`. It returns a promise that resolves with the data on success, or rejects with the error on failure. Note: calling it before the component mounts returns a promise that never settles, so do not call it during `useLayoutEffect`.
+- **`reload`:** Reload function. It cancels the in-flight request (including retries, polling, etc.) first, then reloads with the params from the most recent `load` call (or `defaultParams` if none were ever passed).
+- **`cancel`:** Cancel everything, including the executing request, polling, automatic loading, etc. The promise returned by the cancelled `load` stays pending forever.
+- **`update`:** Update the `data` locally without sending a request.
 
 ## Examples
 
@@ -200,22 +177,6 @@ Results:
 </ExampleBlock>
 <CodeBlock language="tsx">{FallbackExampleCode}</CodeBlock>
 
-### Caching
-
-<ExampleBlock>
-  <CachingExample />
-</ExampleBlock>
-<CodeBlock language="tsx">{CachingExampleCode}</CodeBlock>
-
-### Stale time
-
-`staleTime` must be used with `cacheKey`.
-
-<ExampleBlock>
-  <StaleExample />
-</ExampleBlock>
-<CodeBlock language="tsx">{StaleExampleCode}</CodeBlock>
-
 ### Retries
 
 <ExampleBlock>
@@ -243,13 +204,6 @@ Results:
   <EventsExample />
 </ExampleBlock>
 <CodeBlock language="tsx">{EventsExampleCode}</CodeBlock>
-
-### Prefetch
-
-<ExampleBlock>
-  <PrefetchExample />
-</ExampleBlock>
-<CodeBlock language="tsx">{PrefetchExampleCode}</CodeBlock>
 
 ### Infinite list
 
