@@ -1,4 +1,4 @@
-Detect whether the page is visible.
+Detect whether the page is visible. The `visibilitychange` event doesn't fire when restoring from the bfcache, so this hook also listens to the `pageshow` event to re-detect.
 
 ## API
 
@@ -6,11 +6,18 @@ Detect whether the page is visible.
 function usePageVisible(): boolean;
 ```
 
+Results:
+
+- Returns `true` if the page is visible, otherwise `false`.
+
 ## Example
 
-```ts
+```tsx
+import React from "react";
+import { usePageVisible } from "@lilib/hooks";
+
 function Example() {
-  const isPageVisible = usePageVisible()
+  const visible = usePageVisible();
   ...
 }
 ```
