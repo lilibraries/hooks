@@ -3,13 +3,17 @@ import ExampleBlock from "./components/ExampleBlock";
 import Example from "./examples/UseWindowFocus";
 import ExampleCode from "!!raw-loader!./examples/UseWindowFocus";
 
-Detect whether the `window` is focus. In a non browser environment, it always returns `false`.
+Detect whether the `window` has focus. In a non-browser environment, it always returns `false`.
 
 ## API
 
 ```ts
 function useWindowFocus(): boolean;
 ```
+
+Results:
+
+- Returns `true` if the `window` has focus, otherwise `false`.
 
 ## Example
 

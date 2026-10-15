@@ -1,8 +1,14 @@
-import { useDebugValue } from "react";
-import { inBrowser } from "@lilib/utils";
-import useSafeState from "./useSafeState";
-import useEventListener from "./useEventListener";
+import { useDebugValue, useRef } from "react";
 
+import useEventListener from "./useEventListener";
+import useSafeState from "./useSafeState";
+import inBrowser from "./utils/inBrowser";
+
+/**
+ * Detect whether the `window` has focus. Always returns `false` in non-browser environments.
+ *
+ * @returns Returns `true` if the `window` has focus, otherwise `false`.
+ */
 function useWindowFocus() {
   const [focus, setFocus] = useSafeState(() => {
     if (inBrowser) {
@@ -12,21 +18,15 @@ function useWindowFocus() {
     }
   });
 
-  useEventListener(
-    () => window,
-    "focus",
-    () => {
-      setFocus(true);
-    }
-  );
+  const windowRef = useRef<Window | null>(inBrowser ? window : null);
 
-  useEventListener(
-    () => window,
-    "blur",
-    () => {
-      setFocus(false);
-    }
-  );
+  useEventListener(windowRef, "focus", () => {
+    setFocus(true);
+  });
+
+  useEventListener(windowRef, "blur", () => {
+    setFocus(false);
+  });
 
   useDebugValue(focus);
 
