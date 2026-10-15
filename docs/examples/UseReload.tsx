@@ -2,7 +2,7 @@ import React from "react";
 import { useLoad, useReload } from "@lilib/hooks";
 
 const getNumber = () => {
-  return new Promise((resolve) => {
+  return new Promise<number>((resolve) => {
     setTimeout(() => {
       resolve(Math.random());
     }, 1000);
