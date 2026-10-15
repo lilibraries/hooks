@@ -3,13 +3,18 @@ import ExampleBlock from "./components/ExampleBlock";
 import Example from "./examples/UseMatchMedia";
 import ExampleCode from "!!raw-loader!./examples/UseMatchMedia";
 
-Use [`window.matchMedia()`](https://developer.mozilla.org/en-US/docs/Web/API/Window/matchMedia) to determine if the document matches the media query string.
+Use [`window.matchMedia()`](https://developer.mozilla.org/en-US/docs/Web/API/Window/matchMedia) to determine whether the document matches the media query string.
 
 ## API
 
 ```ts
 function useMatchMedia(query: string, defaultValue?: boolean): boolean;
 ```
+
+Params:
+
+- **`query`:** The media query string.
+- **`defaultValue`:** The default value used in a non-browser environment, or when the query doesn't match. Default is `false`.
 
 ## Example
 
