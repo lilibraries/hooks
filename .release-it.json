@@ -3,8 +3,7 @@
     "commitMessage": "chore(release): ${version}"
   },
   "hooks": {
-    "before:init": ["npm run lint", "npm run test:all", "npm run dist"],
-    "after:release": "echo Successfully released ${name}@${version}."
+    "after:release": ["node -e \"console.log('Successfully released ${name}@${version}.')\""]
   },
   "plugins": {
     "@release-it/conventional-changelog": {

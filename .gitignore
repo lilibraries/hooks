@@ -120,3 +120,4 @@ build
 .npmrc
 .DS_Store
 .docusaurus
+.test-deps

@@ -1,11 +1,10 @@
 {
   "extends": "./tsconfig.base.json",
-  "include": ["src", "docs", "tests", "jest.setup.ts"],
+  "include": ["src", "docs", "tests"],
   "compilerOptions": {
     "noEmit": true,
-    "baseUrl": ".",
     "paths": {
-      "@lilib/hooks": ["src"]
+      "@lilib/hooks": ["./src"]
     }
   }
 }

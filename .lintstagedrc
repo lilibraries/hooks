@@ -3,16 +3,8 @@
     "tsc-files --noEmit docs/assets.d.ts",
     "eslint --fix",
     "jest --bail --findRelatedTests",
-    "prettier --write",
-    "git add --patch"
+    "prettier --write"
   ],
-  "*.{js,jsx}": [
-    "eslint --fix",
-    "prettier --write",
-    "git add --patch"
-  ],
-  "*.{md,mdx,json}": [
-    "prettier --write",
-    "git add --patch"
-  ]
+  "*.{js,jsx}": ["eslint --fix", "prettier --write"],
+  "*.{md,mdx,json}": ["prettier --write"]
 }
