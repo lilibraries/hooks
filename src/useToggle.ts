@@ -1,7 +1,14 @@
 import { useDebugValue } from "react";
+
 import usePersist from "./usePersist";
 import useSafeState from "./useSafeState";
 
+/**
+ * Manage a boolean state with three operations: toggle, set true, and set false.
+ *
+ * @param initialValue The initial value, defaults to `false`.
+ * @returns Returns a `[value, { toggle, toggleOn, toggleOff }]` tuple.
+ */
 function useToggle(initialValue: boolean = false) {
   const [value, setValue] = useSafeState(!!initialValue);
 
