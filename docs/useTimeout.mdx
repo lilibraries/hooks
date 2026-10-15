@@ -3,15 +3,12 @@ import ExampleBlock from "./components/ExampleBlock";
 import Example from "./examples/UseTimeout";
 import ExampleCode from "!!raw-loader!./examples/UseTimeout";
 
-Delay running callback.
+Delay running a callback.
 
 ## API
 
 ```ts
-function useTimeout(
-  callback: () => void,
-  timeout?: number
-): [start: () => void, cancel: () => void];
+function useTimeout(callback: () => void, timeout?: number): [start: () => void, cancel: () => void];
 ```
 
 ### Params

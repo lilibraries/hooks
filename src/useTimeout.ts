@@ -1,10 +1,18 @@
 import { useRef } from "react";
-import useUnmount from "./useUnmount";
-import usePersist from "./usePersist";
 
+import usePersist from "./usePersist";
+import useUnmount from "./useUnmount";
+
+/**
+ * Execute a callback after a delay.
+ *
+ * @param callback The callback to execute after the delay.
+ * @param timeout The delay (milliseconds).
+ * @returns Returns a `[start, cancel]` tuple.
+ */
 function useTimeout(callback: () => void, timeout?: number) {
   const handler = usePersist(callback);
-  const timerRef = useRef<ReturnType<typeof setTimeout>>();
+  const timerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   const cancel = usePersist(() => {
     if (timerRef.current !== undefined) {
