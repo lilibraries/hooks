@@ -5,7 +5,7 @@ function Example() {
   const [loading, { toggle }] = useToggle(false);
   const delayedLoading = useDelayedValue(loading, {
     delay: 500,
-    include: (value) => value === true,
+    shouldDelay: (value) => value === true,
   });
 
   return (

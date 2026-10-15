@@ -1,54 +1,61 @@
 import { useDebugValue } from "react";
+
 import isNumber from "lodash/isNumber";
 import isObject from "lodash/isObject";
-import { warning } from "@lilib/utils";
-import useUpdate from "./useUpdate";
-import useTimeout from "./useTimeout";
-import useSafeState from "./useSafeState";
+import warning from "warning";
 
-export interface DelayedValueHookOptions {
+import useSafeState from "./useSafeState";
+import useTimeout from "./useTimeout";
+import useUpdate from "./useUpdate";
+
+interface UseDelayedValueOptions {
   delay: number;
-  include?: (value: any) => boolean;
+  shouldDelay?: (value: any) => boolean;
   compare?: (x: any, y: any) => boolean;
 }
 
-function useDelayedValue<T>(
-  value: T,
-  options: number | DelayedValueHookOptions
-) {
+/**
+ * Delay updates to a value.
+ *
+ * @param value The value whose updates should be delayed.
+ * @param options The delay time (milliseconds), or an options object.
+ * @param options.delay The delay time (milliseconds), required.
+ * @param options.compare A function to determine whether the new and old values are equal, defaults to `Object.is`.
+ * @param options.shouldDelay A function to determine whether an update should be delayed; returning `false` updates immediately and synchronously.
+ * @returns The delayed value.
+ */
+function useDelayedValue<T>(value: T, options: number | UseDelayedValueOptions) {
   let delay = 0;
-  let include = (value: any) => true;
   let compare = Object.is;
+  let shouldDelay: (value: any) => boolean = () => true;
 
   if (isNumber(options)) {
     delay = options;
   } else if (isObject(options)) {
     delay = +options.delay;
 
-    if (options.include) {
-      include = options.include;
+    if (options.shouldDelay) {
+      shouldDelay = options.shouldDelay;
     }
     if (options.compare) {
       compare = options.compare;
     }
   }
 
-  if (process.env.NODE_ENV !== "production") {
-    warning(
-      !isNumber(delay) || !(delay > 0),
-      "You should provide a positive number as the delay time.",
-      { scope: "useDelayedValue" }
-    );
-  }
+  warning(delay > 0, "[useDelayedValue] The `delay` option must be a positive number, but received `%s`.", delay);
 
   const [state, setState] = useSafeState(value);
   const [update, cancelUpdate] = useTimeout(() => setState(value), delay);
 
+  // Handle only values that differ from the current one: schedule a timed update
+  // when the delay condition holds, otherwise sync immediately; cancel the pending
+  // update when the value is unchanged
   useUpdate(() => {
     if (!compare(value, state)) {
-      if (include(value)) {
+      if (shouldDelay(value)) {
         update();
       } else {
+        cancelUpdate();
         setState(value);
       }
     } else {

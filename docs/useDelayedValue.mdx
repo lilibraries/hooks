@@ -3,7 +3,7 @@ import ExampleBlock from "./components/ExampleBlock";
 import Example from "./examples/UseDelayedValue";
 import ExampleCode from "!!raw-loader!./examples/UseDelayedValue";
 
-Delay update a value.
+Delay updates to a value.
 
 ## API
 
@@ -14,18 +14,18 @@ function useDelayedValue<T>(
     | number
     | {
         delay: number;
-        include?: (value: any) => boolean;
+        shouldDelay?: (value: any) => boolean;
         compare?: (x: any, y: any) => boolean;
-      }
+      },
 ): T;
 ```
 
 Params:
 
-- **`value`:** The value will be delayed.
+- **`value`:** The value whose updates will be delayed.
 - **`options`:** Accepts a positive number as the delay time or an object as the options.
   - **`options.delay`:** Delay time, in milliseconds. It must be a positive number.
-  - **`options.include`:** A function that filters value to be delayed. Any value is delayed by default.
+  - **`options.shouldDelay`:** A function that determines whether an update should be delayed. Returning `false` updates immediately and synchronously. Any value is delayed by default.
   - **`options.compare`:** It is used to compare whether two values are equal to determine whether to update the value. Default is `Object.is`.
 
 ## Example
