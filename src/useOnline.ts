@@ -1,8 +1,14 @@
-import { useDebugValue } from "react";
-import { inBrowser } from "@lilib/utils";
-import useSafeState from "./useSafeState";
-import useEventListener from "./useEventListener";
+import { useDebugValue, useRef } from "react";
 
+import useEventListener from "./useEventListener";
+import useSafeState from "./useSafeState";
+import inBrowser from "./utils/inBrowser";
+
+/**
+ * Detect whether the network is online. Always returns `true` in non-browser environments.
+ *
+ * @returns Returns `true` if the network is online, otherwise `false`.
+ */
 function useOnline() {
   const [online, setOnline] = useSafeState(() => {
     if (inBrowser) {
@@ -15,9 +21,10 @@ function useOnline() {
   const listener = () => {
     setOnline(window.navigator.onLine);
   };
+  const windowRef = useRef<Window | null>(inBrowser ? window : null);
 
-  useEventListener(() => window, "online", listener);
-  useEventListener(() => window, "offline", listener);
+  useEventListener(windowRef, "online", listener);
+  useEventListener(windowRef, "offline", listener);
 
   useDebugValue(online);
 
