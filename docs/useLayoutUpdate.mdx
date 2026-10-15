@@ -1,12 +1,9 @@
-It's similar to [`useUpdate`](./useUpdate), except it uses [`useIsomorphicLayoutEffect`](./useIsomorphicLayoutEffect) internally.
+It's similar to [`useUpdate`](./useUpdate), but it runs synchronously before the browser paints. It uses [`useIsomorphicLayoutEffect`](./useIsomorphicLayoutEffect) internally.
 
 ## API
 
 ```ts
-function useLayoutUpdate(
-  effect: React.EffectCallback,
-  deps?: React.DependencyList
-): void;
+function useLayoutUpdate(effect: React.EffectCallback, deps?: React.DependencyList): void;
 ```
 
 ## Example
