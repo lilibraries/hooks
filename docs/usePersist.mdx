@@ -1,11 +1,9 @@
-It returns the same function identifier no matter whether the `callback` parameter is changed or not. The returned function is used in the same way as the `callback`.
+It returns the same function identity no matter whether the `callback` parameter is changed or not. The returned function is used in the same way as the `callback`.
 
 ## API
 
 ```ts
-function usePersist<T extends (...args: any[]) => any>(
-  callback: T
-): (...args: Parameters<T>) => ReturnType<T>;
+function usePersist<T extends (...args: any[]) => any>(callback: T): (...args: Parameters<T>) => ReturnType<T>;
 ```
 
 ## Example
