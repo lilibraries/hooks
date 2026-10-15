@@ -3,7 +3,7 @@ import ExampleBlock from "./components/ExampleBlock";
 import Example from "./examples/UseCookie";
 import ExampleCode from "!!raw-loader!./examples/UseCookie";
 
-This hook use [js-cookie](https://github.com/js-cookie/js-cookie) as the parser. You can use this hook to get, set and/or remove cookies.
+This hook uses [js-cookie](https://github.com/js-cookie/js-cookie) as the parser. You can use this hook to get, set and/or remove cookies.
 
 ## API
 
@@ -15,16 +15,13 @@ function useCookie(
     polling?: boolean;
     pollingInterval?: number;
     validate?: (value: string) => boolean;
-  }
+  },
 ): [
   value: string | undefined,
   setCookie: (
-    newValue:
-      | string
-      | undefined
-      | ((prevValue: string | undefined) => string | undefined),
-    attributes?: CookieAttributes
-  ) => void
+    newValue: string | undefined | ((prevValue: string | undefined) => string | undefined),
+    attributes?: CookieAttributes,
+  ) => void,
 ];
 
 interface CookieAttributes {
@@ -40,16 +37,16 @@ Params:
 
 - **`name`:** Cookie name.
 - **`options`:** Options object.
-  - **`options.defaultValue`:** Default value. It will be returnd when the specified cookie is non-existant.
+  - **`options.defaultValue`:** Default value. It will be returned when the specified cookie doesn't exist.
   - **`options.polling`:** Pollingly update cookie value. Default is `false`.
   - **`options.pollingInterval`:** Polling interval time, in milliseconds. Default is `100`.
-  - **`options.validate`:** Validate the value got from cookie. If this function return `false`, the `defaultValue` will be used.
+  - **`options.validate`:** Validate the value got from the cookie. If this function returns `false`, the `defaultValue` will be used.
 
 Results:
 
 - **`value`:** Cookie value.
 - **`setCookie`:** A function that can set or remove the named cookie. It accepts two params:
-  - **`newValue`:** The new cookie value. If it is `undefined` or a function that returns `undefined`, the named cookie will be cleared, and the `options.defaultValue` will be returnd as `value`.
+  - **`newValue`:** The new cookie value. If it is `undefined` or a function that returns `undefined`, the named cookie will be cleared, and the `options.defaultValue` will be returned as `value`.
   - **`attributes`:** Cookie attributes. See [js-cookie attributes](https://github.com/js-cookie/js-cookie#cookie-attributes).
 
 ## Example

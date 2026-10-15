@@ -1,50 +1,55 @@
-import { useDebugValue, useEffect } from "react";
-import isFunction from "lodash/isFunction";
-import Cookies, { CookieAttributes } from "js-cookie";
-import useUpdate from "./useUpdate";
-import usePersist from "./usePersist";
-import useInterval from "./useInterval";
-import useSafeState from "./useSafeState";
+import { useDebugValue, useEffect, useMemo } from "react";
 
-export interface CookieHookOptions {
+import Cookies from "js-cookie";
+import isFunction from "lodash/isFunction";
+
+import useInterval from "./useInterval";
+import useLatestRef from "./useLatestRef";
+import usePersist from "./usePersist";
+import useSafeState from "./useSafeState";
+import useUpdate from "./useUpdate";
+
+type CookieAttributes = Cookies.CookieAttributes;
+
+interface UseCookieOptions {
   defaultValue?: string;
   polling?: boolean;
   pollingInterval?: number;
   validate?: (value: string) => boolean;
 }
 
+/**
+ * A hook built on js-cookie for reading, writing, and removing cookies.
+ *
+ * @param name The cookie name.
+ * @param options The options object.
+ * @param options.defaultValue The default value.
+ * @param options.polling Whether to poll for cookie changes.
+ * @param options.pollingInterval The polling interval (milliseconds).
+ * @param options.validate A validation function.
+ * @returns Returns a `[value, setCookie]` tuple.
+ */
 function useCookie(
   name: string,
-  options: CookieHookOptions & { defaultValue: string }
+  options: UseCookieOptions & { defaultValue: string },
 ): readonly [
   string,
-  (
-    newValue: string | undefined | ((prevValue: string) => string | undefined),
-    attributes?: CookieAttributes
-  ) => void
+  (newValue: string | undefined | ((prevValue: string) => string | undefined), attributes?: CookieAttributes) => void,
 ];
 
 function useCookie(
   name: string,
-  options?: CookieHookOptions
+  options?: UseCookieOptions,
 ): readonly [
   string | undefined,
   (
-    newValue:
-      | string
-      | undefined
-      | ((prevValue: string | undefined) => string | undefined),
-    attributes?: CookieAttributes
-  ) => void
+    newValue: string | undefined | ((prevValue: string | undefined) => string | undefined),
+    attributes?: CookieAttributes,
+  ) => void,
 ];
 
-function useCookie(name: string, options?: CookieHookOptions) {
-  const {
-    defaultValue,
-    polling = false,
-    pollingInterval = 100,
-    validate,
-  } = options || {};
+function useCookie(name: string, options?: UseCookieOptions) {
+  const { defaultValue, polling = false, pollingInterval = 100, validate } = options || {};
 
   function getCookie() {
     const cookie = Cookies.get(name);
@@ -60,26 +65,25 @@ function useCookie(name: string, options?: CookieHookOptions) {
   }
 
   const [value, setValue] = useSafeState(getCookie);
+  const valueRef = useLatestRef(value);
 
   const setCookie = usePersist(
     (
-      newValue:
-        | string
-        | undefined
-        | ((prevValue: string | undefined) => string | undefined),
-      attributes?: CookieAttributes
+      newValue: string | undefined | ((prevValue: string | undefined) => string | undefined),
+      attributes?: CookieAttributes,
     ) => {
-      setValue((prevValue) => {
-        newValue = isFunction(newValue) ? newValue(prevValue) : newValue;
-        if (newValue === undefined) {
-          Cookies.remove(name, attributes);
-          return defaultValue;
-        } else {
-          Cookies.set(name, newValue, attributes);
-          return newValue;
-        }
-      });
-    }
+      const resolved = isFunction(newValue) ? newValue(valueRef.current) : newValue;
+
+      if (resolved === undefined) {
+        Cookies.remove(name, attributes);
+        valueRef.current = defaultValue;
+        setValue(defaultValue);
+      } else {
+        Cookies.set(name, resolved, attributes);
+        valueRef.current = resolved;
+        setValue(resolved);
+      }
+    },
   );
 
   const [startPolling, cancelPolling] = useInterval(() => {
@@ -96,9 +100,11 @@ function useCookie(name: string, options?: CookieHookOptions) {
         startPolling();
       }
     },
-    [polling] // eslint-disable-line
+    [polling], // eslint-disable-line
   );
 
+  // When the name changes: stop the previous polling, re-read the cookie,
+  // and restart polling if needed
   useUpdate(() => {
     cancelPolling();
     setValue(getCookie());
@@ -107,6 +113,8 @@ function useCookie(name: string, options?: CookieHookOptions) {
     }
   }, [name]);
 
+  // When the default value changes and the cookie is absent,
+  // sync the state to the new default value
   useUpdate(() => {
     if (Cookies.get(name) === undefined && defaultValue !== value) {
       setValue(defaultValue);
@@ -114,8 +122,11 @@ function useCookie(name: string, options?: CookieHookOptions) {
   }, [defaultValue]);
 
   useDebugValue(value);
-  useDebugValue(name, (name) => {
-    return "(raw) " + Cookies.get(name);
+  // `value` appears in the deps only to trigger recomputation: the raw cookie is
+  // re-read whenever name or value changes, for display in DevTools
+  const rawValue = useMemo(() => Cookies.get(name), [name, value]); // eslint-disable-line react-hooks/exhaustive-deps
+  useDebugValue(name, () => {
+    return "(raw) " + rawValue;
   });
 
   return [value, setCookie] as const;
