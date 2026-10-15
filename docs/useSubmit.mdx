@@ -3,34 +3,32 @@ import ExampleBlock from "./components/ExampleBlock";
 import Example from "./examples/UseSubmit";
 import ExampleCode from "!!raw-loader!./examples/UseSubmit";
 
-This hook is based on [`useLoad`](./useLoad). It reduces many functions for convenience, and it only supports a few options. Specially, it will never execute automatically. This hook is usually used for network requests such as creating, updating and deleting, but not reading. The [`LoadConfig`](./LoadConfig) component can only set some of the options listed below for this hook.
+This hook is based on [`useLoad`](./useLoad). It reduces many functions for convenience, and it only supports a few options. Specially, it will never execute automatically. This hook is usually used for network requests such as creating, updating and deleting, but not reading.
 
 ## API
 
 ```ts
-type PromiseResolve<T extends Promise<any>> = T extends Promise<infer P>
-  ? P
-  : never;
+type PromiseResolve<T extends Promise<any>> = T extends Promise<infer P> ? P : never;
 type LoadCallback = (...args: any[]) => Promise<any>;
 type LoadData<T extends LoadCallback> = PromiseResolve<ReturnType<T>>;
 
 function useSubmit<Callback extends LoadCallback>(
   callback: Callback,
   options?: {
-    idle?: boolean;
+    idle?: boolean | IdleRequestOptions;
     fallback?: Callback;
 
-    retry?: boolean;
+    retry?: boolean | ((error: any) => boolean);
     retryLimit?: number;
     retryInterval?: number | ((count: number) => number);
-    fallbackRetry?: boolean;
+    fallbackRetry?: boolean | ((error: any) => boolean);
     fallbackRetryLimit?: number;
     fallbackRetryInterval?: number | ((count: number) => number);
 
     onSuccess?: (data: LoadData<Callback>) => void;
     onFailure?: (error: any) => void;
     onFinally?: () => void;
-  }
+  },
 ): {
   submitting: boolean;
   submit: (...params: Parameters<Callback>) => ReturnType<Callback>;
@@ -39,16 +37,16 @@ function useSubmit<Callback extends LoadCallback>(
 
 Params:
 
-- **`callback`:** A function returns a promise object.
+- **`callback`:** A function that returns a promise.
 - **`options`:** Options object.
-  - **`options.idle`:** Run callback during the browser's idle periods. You can set an object contains a `timeout` property to limit the max waiting time.
-  - **`options.fallback`:** When the `callback` function reject an error and the count of retries has been exhausted, the `fallback` function will be called.
-  - **`options.retry`:** Enable retry callback. Default is `false`.
+  - **`options.idle`:** Run the callback during the browser's idle periods. You can pass an `IdleRequestOptions` object to limit the max waiting time.
+  - **`options.fallback`:** When the `callback` function rejects an error and the count of retries has been exhausted, the `fallback` function will be called. Usually used for an alternate data source.
+  - **`options.retry`:** Enable retrying the callback. Default is `false`. It can be a function that receives the error and returns whether to retry.
   - **`options.retryLimit`:** Callback retry limit. Default is `3`.
-  - **`options.retryInterval`:** Callback retry interval. Default is `0`. You can set a function that returns a number value for this option, for example `(count) => Math.pow(2, count)`.
-  - **`options.fallbackRetry`:** Enable retry fallback. Default is `false`.
+  - **`options.retryInterval`:** Callback retry interval, in milliseconds. Defaults to exponential growth: the `count`-th retry waits 2^(count-1) × 1000 ms. You can set a function that returns a number value for this option, for example `(count) => Math.pow(2, count)`.
+  - **`options.fallbackRetry`:** Enable retrying the fallback function after it fails too. Default is `false`. It can be a function that receives the error and returns whether to retry.
   - **`options.fallbackRetryLimit`:** Fallback retry limit. Default is `3`.
-  - **`options.fallbackRetryInterval`:** Fallback retry interval. It also can be a function.
+  - **`options.fallbackRetryInterval`:** Fallback retry interval, in milliseconds. Defaults to exponential growth like `retryInterval`. It can also be a function.
   - **`options.onSuccess`:** Success event.
   - **`options.onFailure`:** Failure event.
   - **`options.onFinally`:** Finally event.
@@ -56,7 +54,7 @@ Params:
 Results:
 
 - **`submitting`:** Submitting state. Initial value is `false`.
-- **`submit`:** Submit function. Used in the same way as the `callback`.
+- **`submit`:** Submit function. Used in the same way as the `callback`. Each submission cancels the previous pending submission.
 
 ## Example
 
