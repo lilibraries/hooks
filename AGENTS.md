@@ -15,7 +15,6 @@ Every hook must support React 16.8+ / 17 / 18 / 19, as well as SSR and StrictMod
 
 - Compose new functionality from the library's own primitive hooks (`useLatestRef`, `usePersist`, `useSafeState`, `useUnmount`, `useMountedRef`/`useUnmountedRef`, `useUpdate`, etc.) instead of reimplementing their logic.
 - lodash must be imported via subpaths (`lodash/isEqual`); importing the whole package is forbidden.
-- Merge option defaults with `mergeDefined(defaults, options)`.
 - One hook per file; return tuples/objects with `as const`; document all parameters with JSDoc (`@param`, `@returns`).
 - Published code may only import from within `src/` (the published package contains only `src` and `dist`).
 - Docs and comments are written in English by default and must follow English writing conventions; when authoring docs for a specific language, write in that language with its corresponding conventions.
