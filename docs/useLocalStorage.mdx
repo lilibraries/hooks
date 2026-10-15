@@ -18,12 +18,10 @@ function useLocalStorage<T>(
     validate?: (value: any) => boolean;
     serialize?: (value: T) => string;
     deserialize?: (raw: string) => T;
-  }
+  },
 ): [
   value: T | undefined,
-  setLocalStorage: (
-    newValue: T | undefined | ((prevValue: T | undefined) => T | undefined)
-  ) => void
+  setLocalStorage: (newValue: T | undefined | ((prevValue: T | undefined) => T | undefined)) => void,
 ];
 ```
 
@@ -35,14 +33,14 @@ Params:
   - **`options.polling`:** Pollingly update value. Default is `false`.
   - **`options.pollingInterval`:** Polling interval time, in milliseconds. Default is `100`.
   - **`options.compare`:** The comparison function in polling. Use deep comparison by default.
-  - **`options.validate`:** Validate the value got from `localStorage` which deserialized by `deserialize` function. If this function return `false`, the `defaultValue` will be used.
+  - **`options.validate`:** Validate the value got from `localStorage` which is deserialized by the `deserialize` function. If this function returns `false`, the `defaultValue` will be used.
   - **`options.serialize`:** Serialization function. Default is `JSON.stringify`.
   - **`options.deserialize`:** Deserialization function. Default is `JSON.parse`.
 
 Results:
 
 - **`value`:** Parsed by the deserialization function.
-- **`setLocalStorage`:** Set `localStorage`. If the `newValue` is `undefined`, return the `defaultValue`.
+- **`setLocalStorage`:** Set `localStorage`. If the `newValue` is `undefined`, the entry will be removed and the `defaultValue` will be returned.
 
 ## Example
 
