@@ -1,14 +1,18 @@
-import { useDebugValue, useEffect } from "react";
+import { useDebugValue, useEffect, useRef } from "react";
+
 import isEqual from "lodash/isEqual";
 import isFunction from "lodash/isFunction";
-import useUpdate from "../useUpdate";
-import usePersist from "../usePersist";
-import useInterval from "../useInterval";
-import useSafeState from "../useSafeState";
-import useEventListener from "../useEventListener";
-import useMemoizedValue from "../useMemoizedValue";
 
-export interface StorageHookOptions<T> {
+import useEventListener from "../useEventListener";
+import useInterval from "../useInterval";
+import useLatestRef from "../useLatestRef";
+import useMemoizedValue from "../useMemoizedValue";
+import usePersist from "../usePersist";
+import useSafeState from "../useSafeState";
+import useUpdate from "../useUpdate";
+import inBrowser from "../utils/inBrowser";
+
+export interface UseStorageOptions<T> {
   defaultValue?: T;
   polling?: boolean;
   pollingInterval?: number;
@@ -18,26 +22,26 @@ export interface StorageHookOptions<T> {
   deserialize?: (raw: string) => T;
 }
 
-function createStorageHook(storage: Storage | null) {
+/**
+ * Factory for creating storage hooks: takes a function that returns a `Storage`
+ * object (e.g. `() => localStorage`) and returns a hook for reading, writing,
+ * and removing values in that storage.
+ * The storage object is accessed lazily through the function, so accessing the
+ * storage property in private-browsing or restricted environments does not
+ * throw at module load time.
+ */
+function createStorageHook(getStorage: () => Storage | null) {
   function useStorage<T>(
     key: string,
-    options: StorageHookOptions<T> & { defaultValue: T }
-  ): readonly [
-    T,
-    (value: T | undefined | ((prevValue: T) => T | undefined)) => void
-  ];
+    options: UseStorageOptions<T> & { defaultValue: T },
+  ): readonly [T, (value: T | undefined | ((prevValue: T) => T | undefined)) => void];
 
   function useStorage<T>(
     key: string,
-    options?: StorageHookOptions<T>
-  ): readonly [
-    T | undefined,
-    (
-      value: T | undefined | ((prevValue: T | undefined) => T | undefined)
-    ) => void
-  ];
+    options?: UseStorageOptions<T>,
+  ): readonly [T | undefined, (value: T | undefined | ((prevValue: T | undefined) => T | undefined)) => void];
 
-  function useStorage<T>(key: string, options?: StorageHookOptions<T>) {
+  function useStorage<T>(key: string, options?: UseStorageOptions<T>) {
     const {
       defaultValue: defaultValueOption,
       polling = false,
@@ -47,6 +51,7 @@ function createStorageHook(storage: Storage | null) {
       serialize = JSON.stringify as (value: T) => string,
       deserialize = JSON.parse as (raw: string) => T,
     } = options || {};
+    const storage = getStorage();
     const defaultValue = useMemoizedValue(defaultValueOption, compare);
 
     function getStoredValue(): T | undefined {
@@ -67,26 +72,25 @@ function createStorageHook(storage: Storage | null) {
     }
 
     const [value, setValue] = useSafeState<T | undefined>(getStoredValue);
+    const valueRef = useLatestRef(value);
 
-    const setStorage = usePersist(
-      (
-        newValue: T | undefined | ((prevValue: T | undefined) => T | undefined)
-      ) => {
-        setValue((prevValue) => {
-          newValue = isFunction(newValue) ? newValue(prevValue) : newValue;
-          if (newValue === undefined) {
-            storage?.removeItem(key);
-            return defaultValue;
-          }
-          try {
-            storage?.setItem(key, serialize(newValue));
-          } catch (error) {
-            console.error(error);
-          }
-          return newValue;
-        });
+    const setStorage = usePersist((newValue: T | undefined | ((prevValue: T | undefined) => T | undefined)) => {
+      const resolved = isFunction(newValue) ? newValue(valueRef.current) : newValue;
+
+      if (resolved === undefined) {
+        storage?.removeItem(key);
+        valueRef.current = defaultValue;
+        setValue(defaultValue);
+      } else {
+        try {
+          storage?.setItem(key, serialize(resolved));
+        } catch (error) {
+          console.error(error);
+        }
+        valueRef.current = resolved;
+        setValue(resolved);
       }
-    );
+    });
 
     const handleChange = () => {
       const newValue = getStoredValue();
@@ -95,11 +99,9 @@ function createStorageHook(storage: Storage | null) {
       }
     };
 
-    const [startPolling, cancelPolling] = useInterval(
-      handleChange,
-      pollingInterval
-    );
+    const [startPolling, cancelPolling] = useInterval(handleChange, pollingInterval);
 
+    // Restart or stop polling when the polling flag changes
     useEffect(
       () => {
         cancelPolling();
@@ -107,11 +109,15 @@ function createStorageHook(storage: Storage | null) {
           startPolling();
         }
       },
-      [polling] // eslint-disable-line
+      [polling], // eslint-disable-line
     );
 
-    useEventListener(() => window, "storage", handleChange);
+    const windowRef = useRef<Window | null>(inBrowser ? window : null);
 
+    useEventListener(windowRef, "storage", handleChange);
+
+    // When the key changes: stop the previous polling, re-read the storage,
+    // and restart polling if needed
     useUpdate(() => {
       cancelPolling();
       setValue(getStoredValue());
@@ -120,6 +126,8 @@ function createStorageHook(storage: Storage | null) {
       }
     }, [key]);
 
+    // When the default value changes and the key is absent from storage,
+    // sync the state to the new default value
     useUpdate(() => {
       if (storage?.getItem(key) == null && !compare(defaultValue, value)) {
         setValue(defaultValue);
@@ -127,7 +135,7 @@ function createStorageHook(storage: Storage | null) {
     }, [defaultValue]);
 
     useDebugValue(value);
-    useDebugValue(key, (key) => {
+    useDebugValue(key, () => {
       return "(raw) " + storage?.getItem(key);
     });
 
