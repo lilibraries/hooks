@@ -1,12 +1,9 @@
-Run effect after the component is updated or the deps are changed, ignore on mount.
+Run an effect after the component is updated or the deps are changed, but ignore it on mount.
 
 ## API
 
 ```ts
-function useUpdate(
-  effect: React.EffectCallback,
-  deps?: React.DependencyList
-): void;
+function useUpdate(effect: React.EffectCallback, deps?: React.DependencyList): void;
 ```
 
 ## Example
