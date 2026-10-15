@@ -1,6 +1,13 @@
-# Hooks
+# @lilib/hooks
+
+[![npm version](https://img.shields.io/npm/v/@lilib/hooks?style=flat-square)](https://www.npmjs.com/package/@lilib/hooks)
+[![npm downloads](https://img.shields.io/npm/dm/@lilib/hooks?style=flat-square)](https://www.npmjs.com/package/@lilib/hooks)
+[![license](https://img.shields.io/npm/l/@lilib/hooks?style=flat-square)](https://github.com/lilibraries/hooks/blob/master/LICENSE)
 
 React hook library.
+
+- [Documentation](https://lilibraries.github.io/hooks/)
+- [Changelog](https://github.com/lilibraries/hooks/blob/master/CHANGELOG.md)
 
 ## Features
 
@@ -8,7 +15,8 @@ React hook library.
 - Supports SSR.
 - Supports React StrictMode.
 - Supports loading async data.
-- Provides 50+ hooks.
+- Provides 51 hooks.
+- Written in TypeScript.
 
 ## Install
 
@@ -20,7 +28,7 @@ yarn add @lilib/hooks
 pnpm add @lilib/hooks
 ```
 
-## Example
+## Usage
 
 ```tsx
 import React from "react";
@@ -34,10 +42,6 @@ function Example() {
 }
 ```
 
-## Document
-
-https://lilibraries.github.io/hooks/
-
 ## Hooks
 
 <table>
@@ -50,21 +54,38 @@ https://lilibraries.github.io/hooks/
   </thead>
   <tbody>
     <tr>
-      <td rowspan="9">Effects</td>
+      <td rowspan="3">Async</td>
       <td>
-        <a href="https://lilibraries.github.io/hooks/useOnce">
-          <code>useOnce</code>
+        <a href="https://lilibraries.github.io/hooks/useLoad">
+          <code>useLoad</code>
         </a>
       </td>
-      <td>Run effect synchronously only once.</td>
+      <td>Load async data.</td>
     </tr>
     <tr>
+      <td>
+        <a href="https://lilibraries.github.io/hooks/useReload">
+          <code>useReload</code>
+        </a>
+      </td>
+      <td>Reload async data.</td>
+    </tr>
+    <tr>
+      <td>
+        <a href="https://lilibraries.github.io/hooks/useSubmit">
+          <code>useSubmit</code>
+        </a>
+      </td>
+      <td>Submit network requests.</td>
+    </tr>
+    <tr>
+      <td rowspan="10">Effects</td>
       <td>
         <a href="https://lilibraries.github.io/hooks/useMount">
           <code>useMount</code>
         </a>
       </td>
-      <td>Run effect after the component is mounted.</td>
+      <td>Run an effect after the component is mounted.</td>
     </tr>
     <tr>
       <td>
@@ -73,8 +94,8 @@ https://lilibraries.github.io/hooks/
         </a>
       </td>
       <td>
-        Run effect after the component is updated or the deps are changed,
-        ignore on mount.
+        Run an effect after the component is updated or the deps are changed,
+        but ignore it on mount.
       </td>
     </tr>
     <tr>
@@ -83,17 +104,28 @@ https://lilibraries.github.io/hooks/
           <code>useUnmount</code>
         </a>
       </td>
-      <td>Run effect on the component unmount.</td>
+      <td>Run an effect on the component unmount.</td>
     </tr>
     <tr>
       <td>
-        <a href="https://lilibraries.github.io/hooks/useTargetEffect">
-          <code>useTargetEffect</code>
+        <a href="https://lilibraries.github.io/hooks/useRefEffect">
+          <code>useRefEffect</code>
         </a>
       </td>
       <td>
-        It accepts functions or refs as effect dependencies. It is useful when
-        using DOM nodes as effect dependencies.
+        Like <code>React.useEffect</code>, but ReactRefs in the deps are
+        dereferenced to <code>ref.current</code> before comparison.
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <a href="https://lilibraries.github.io/hooks/useRefUpdate">
+          <code>useRefUpdate</code>
+        </a>
+      </td>
+      <td>
+        Like <code>useUpdate</code>, but ReactRefs in the deps are dereferenced
+        to <code>ref.current</code> before comparison.
       </td>
     </tr>
     <tr>
@@ -103,7 +135,8 @@ https://lilibraries.github.io/hooks/
         </a>
       </td>
       <td>
-        It's similar to <code>useMount</code>, except it uses <code>useIsomorphicLayoutEffect</code> internally.
+        Like <code>useMount</code>, but runs synchronously before the browser
+        paints.
       </td>
     </tr>
     <tr>
@@ -113,17 +146,30 @@ https://lilibraries.github.io/hooks/
         </a>
       </td>
       <td>
-        It's similar to <code>useUpdate</code>, except it uses <code>useIsomorphicLayoutEffect</code> internally.
+        Like <code>useUpdate</code>, but runs synchronously before the browser
+        paints.
       </td>
     </tr>
     <tr>
       <td>
-        <a href="https://lilibraries.github.io/hooks/useLayoutTargetEffect">
-          <code>useLayoutTargetEffect</code>
+        <a href="https://lilibraries.github.io/hooks/useLayoutRefEffect">
+          <code>useLayoutRefEffect</code>
         </a>
       </td>
       <td>
-        It's similar to <code>useTargetEffect</code>, except it uses <code>useIsomorphicLayoutEffect</code> internally.
+        Like <code>useRefEffect</code>, but runs synchronously before the
+        browser paints.
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <a href="https://lilibraries.github.io/hooks/useLayoutRefUpdate">
+          <code>useLayoutRefUpdate</code>
+        </a>
+      </td>
+      <td>
+        Like <code>useRefUpdate</code>, but runs synchronously before the
+        browser paints.
       </td>
     </tr>
     <tr>
@@ -133,26 +179,18 @@ https://lilibraries.github.io/hooks/
         </a>
       </td>
       <td>
-        In the DOM environment, this hook is the same as React.useLayoutEffect.
-        In the SSR environment, it is the same as React.useEffect.
+        Same as <code>React.useLayoutEffect</code> in the DOM environment and{" "}
+        <code>React.useEffect</code> in the SSR environment.
       </td>
     </tr>
     <tr>
-      <td rowspan="8">States</td>
-      <td>
-        <a href="https://lilibraries.github.io/hooks/useCache">
-          <code>useCache</code>
-        </a>
-      </td>
-      <td>Cache data for a certain period of time.</td>
-    </tr>
-    <tr>
+      <td rowspan="7">States</td>
       <td>
         <a href="https://lilibraries.github.io/hooks/useToggle">
           <code>useToggle</code>
         </a>
       </td>
-      <td>Use boolean value.</td>
+      <td>Manage a boolean value.</td>
     </tr>
     <tr>
       <td>
@@ -161,7 +199,7 @@ https://lilibraries.github.io/hooks/
         </a>
       </td>
       <td>
-        This hook is like <code>this.setState</code> method of class component.
+        Like the <code>this.setState</code> method of class components.
       </td>
     </tr>
     <tr>
@@ -171,8 +209,8 @@ https://lilibraries.github.io/hooks/
         </a>
       </td>
       <td>
-        Eliminate errors thrown by setting state when the component is
-        unmounted.
+        Same as <code>React.useState</code>, but setting state after unmount has
+        no effect and never errors.
       </td>
     </tr>
     <tr>
@@ -181,7 +219,7 @@ https://lilibraries.github.io/hooks/
           <code>useDelayedValue</code>
         </a>
       </td>
-      <td>Delay updating a value.</td>
+      <td>Delay updates to a value.</td>
     </tr>
     <tr>
       <td>
@@ -217,7 +255,7 @@ https://lilibraries.github.io/hooks/
           <code>useRaf</code>
         </a>
       </td>
-      <td>Invoke the callback before the browser repainting.</td>
+      <td>Invoke the callback before the browser repaints.</td>
     </tr>
     <tr>
       <td>
@@ -229,11 +267,19 @@ https://lilibraries.github.io/hooks/
     </tr>
     <tr>
       <td>
+        <a href="https://lilibraries.github.io/hooks/useAnimate">
+          <code>useAnimate</code>
+        </a>
+      </td>
+      <td>Run JavaScript animations.</td>
+    </tr>
+    <tr>
+      <td>
         <a href="https://lilibraries.github.io/hooks/useTimeout">
           <code>useTimeout</code>
         </a>
       </td>
-      <td>Delay running callback.</td>
+      <td>Delay running a callback.</td>
     </tr>
     <tr>
       <td>
@@ -241,15 +287,7 @@ https://lilibraries.github.io/hooks/
           <code>useInterval</code>
         </a>
       </td>
-      <td>Loop run callback.</td>
-    </tr>
-    <tr>
-      <td>
-        <a href="https://lilibraries.github.io/hooks/useAnimation">
-          <code>useAnimation</code>
-        </a>
-      </td>
-      <td>Use this hook to perform JavaScript animation.</td>
+      <td>Run a callback repeatedly at a fixed interval.</td>
     </tr>
     <tr>
       <td>
@@ -257,7 +295,7 @@ https://lilibraries.github.io/hooks/
           <code>usePersist</code>
         </a>
       </td>
-      <td>Returns a function whose identifier never changes.</td>
+      <td>Return a function whose identity never changes.</td>
     </tr>
     <tr>
       <td>
@@ -265,7 +303,7 @@ https://lilibraries.github.io/hooks/
           <code>useRerender</code>
         </a>
       </td>
-      <td>Force rerender the component.</td>
+      <td>Force re-render the component.</td>
     </tr>
     <tr>
       <td>
@@ -273,7 +311,7 @@ https://lilibraries.github.io/hooks/
           <code>useThrottle</code>
         </a>
       </td>
-      <td>Use throttled callback.</td>
+      <td>Use a throttled callback.</td>
     </tr>
     <tr>
       <td>
@@ -281,7 +319,7 @@ https://lilibraries.github.io/hooks/
           <code>useDebounce</code>
         </a>
       </td>
-      <td>Use debounced callback.</td>
+      <td>Use a debounced callback.</td>
     </tr>
     <tr>
       <td rowspan="5">Refs</td>
@@ -291,8 +329,8 @@ https://lilibraries.github.io/hooks/
         </a>
       </td>
       <td>
-        Return a ref object whose <code>.current</code> property is assigned to
-        latest updated value.
+        Return a ref object whose <code>.current</code> property always points
+        to the latest value.
       </td>
     </tr>
     <tr>
@@ -302,8 +340,8 @@ https://lilibraries.github.io/hooks/
         </a>
       </td>
       <td>
-        Return a ref object whose <code>.current</code> property is assigned to
-        previous updated value.
+        Return a ref object whose <code>.current</code> property points to the
+        value from the previous update.
       </td>
     </tr>
     <tr>
@@ -312,7 +350,7 @@ https://lilibraries.github.io/hooks/
           <code>useComposedRef</code>
         </a>
       </td>
-      <td>This hook compose multiple refs into one.</td>
+      <td>Compose multiple refs into one.</td>
     </tr>
     <tr>
       <td>
@@ -321,7 +359,7 @@ https://lilibraries.github.io/hooks/
         </a>
       </td>
       <td>
-        It returns a ref object that used to determine whether the component is
+        Return a ref object that is used to determine whether the component is
         mounted.
       </td>
     </tr>
@@ -332,7 +370,7 @@ https://lilibraries.github.io/hooks/
         </a>
       </td>
       <td>
-        It returns a ref object that used to determine whether the component is
+        Return a ref object that is used to determine whether the component is
         unmounted.
       </td>
     </tr>
@@ -343,7 +381,7 @@ https://lilibraries.github.io/hooks/
           <code>useTitle</code>
         </a>
       </td>
-      <td>Set document title.</td>
+      <td>Set the document title.</td>
     </tr>
     <tr>
       <td>
@@ -351,7 +389,7 @@ https://lilibraries.github.io/hooks/
           <code>useFavicon</code>
         </a>
       </td>
-      <td>Set document favicon.</td>
+      <td>Set the document favicon.</td>
     </tr>
     <tr>
       <td>
@@ -367,7 +405,7 @@ https://lilibraries.github.io/hooks/
           <code>useDarkMode</code>
         </a>
       </td>
-      <td>Detect whether the preferred color mode of the system is dark.</td>
+      <td>Detect whether the preferred color scheme of the system is dark.</td>
     </tr>
     <tr>
       <td>
@@ -383,7 +421,7 @@ https://lilibraries.github.io/hooks/
           <code>useWindowFocus</code>
         </a>
       </td>
-      <td>Detect whether the window is focus.</td>
+      <td>Detect whether the window has focus.</td>
     </tr>
     <tr>
       <td>
@@ -391,7 +429,7 @@ https://lilibraries.github.io/hooks/
           <code>useMatchMedia</code>
         </a>
       </td>
-      <td>Determine if the document matches the media query string.</td>
+      <td>Determine whether the document matches the media query string.</td>
     </tr>
     <tr>
       <td>
@@ -415,7 +453,7 @@ https://lilibraries.github.io/hooks/
           <code>useIntersecting</code>
         </a>
       </td>
-      <td>Determine whether two elements intersect.</td>
+      <td>Determine whether an element intersects with another one.</td>
     </tr>
     <tr>
       <td>
@@ -431,7 +469,7 @@ https://lilibraries.github.io/hooks/
           <code>useEventListener</code>
         </a>
       </td>
-      <td>Set up the event listener to the target.</td>
+      <td>Set up an event listener on the target.</td>
     </tr>
     <tr>
       <td>
@@ -439,7 +477,7 @@ https://lilibraries.github.io/hooks/
           <code>useResizeObserver</code>
         </a>
       </td>
-      <td>Observe a element size changing.</td>
+      <td>Observe an element's size changes.</td>
     </tr>
     <tr>
       <td>
@@ -447,7 +485,10 @@ https://lilibraries.github.io/hooks/
           <code>useIntersectionObserver</code>
         </a>
       </td>
-      <td>Observe whether two elements intersect.</td>
+      <td>
+        Observe when an element's intersection with another element or the
+        viewport changes.
+      </td>
     </tr>
     <tr>
       <td>
@@ -477,50 +518,6 @@ https://lilibraries.github.io/hooks/
         Get, set and/or remove <code>sessionStorage</code>.
       </td>
     </tr>
-    <tr>
-      <td rowspan="3">Requests</td>
-      <td>
-        <a href="https://lilibraries.github.io/hooks/useLoad">
-          <code>useLoad</code>
-        </a>
-      </td>
-      <td>Load async data.</td>
-    </tr>
-    <tr>
-      <td>
-        <a href="https://lilibraries.github.io/hooks/useReload">
-          <code>useReload</code>
-        </a>
-      </td>
-      <td>Reload async data.</td>
-    </tr>
-    <tr>
-      <td>
-        <a href="https://lilibraries.github.io/hooks/useSubmit">
-          <code>useSubmit</code>
-        </a>
-      </td>
-      <td>Submit network requests.</td>
-    </tr>
-    <tr>
-      <td rowspan="2">Configs</td>
-      <td>
-        <a href="https://lilibraries.github.io/hooks/LoadConfig">
-          <code>LoadConfig</code>
-        </a>
-      </td>
-      <td>Config component of request hooks.</td>
-    </tr>
-    <tr>
-      <td>
-        <a href="https://lilibraries.github.io/hooks/CacheConfig">
-          <code>CacheConfig</code>
-        </a>
-      </td>
-      <td>
-        Config component of <code>useCache</code>.
-      </td>
-    </tr>
   </tbody>
 </table>
 
@@ -530,4 +527,4 @@ https://github.com/lilibraries/hooks/blob/master/CHANGELOG.md
 
 ## License
 
-Code licensed MIT, docs CC BY 4.0.
+MIT.
