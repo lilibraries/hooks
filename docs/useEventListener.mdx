@@ -3,31 +3,22 @@ import ExampleBlock from "./components/ExampleBlock";
 import Example from "./examples/UseEventListener";
 import ExampleCode from "!!raw-loader!./examples/UseEventListener";
 
-Set up the event listener to the target.
+Set up an event listener on the target.
 
 ## API
 
 ```ts
-function useEventListener<
-  T extends EventTarget = EventTarget,
-  E extends Event = Event
->(
-  target: EffectTarget<T>,
+function useEventListener<T extends EventTarget = EventTarget, E extends Event = Event>(
+  target: T | React.RefObject<T | null>,
   eventName: string,
   listener: (event: E) => void,
-  options?: boolean | { capture?: boolean; once?: boolean; passive?: boolean }
+  options?: boolean | { capture?: boolean; once?: boolean; passive?: boolean },
 ): void;
-
-type Nullable<T> = T | undefined | null;
-type EffectTarget<T> =
-  | Nullable<T>
-  | (() => Nullable<T>)
-  | { current: Nullable<T> };
 ```
 
 Params:
 
-- **`target`:** Event target. It can be `undefined`, `null`, event target, a ref object or a function that returns a event target.
+- **`target`:** Event target. It can be `undefined`, `null`, an event target, or a ref object that references an event target.
 - **`eventName`:** Event name.
 - **`listener`:** Listener function.
 - **`options`:** Similar to the third parameter of the [`addEventListener`](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener) function.

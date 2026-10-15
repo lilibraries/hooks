@@ -1,22 +1,32 @@
-import isObject from "lodash/isObject";
-import { EffectTarget, isEventTarget, getEffectTarget } from "@lilib/utils";
-import usePersist from "./usePersist";
-import useTargetEffect from "./useTargetEffect";
+import type { RefObject } from "react";
 
-function useEventListener<
-  T extends EventTarget = EventTarget,
-  E extends Event = Event
->(
-  target: EffectTarget<T>,
+import isBoolean from "lodash/isBoolean";
+import isObject from "lodash/isObject";
+
+import usePersist from "./usePersist";
+import useRefEffect from "./useRefEffect";
+import isEventTarget from "./utils/isEventTarget";
+import unref from "./utils/unref";
+
+/**
+ * Attach an event listener to a target.
+ *
+ * @param target The event target or its ref.
+ * @param eventName The event name.
+ * @param listener The event listener.
+ * @param options A boolean or `AddEventListenerOptions` object.
+ */
+function useEventListener<T extends EventTarget = EventTarget, E extends Event = Event>(
+  target: T | RefObject<T | null>,
   eventName: string,
   listener: (event: E) => void,
-  options?: boolean | AddEventListenerOptions
+  options?: boolean | AddEventListenerOptions,
 ) {
   let capture: boolean | undefined;
   let once: boolean | undefined;
   let passive: boolean | undefined;
 
-  if (typeof options === "boolean") {
+  if (isBoolean(options)) {
     capture = options;
   } else if (isObject(options)) {
     if (options.capture !== undefined) {
@@ -32,27 +42,23 @@ function useEventListener<
 
   const handler = usePersist(listener) as EventListener;
 
-  useTargetEffect(
-    () => {
-      const element = getEffectTarget(target);
+  useRefEffect(() => {
+    const element = unref(target);
 
-      if (isEventTarget(element)) {
-        element.addEventListener(eventName, handler, {
+    if (isEventTarget(element)) {
+      element.addEventListener(eventName, handler, {
+        capture,
+        once,
+        passive,
+      });
+
+      return () => {
+        element.removeEventListener(eventName, handler, {
           capture,
-          once,
-          passive,
         });
-
-        return () => {
-          element.removeEventListener(eventName, handler, {
-            capture,
-          });
-        };
-      }
-    },
-    [eventName, capture, once, passive],
-    [target]
-  );
+      };
+    }
+  }, [eventName, capture, once, passive, target]);
 }
 
 export default useEventListener;
