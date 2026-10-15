@@ -3,15 +3,12 @@ import ExampleBlock from "./components/ExampleBlock";
 import Example from "./examples/UseInterval";
 import ExampleCode from "!!raw-loader!./examples/UseInterval";
 
-Loop run callback.
+Run a callback repeatedly at a fixed interval.
 
 ## API
 
 ```ts
-function useInterval(
-  callback: () => void,
-  interval?: number
-): [start: () => void, cancel: () => void];
+function useInterval(callback: () => void, interval?: number): [start: () => void, cancel: () => void];
 ```
 
 Params:
