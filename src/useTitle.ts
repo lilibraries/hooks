@@ -1,22 +1,39 @@
-import { useRef } from "react";
-import { inBrowser } from "@lilib/utils";
-import useUnmount from "./useUnmount";
-import usePreviousRef from "./usePreviousRef";
+import { useEffect, useRef } from "react";
 
-export interface TitleHookOptions {
+import useUnmount from "./useUnmount";
+import inBrowser from "./utils/inBrowser";
+
+interface UseTitleOptions {
   restore?: boolean;
 }
 
-function useTitle(title: string | null, options?: TitleHookOptions) {
-  const oldTitleRef = useRef(inBrowser ? document.title : "");
-  const prevTitleRef = usePreviousRef(title);
+/**
+ * Set the document title.
+ *
+ * @param title The document title; pass `null` to not set one.
+ * @param options The options object.
+ * @param options.restore Whether to restore the previous title on unmount.
+ */
+function useTitle(title: string | null, options?: UseTitleOptions) {
+  const oldTitleRef = useRef("");
+  // Capture the original title on the first render only, for restoration via the `restore` option
+  const capturedRef = useRef(false);
 
-  if (inBrowser && title != null && title !== prevTitleRef.current) {
-    document.title = title;
-  }
+  useEffect(() => {
+    if (!inBrowser) {
+      return;
+    }
+    if (!capturedRef.current) {
+      capturedRef.current = true;
+      oldTitleRef.current = document.title;
+    }
+    if (title != null) {
+      document.title = title;
+    }
+  }, [title]);
 
   useUnmount(() => {
-    if (inBrowser && options && options.restore) {
+    if (inBrowser && options?.restore) {
       document.title = oldTitleRef.current;
     }
   });
