@@ -1,14 +1,11 @@
-This hook is used in the same way as React.useState, expect that calling `setState` after the component is unmounted has no effect rather than throwing an error.
+This hook is used in the same way as React.useState, except that calling `setState` after the component is unmounted has no effect rather than throwing an error.
 
 ## API
 
 ```ts
 function useSafeState<S>(
-  initialState?: S | (() => S)
-): [
-  state: S | undefined,
-  setState: React.Dispatch<React.SetStateAction<S | undefined>>
-];
+  initialState?: S | (() => S),
+): [state: S | undefined, setState: React.Dispatch<React.SetStateAction<S | undefined>>];
 ```
 
 ## Example
@@ -20,10 +17,9 @@ import { useMount, useSafeState } from "@lilib/hooks";
 function Example() {
   const [data, setData] = useSafeState<any>();
 
-  useMount(() => {
-    fetch("http://example.com/api/getData").then((response) => {
-      setData(response.json());
-    });
+  useMount(async () => {
+    const response = await fetch("http://example.com/api/getData");
+    setData(await response.json());
   });
 
   ...
