@@ -6,7 +6,7 @@ function Example() {
   const containerRef = useRef(null);
 
   useResizeObserver(containerRef, () => {
-    setCount((count) => ++count);
+    setCount((count) => count + 1);
   });
 
   return <div ref={containerRef}>Container size change times: {count}</div>;

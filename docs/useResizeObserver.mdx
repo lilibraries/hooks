@@ -3,22 +3,21 @@ import ExampleBlock from "./components/ExampleBlock";
 import Example from "./examples/UseResizeObserver";
 import ExampleCode from "!!raw-loader!./examples/UseResizeObserver";
 
-Observe a element size changing.
+Observe an element's size changes.
 
 ## API
 
 ```ts
 function useResizeObserver(
-  target: EffectTarget<Element>,
-  listener: (entries: ResizeObserverEntry[]) => void
+  target: Element | React.RefObject<Element | null>,
+  listener: (entries: ResizeObserverEntry[]) => void,
 ): void;
-
-type Nullable<T> = T | undefined | null;
-type EffectTarget<T> =
-  | Nullable<T>
-  | (() => Nullable<T>)
-  | { current: Nullable<T> };
 ```
+
+Params:
+
+- **`target`:** A DOM element to observe, or a ref object that references it.
+- **`listener`:** Listener function.
 
 ## Example
 
