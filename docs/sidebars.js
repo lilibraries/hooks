@@ -3,16 +3,22 @@ module.exports = {
     "GettingStarted",
     {
       type: "category",
+      label: "Async",
+      items: ["useLoad", "useReload", "useSubmit"],
+    },
+    {
+      type: "category",
       label: "Effects",
       items: [
-        "useOnce",
         "useMount",
         "useUpdate",
         "useUnmount",
-        "useTargetEffect",
+        "useRefEffect",
+        "useRefUpdate",
         "useLayoutMount",
         "useLayoutUpdate",
-        "useLayoutTargetEffect",
+        "useLayoutRefEffect",
+        "useLayoutRefUpdate",
         "useIsomorphicLayoutEffect",
       ],
     },
@@ -20,7 +26,6 @@ module.exports = {
       type: "category",
       label: "States",
       items: [
-        "useCache",
         "useToggle",
         "useSetState",
         "useSafeState",
@@ -36,9 +41,9 @@ module.exports = {
       items: [
         "useRaf",
         "useIdle",
+        "useAnimate",
         "useTimeout",
         "useInterval",
-        "useAnimation",
         "usePersist",
         "useRerender",
         "useThrottle",
@@ -48,13 +53,7 @@ module.exports = {
     {
       type: "category",
       label: "Refs",
-      items: [
-        "useLatestRef",
-        "usePreviousRef",
-        "useComposedRef",
-        "useMountedRef",
-        "useUnmountedRef",
-      ],
+      items: ["useLatestRef", "usePreviousRef", "useComposedRef", "useMountedRef", "useUnmountedRef"],
     },
     {
       type: "category",
@@ -78,16 +77,6 @@ module.exports = {
         "useLocalStorage",
         "useSessionStorage",
       ],
-    },
-    {
-      type: "category",
-      label: "Requests",
-      items: ["useLoad", "useReload", "useSubmit"],
-    },
-    {
-      type: "category",
-      label: "Configs",
-      items: ["LoadConfig", "CacheConfig"],
     },
   ],
 };

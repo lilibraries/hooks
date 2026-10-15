@@ -2,13 +2,30 @@
 
 const path = require("path");
 
+/**
+ * Local plugin providing webpack module aliases.
+ */
+const moduleAliasPlugin = function (context, { alias }) {
+  return {
+    name: "docusaurus-plugin-module-alias",
+    configureWebpack(config) {
+      config.resolve.alias = { ...config.resolve.alias, ...alias };
+      return {};
+    },
+  };
+};
+
 module.exports = {
   title: "Hooks",
   url: "https://lilibraries.github.io/",
   baseUrl: "/hooks/",
   onBrokenLinks: "throw",
-  onBrokenMarkdownLinks: "throw",
   onDuplicateRoutes: "throw",
+  markdown: {
+    hooks: {
+      onBrokenMarkdownLinks: "throw",
+    },
+  },
   organizationName: "lilibraries",
   projectName: "hooks",
   themeConfig: {
@@ -23,7 +40,7 @@ module.exports = {
       ],
     },
     footer: {
-      copyright: `Copyright © 李蔚生. Code licensed MIT, docs CC BY 4.0.`,
+      copyright: `Copyright © 2021-${new Date().getFullYear()} <a href="https://github.com/LeeWeisheng" target="_blank" rel="noopener noreferrer">李蔚生 (LeeWeisheng)</a> · <a href="https://github.com/lilibraries/hooks/blob/master/LICENSE" target="_blank" rel="noopener noreferrer">MIT License</a>`,
     },
   },
   presets: [
@@ -39,7 +56,7 @@ module.exports = {
   ],
   plugins: [
     [
-      "docusaurus-plugin-module-alias",
+      moduleAliasPlugin,
       {
         alias: {
           "@lilib/hooks": path.resolve(__dirname, "./src"),
