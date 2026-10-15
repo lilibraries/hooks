@@ -1,25 +1,35 @@
 import { useMemo, useRef } from "react";
+
+import isNumber from "lodash/isNumber";
 import isObject from "lodash/isObject";
 import throttle from "lodash/throttle";
+
+import useLatestRef from "./useLatestRef";
 import usePersist from "./usePersist";
 import useUnmount from "./useUnmount";
-import useLatestRef from "./useLatestRef";
 
-export interface ThrottleOptions {
+export interface UseThrottleOptions {
   wait?: number;
   leading?: boolean;
   trailing?: boolean;
 }
 
-function useThrottle<T extends (...args: any[]) => any>(
-  callback: T,
-  options?: number | ThrottleOptions
-) {
+/**
+ * Use a throttled callback.
+ *
+ * @param callback The callback to throttle.
+ * @param options The throttle wait time (milliseconds), or an options object.
+ * @param options.wait The throttle wait time (milliseconds).
+ * @param options.leading Whether to invoke at the start.
+ * @param options.trailing Whether to invoke at the end.
+ * @returns Returns a `[throttled, { flush, cancel }]` tuple.
+ */
+function useThrottle<T extends (...args: any[]) => any>(callback: T, options?: number | UseThrottleOptions) {
   let wait = 0;
   let leading = false;
   let trailing = true;
 
-  if (typeof options === "number") {
+  if (isNumber(options)) {
     wait = options;
   } else if (isObject(options)) {
     if (options.wait !== undefined) {
@@ -34,27 +44,25 @@ function useThrottle<T extends (...args: any[]) => any>(
   }
 
   const callbackRef = useLatestRef(callback);
-  const throttledRef = useRef<ReturnType<typeof throttle>>();
+  const throttledRef = useRef<ReturnType<typeof throttle> | undefined>(undefined);
 
-  useMemo(
-    () => {
-      throttledRef.current?.flush();
-      throttledRef.current = throttle(
-        function (...args: Parameters<T>) {
-          // @ts-ignore
-          return callbackRef.current.apply(this, args);
-        },
-        wait,
-        { leading, trailing }
-      );
-    },
-    [wait, leading, trailing] // eslint-disable-line
-  );
+  // Rebuild the throttled function when throttle options change; useMemo (rather
+  // than useEffect) ensures calls to `throttled` within the same render already
+  // use the new function.
+  // Flush the old function before rebuilding to run its pending call immediately
+  // and avoid leftover timers.
+  useMemo(() => {
+    throttledRef.current?.flush();
+    throttledRef.current = throttle(
+      function (this: any, ...args: Parameters<T>) {
+        return callbackRef.current.apply(this, args);
+      },
+      wait,
+      { leading, trailing },
+    );
+  }, [wait, leading, trailing, callbackRef]);
 
-  const throttled = usePersist(function (
-    ...args: Parameters<T>
-  ): ReturnType<T> | undefined {
-    // @ts-ignore
+  const throttled = usePersist(function (this: any, ...args: Parameters<T>): ReturnType<T> | undefined {
     return throttledRef.current?.apply(this, args);
   });
 
