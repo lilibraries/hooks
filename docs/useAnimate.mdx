@@ -1,0 +1,34 @@
+import CodeBlock from "@theme/CodeBlock";
+import ExampleBlock from "./components/ExampleBlock";
+import Example from "./examples/UseAnimate";
+import ExampleCode from "!!raw-loader!./examples/UseAnimate";
+
+Run JavaScript animations with this hook.
+
+## API
+
+```ts
+function useAnimate(
+  callback: (percent: number) => void,
+  options: number | { duration: number; algorithm?: (percent: number) => number },
+): [start: () => void, cancel: () => void];
+```
+
+Params:
+
+- **`callback`:** The animation step function. It receives a percent number (0~1) as the first param.
+- **`options`:** The animation duration time, or an options object.
+  - **`options.duration`:** Required animation duration time, in milliseconds.
+  - **`options.algorithm`:** Optional easing function. The animation runs linearly by default, use this option to override the default behavior.
+
+Results:
+
+- **`start`:** Start function.
+- **`cancel`:** Cancel function.
+
+## Example
+
+<ExampleBlock>
+  <Example />
+</ExampleBlock>
+<CodeBlock language="tsx">{ExampleCode}</CodeBlock>
