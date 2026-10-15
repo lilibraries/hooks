@@ -1,17 +1,22 @@
 import { useDebugValue } from "react";
-import useUpdate from "./useUpdate";
+
+import useLatestRef from "./useLatestRef";
 import usePersist from "./usePersist";
 import useSafeState from "./useSafeState";
-import useLatestRef from "./useLatestRef";
-import useThrottle, { ThrottleOptions } from "./useThrottle";
+import useThrottle, { type UseThrottleOptions } from "./useThrottle";
+import useUpdate from "./useUpdate";
 
-function useThrottledValue<T>(value: T, options?: number | ThrottleOptions) {
+/**
+ * Throttle a value.
+ *
+ * @param value The value to throttle.
+ * @param options The throttle wait time (milliseconds), or an options object (same as `useThrottle`).
+ * @returns Returns a `[throttledValue, { flush, cancel }]` tuple.
+ */
+function useThrottledValue<T>(value: T, options?: number | UseThrottleOptions) {
   const valueRef = useLatestRef(value);
   const [throttledValue, setThrottledValue] = useSafeState(value);
-  const [updateThrottledValue, { cancel }] = useThrottle(
-    setThrottledValue,
-    options
-  );
+  const [updateThrottledValue, { cancel }] = useThrottle(setThrottledValue, options);
 
   const flush = usePersist(function (finalValue?: T) {
     cancel();
