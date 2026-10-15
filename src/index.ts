@@ -16,6 +16,7 @@ export { default as useLayoutRefUpdate } from "./useLayoutRefUpdate";
 export { default as useIsomorphicLayoutEffect } from "./useIsomorphicLayoutEffect";
 
 // States
+export { default as useCache } from "./useCache";
 export { default as useToggle } from "./useToggle";
 export { default as useSetState } from "./useSetState";
 export { default as useSafeState } from "./useSafeState";

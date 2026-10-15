@@ -26,6 +26,7 @@ module.exports = {
       type: "category",
       label: "States",
       items: [
+        "useCache",
         "useToggle",
         "useSetState",
         "useSafeState",

@@ -7,6 +7,7 @@ import { renderToString } from "react-dom/server";
 
 import {
   useAnimate,
+  useCache,
   useClickOutside,
   useComposedRef,
   useCookie,
@@ -82,6 +83,7 @@ function AllHooks() {
   useIsomorphicLayoutEffect(() => {});
 
   // States
+  useCache("ssr-cache");
   useToggle();
   useSetState({ count: 0 });
   useSafeState(0);

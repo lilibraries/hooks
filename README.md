@@ -184,7 +184,15 @@ function Example() {
       </td>
     </tr>
     <tr>
-      <td rowspan="7">States</td>
+      <td rowspan="8">States</td>
+      <td>
+        <a href="https://lilibraries.github.io/hooks/useCache">
+          <code>useCache</code>
+        </a>
+      </td>
+      <td>Cache data for a certain period of time.</td>
+    </tr>
+    <tr>
       <td>
         <a href="https://lilibraries.github.io/hooks/useToggle">
           <code>useToggle</code>

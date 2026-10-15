@@ -1,0 +1,51 @@
+import CodeBlock from "@theme/CodeBlock";
+import ExampleBlock from "./components/ExampleBlock";
+import Example from "./examples/UseCache";
+import ExampleCode from "!!raw-loader!./examples/UseCache";
+
+Cache data for a certain period of time, and synchronize data between components sharing the same [`LRUCache`](https://github.com/isaacs/node-lru-cache) instance. Pass a cache instance via `options.cache`, otherwise a shared internal instance is used.
+
+## API
+
+```ts
+function useCache<T>(
+  key: {},
+  options?: {
+    defaultValue?: T;
+    cache?: LRUCache<any, any>;
+    cacheTime?: number;
+    cacheSync?: boolean | { set?: boolean; delete?: boolean };
+    validate?: (value: any) => boolean;
+    onSet?: (value: any) => void;
+    onDelete?: (value: any) => void;
+  },
+): [value: T | undefined, setCache: (newValue: T | undefined) => void];
+```
+
+Params:
+
+- **`key`:** Cache key. Any value except `null` and `undefined`.
+- **`options`:** Options object.
+  - **`options.defaultValue`:** Default value when the cache value does not exist.
+  - **`options.cache`:** Cache instance. Create it with `new LRUCache({ max, ttl, ... })`. If not specified, a shared internal instance is created.
+  - **`options.cacheTime`:** Cache time, in milliseconds. Default is 5 minutes. The TTL is set per entry, so it works regardless of the `ttl` option of the cache instance. You can set a permanent cache by setting this option to `Infinity`. Non-positive values are normalized to 1 ms, so the entry expires on the next read.
+  - **`options.cacheSync`:** Synchronize data on set and/or delete data. Default is `false`. It can be an object to synchronize data in different events.
+    - **`options.cacheSync.set`:** Synchronize data on set cache.
+    - **`options.cacheSync.delete`:** Synchronize data on delete cache or when cache time expires.
+  - **`options.validate`:** Validate the cache value. If it returns falsy, the `defaultValue` will be used.
+  - **`options.onSet`:** Data set event. The `value` param will not be validated by the `validate` function.
+  - **`options.onDelete`:** Data delete event. The `value` param will not be validated by the `validate` function.
+
+Results:
+
+- **`value`:** Cache value or default value.
+- **`setCache`:** The function to set cache. It the `newValue` param is `undefined`, the cache will be deleted.
+
+Note: `LRUCache` expires entries lazily. Expired entries are only removed and notified when they are read, so an expired cache may still occupy memory until the next read. The shared internal cache enables `ttlAutopurge` to purge expired entries in the background; enable it on your own cache instance if needed.
+
+## Example
+
+<ExampleBlock>
+  <Example />
+</ExampleBlock>
+<CodeBlock language="tsx">{ExampleCode}</CodeBlock>
