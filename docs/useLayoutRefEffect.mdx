@@ -1,0 +1,31 @@
+This hook is similar to [`useRefEffect`](./useRefEffect), but it runs synchronously before the browser paints (layout phase), which suits cases that need immediate DOM reads or writes. It is built on [`useIsomorphicLayoutEffect`](./useIsomorphicLayoutEffect) internally.
+
+Note: plain objects with a `current` property are treated as ReactRefs and dereferenced, so they cannot be used as dependency values directly.
+
+## API
+
+```ts
+function useLayoutRefEffect(effect: React.EffectCallback, deps?: React.DependencyList): void;
+```
+
+Params:
+
+- **`effect`:** The effect function. It may return a cleanup function.
+- **`deps`:** The dependency array. Its elements can be plain values or ReactRefs. If omitted, the effect re-runs after every update.
+
+## Example
+
+```tsx
+import React, { useRef } from "react";
+import { useLayoutRefEffect } from "@lilib/hooks";
+
+function Example() {
+  const domRef = useRef<HTMLDivElement>(null);
+
+  useLayoutRefEffect(() => {
+    // `domRef.current` is the DOM node.
+  }, [domRef]);
+
+  return <div ref={domRef}>...</div>;
+}
+```
