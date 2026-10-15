@@ -18,6 +18,7 @@ Every hook must support React 16.8+ / 17 / 18 / 19, as well as SSR and StrictMod
 - Merge option defaults with `mergeDefined(defaults, options)`.
 - One hook per file; return tuples/objects with `as const`; document all parameters with JSDoc (`@param`, `@returns`).
 - Published code may only import from within `src/` (the published package contains only `src` and `dist`).
+- Docs and comments are written in English by default and must follow English writing conventions; when authoring docs for a specific language, write in that language with its corresponding conventions.
 
 ## Adding a Hook
 
@@ -42,7 +43,7 @@ Adding a new hook requires modifying five places — missing any one of them bre
 
 - Adding a hook requires no build config changes (Babel cjs/esm, Rollup umd, tsc types).
 - CHANGELOG.md is generated automatically by release-it from commit history — never edit it by hand.
-- Commit messages must follow Conventional Commits (enforced by commitlint via husky). Hook parameter names in commit messages must be wrapped in backticks.
+- Commit messages must follow Conventional Commits (enforced by commitlint via husky) and be written in English. Hook names and hook parameter names in commit messages must be wrapped in backticks.
 
 ## Do Not "Fix"
 
