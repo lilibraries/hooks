@@ -1,11 +1,21 @@
 import "requestidlecallback";
+
 import { useRef } from "react";
+
+import useLatestRef from "./useLatestRef";
 import usePersist from "./usePersist";
 import useUnmount from "./useUnmount";
-import useLatestRef from "./useLatestRef";
 
+/**
+ * Invoke a callback when the browser is idle. Uses `window.requestIdleCallback`
+ * by default, falling back to `setTimeout` when unavailable.
+ *
+ * @param callback The callback invoked when idle.
+ * @param options `IdleRequestOptions` options.
+ * @returns Returns a `[start, cancel]` tuple.
+ */
 function useIdle(callback: () => void, options?: IdleRequestOptions) {
-  const timerRef = useRef<number>();
+  const timerRef = useRef<number | undefined>(undefined);
   const callbackRef = useLatestRef(callback);
 
   const cancel = usePersist(() => {
