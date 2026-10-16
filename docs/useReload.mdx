@@ -8,16 +8,18 @@ This hook returns a function to reload all requests that share the same `key` in
 ## API
 
 ```ts
-function useReload(key: {}): () => void;
+function useReload(key: {}, options?: { force?: boolean }): (options?: { force?: boolean }) => void;
 ```
 
 Params:
 
 - **`key`:** The key set in `useLoad`. It must be an immutable value.
+- **`options`:** Options object.
+  - **`options.force`:** Whether to reload forcibly, bypassing the `staleTime` cache hit of the associated [`useLoad`](./useLoad) instances.
 
 Results:
 
-- A function to reload all of the associated requests.
+- A function to reload all of the associated requests. It also accepts an options object; the `force` passed on call overrides the hook-level one.
 
 ## Example
 

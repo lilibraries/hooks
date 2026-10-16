@@ -3,8 +3,12 @@ import renderHook from "./helpers/renderHook";
 
 import useLoad from "../src/useLoad";
 import useReload from "../src/useReload";
+import { getDefaultCache } from "../src/utils/cache";
 
 describe("useReload", () => {
+  afterEach(() => {
+    getDefaultCache().clear();
+  });
   it("reloads all useLoad instances with the same key", async () => {
     const callbackA = jest.fn(async () => "data-a");
     const callbackB = jest.fn(async () => "data-b");
@@ -90,5 +94,59 @@ describe("useReload", () => {
     rerender();
 
     expect(result.current).toBe(reload);
+  });
+
+  it("respects the staleTime cache hit unless forced", async () => {
+    const cacheKey = Symbol("cache-key");
+    getDefaultCache().set(cacheKey, "cached", { ttl: 60 * 1000 });
+
+    const callback = jest.fn(async () => "loaded");
+    const loader = renderHook(() =>
+      useLoad(callback, [], {
+        key: "shared",
+        cacheKey,
+        cacheTime: 60 * 1000,
+        staleTime: 30 * 1000,
+      }),
+    );
+    const reloader = renderHook(() => useReload("shared"));
+
+    // The mount load hits the fresh cache and sends no request.
+    await waitFor(() => expect(loader.result.current.data).toBe("cached"));
+    expect(callback).not.toHaveBeenCalled();
+
+    // reload() respects staleTime: still no request.
+    await act(async () => {
+      reloader.result.current();
+      await Promise.resolve();
+    });
+    expect(callback).not.toHaveBeenCalled();
+
+    // reload({ force: true }) bypasses the staleTime cache hit.
+    await act(async () => {
+      reloader.result.current({ force: true });
+      await Promise.resolve();
+    });
+    await waitFor(() => expect(callback).toHaveBeenCalledTimes(1));
+    expect(loader.result.current.data).toBe("loaded");
+
+    // The hook-level force option also bypasses the staleTime cache hit.
+    const forcedReloader = renderHook(() => useReload("shared", { force: true }));
+    await act(async () => {
+      forcedReloader.result.current();
+      await Promise.resolve();
+    });
+    await waitFor(() => expect(callback).toHaveBeenCalledTimes(2));
+
+    // The per-call force overrides the hook-level one: an explicit false downgrades to non-forced reloading.
+    await act(async () => {
+      forcedReloader.result.current({ force: false });
+      await Promise.resolve();
+    });
+    expect(callback).toHaveBeenCalledTimes(2);
+
+    loader.unmount();
+    reloader.unmount();
+    forcedReloader.unmount();
   });
 });
