@@ -1,4 +1,3 @@
-import React from "react";
 import { useCache } from "@lilib/hooks";
 import { LRUCache } from "lru-cache";
 

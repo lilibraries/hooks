@@ -1,4 +1,3 @@
-import React from "react";
 import { useCookie } from "@lilib/hooks";
 
 function Example() {

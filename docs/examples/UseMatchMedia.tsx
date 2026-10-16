@@ -1,4 +1,3 @@
-import React from "react";
 import { useMatchMedia } from "@lilib/hooks";
 
 function Example() {

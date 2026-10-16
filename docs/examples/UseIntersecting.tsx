@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import { useRef } from "react";
 import { useIntersecting } from "@lilib/hooks";
 
 function Example() {

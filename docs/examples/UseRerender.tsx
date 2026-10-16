@@ -1,4 +1,3 @@
-import React from "react";
 import { useRerender } from "@lilib/hooks";
 
 let count = 0;

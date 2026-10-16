@@ -1,4 +1,3 @@
-import React from "react";
 import { useSetState } from "@lilib/hooks";
 
 function Example() {

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useThrottle, useUpdate } from "@lilib/hooks";
 
 function Example() {

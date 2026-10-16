@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import { useRef } from "react";
 import TweenJS from "@tweenjs/tween.js";
 import { useAnimate } from "@lilib/hooks";
 

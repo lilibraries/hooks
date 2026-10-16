@@ -1,4 +1,3 @@
-import React from "react";
 import { useSessionStorage } from "@lilib/hooks";
 
 function Example() {

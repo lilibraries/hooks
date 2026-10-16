@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useResizeObserver } from "@lilib/hooks";
 
 function Example() {
@@ -9,7 +9,7 @@ function Example() {
     setCount((count) => count + 1);
   });
 
-  return <div ref={containerRef}>Container size change times: {count}</div>;
+  return <div ref={containerRef}>Resized times: {count}</div>;
 }
 
 export default Example;
