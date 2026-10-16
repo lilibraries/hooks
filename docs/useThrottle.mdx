@@ -20,7 +20,7 @@ function useThrottle<T extends (...args: any[]) => any>(
 ];
 ```
 
-Params:
+Parameters:
 
 - **`callback`:** Original callback function.
 - **`options`:** Throttle wait time or an options object.
@@ -36,6 +36,8 @@ Results:
   - **`actions.cancel`:** Cancel throttle timer.
 
 ## Example
+
+The following example shows how many times the callback actually runs after clicking the button rapidly.
 
 <ExampleBlock>
   <Example />

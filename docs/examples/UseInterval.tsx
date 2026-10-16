@@ -1,15 +1,21 @@
 import { useState } from "react";
-import { useInterval } from "@lilib/hooks";
+import { useInterval, useMount } from "@lilib/hooks";
 
 function Example() {
-  const [count, setCount] = useState(0);
+  const [elapsed, setElapsed] = useState(0);
   const [start, cancel] = useInterval(() => {
-    setCount((count) => count + 1);
+    setElapsed((elapsed) => elapsed + 1);
   }, 1000);
+
+  // Start the clock automatically on mount.
+  useMount(start);
 
   return (
     <>
-      <button onClick={start}>Start</button> <button onClick={cancel}>Cancel</button> Count: {count}
+      <div>
+        <button onClick={cancel}>Pause</button> <button onClick={start}>Resume</button>
+      </div>
+      <div>Elapsed seconds: {elapsed}</div>
     </>
   );
 }

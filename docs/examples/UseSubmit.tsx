@@ -1,6 +1,14 @@
 import { useLoad, useSubmit } from "@lilib/hooks";
 
-const getNumber = () => {
+const fetchNumber = () => {
+  return new Promise<number>((resolve) => {
+    setTimeout(() => {
+      resolve(Math.random());
+    }, 1000);
+  });
+};
+
+const submitNumber = () => {
   return new Promise<number>((resolve) => {
     setTimeout(() => {
       resolve(Math.random());
@@ -9,9 +17,9 @@ const getNumber = () => {
 };
 
 function Example() {
-  const { data, loading, update, reload } = useLoad(getNumber);
+  const { data, loading, update, reload } = useLoad(fetchNumber);
 
-  const { submit, submitting, error } = useSubmit(getNumber, {
+  const { submit, submitting, error } = useSubmit(submitNumber, {
     onSuccess: (result) => {
       update(result);
       reload();

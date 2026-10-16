@@ -3,509 +3,146 @@ title: Getting Started
 slug: /
 ---
 
-`@lilib/hooks` is a React hook library.
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import CodeBlock from "@theme/CodeBlock";
+
+`@lilib/hooks` is a collection of practical React hooks covering async data, states, effects, callbacks, refs and browser APIs — written in TypeScript and designed to work everywhere: React 16.8+, 17, 18 and 19, SSR and StrictMode included.
 
 ## Features
 
-- Supports React 16.8+, 17+, 18+ and 19+.
-- Supports SSR.
-- Supports React StrictMode.
-- Supports loading async data.
-- Provides 51 hooks.
-- Written in TypeScript.
+- More than 50 hooks covering async data, effects, states, callbacks, refs and browser APIs.
+- Works with React 16.8+, 17, 18 and 19.
+- SSR-safe — hooks fall back gracefully outside the browser instead of crashing.
+- StrictMode-safe — effects are idempotent, and timers, listeners and subscriptions are cleaned up on unmount.
+- Fully typed — written in TypeScript with JSDoc comments and shipped with type definitions.
+- Ships ESM, CJS and UMD builds.
+- Tree-shakeable — published with `sideEffects: false`, so unused hooks add no bundle weight.
 
 ## Install
 
-```shell
-npm install --save @lilib/hooks
-# Or
-yarn add @lilib/hooks
-# Or
-pnpm add @lilib/hooks
-```
+<Tabs>
+  <TabItem value="npm" label="npm" default>
+    <CodeBlock language="shell">{"npm install @lilib/hooks"}</CodeBlock>
+  </TabItem>
+  <TabItem value="pnpm" label="pnpm">
+    <CodeBlock language="shell">{"pnpm add @lilib/hooks"}</CodeBlock>
+  </TabItem>
+</Tabs>
 
-## Example
+## Quick start
 
 ```tsx
 import { useLoad } from "@lilib/hooks";
 
-function Example() {
-  const { data, error, loading } = useLoad(() => {
-    return fetch("/users/0").then((response) => response.json());
-  });
-  ...
+function UserProfile({ userId }: { userId: string }) {
+  const { data, error, loading } = useLoad(
+    () => fetch(`/users/${userId}`).then((response) => response.json()),
+    [userId],
+  );
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Something went wrong.</div>;
+  }
+
+  return <div>Hello, {data.name}!</div>;
 }
 ```
 
+For the full API reference and live examples, check out the docs of each hook listed below.
+
 ## Hooks
 
-<table>
-  <thead>
-    <tr>
-      <th>Category</th>
-      <th>Hook</th>
-      <th>Description</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td rowspan="3">Async</td>
-      <td>
-        <a href="./useLoad">
-          <code>useLoad</code>
-        </a>
-      </td>
-      <td>Load async data.</td>
-    </tr>
-    <tr>
-      <td>
-        <a href="./useReload">
-          <code>useReload</code>
-        </a>
-      </td>
-      <td>Reload async data.</td>
-    </tr>
-    <tr>
-      <td>
-        <a href="./useSubmit">
-          <code>useSubmit</code>
-        </a>
-      </td>
-      <td>Submit network requests.</td>
-    </tr>
-    <tr>
-      <td rowspan="10">Effects</td>
-      <td>
-        <a href="./useMount">
-          <code>useMount</code>
-        </a>
-      </td>
-      <td>Run an effect after the component is mounted.</td>
-    </tr>
-    <tr>
-      <td>
-        <a href="./useUpdate">
-          <code>useUpdate</code>
-        </a>
-      </td>
-      <td>Run an effect after the component updates or the deps change (the initial mount is skipped).</td>
-    </tr>
-    <tr>
-      <td>
-        <a href="./useUnmount">
-          <code>useUnmount</code>
-        </a>
-      </td>
-      <td>Run an effect when the component unmounts.</td>
-    </tr>
-    <tr>
-      <td>
-        <a href="./useRefEffect">
-          <code>useRefEffect</code>
-        </a>
-      </td>
-      <td>
-        Like <code>React.useEffect</code>, but ReactRefs in the deps are dereferenced to <code>ref.current</code> before
-        comparison.
-      </td>
-    </tr>
-    <tr>
-      <td>
-        <a href="./useRefUpdate">
-          <code>useRefUpdate</code>
-        </a>
-      </td>
-      <td>
-        Like <code>useUpdate</code>, but ReactRefs in the deps are dereferenced to <code>ref.current</code> before
-        comparison.
-      </td>
-    </tr>
-    <tr>
-      <td>
-        <a href="./useLayoutMount">
-          <code>useLayoutMount</code>
-        </a>
-      </td>
-      <td>
-        Like <code>useMount</code>, but runs synchronously before the browser paints.
-      </td>
-    </tr>
-    <tr>
-      <td>
-        <a href="./useLayoutUpdate">
-          <code>useLayoutUpdate</code>
-        </a>
-      </td>
-      <td>
-        Like <code>useUpdate</code>, but runs synchronously before the browser paints.
-      </td>
-    </tr>
-    <tr>
-      <td>
-        <a href="./useLayoutRefEffect">
-          <code>useLayoutRefEffect</code>
-        </a>
-      </td>
-      <td>
-        Like <code>useRefEffect</code>, but runs synchronously before the browser paints.
-      </td>
-    </tr>
-    <tr>
-      <td>
-        <a href="./useLayoutRefUpdate">
-          <code>useLayoutRefUpdate</code>
-        </a>
-      </td>
-      <td>
-        Like <code>useRefUpdate</code>, but runs synchronously before the browser paints.
-      </td>
-    </tr>
-    <tr>
-      <td>
-        <a href="./useIsomorphicLayoutEffect">
-          <code>useIsomorphicLayoutEffect</code>
-        </a>
-      </td>
-      <td>
-        Same as <code>React.useLayoutEffect</code> in the DOM environment and <code>React.useEffect</code> in the SSR
-        environment.
-      </td>
-    </tr>
-    <tr>
-      <td rowspan="8">States</td>
-      <td>
-        <a href="./useCache">
-          <code>useCache</code>
-        </a>
-      </td>
-      <td>Cache data for a certain period of time.</td>
-    </tr>
-    <tr>
-      <td>
-        <a href="./useToggle">
-          <code>useToggle</code>
-        </a>
-      </td>
-      <td>Manage a boolean value.</td>
-    </tr>
-    <tr>
-      <td>
-        <a href="./useSetState">
-          <code>useSetState</code>
-        </a>
-      </td>
-      <td>
-        Like the <code>this.setState</code> method of class components.
-      </td>
-    </tr>
-    <tr>
-      <td>
-        <a href="./useSafeState">
-          <code>useSafeState</code>
-        </a>
-      </td>
-      <td>
-        Same as <code>React.useState</code>, but setting state after unmount has no effect and never errors.
-      </td>
-    </tr>
-    <tr>
-      <td>
-        <a href="./useDelayedValue">
-          <code>useDelayedValue</code>
-        </a>
-      </td>
-      <td>Delay updates to a value.</td>
-    </tr>
-    <tr>
-      <td>
-        <a href="./useMemoizedValue">
-          <code>useMemoizedValue</code>
-        </a>
-      </td>
-      <td>Return the previous value when the value has not changed. Use deep comparison by default.</td>
-    </tr>
-    <tr>
-      <td>
-        <a href="./useThrottledValue">
-          <code>useThrottledValue</code>
-        </a>
-      </td>
-      <td>Throttle a value.</td>
-    </tr>
-    <tr>
-      <td>
-        <a href="./useDebouncedValue">
-          <code>useDebouncedValue</code>
-        </a>
-      </td>
-      <td>Debounce a value.</td>
-    </tr>
-    <tr>
-      <td rowspan="9">Callbacks</td>
-      <td>
-        <a href="./useRaf">
-          <code>useRaf</code>
-        </a>
-      </td>
-      <td>Invoke the callback before the browser repaints.</td>
-    </tr>
-    <tr>
-      <td>
-        <a href="./useIdle">
-          <code>useIdle</code>
-        </a>
-      </td>
-      <td>Invoke the callback when the browser is idle.</td>
-    </tr>
-    <tr>
-      <td>
-        <a href="./useAnimate">
-          <code>useAnimate</code>
-        </a>
-      </td>
-      <td>Run JavaScript animations.</td>
-    </tr>
-    <tr>
-      <td>
-        <a href="./useTimeout">
-          <code>useTimeout</code>
-        </a>
-      </td>
-      <td>Delay running a callback.</td>
-    </tr>
-    <tr>
-      <td>
-        <a href="./useInterval">
-          <code>useInterval</code>
-        </a>
-      </td>
-      <td>Run a callback repeatedly at a fixed interval.</td>
-    </tr>
-    <tr>
-      <td>
-        <a href="./usePersist">
-          <code>usePersist</code>
-        </a>
-      </td>
-      <td>Return a function whose identity never changes.</td>
-    </tr>
-    <tr>
-      <td>
-        <a href="./useRerender">
-          <code>useRerender</code>
-        </a>
-      </td>
-      <td>Force re-render the component.</td>
-    </tr>
-    <tr>
-      <td>
-        <a href="./useThrottle">
-          <code>useThrottle</code>
-        </a>
-      </td>
-      <td>Use a throttled callback.</td>
-    </tr>
-    <tr>
-      <td>
-        <a href="./useDebounce">
-          <code>useDebounce</code>
-        </a>
-      </td>
-      <td>Use a debounced callback.</td>
-    </tr>
-    <tr>
-      <td rowspan="5">Refs</td>
-      <td>
-        <a href="./useLatestRef">
-          <code>useLatestRef</code>
-        </a>
-      </td>
-      <td>
-        Return a ref object whose <code>.current</code> property always points to the latest value.
-      </td>
-    </tr>
-    <tr>
-      <td>
-        <a href="./usePreviousRef">
-          <code>usePreviousRef</code>
-        </a>
-      </td>
-      <td>
-        Return a ref object whose <code>.current</code> property points to the value from the previous update.
-      </td>
-    </tr>
-    <tr>
-      <td>
-        <a href="./useComposedRef">
-          <code>useComposedRef</code>
-        </a>
-      </td>
-      <td>Compose multiple refs into one.</td>
-    </tr>
-    <tr>
-      <td>
-        <a href="./useMountedRef">
-          <code>useMountedRef</code>
-        </a>
-      </td>
-      <td>Return a ref object that is used to determine whether the component is mounted.</td>
-    </tr>
-    <tr>
-      <td>
-        <a href="./useUnmountedRef">
-          <code>useUnmountedRef</code>
-        </a>
-      </td>
-      <td>Return a ref object that is used to determine whether the component is unmounted.</td>
-    </tr>
-    <tr>
-      <td rowspan="17">Browser</td>
-      <td>
-        <a href="./useTitle">
-          <code>useTitle</code>
-        </a>
-      </td>
-      <td>Set the document title.</td>
-    </tr>
-    <tr>
-      <td>
-        <a href="./useFavicon">
-          <code>useFavicon</code>
-        </a>
-      </td>
-      <td>Set the document favicon.</td>
-    </tr>
-    <tr>
-      <td>
-        <a href="./useOnline">
-          <code>useOnline</code>
-        </a>
-      </td>
-      <td>Detect whether the network is online.</td>
-    </tr>
-    <tr>
-      <td>
-        <a href="./useDarkMode">
-          <code>useDarkMode</code>
-        </a>
-      </td>
-      <td>Detect whether the preferred color scheme of the system is dark.</td>
-    </tr>
-    <tr>
-      <td>
-        <a href="./usePageVisible">
-          <code>usePageVisible</code>
-        </a>
-      </td>
-      <td>Detect whether the page is visible.</td>
-    </tr>
-    <tr>
-      <td>
-        <a href="./useWindowFocus">
-          <code>useWindowFocus</code>
-        </a>
-      </td>
-      <td>Detect whether the window has focus.</td>
-    </tr>
-    <tr>
-      <td>
-        <a href="./useMatchMedia">
-          <code>useMatchMedia</code>
-        </a>
-      </td>
-      <td>Determine whether the document matches the media query string.</td>
-    </tr>
-    <tr>
-      <td>
-        <a href="./useWindowSize">
-          <code>useWindowSize</code>
-        </a>
-      </td>
-      <td>Get the window size.</td>
-    </tr>
-    <tr>
-      <td>
-        <a href="./useElementSize">
-          <code>useElementSize</code>
-        </a>
-      </td>
-      <td>Get the size of a DOM element.</td>
-    </tr>
-    <tr>
-      <td>
-        <a href="./useIntersecting">
-          <code>useIntersecting</code>
-        </a>
-      </td>
-      <td>Determine whether an element intersects with another one.</td>
-    </tr>
-    <tr>
-      <td>
-        <a href="./useClickOutside">
-          <code>useClickOutside</code>
-        </a>
-      </td>
-      <td>Trigger a callback when clicking outside the target area.</td>
-    </tr>
-    <tr>
-      <td>
-        <a href="./useEventListener">
-          <code>useEventListener</code>
-        </a>
-      </td>
-      <td>Set up an event listener on the target.</td>
-    </tr>
-    <tr>
-      <td>
-        <a href="./useResizeObserver">
-          <code>useResizeObserver</code>
-        </a>
-      </td>
-      <td>Observe an element's size changes.</td>
-    </tr>
-    <tr>
-      <td>
-        <a href="./useIntersectionObserver">
-          <code>useIntersectionObserver</code>
-        </a>
-      </td>
-      <td>Observe when an element's intersection with another element or the viewport changes.</td>
-    </tr>
-    <tr>
-      <td>
-        <a href="./useCookie">
-          <code>useCookie</code>
-        </a>
-      </td>
-      <td>Get, set and/or remove cookies.</td>
-    </tr>
-    <tr>
-      <td>
-        <a href="./useLocalStorage">
-          <code>useLocalStorage</code>
-        </a>
-      </td>
-      <td>
-        Get, set and/or remove <code>localStorage</code>.
-      </td>
-    </tr>
-    <tr>
-      <td>
-        <a href="./useSessionStorage">
-          <code>useSessionStorage</code>
-        </a>
-      </td>
-      <td>
-        Get, set and/or remove <code>sessionStorage</code>.
-      </td>
-    </tr>
-  </tbody>
-</table>
+### Async
+
+| Hook                       | Description                                                |
+| -------------------------- | ---------------------------------------------------------- |
+| [`useLoad`](./useLoad)     | Load async data, typically for network requests.           |
+| [`useReload`](./useReload) | Reload all `useLoad` requests that share the same `key`.   |
+| [`useSubmit`](./useSubmit) | Submit network requests such as create, update and delete. |
+
+### Effects
+
+| Hook                                                       | Description                                                                                            |
+| ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| [`useMount`](./useMount)                                   | Run an effect after the component is mounted.                                                          |
+| [`useUpdate`](./useUpdate)                                 | Run an effect after the component updates (the initial mount is skipped).                              |
+| [`useUnmount`](./useUnmount)                               | Run an effect when the component unmounts.                                                             |
+| [`useRefEffect`](./useRefEffect)                           | Like `React.useEffect`, but ReactRefs in the deps are dereferenced to `ref.current` before comparison. |
+| [`useRefUpdate`](./useRefUpdate)                           | Like `useUpdate`, but ReactRefs in the deps are dereferenced to `ref.current` before comparison.       |
+| [`useLayoutMount`](./useLayoutMount)                       | Like `useMount`, but runs before the browser paints.                                                   |
+| [`useLayoutUpdate`](./useLayoutUpdate)                     | Like `useUpdate`, but runs before the browser paints.                                                  |
+| [`useLayoutRefEffect`](./useLayoutRefEffect)               | Like `useRefEffect`, but runs before the browser paints.                                               |
+| [`useLayoutRefUpdate`](./useLayoutRefUpdate)               | Like `useRefUpdate`, but runs before the browser paints.                                               |
+| [`useIsomorphicLayoutEffect`](./useIsomorphicLayoutEffect) | `React.useLayoutEffect` in the DOM, `React.useEffect` during SSR.                                      |
+
+### States
+
+| Hook                                       | Description                                                                                                     |
+| ------------------------------------------ | --------------------------------------------------------------------------------------------------------------- |
+| [`useCache`](./useCache)                   | Cache data for a certain period of time, with optional sync between components sharing the same cache instance. |
+| [`useToggle`](./useToggle)                 | Manage a boolean value.                                                                                         |
+| [`useSetState`](./useSetState)             | Like `this.setState` of class components, merging partial state updates.                                        |
+| [`useSafeState`](./useSafeState)           | Like `React.useState`, but setting state after unmount is safe.                                                 |
+| [`useDelayedValue`](./useDelayedValue)     | Delay updates to a value.                                                                                       |
+| [`useMemoizedValue`](./useMemoizedValue)   | Return the previous value until the value actually changes (deep comparison).                                   |
+| [`useThrottledValue`](./useThrottledValue) | Throttle a value.                                                                                               |
+| [`useDebouncedValue`](./useDebouncedValue) | Debounce a value.                                                                                               |
+
+### Callbacks
+
+| Hook                           | Description                                                            |
+| ------------------------------ | ---------------------------------------------------------------------- |
+| [`useRaf`](./useRaf)           | Invoke a callback before the browser repaints.                         |
+| [`useIdle`](./useIdle)         | Invoke a callback when the browser is idle.                            |
+| [`useAnimate`](./useAnimate)   | Run JavaScript animations.                                             |
+| [`useTimeout`](./useTimeout)   | Execute a callback after a delay.                                      |
+| [`useInterval`](./useInterval) | Run a callback repeatedly at a fixed interval.                         |
+| [`usePersist`](./usePersist)   | Keep a stable function identity while always calling the latest logic. |
+| [`useRerender`](./useRerender) | Re-render the component manually, usually for mutable data.            |
+| [`useThrottle`](./useThrottle) | Use a throttled callback.                                              |
+| [`useDebounce`](./useDebounce) | Use a debounced callback.                                              |
+
+### Refs
+
+| Hook                                   | Description                                                                                    |
+| -------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| [`useLatestRef`](./useLatestRef)       | A ref that always points to the latest value, avoiding stale closures in long-lived callbacks. |
+| [`usePreviousRef`](./usePreviousRef)   | A ref that points to the value from the previous update.                                       |
+| [`useComposedRef`](./useComposedRef)   | Compose multiple refs (objects or callbacks) into one.                                         |
+| [`useMountedRef`](./useMountedRef)     | A ref that tells whether the component is mounted.                                             |
+| [`useUnmountedRef`](./useUnmountedRef) | A ref that tells whether the component is unmounted.                                           |
+
+### Browser
+
+| Hook                                                   | Description                                                                        |
+| ------------------------------------------------------ | ---------------------------------------------------------------------------------- |
+| [`useTitle`](./useTitle)                               | Set the document title.                                                            |
+| [`useFavicon`](./useFavicon)                           | Set the document favicon.                                                          |
+| [`useOnline`](./useOnline)                             | Detect whether the network is online.                                              |
+| [`useDarkMode`](./useDarkMode)                         | Detect whether the system prefers a dark color scheme.                             |
+| [`usePageVisible`](./usePageVisible)                   | Detect whether the page is visible, including bfcache restores.                    |
+| [`useWindowFocus`](./useWindowFocus)                   | Detect whether the window has focus.                                               |
+| [`useMatchMedia`](./useMatchMedia)                     | Determine whether the document matches a media query.                              |
+| [`useWindowSize`](./useWindowSize)                     | Get the window size.                                                               |
+| [`useElementSize`](./useElementSize)                   | Get the size of a DOM element.                                                     |
+| [`useIntersecting`](./useIntersecting)                 | Detect whether an element intersects the viewport or a specified root.             |
+| [`useClickOutside`](./useClickOutside)                 | Trigger a callback when clicking outside the target area.                          |
+| [`useEventListener`](./useEventListener)               | Set up an event listener on the target.                                            |
+| [`useResizeObserver`](./useResizeObserver)             | Observe an element's size changes.                                                 |
+| [`useIntersectionObserver`](./useIntersectionObserver) | Observe changes in an element's intersection with another element or the viewport. |
+| [`useCookie`](./useCookie)                             | Get, set and/or remove cookies.                                                    |
+| [`useLocalStorage`](./useLocalStorage)                 | Get, set and/or remove `localStorage`.                                             |
+| [`useSessionStorage`](./useSessionStorage)             | Get, set and/or remove `sessionStorage`.                                           |
 
 ## Changelog
 
-https://github.com/lilibraries/hooks/blob/master/CHANGELOG.md
+See [CHANGELOG.md](https://github.com/lilibraries/hooks/blob/master/CHANGELOG.md) for the full release history.
 
 ## License
 
-MIT.
+[MIT](https://github.com/lilibraries/hooks/blob/master/LICENSE)

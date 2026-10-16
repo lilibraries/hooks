@@ -1,3 +1,8 @@
+import CodeBlock from "@theme/CodeBlock";
+import ExampleBlock from "./components/ExampleBlock";
+import Example from "./examples/UseRefUpdate";
+import ExampleCode from "!!raw-loader!./examples/UseRefUpdate";
+
 This hook is similar to [`useUpdate`](./useUpdate), but it is built on [`useRefEffect`](./useRefEffect) internally, so ReactRefs in the dependency array are dereferenced to `ref.current` before comparison. It is useful when the ref target itself is an update dependency.
 
 Note: plain objects with a `current` property are treated as ReactRefs and dereferenced, so they cannot be used as dependency values directly.
@@ -8,24 +13,16 @@ Note: plain objects with a `current` property are treated as ReactRefs and deref
 function useRefUpdate(effect: React.EffectCallback, deps?: React.DependencyList): void;
 ```
 
-Params:
+Parameters:
 
 - **`effect`:** The effect to run after an update. It may return a cleanup function.
 - **`deps`:** The dependency array. Its elements can be plain values or ReactRefs.
 
 ## Example
 
-```tsx
-import { useRef } from "react";
-import { useRefUpdate } from "@lilib/hooks";
+The following example measures the width whenever the element is re-attached.
 
-function Example() {
-  const domRef = useRef<HTMLDivElement>(null);
-
-  useRefUpdate(() => {
-    // `domRef.current` is the DOM node.
-  }, [domRef]);
-
-  return <div ref={domRef}>...</div>;
-}
-```
+<ExampleBlock>
+  <Example />
+</ExampleBlock>
+<CodeBlock language="tsx">{ExampleCode}</CodeBlock>

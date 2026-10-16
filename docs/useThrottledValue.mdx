@@ -20,7 +20,7 @@ function useThrottledValue<T>(
 ];
 ```
 
-Params:
+Parameters:
 
 - **`value`:** The value to throttle.
 - **`options`:** Throttle wait time or an options object.
@@ -36,6 +36,8 @@ Results:
   - **`actions.cancel`:** Cancel throttle timer.
 
 ## Example
+
+The following example shows a search box; requests are only sent when the throttled value changes.
 
 <ExampleBlock>
   <Example />

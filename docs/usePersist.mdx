@@ -1,4 +1,9 @@
-Return the same function identity regardless of how the `callback` argument changes. The returned function behaves exactly like `callback`.
+import CodeBlock from "@theme/CodeBlock";
+import ExampleBlock from "./components/ExampleBlock";
+import Example from "./examples/UsePersist";
+import ExampleCode from "!!raw-loader!./examples/UsePersist";
+
+Return the same function identity regardless of how the `callback` argument changes. The returned function behaves exactly like `callback`. A typical use case: the callback must go into a dependency array (e.g. `useEffect`), yet calls should always use the latest logic.
 
 ## API
 
@@ -6,15 +11,15 @@ Return the same function identity regardless of how the `callback` argument chan
 function usePersist<T extends (...args: any[]) => any>(callback: T): (...args: Parameters<T>) => ReturnType<T>;
 ```
 
+Parameters:
+
+- **`callback`:** The callback function.
+
 ## Example
 
-```tsx
-import { usePersist } from "@lilib/hooks";
+The following example binds a document click listener only once, and it always reads the latest input value.
 
-function Example() {
-  const callback = usePersist(() => {
-    // Do something.
-  });
-  ...
-}
-```
+<ExampleBlock>
+  <Example />
+</ExampleBlock>
+<CodeBlock language="tsx">{ExampleCode}</CodeBlock>

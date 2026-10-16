@@ -18,7 +18,7 @@ function useIntersecting(
 ): boolean;
 ```
 
-Params:
+Parameters:
 
 - **`target`:** A DOM element to observe, or a ref object that references it.
 - **`options`:** See [IntersectionObserver](https://developer.mozilla.org/en-US/docs/Web/API/IntersectionObserver/IntersectionObserver) options.
@@ -28,6 +28,8 @@ Results:
 - A boolean indicating whether the target is intersecting with the root.
 
 ## Example
+
+The following example scrolls a container and highlights the target when it is fully visible.
 
 <ExampleBlock>
   <Example />

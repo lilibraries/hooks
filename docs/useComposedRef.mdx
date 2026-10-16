@@ -1,4 +1,4 @@
-This hook composes multiple refs into one. Ref objects, ref callbacks and `undefined` are all accepted, which makes it very useful when developing components.
+This hook composes multiple refs into one. Ref objects, ref callbacks, `null` and `undefined` are all accepted, which makes it very useful when developing components.
 
 ## API
 
@@ -7,6 +7,8 @@ function useComposedRef<T>(...refs: (React.Ref<T> | undefined)[]): React.RefCall
 ```
 
 ## Example
+
+A typical use: composing the forwarded ref and an internal ref in a library component.
 
 ```tsx
 import { forwardRef, useRef } from "react";

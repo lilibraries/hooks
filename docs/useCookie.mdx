@@ -8,14 +8,27 @@ This hook uses [js-cookie](https://github.com/js-cookie/js-cookie) as the parser
 ## API
 
 ```ts
+interface UseCookieOptions {
+  defaultValue?: string;
+  polling?: boolean;
+  pollingInterval?: number;
+  validate?: (value: string) => boolean;
+}
+
 function useCookie(
   name: string,
-  options?: {
-    defaultValue?: string;
-    polling?: boolean;
-    pollingInterval?: number;
-    validate?: (value: string) => boolean;
-  },
+  options: UseCookieOptions & { defaultValue: string },
+): [
+  value: string,
+  setCookie: (
+    newValue: string | undefined | ((prevValue: string) => string | undefined),
+    attributes?: CookieAttributes,
+  ) => void,
+];
+
+function useCookie(
+  name: string,
+  options?: UseCookieOptions,
 ): [
   value: string | undefined,
   setCookie: (
@@ -33,11 +46,11 @@ interface CookieAttributes {
 }
 ```
 
-Params:
+Parameters:
 
 - **`name`:** Cookie name.
 - **`options`:** Options object.
-  - **`options.defaultValue`:** Default value. It will be returned when the specified cookie doesn't exist.
+  - **`options.defaultValue`:** Default value. It will be returned when the specified cookie doesn't exist. When set, the returned `value` type no longer includes `undefined`.
   - **`options.polling`:** Whether to poll for cookie changes. Default is `false`.
   - **`options.pollingInterval`:** Polling interval time, in milliseconds. Default is `100`.
   - **`options.validate`:** Validate the value got from the cookie. If this function returns `false`, the `defaultValue` will be used.
@@ -50,6 +63,8 @@ Results:
   - **`attributes`:** Cookie attributes. See [js-cookie attributes](https://github.com/js-cookie/js-cookie#cookie-attributes).
 
 ## Example
+
+The following example sets and removes a cookie; open this page in another tab to see polling keep the values in sync.
 
 <ExampleBlock>
   <Example />

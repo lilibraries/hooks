@@ -1,3 +1,8 @@
+import CodeBlock from "@theme/CodeBlock";
+import ExampleBlock from "./components/ExampleBlock";
+import Example from "./examples/UseUnmount";
+import ExampleCode from "!!raw-loader!./examples/UseUnmount";
+
 Run an effect when the component unmounts.
 
 ## API
@@ -6,15 +11,15 @@ Run an effect when the component unmounts.
 function useUnmount(effect: () => void): void;
 ```
 
+Parameters:
+
+- **`effect`:** The effect to run when the component unmounts.
+
 ## Example
 
-```tsx
-import { useUnmount } from "@lilib/hooks";
+The following example records when the child component unmounts.
 
-function Example() {
-  useUnmount(() => {
-    console.log("Component will unmount");
-  });
-  ...
-}
-```
+<ExampleBlock>
+  <Example />
+</ExampleBlock>
+<CodeBlock language="tsx">{ExampleCode}</CodeBlock>

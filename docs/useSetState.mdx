@@ -13,7 +13,18 @@ function useSetState<S extends object>(
 ): [state: S, setState: (patch: Partial<S> | ((prevState: S) => Partial<S>)) => void];
 ```
 
+Parameters:
+
+- **`initialState`:** The initial state object, or a function that returns it.
+
+Results:
+
+- **`state`:** The current state object.
+- **`setState`:** Update part of the state; the patch will be merged with the old state. The `patch` can be an object or a function computed from the previous state.
+
 ## Example
+
+The following example manages a form's fields in one state object, updating one field at a time.
 
 <ExampleBlock>
   <Example />

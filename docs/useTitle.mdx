@@ -11,13 +11,15 @@ Set the document title.
 function useTitle(title: string | null, options?: { restore?: boolean }): void;
 ```
 
-Params:
+Parameters:
 
 - **`title`:** The document title. Pass `null` to not set one.
 - **`options`:** Options object.
   - **`options.restore`:** Whether to restore the previous title on unmount.
 
 ## Example
+
+The following example syncs the browser tab title with the input.
 
 <ExampleBlock>
   <Example />

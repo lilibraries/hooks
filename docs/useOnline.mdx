@@ -3,7 +3,7 @@ import ExampleBlock from "./components/ExampleBlock";
 import Example from "./examples/UseOnline";
 import ExampleCode from "!!raw-loader!./examples/UseOnline";
 
-Detect whether the network is online.
+Detect whether the network is online. In a non-browser environment, it always returns `true`.
 
 ## API
 
@@ -11,7 +11,13 @@ Detect whether the network is online.
 function useOnline(): boolean;
 ```
 
+Results:
+
+- Returns `true` if the network is online, otherwise `false`.
+
 ## Example
+
+The following example shows a banner when the network goes offline.
 
 <ExampleBlock>
   <Example />

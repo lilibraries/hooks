@@ -1,3 +1,8 @@
+import CodeBlock from "@theme/CodeBlock";
+import ExampleBlock from "./components/ExampleBlock";
+import Example from "./examples/UseLayoutRefEffect";
+import ExampleCode from "!!raw-loader!./examples/UseLayoutRefEffect";
+
 This hook is similar to [`useRefEffect`](./useRefEffect), but it runs synchronously before the browser paints (layout phase), which suits cases that need immediate DOM reads or writes. It is built on [`useIsomorphicLayoutEffect`](./useIsomorphicLayoutEffect) internally.
 
 Note: plain objects with a `current` property are treated as ReactRefs and dereferenced, so they cannot be used as dependency values directly.
@@ -8,24 +13,16 @@ Note: plain objects with a `current` property are treated as ReactRefs and deref
 function useLayoutRefEffect(effect: React.EffectCallback, deps?: React.DependencyList): void;
 ```
 
-Params:
+Parameters:
 
 - **`effect`:** The effect function. It may return a cleanup function.
 - **`deps`:** The dependency array. Its elements can be plain values or ReactRefs. If omitted, the effect re-runs after every update.
 
 ## Example
 
-```tsx
-import { useRef } from "react";
-import { useLayoutRefEffect } from "@lilib/hooks";
+The following example measures the element size as soon as the DOM node is attached.
 
-function Example() {
-  const domRef = useRef<HTMLDivElement>(null);
-
-  useLayoutRefEffect(() => {
-    // `domRef.current` is the DOM node.
-  }, [domRef]);
-
-  return <div ref={domRef}>...</div>;
-}
-```
+<ExampleBlock>
+  <Example />
+</ExampleBlock>
+<CodeBlock language="tsx">{ExampleCode}</CodeBlock>

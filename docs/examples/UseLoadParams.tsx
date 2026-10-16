@@ -1,25 +1,31 @@
-import { useRef } from "react";
+import { useState } from "react";
 import { useLoad } from "@lilib/hooks";
 
-const getCount = (count: number) => {
+const fetchCount = (multiplier: number) => {
   return new Promise<number>((resolve) => {
     setTimeout(() => {
-      resolve(count);
+      resolve(10 * multiplier);
     }, 1000);
   });
 };
 
 function Example() {
-  const countRef = useRef(0);
+  const [multiplier, setMultiplier] = useState(1);
 
-  const { data, loading, load } = useLoad(getCount, [], {
+  // `initialData` is shown before any data arrives; `defaultParams` are used by the first load.
+  const { data, loading, load } = useLoad(fetchCount, [], {
     initialData: -1,
-    defaultParams: [0],
+    defaultParams: [1],
   });
 
   return (
     <div>
-      <button onClick={() => load(++countRef.current)}>Load</button>
+      <select value={multiplier} onChange={(event) => setMultiplier(Number(event.target.value))}>
+        <option value={1}>×1</option>
+        <option value={2}>×2</option>
+        <option value={3}>×3</option>
+      </select>
+      <button onClick={() => load(multiplier)}>Load</button>
       Count: {data} {loading ? "(Loading...)" : ""}
     </div>
   );

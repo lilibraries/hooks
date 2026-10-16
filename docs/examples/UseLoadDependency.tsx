@@ -1,21 +1,27 @@
 import { useState } from "react";
 import { useLoad } from "@lilib/hooks";
 
-function Example() {
-  const [count, setCount] = useState(0);
+const fetchUser = (userId: number) => {
+  return new Promise<string>((resolve) => {
+    setTimeout(() => {
+      resolve(`User ${userId}`);
+    }, 1000);
+  });
+};
 
-  const { data, loading } = useLoad(() => {
-    return new Promise<number>((resolve) => {
-      setTimeout(() => {
-        resolve(count);
-      }, 1000);
-    });
-  }, [count]);
+function UserCard({ userId }: { userId: number }) {
+  const { data, loading } = useLoad(() => fetchUser(userId), [userId]);
+
+  return <div>User: {loading ? "Loading..." : data}</div>;
+}
+
+function Example() {
+  const [userId, setUserId] = useState(1);
 
   return (
     <div>
-      <button onClick={() => setCount(count + 1)}>Increase</button>
-      Count: {loading ? "Loading..." : data}
+      <button onClick={() => setUserId((userId) => (userId % 3) + 1)}>Switch user</button>
+      <UserCard userId={userId} />
     </div>
   );
 }

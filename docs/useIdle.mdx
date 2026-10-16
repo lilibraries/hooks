@@ -1,3 +1,8 @@
+import CodeBlock from "@theme/CodeBlock";
+import ExampleBlock from "./components/ExampleBlock";
+import Example from "./examples/UseIdle";
+import ExampleCode from "!!raw-loader!./examples/UseIdle";
+
 Invoke the callback when the browser is idle. This hook uses [window.requestIdleCallback](https://developer.mozilla.org/en-US/docs/Web/API/Window/requestIdleCallback) by default. If `window.requestIdleCallback` is unavailable, it falls back to `setTimeout`.
 
 ## API
@@ -6,7 +11,7 @@ Invoke the callback when the browser is idle. This hook uses [window.requestIdle
 function useIdle(callback: () => void, options?: IdleRequestOptions): [start: () => void, cancel: () => void];
 ```
 
-Params:
+Parameters:
 
 - **`callback`:** The callback invoked when idle.
 - **`options`:** The options passed to [window.requestIdleCallback](https://developer.mozilla.org/en-US/docs/Web/API/Window/requestIdleCallback).
@@ -18,12 +23,9 @@ Results:
 
 ## Example
 
-```tsx
-import { useIdle } from "@lilib/hooks";
+The following example runs a low-priority task (e.g. analytics) when the browser is idle.
 
-function Example() {
-  const [start, cancel] = useIdle(() => {
-    // Do something
-  });
-}
-```
+<ExampleBlock>
+  <Example />
+</ExampleBlock>
+<CodeBlock language="tsx">{ExampleCode}</CodeBlock>

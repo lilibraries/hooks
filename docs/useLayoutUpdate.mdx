@@ -1,3 +1,8 @@
+import CodeBlock from "@theme/CodeBlock";
+import ExampleBlock from "./components/ExampleBlock";
+import Example from "./examples/UseLayoutUpdate";
+import ExampleCode from "!!raw-loader!./examples/UseLayoutUpdate";
+
 It's similar to [`useUpdate`](./useUpdate), but it runs synchronously before the browser paints. It uses [`useIsomorphicLayoutEffect`](./useIsomorphicLayoutEffect) internally.
 
 ## API
@@ -6,19 +11,16 @@ It's similar to [`useUpdate`](./useUpdate), but it runs synchronously before the
 function useLayoutUpdate(effect: React.EffectCallback, deps?: React.DependencyList): void;
 ```
 
+Parameters:
+
+- **`effect`:** The effect to run after an update. It may return a cleanup function.
+- **`deps`:** The dependency array. If omitted, the effect runs after every render; an empty array means the effect never runs.
+
 ## Example
 
-```tsx
-import { useState } from "react";
-import { useLayoutUpdate } from "@lilib/hooks";
+The following example measures the width after the content changes, before the browser paints.
 
-function Example() {
-  const [signal, setSignal] = useState({});
-
-  useLayoutUpdate(() => {
-    console.log("Signal changed");
-  }, [signal]);
-
-  return <button onClick={() => setSignal({})}>Change signal</button>;
-}
-```
+<ExampleBlock>
+  <Example />
+</ExampleBlock>
+<CodeBlock language="tsx">{ExampleCode}</CodeBlock>

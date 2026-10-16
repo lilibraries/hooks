@@ -18,7 +18,7 @@ function useToggle(initialValue?: boolean): [
 ];
 ```
 
-Params:
+Parameters:
 
 - **`initialValue`:** Optional initial value. Default is `false`.
 
@@ -26,11 +26,13 @@ Results:
 
 - **`value`:** A boolean value that can be changed by the following actions.
 - **`actions`:** Actions object.
-  - **`actions.toggle`:** Toggle the `value`. If the `newValue` param is not `undefined`, the `value` will be set to `newValue`.
+  - **`actions.toggle`:** Toggle the `value`. If the `newValue` param is not `undefined`, the `value` will be set to `newValue` (cast to boolean).
   - **`actions.toggleOn`:** Set the `value` to `true`.
   - **`actions.toggleOff`:** Set the `value` to `false`.
 
 ## Example
+
+The following example controls a details panel with the toggle actions.
 
 <ExampleBlock>
   <Example />

@@ -1,3 +1,8 @@
+import CodeBlock from "@theme/CodeBlock";
+import ExampleBlock from "./components/ExampleBlock";
+import Example from "./examples/UseRaf";
+import ExampleCode from "!!raw-loader!./examples/UseRaf";
+
 Use [requestAnimationFrame](https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame) to invoke the callback before the browser repaints.
 
 ## API
@@ -6,7 +11,7 @@ Use [requestAnimationFrame](https://developer.mozilla.org/en-US/docs/Web/API/win
 function useRaf(callback: () => void): [start: () => void, cancel: () => void];
 ```
 
-Params:
+Parameters:
 
 - **`callback`:** The callback invoked before the browser repaints.
 
@@ -17,12 +22,9 @@ Results:
 
 ## Example
 
-```tsx
-import { useRaf } from "@lilib/hooks";
+The following example animates a progress bar with requestAnimationFrame.
 
-function Example() {
-  const [start, cancel] = useRaf(() => {
-    // Do something
-  });
-}
-```
+<ExampleBlock>
+  <Example />
+</ExampleBlock>
+<CodeBlock language="tsx">{ExampleCode}</CodeBlock>

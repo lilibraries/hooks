@@ -1,27 +1,24 @@
-import { useState } from "react";
-import { useThrottle, useUpdate } from "@lilib/hooks";
+import { useRef, useState } from "react";
+import { useThrottle } from "@lilib/hooks";
 
 function Example() {
-  const [value, setValue] = useState("");
-  const [throttledValue, setThrottledValue] = useState("");
-  const [updateThrottledValue] = useThrottle(setThrottledValue, { wait: 500 });
+  const callsRef = useRef(0);
+  const [runs, setRuns] = useState(0);
 
-  useUpdate(() => {
-    updateThrottledValue(value);
-  }, [value]);
+  const [throttledCall] = useThrottle(
+    () => {
+      callsRef.current++;
+      setRuns(callsRef.current);
+    },
+    { wait: 500 },
+  );
 
   return (
     <>
-      <p>
-        Enter value:{" "}
-        <input
-          value={value}
-          onChange={(event) => {
-            setValue(event.target.value);
-          }}
-        />
-      </p>
-      <div>Throttled value: {throttledValue}</div>
+      <div>
+        <button onClick={() => throttledCall()}>Throttled call</button>
+      </div>
+      <div>Callback actually runs: {runs}</div>
     </>
   );
 }

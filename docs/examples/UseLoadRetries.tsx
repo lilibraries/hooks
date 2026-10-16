@@ -1,41 +1,44 @@
+import { useEffect } from "react";
 import { useLoad } from "@lilib/hooks";
 
-const getNumber = () => {
-  return new Promise((resolve, reject) => {
+let attempt = 0;
+
+const fetchData = () => {
+  attempt += 1;
+  return new Promise<string>((resolve, reject) => {
     setTimeout(() => {
-      if (Math.random() >= 0.8) {
+      if (attempt >= 3) {
         resolve("resolved");
       } else {
-        reject(new Error("rejected"));
-      }
-    }, 1000);
-  });
-};
-
-const getNumberFallback = () => {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      if (Math.random() >= 0.8) {
-        resolve("fallback resolved");
-      } else {
-        reject(new Error("fallback rejected"));
+        reject(new Error(`attempt ${attempt} failed`));
       }
     }, 1000);
   });
 };
 
 function Example() {
-  const { data, error, loading, load } = useLoad(getNumber, [], {
+  useEffect(() => {
+    attempt = 0;
+  }, []);
+
+  const { data, error, loading, load } = useLoad(fetchData, [], {
     imperative: true,
-    fallback: getNumberFallback,
     retry: true,
-    fallbackRetry: true,
+    retryInterval: 1000,
   });
 
   return (
     <div>
-      <button onClick={() => load().catch(() => {})}>Load</button>
-      {loading ? "loading" : error ? error.message : data}
+      <button
+        onClick={() => {
+          attempt = 0;
+          load().catch(() => {});
+        }}
+      >
+        Load
+      </button>
+      {attempt > 0 && <div>Attempt: {attempt}</div>}
+      {loading ? "Loading..." : error ? `Error: ${error.message}` : data}
     </div>
   );
 }

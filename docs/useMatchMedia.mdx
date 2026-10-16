@@ -11,12 +11,18 @@ Use [`window.matchMedia()`](https://developer.mozilla.org/en-US/docs/Web/API/Win
 function useMatchMedia(query: string, defaultValue?: boolean): boolean;
 ```
 
-Params:
+Parameters:
 
 - **`query`:** The media query string.
 - **`defaultValue`:** The default return value in non-browser environments. Default is `false`.
 
+Results:
+
+- Returns `true` if the document matches the query, otherwise `false`.
+
 ## Example
+
+The following example switches the layout when the viewport is narrower than 600px.
 
 <ExampleBlock>
   <Example />

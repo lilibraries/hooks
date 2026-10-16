@@ -20,7 +20,7 @@ function useDelayedValue<T>(
 ): T;
 ```
 
-Params:
+Parameters:
 
 - **`value`:** The value whose updates will be delayed.
 - **`options`:** The delay time (milliseconds) or an options object.
@@ -28,9 +28,13 @@ Params:
   - **`options.shouldDelay`:** A function that determines whether an update should be delayed. Returning `false` updates immediately and synchronously. Any value is delayed by default.
   - **`options.compare`:** A function to determine whether the new and old values are equal, defaults to `Object.is`.
 
+Results:
+
+- Returns the delayed value.
+
 ## Example
 
-The following example will show `"Loading..."` after 500ms when you click the `Toggle` button.
+In the following example, showing `"Loading..."` is delayed for 500ms after the value changes to `true`; changes to `false` are applied immediately.
 
 <ExampleBlock>
   <Example />

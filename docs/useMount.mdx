@@ -1,20 +1,25 @@
+import CodeBlock from "@theme/CodeBlock";
+import ExampleBlock from "./components/ExampleBlock";
+import Example from "./examples/UseMount";
+import ExampleCode from "!!raw-loader!./examples/UseMount";
+
 Run an effect after the component is mounted.
 
 ## API
 
 ```ts
-function useMount(effect: () => void): void;
+function useMount(effect: React.EffectCallback): void;
 ```
+
+Parameters:
+
+- **`effect`:** The effect to run after the component mounts. It may return a cleanup function.
 
 ## Example
 
-```tsx
-import { useMount } from "@lilib/hooks";
+The following example focuses an input when the component mounts.
 
-function Example() {
-  useMount(() => {
-    console.log("Component is mounted");
-  });
-  ...
-}
-```
+<ExampleBlock>
+  <Example />
+</ExampleBlock>
+<CodeBlock language="tsx">{ExampleCode}</CodeBlock>

@@ -1,6 +1,6 @@
 import { useLoad } from "@lilib/hooks";
 
-const getData = () => {
+const fetchData = () => {
   return new Promise<string>((resolve) => {
     setTimeout(() => {
       resolve("@lilib/hooks");
@@ -9,7 +9,7 @@ const getData = () => {
 };
 
 function Example() {
-  const { data, error, loading } = useLoad(getData);
+  const { data, error, loading } = useLoad(fetchData);
 
   if (error) {
     return <div>Error: {error.message}</div>;

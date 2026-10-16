@@ -20,7 +20,7 @@ function useDebounce<T extends (...args: any[]) => any>(
 ];
 ```
 
-Params:
+Parameters:
 
 - **`callback`:** Original callback function.
 - **`options`:** Debounce wait time or an options object.
@@ -37,6 +37,8 @@ Results:
   - **`actions.cancel`:** Cancel debounce timer.
 
 ## Example
+
+The following example shows how many times the callback actually runs after clicking the button rapidly.
 
 <ExampleBlock>
   <Example />

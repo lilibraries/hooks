@@ -1,7 +1,7 @@
 import { useLoad } from "@lilib/hooks";
 
 let count = 0;
-const getCount = () => {
+const fetchCount = () => {
   return new Promise<number>((resolve) => {
     setTimeout(() => {
       resolve(++count);
@@ -10,7 +10,7 @@ const getCount = () => {
 };
 
 function Example() {
-  const { data, loading, load, cancel } = useLoad(getCount, [], {
+  const { data, loading, load, cancel } = useLoad(fetchCount, [], {
     imperative: true,
     polling: true,
     pollingInterval: 3000,

@@ -1,7 +1,10 @@
 import { useLoad, useReload } from "@lilib/hooks";
 
-const getNumber = () => {
+let requestCount = 0;
+
+const fetchNumber = () => {
   return new Promise<number>((resolve) => {
+    requestCount += 1;
     setTimeout(() => {
       resolve(Math.random());
     }, 1000);
@@ -9,25 +12,21 @@ const getNumber = () => {
 };
 
 function Component() {
-  const { data, loading, reload } = useLoad(getNumber, [], { key: "load-key" });
+  const { data, loading } = useLoad(fetchNumber, [], { key: "load-key" });
 
-  return (
-    <div>
-      Number: {loading ? "Loading..." : data}
-      <button onClick={() => reload()}>Reload</button>
-    </div>
-  );
+  return <div>Number: {loading ? "Loading..." : data}</div>;
 }
 
 function Example() {
   const reload = useReload("load-key");
 
   return (
-    <>
+    <div>
       <Component />
       <Component />
+      Requests sent: {requestCount}
       <button onClick={() => reload()}>Reload</button>
-    </>
+    </div>
   );
 }
 

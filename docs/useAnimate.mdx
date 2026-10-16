@@ -14,10 +14,10 @@ function useAnimate(
 ): [start: () => void, cancel: () => void];
 ```
 
-Params:
+Parameters:
 
 - **`callback`:** The animation step function. It receives a percent number between 0 and 1 as the first param.
-- **`options`:** The animation duration time, or an options object.
+- **`options`:** The animation duration (milliseconds), or an options object.
   - **`options.duration`:** The duration in milliseconds. Required in the options-object form; ignored when a number is passed directly.
   - **`options.algorithm`:** Optional easing function. The animation runs linearly by default, use this option to override the default behavior.
 
@@ -27,6 +27,8 @@ Results:
 - **`cancel`:** Cancels the animation.
 
 ## Example
+
+The following example animates a progress bar with a TweenJS easing function.
 
 <ExampleBlock>
   <Example />

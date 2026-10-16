@@ -8,27 +8,34 @@ Cache data for a certain period of time, and synchronize data between components
 ## API
 
 ```ts
+interface UseCacheOptions<T> {
+  defaultValue?: T;
+  cache?: LRUCache<any, any>;
+  cacheTime?: number;
+  cacheSync?: boolean | { set?: boolean; delete?: boolean };
+  validate?: (value: any) => boolean;
+  onSet?: (value: any) => void;
+  onDelete?: (value: any) => void;
+}
+
 function useCache<T>(
-  key: {},
-  options?: {
-    defaultValue?: T;
-    cache?: LRUCache<any, any>;
-    cacheTime?: number;
-    cacheSync?: boolean | { set?: boolean; delete?: boolean };
-    validate?: (value: any) => boolean;
-    onSet?: (value: any) => void;
-    onDelete?: (value: any) => void;
-  },
+  key: NonNullable<unknown>,
+  options: UseCacheOptions<T> & { defaultValue: T },
+): [value: T, setCache: (newValue: T | undefined) => void];
+
+function useCache<T>(
+  key: NonNullable<unknown>,
+  options?: UseCacheOptions<T>,
 ): [value: T | undefined, setCache: (newValue: T | undefined) => void];
 ```
 
-Params:
+Parameters:
 
 - **`key`:** Cache key. Any value except `null` and `undefined`.
 - **`options`:** Options object.
-  - **`options.defaultValue`:** Default value when the cache value does not exist.
+  - **`options.defaultValue`:** Default value when the cache value does not exist. When set, the returned `value` type no longer includes `undefined`.
   - **`options.cache`:** Cache instance. Create it with `new LRUCache({ max, ttl, ... })`. If not specified, a shared internal instance is used.
-  - **`options.cacheTime`:** Cache time, in milliseconds. Default is 5 minutes. The TTL is set per entry, so it works regardless of the `ttl` option of the cache instance. You can set a permanent cache by setting this option to `Infinity`. Non-positive values are normalized to 1 ms, so the entry expires on the next read.
+  - **`options.cacheTime`:** Cache time, in milliseconds. Default is 5 minutes. The TTL is set per entry, so it works regardless of the `ttl` option of the cache instance. You can set a permanent cache by setting this option to `Infinity`. Non-positive values are normalized to 1 ms, so the entry expires on the next read. A `NaN` value falls back to the default.
   - **`options.cacheSync`:** Whether to synchronize data between components on set and/or delete events. Default is `false`. It can be an object to enable synchronization for each event separately.
     - **`options.cacheSync.set`:** Synchronize data on set cache.
     - **`options.cacheSync.delete`:** Synchronize data on delete cache or when cache time expires.
@@ -44,6 +51,8 @@ Results:
 Note: `LRUCache` expires entries lazily. Expired entries are only removed and notified when they are read, so an expired cache may still occupy memory until the next read. The shared internal cache enables `ttlAutopurge` to purge expired entries in the background; enable it on your own cache instance if needed.
 
 ## Example
+
+The following example writes to a shared cache and reads it back with synchronization enabled.
 
 <ExampleBlock>
   <Example />

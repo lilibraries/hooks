@@ -1,20 +1,25 @@
+import CodeBlock from "@theme/CodeBlock";
+import ExampleBlock from "./components/ExampleBlock";
+import Example from "./examples/UseLayoutMount";
+import ExampleCode from "!!raw-loader!./examples/UseLayoutMount";
+
 It's similar to [`useMount`](./useMount), but it runs synchronously before the browser paints. It uses [`useIsomorphicLayoutEffect`](./useIsomorphicLayoutEffect) internally.
 
 ## API
 
 ```ts
-function useLayoutMount(effect: () => void): void;
+function useLayoutMount(effect: React.EffectCallback): void;
 ```
+
+Parameters:
+
+- **`effect`:** The effect to run after the component mounts. It may return a cleanup function.
 
 ## Example
 
-```tsx
-import { useLayoutMount } from "@lilib/hooks";
+The following example measures the element width before the browser paints.
 
-function Example() {
-  useLayoutMount(() => {
-    console.log("Component is mounted");
-  });
-  ...
-}
-```
+<ExampleBlock>
+  <Example />
+</ExampleBlock>
+<CodeBlock language="tsx">{ExampleCode}</CodeBlock>

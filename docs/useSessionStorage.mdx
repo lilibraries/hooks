@@ -8,28 +8,35 @@ Get, set and/or remove `sessionStorage`.
 ## API
 
 ```ts
+interface UseStorageOptions<T> {
+  defaultValue?: T;
+  polling?: boolean;
+  pollingInterval?: number;
+  compare?: (x: any, y: any) => boolean;
+  validate?: (value: any) => boolean;
+  serialize?: (value: T) => string;
+  deserialize?: (raw: string) => T;
+}
+
 function useSessionStorage<T>(
   key: string,
-  options?: {
-    defaultValue?: T;
-    polling?: boolean;
-    pollingInterval?: number;
-    compare?: (x: any, y: any) => boolean;
-    validate?: (value: any) => boolean;
-    serialize?: (value: T) => string;
-    deserialize?: (raw: string) => T;
-  },
+  options: UseStorageOptions<T> & { defaultValue: T },
+): [value: T, setSessionStorage: (newValue: T | undefined | ((prevValue: T) => T | undefined)) => void];
+
+function useSessionStorage<T>(
+  key: string,
+  options?: UseStorageOptions<T>,
 ): [
   value: T | undefined,
   setSessionStorage: (newValue: T | undefined | ((prevValue: T | undefined) => T | undefined)) => void,
 ];
 ```
 
-Params:
+Parameters:
 
 - **`key`:** `sessionStorage` key.
 - **`options`:** Options object.
-  - **`options.defaultValue`:** Default value.
+  - **`options.defaultValue`:** Default value. When set, the returned `value` type no longer includes `undefined`.
   - **`options.polling`:** Whether to poll for storage changes. Default is `false`.
   - **`options.pollingInterval`:** Polling interval time, in milliseconds. Default is `100`.
   - **`options.compare`:** A function to determine whether the new and old values are equal. Defaults to deep comparison.
@@ -40,9 +47,11 @@ Params:
 Results:
 
 - **`value`:** The value parsed by the deserialization function.
-- **`setSessionStorage`:** Set `sessionStorage`. If the `newValue` is `undefined`, the entry will be removed and the `defaultValue` will be returned.
+- **`setSessionStorage`:** Set `sessionStorage`. The `newValue` can also be a function that returns the new value. If it is `undefined`, the entry will be removed and the `defaultValue` will be returned.
 
 ## Example
+
+The following example sets and removes a value; open this page in another tab to see polling keep the values in sync.
 
 <ExampleBlock>
   <Example />

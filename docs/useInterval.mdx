@@ -11,7 +11,7 @@ Run a callback repeatedly at a fixed interval.
 function useInterval(callback: () => void, interval?: number): [start: () => void, cancel: () => void];
 ```
 
-Params:
+Parameters:
 
 - **`callback`:** A function to be called at intervals.
 - **`interval`:** The interval, in milliseconds.
@@ -22,6 +22,8 @@ Results:
 - **`cancel`:** Cancels the loop.
 
 ## Example
+
+The following example shows an elapsed-seconds clock that starts automatically on mount.
 
 <ExampleBlock>
   <Example />

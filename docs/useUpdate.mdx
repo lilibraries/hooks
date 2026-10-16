@@ -1,3 +1,8 @@
+import CodeBlock from "@theme/CodeBlock";
+import ExampleBlock from "./components/ExampleBlock";
+import Example from "./examples/UseUpdate";
+import ExampleCode from "!!raw-loader!./examples/UseUpdate";
+
 Run an effect after the component updates or the dependencies change (the initial mount is skipped).
 
 ## API
@@ -6,19 +11,16 @@ Run an effect after the component updates or the dependencies change (the initia
 function useUpdate(effect: React.EffectCallback, deps?: React.DependencyList): void;
 ```
 
+Parameters:
+
+- **`effect`:** The effect to run after an update. It may return a cleanup function.
+- **`deps`:** The dependency array. If omitted, the effect runs after every render; an empty array means the effect never runs.
+
 ## Example
 
-```tsx
-import { useState } from "react";
-import { useUpdate } from "@lilib/hooks";
+The following example shows that the effect runs after updates and skips the initial mount.
 
-function Example() {
-  const [signal, setSignal] = useState({});
-
-  useUpdate(() => {
-    console.log("Signal changed");
-  }, [signal]);
-
-  return <button onClick={() => setSignal({})}>Change signal</button>;
-}
-```
+<ExampleBlock>
+  <Example />
+</ExampleBlock>
+<CodeBlock language="tsx">{ExampleCode}</CodeBlock>

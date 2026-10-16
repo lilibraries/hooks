@@ -11,7 +11,7 @@ Execute a callback after a delay.
 function useTimeout(callback: () => void, timeout?: number): [start: () => void, cancel: () => void];
 ```
 
-Params:
+Parameters:
 
 - **`callback`:** The callback to execute after the delay.
 - **`timeout`:** Optional delay time, in milliseconds.
@@ -22,6 +22,8 @@ Results:
 - **`cancel`:** Cancels the timer.
 
 ## Example
+
+The following example shows a toast message that disappears automatically after a delay.
 
 <ExampleBlock>
   <Example />

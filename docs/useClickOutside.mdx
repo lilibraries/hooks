@@ -18,15 +18,17 @@ function useClickOutside<E extends Event = Event>(
 ): void;
 ```
 
-Params:
+Parameters:
 
-- **`target`:** The target area: a single element or element ref, or an array of them. The listener fires when a click happens outside all of these targets.
+- **`target`:** The target area: a single element or element ref, or an array of them. The listener fires when a click happens outside all of these targets. It only fires when at least one target element is valid; all-invalid targets are treated as not ready.
 - **`listener`:** The callback invoked when a click happens outside the target area.
 - **`options`:** Options object.
   - **`options.container`:** The element (or its ref) that receives the event listener. Default is `document`.
   - **`options.eventName`:** Event name or names. Default is `"mousedown"`.
 
 ## Example
+
+The following example counts clicks outside the button (typical for closing dropdowns).
 
 <ExampleBlock>
   <Example />

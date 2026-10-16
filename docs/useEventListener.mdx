@@ -16,14 +16,16 @@ function useEventListener<T extends EventTarget = EventTarget, E extends Event =
 ): void;
 ```
 
-Params:
+Parameters:
 
-- **`target`:** Event target. It can be `undefined`, `null`, an event target, or a ref object that references an event target.
+- **`target`:** An event target, or a ref object that references an event target (or `null`).
 - **`eventName`:** Event name.
 - **`listener`:** Listener function.
-- **`options`:** Similar to the third parameter of the [`addEventListener`](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener) function.
+- **`options`:** Similar to the third parameter of the [`addEventListener`](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener) function, but only the `capture`, `once` and `passive` options are used.
 
 ## Example
+
+The following example counts clicks on a button.
 
 <ExampleBlock>
   <Example />

@@ -1,3 +1,8 @@
+import CodeBlock from "@theme/CodeBlock";
+import ExampleBlock from "./components/ExampleBlock";
+import Example from "./examples/UseUnmountedRef";
+import ExampleCode from "!!raw-loader!./examples/UseUnmountedRef";
+
 It returns a ref object that is used to determine whether the component is unmounted.
 
 ## API
@@ -8,16 +13,9 @@ function useUnmountedRef(): React.MutableRefObject<boolean>;
 
 ## Example
 
-```tsx
-import { useUnmountedRef } from "@lilib/hooks";
+The following example loads fake data asynchronously; click Load and unmount the loader before it finishes to see the update being skipped.
 
-function Example() {
-  const unmountedRef = useUnmountedRef();
-
-  if (unmountedRef.current) {
-    // Do something.
-  }
-
-  ...
-}
-```
+<ExampleBlock>
+  <Example />
+</ExampleBlock>
+<CodeBlock language="tsx">{ExampleCode}</CodeBlock>

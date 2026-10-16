@@ -1,3 +1,8 @@
+import CodeBlock from "@theme/CodeBlock";
+import ExampleBlock from "./components/ExampleBlock";
+import Example from "./examples/UseMountedRef";
+import ExampleCode from "!!raw-loader!./examples/UseMountedRef";
+
 It returns a ref object that is used to determine whether the component is mounted.
 
 ## API
@@ -8,16 +13,9 @@ function useMountedRef(): React.MutableRefObject<boolean>;
 
 ## Example
 
-```tsx
-import { useMountedRef } from "@lilib/hooks";
+The following example loads fake data asynchronously; click Load and unmount the loader before it finishes to see the update being skipped.
 
-function Example() {
-  const mountedRef = useMountedRef();
-
-  if (mountedRef.current) {
-    // Do something.
-  }
-
-  ...
-}
-```
+<ExampleBlock>
+  <Example />
+</ExampleBlock>
+<CodeBlock language="tsx">{ExampleCode}</CodeBlock>

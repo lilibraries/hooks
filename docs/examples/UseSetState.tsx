@@ -1,30 +1,30 @@
 import { useSetState } from "@lilib/hooks";
 
 function Example() {
-  const [state, setState] = useSetState({ count1: 0, count2: 0 });
-  const { count1, count2 } = state;
+  const [state, setState] = useSetState({ firstName: "", lastName: "" });
 
   return (
     <>
-      <div>
-        <button
-          onClick={() => {
-            setState({ count1: count1 + 1 });
+      <p>
+        First name:{" "}
+        <input
+          value={state.firstName}
+          onChange={(event) => {
+            setState({ firstName: event.target.value });
           }}
-        >
-          +1
-        </button>{" "}
-        {count1}
-      </div>
-      <div>
-        <button
-          onClick={() => {
-            setState({ count2: count2 + 2 });
+        />
+      </p>
+      <p>
+        Last name:{" "}
+        <input
+          value={state.lastName}
+          onChange={(event) => {
+            setState({ lastName: event.target.value });
           }}
-        >
-          +2
-        </button>{" "}
-        {count2}
+        />
+      </p>
+      <div>
+        Full name: {state.firstName} {state.lastName}
       </div>
     </>
   );

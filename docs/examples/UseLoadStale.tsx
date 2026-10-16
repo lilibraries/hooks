@@ -1,7 +1,10 @@
 import { useLoad } from "@lilib/hooks";
 
-const getNumber = () => {
+let requestCount = 0;
+
+const fetchNumber = () => {
   return new Promise<number>((resolve) => {
+    requestCount += 1;
     setTimeout(() => {
       resolve(Math.random());
     }, 1000);
@@ -9,7 +12,7 @@ const getNumber = () => {
 };
 
 function Example() {
-  const { data, loading, load, force } = useLoad(getNumber, [], {
+  const { data, loading, load, force } = useLoad(fetchNumber, [], {
     imperative: true,
     cacheKey: "load-stale-time",
     staleTime: 5000,
@@ -20,6 +23,8 @@ function Example() {
       <button onClick={() => load()}>Load</button>
       <button onClick={() => force()}>Force</button>
       Number: {loading ? "Loading..." : String(data)}
+      <br />
+      Requests sent: {requestCount}
     </div>
   );
 }

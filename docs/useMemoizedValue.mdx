@@ -6,12 +6,18 @@ Return the previous value when the value has not changed. Use deep comparison by
 function useMemoizedValue<T>(value: T, compare?: (x: any, y: any) => boolean): T;
 ```
 
-Params:
+Parameters:
 
 - **`value`:** The value.
 - **`compare`:** A function to determine whether the new and old values are equal, defaults to deep comparison.
 
+Results:
+
+- Returns the previous value if unchanged, otherwise the current value.
+
 ## Example
+
+A typical use: building a `useMemo` with deep-compared dependencies.
 
 ```ts
 import { useMemo, DependencyList } from "react";

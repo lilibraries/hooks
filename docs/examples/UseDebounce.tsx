@@ -1,27 +1,24 @@
-import { useState } from "react";
-import { useDebounce, useUpdate } from "@lilib/hooks";
+import { useRef, useState } from "react";
+import { useDebounce } from "@lilib/hooks";
 
 function Example() {
-  const [value, setValue] = useState("");
-  const [debouncedValue, setDebouncedValue] = useState("");
-  const [updateDebouncedValue] = useDebounce(setDebouncedValue, { wait: 500 });
+  const callsRef = useRef(0);
+  const [runs, setRuns] = useState(0);
 
-  useUpdate(() => {
-    updateDebouncedValue(value);
-  }, [value]);
+  const [debouncedCall] = useDebounce(
+    () => {
+      callsRef.current++;
+      setRuns(callsRef.current);
+    },
+    { wait: 500 },
+  );
 
   return (
     <>
-      <p>
-        Enter value:{" "}
-        <input
-          value={value}
-          onChange={(event) => {
-            setValue(event.target.value);
-          }}
-        />
-      </p>
-      <div>Debounced value: {debouncedValue}</div>
+      <div>
+        <button onClick={() => debouncedCall()}>Debounced call</button>
+      </div>
+      <div>Callback actually runs: {runs}</div>
     </>
   );
 }

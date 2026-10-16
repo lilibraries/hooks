@@ -1,3 +1,8 @@
+import CodeBlock from "@theme/CodeBlock";
+import ExampleBlock from "./components/ExampleBlock";
+import Example from "./examples/UseRefEffect";
+import ExampleCode from "!!raw-loader!./examples/UseRefEffect";
+
 This hook is similar to [`React.useEffect`](https://react.dev/reference/react/useEffect), but ReactRefs in the dependency array are dereferenced to `ref.current` before comparison. The effect re-runs when the value a ref points to changes (such as a DOM node), which makes it useful when a DOM node itself is an effect dependency.
 
 Note: plain objects with a `current` property are treated as ReactRefs and dereferenced, so they cannot be used as dependency values directly.
@@ -8,24 +13,16 @@ Note: plain objects with a `current` property are treated as ReactRefs and deref
 function useRefEffect(effect: React.EffectCallback, deps?: React.DependencyList): void;
 ```
 
-Params:
+Parameters:
 
 - **`effect`:** The effect function. It may return a cleanup function.
 - **`deps`:** The dependency array. Its elements can be plain values or ReactRefs. If omitted, the effect re-runs after every update.
 
 ## Example
 
-```tsx
-import { useRef } from "react";
-import { useRefEffect } from "@lilib/hooks";
+The following example binds hover listeners as soon as the DOM node is attached.
 
-function Example() {
-  const domRef = useRef<HTMLDivElement>(null);
-
-  useRefEffect(() => {
-    // `domRef.current` is the DOM node.
-  }, [domRef]);
-
-  return <div ref={domRef}>...</div>;
-}
-```
+<ExampleBlock>
+  <Example />
+</ExampleBlock>
+<CodeBlock language="tsx">{ExampleCode}</CodeBlock>

@@ -1,20 +1,27 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { useElementSize } from "@lilib/hooks";
 
 function Example() {
-  const ref = useRef(null);
+  const [wide, setWide] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
   const { width = 0, height = 0 } = useElementSize(ref);
 
   return (
-    <div
-      ref={ref}
-      style={{
-        padding: 16,
-        border: "1px solid rgba(128, 128, 128, 0.25)",
-      }}
-    >
-      Element size: {JSON.stringify({ width, height })}
-    </div>
+    <>
+      <div>
+        <button onClick={() => setWide((wide) => !wide)}>Toggle size</button>
+      </div>
+      <div
+        ref={ref}
+        style={{
+          padding: 16,
+          width: wide ? "100%" : "50%",
+          border: "1px solid rgba(128, 128, 128, 0.25)",
+        }}
+      >
+        Element size: {JSON.stringify({ width, height })}
+      </div>
+    </>
   );
 }
 

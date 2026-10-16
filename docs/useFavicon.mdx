@@ -6,7 +6,7 @@ Set the document favicon.
 function useFavicon(href: string | null, options?: { mime?: string; restore?: boolean }): void;
 ```
 
-Params:
+Parameters:
 
 - **`href`:** The favicon URL. Pass `null` to not set one.
 - **`options`:** Options object.
@@ -15,11 +15,34 @@ Params:
 
 ## Example
 
+The following example switches the favicon together with the title when the brand changes.
+
 ```tsx
-import { useFavicon } from "@lilib/hooks";
+import { useState } from "react";
+import { useFavicon, useTitle } from "@lilib/hooks";
+
+const brands = {
+  lilib: { title: "Lilib", icon: "https://lilib.dev/favicon.ico" },
+  react: { title: "React", icon: "https://react.dev/favicon.ico" },
+};
 
 function Example() {
-  useFavicon("https://example.com/favicon.ico", { restore: true });
-  ...
+  const [brand, setBrand] = useState<keyof typeof brands>("lilib");
+  const meta = brands[brand];
+
+  useTitle(meta.title);
+  useFavicon(meta.icon, { restore: true });
+
+  return (
+    <select
+      value={brand}
+      onChange={(event) => {
+        setBrand(event.target.value as keyof typeof brands);
+      }}
+    >
+      <option value="lilib">Lilib</option>
+      <option value="react">React</option>
+    </select>
+  );
 }
 ```

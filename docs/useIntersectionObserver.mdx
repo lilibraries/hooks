@@ -19,13 +19,15 @@ function useIntersectionObserver(
 ): void;
 ```
 
-Params:
+Parameters:
 
 - **`target`:** A DOM element to observe, or a ref object that references it.
 - **`listener`:** Listener function.
 - **`options`:** See [IntersectionObserver](https://developer.mozilla.org/en-US/docs/Web/API/IntersectionObserver/IntersectionObserver) options.
 
 ## Example
+
+The following example scrolls a container and highlights the target when it is fully visible.
 
 <ExampleBlock>
   <Example />

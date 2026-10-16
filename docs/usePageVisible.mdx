@@ -1,3 +1,8 @@
+import CodeBlock from "@theme/CodeBlock";
+import ExampleBlock from "./components/ExampleBlock";
+import Example from "./examples/UsePageVisible";
+import ExampleCode from "!!raw-loader!./examples/UsePageVisible";
+
 Detect whether the page is visible. The `visibilitychange` event doesn't fire when restoring from the bfcache, so this hook also listens to the `pageshow` event to re-detect.
 
 ## API
@@ -12,11 +17,9 @@ Results:
 
 ## Example
 
-```tsx
-import { usePageVisible } from "@lilib/hooks";
+The following example pauses a timer while the page is hidden (typical for pausing video).
 
-function Example() {
-  const visible = usePageVisible();
-  ...
-}
-```
+<ExampleBlock>
+  <Example />
+</ExampleBlock>
+<CodeBlock language="tsx">{ExampleCode}</CodeBlock>

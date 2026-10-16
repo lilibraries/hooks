@@ -1,6 +1,7 @@
+import { useState } from "react";
 import { useLoad } from "@lilib/hooks";
 
-const getData = () => {
+const fetchData = () => {
   return new Promise<string>((resolve, reject) => {
     setTimeout(() => {
       if (Math.random() >= 0.5) {
@@ -13,30 +14,42 @@ const getData = () => {
 };
 
 function Example() {
-  const { load } = useLoad(getData, [], {
+  const [logs, setLogs] = useState<string[]>([]);
+
+  const { load } = useLoad(fetchData, [], {
     imperative: true,
     onSuccess: () => {
-      console.log("onSuccess");
+      setLogs((logs) => [...logs, "onSuccess"]);
     },
     onFailure: () => {
-      console.log("onFailure");
+      setLogs((logs) => [...logs, "onFailure"]);
     },
     onFinally: () => {
-      console.log("onFinally");
+      setLogs((logs) => [...logs, "onFinally"]);
     },
   });
 
   function handleClick() {
+    setLogs([]);
     load()
       .then(() => {
-        console.log("success");
+        setLogs((logs) => [...logs, "then"]);
       })
       .catch(() => {
-        console.log("failed");
+        setLogs((logs) => [...logs, "catch"]);
       });
   }
 
-  return <button onClick={handleClick}>Load</button>;
+  return (
+    <div>
+      <button onClick={handleClick}>Load</button>
+      <ul>
+        {logs.map((log, index) => (
+          <li key={index}>{log}</li>
+        ))}
+      </ul>
+    </div>
+  );
 }
 
 export default Example;

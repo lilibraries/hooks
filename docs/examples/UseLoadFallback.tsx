@@ -1,24 +1,25 @@
 import { useLoad } from "@lilib/hooks";
 
-const getNumberError = () => {
-  return new Promise<number>((resolve, reject) => {
+const fetchFromPrimary = () => {
+  return new Promise<string>((resolve, reject) => {
     setTimeout(() => {
-      reject(new Error("rejected"));
+      reject(new Error("primary source failed"));
     }, 1000);
   });
 };
 
-const getNumberFallback = () => {
-  return new Promise<number>((resolve) => {
+const fetchFromFallback = () => {
+  return new Promise<string>((resolve) => {
     setTimeout(() => {
-      resolve(Math.random());
+      resolve("data from fallback");
     }, 1000);
   });
 };
 
 function Example() {
-  const { data, error, loading } = useLoad(getNumberError, [], {
-    fallback: getNumberFallback,
+  // The primary source always fails, so the data always comes from the fallback.
+  const { data, error, loading } = useLoad(fetchFromPrimary, [], {
+    fallback: fetchFromFallback,
   });
 
   if (error) {
@@ -27,7 +28,7 @@ function Example() {
   if (loading) {
     return <div>Loading...</div>;
   }
-  return <div>Number: {data}</div>;
+  return <div>Data: {data}</div>;
 }
 
 export default Example;

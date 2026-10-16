@@ -1,3 +1,8 @@
+import CodeBlock from "@theme/CodeBlock";
+import ExampleBlock from "./components/ExampleBlock";
+import Example from "./examples/UseLatestRef";
+import ExampleCode from "!!raw-loader!./examples/UseLatestRef";
+
 Return a ref object whose `.current` property always points to the latest value. It is typically used to read the latest value inside long-lived callbacks (timers, event listeners) to avoid stale closures.
 
 ## API
@@ -8,11 +13,9 @@ function useLatestRef<T>(value: T): React.MutableRefObject<T>;
 
 ## Example
 
-```ts
-import { useLatestRef } from "@lilib/hooks";
+The following example shows an interval that always reads the latest input value.
 
-function Example(props) {
-  const valueRef = useLatestRef(props.value)
-  ...
-}
-```
+<ExampleBlock>
+  <Example />
+</ExampleBlock>
+<CodeBlock language="tsx">{ExampleCode}</CodeBlock>

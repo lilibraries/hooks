@@ -1,6 +1,6 @@
 import { useLoad } from "@lilib/hooks";
 
-const getNumber = () => {
+const fetchNumber = () => {
   return new Promise<number>((resolve) => {
     setTimeout(() => {
       resolve(Math.random());
@@ -9,7 +9,7 @@ const getNumber = () => {
 };
 
 function Example() {
-  const { data, loading, load } = useLoad(getNumber, [], { imperative: true });
+  const { data, loading, load } = useLoad(fetchNumber, [], { imperative: true });
 
   return (
     <div>

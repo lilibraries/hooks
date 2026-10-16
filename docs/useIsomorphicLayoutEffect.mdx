@@ -1,3 +1,8 @@
+import CodeBlock from "@theme/CodeBlock";
+import ExampleBlock from "./components/ExampleBlock";
+import Example from "./examples/UseIsomorphicLayoutEffect";
+import ExampleCode from "!!raw-loader!./examples/UseIsomorphicLayoutEffect";
+
 In the DOM environment, this hook is the same as `React.useLayoutEffect`. In the SSR environment, it is the same as `React.useEffect`.
 
 ## API
@@ -8,13 +13,9 @@ function useIsomorphicLayoutEffect(effect: React.EffectCallback, deps?: React.De
 
 ## Example
 
-```tsx
-import { useIsomorphicLayoutEffect } from "@lilib/hooks";
+The following example measures the element height; the same code runs safely during SSR.
 
-function Example() {
-  useIsomorphicLayoutEffect(() => {
-    console.log("Run effect");
-  });
-  ...
-}
-```
+<ExampleBlock>
+  <Example />
+</ExampleBlock>
+<CodeBlock language="tsx">{ExampleCode}</CodeBlock>

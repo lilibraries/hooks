@@ -14,18 +14,18 @@ function useElementSize(target: Element | React.RefObject<Element | null>): {
 };
 ```
 
-Params:
+Parameters:
 
 - **`target`:** A DOM element, or a ref object that references a DOM element.
 
 Results:
 
-- **`width`:** Element width.
-- **`height`:** Element height.
+- **`width`:** Element width, or `undefined` when the target is invalid.
+- **`height`:** Element height, or `undefined` when the target is invalid.
 
 ## Example
 
-You can change the browser window size to see the effect.
+The following example shows the element size; click Toggle size to see it change.
 
 <ExampleBlock>
   <Example />

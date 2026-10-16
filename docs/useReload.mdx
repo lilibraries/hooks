@@ -3,17 +3,29 @@ import ExampleBlock from "./components/ExampleBlock";
 import Example from "./examples/UseReload";
 import ExampleCode from "!!raw-loader!./examples/UseReload";
 
-This hook returns a function to reload all requests that share the same `key` in [`useLoad`](./useLoad).
+This hook returns a function to reload all requests that share the same `key` in [`useLoad`](./useLoad). It is the companion of `useLoad`'s [`key` option](./useLoad#api): set the same `key` in multiple `useLoad` instances, and call the returned function from anywhere to refresh them all at once.
+
+Typical use case: after a create/update/delete operation succeeds, all components showing data of the same origin must be refreshed — the [`useSubmit`](./useSubmit) example demonstrates such a workflow.
+
+## How it works
+
+- Every mounted `useLoad` instance with a `key` registers its own `reload` in a shared store.
+- The function returned by `useReload(key)` calls `reload` on every registered instance with that key. Each instance reloads with its own most recent params (or `defaultParams`).
+- The returned function also accepts an options object; the `force` passed on call overrides the hook-level one. With `force: true`, the reload bypasses the `staleTime` cache hit of the associated instances.
 
 ## API
 
 ```ts
-function useReload(key: {}, options?: { force?: boolean }): (options?: { force?: boolean }) => void;
+interface UseReloadOptions {
+  force?: boolean;
+}
+
+function useReload(key: NonNullable<unknown>, options?: UseReloadOptions): (options?: UseReloadOptions) => void;
 ```
 
-Params:
+Parameters:
 
-- **`key`:** The key set in `useLoad`. It must be an immutable value.
+- **`key`:** The key set in `useLoad`, matching the instances to reload. It can be any value except `null` and `undefined`, and must be immutable.
 - **`options`:** Options object.
   - **`options.force`:** Whether to reload forcibly, bypassing the `staleTime` cache hit of the associated [`useLoad`](./useLoad) instances.
 
@@ -22,6 +34,8 @@ Results:
 - A function to reload all of the associated requests. It also accepts an options object; the `force` passed on call overrides the hook-level one.
 
 ## Example
+
+_One click reloads both components. `independent: true` keeps their requests separate so each shows its own data._
 
 <ExampleBlock>
   <Example />

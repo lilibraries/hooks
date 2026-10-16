@@ -1,3 +1,8 @@
+import CodeBlock from "@theme/CodeBlock";
+import ExampleBlock from "./components/ExampleBlock";
+import Example from "./examples/UsePreviousRef";
+import ExampleCode from "!!raw-loader!./examples/UsePreviousRef";
+
 Return a ref object whose `.current` property points to the value from the previous update, and is kept while the value is unchanged. The first time is `undefined`.
 
 ## API
@@ -8,11 +13,9 @@ function usePreviousRef<T>(value: T): React.MutableRefObject<T | undefined>;
 
 ## Example
 
-```ts
-import { usePreviousRef } from "@lilib/hooks";
+The following example shows the value of the previous render.
 
-function Example(props) {
-  const valueRef = usePreviousRef(props.value)
-  ...
-}
-```
+<ExampleBlock>
+  <Example />
+</ExampleBlock>
+<CodeBlock language="tsx">{ExampleCode}</CodeBlock>
