@@ -3,7 +3,7 @@ import ExampleBlock from "./components/ExampleBlock";
 import Example from "./examples/UseSubmit";
 import ExampleCode from "!!raw-loader!./examples/UseSubmit";
 
-This hook is based on [`useLoad`](./useLoad). It reduces many functions for convenience, and it only supports a few options. Specially, it will never execute automatically. This hook is usually used for network requests such as creating, updating and deleting, but not reading.
+This hook is built on [`useLoad`](./useLoad) with a trimmed feature set: it supports only a few options and never runs automatically. It is typically used for network requests such as create, update, and delete.
 
 ## API
 
@@ -31,29 +31,31 @@ function useSubmit<Callback extends LoadCallback>(
   },
 ): {
   submitting: boolean;
+  error: any;
   submit: (...params: Parameters<Callback>) => ReturnType<Callback>;
 };
 ```
 
 Params:
 
-- **`callback`:** A function that returns a promise.
+- **`callback`:** The submit function; its params are forwarded by `submit`. It must return a promise; the resolved value is the success data.
 - **`options`:** Options object.
   - **`options.idle`:** Run the callback during the browser's idle periods. You can pass an `IdleRequestOptions` object to limit the max waiting time.
   - **`options.fallback`:** When the `callback` function rejects an error and the count of retries has been exhausted, the `fallback` function will be called. Usually used for an alternate data source.
   - **`options.retry`:** Enable retrying the callback. Default is `false`. It can be a function that receives the error and returns whether to retry.
   - **`options.retryLimit`:** Callback retry limit. Default is `3`.
-  - **`options.retryInterval`:** Callback retry interval, in milliseconds. Defaults to exponential growth: the `count`-th retry waits 2^(count-1) × 1000 ms. You can set a function that returns a number value for this option, for example `(count) => Math.pow(2, count)`.
+  - **`options.retryInterval`:** Callback retry interval, in milliseconds. Defaults to exponential growth: the `count`-th retry waits 2^(count-1) × 1000 ms. You can set a function that returns a number for this option, for example `(count) => Math.pow(2, count)`.
   - **`options.fallbackRetry`:** Enable retrying the fallback function after it fails too. Default is `false`. It can be a function that receives the error and returns whether to retry.
   - **`options.fallbackRetryLimit`:** Fallback retry limit. Default is `3`.
   - **`options.fallbackRetryInterval`:** Fallback retry interval, in milliseconds. Defaults to exponential growth like `retryInterval`. It can also be a function.
-  - **`options.onSuccess`:** Success event.
-  - **`options.onFailure`:** Failure event.
-  - **`options.onFinally`:** Finally event.
+  - **`options.onSuccess`:** Called on success with the loaded data.
+  - **`options.onFailure`:** Called on failure with the error object.
+  - **`options.onFinally`:** Called when loading settles (success or failure).
 
 Results:
 
 - **`submitting`:** Submitting state. Initial value is `false`.
+- **`error`:** The error of the most recent failure, `null` on success.
 - **`submit`:** Submit function. Used in the same way as the `callback`. Each submission cancels the previous pending submission.
 
 ## Example

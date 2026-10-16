@@ -31,6 +31,8 @@ const defaultOptions = {
   independent: true,
   initialData: undefined,
   defaultParams: undefined,
+  cacheKey: undefined,
+  staleTime: 0,
   polling: false,
   pollingInPageHidden: false,
   autoReloadOnPageShow: false,
@@ -41,22 +43,26 @@ const defaultOptions = {
 /**
  * Built on `useLoad` with a trimmed feature set: supports only a few options and never runs automatically. Typically used for network requests such as create, update, and delete.
  *
- * The returned `submit` is implemented by `useLoad`'s `load`, so each submission cancels the previous pending submission.
+ * The returned `submit` is implemented by `useLoad`'s `force`, so each submission cancels the previous pending submission and always sends the request.
  *
  * @param callback The submit function; its params are forwarded by `submit`, must return a Promise; the resolved value is the success data.
  * @param options The options object (see `UseSubmitOptions`).
- * @returns Returns a `{ submit, submitting }` object: `submit` is the submit function, `submitting` indicates whether a submission is in progress.
+ * @returns Returns a `{ submit, submitting, error }` object: `submit` is the submit function, `submitting` indicates whether a submission is in progress, and `error` is the error of the most recent failure (`null` on success).
  */
 function useSubmit<Callback extends LoadCallback>(
   callback: Callback,
   options?: UseSubmitOptions<Callback, LoadData<Callback>>,
 ) {
-  const { load: submit, loading: submitting } = useLoad(callback, [], {
+  const {
+    force: submit,
+    loading: submitting,
+    error,
+  } = useLoad(callback, [], {
     ...options,
     ...defaultOptions,
   });
 
-  return { submit, submitting } as const;
+  return { submit, submitting, error } as const;
 }
 
 export default useSubmit;

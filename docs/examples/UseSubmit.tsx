@@ -1,4 +1,3 @@
-import React from "react";
 import { useLoad, useSubmit } from "@lilib/hooks";
 
 const getNumber = () => {
@@ -12,7 +11,7 @@ const getNumber = () => {
 function Example() {
   const { data, loading, update, reload } = useLoad(getNumber);
 
-  const { submit, submitting } = useSubmit(getNumber, {
+  const { submit, submitting, error } = useSubmit(getNumber, {
     onSuccess: (result) => {
       update(result);
       reload();
@@ -22,6 +21,7 @@ function Example() {
   return (
     <div>
       <button onClick={() => submit()}>{submitting ? "Submitting" : "Submit"}</button>
+      {error && <div>Error: {error.message}</div>}
       Number: {data} {loading ? "(Loading...)" : ""}
     </div>
   );

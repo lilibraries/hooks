@@ -198,4 +198,27 @@ describe("useSubmit", () => {
 
     expect(result.current.submit).toBe(submit);
   });
+
+  it("exposes the error of the most recent failure and clears it on success", async () => {
+    const error = new Error("submit-fail");
+    const callback = jest.fn(async (fail: boolean) => {
+      if (fail) {
+        throw error;
+      }
+      return "ok";
+    });
+    const { result } = renderHook(() => useSubmit(callback));
+
+    expect(result.current.error).toBeNull();
+
+    await act(async () => {
+      await result.current.submit(true).catch(() => {});
+    });
+    expect(result.current.error).toBe(error);
+
+    await act(async () => {
+      await result.current.submit(false);
+    });
+    expect(result.current.error).toBeNull();
+  });
 });
