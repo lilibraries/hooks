@@ -39,8 +39,8 @@ importers:
         specifier: ^4.18.1
         version: 4.18.1
       lru-cache:
-        specifier: ^11.5.3
-        version: 11.5.3
+        specifier: ^10.4.3
+        version: 10.4.3
       raf:
         specifier: ^3.4.1
         version: 3.4.1
