@@ -6,7 +6,7 @@ import inBrowser from "./utils/inBrowser";
 /**
  * Get the window size.
  *
- * @returns Returns a `{ width, height }` object.
+ * @returns Returns a `{ width, height }` object; both are `undefined` outside the browser.
  */
 function useWindowSize() {
   const [{ width, height }, setState] = useState(() => {
@@ -25,7 +25,7 @@ function useWindowSize() {
 
   useEventListener(windowRef, "resize", listener);
   useEventListener(windowRef, "orientationchange", listener);
-  // On mobile, collapsing/expanding the address bar changes the visualViewport size without firing a window resize
+  // On mobile, collapsing/expanding the address bar changes the visualViewport size without firing a window resize.
   useEventListener(viewportRef, "resize", listener);
 
   useDebugValue({ width, height });

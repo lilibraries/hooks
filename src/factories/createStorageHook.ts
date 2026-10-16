@@ -101,7 +101,6 @@ function createStorageHook(getStorage: () => Storage | null) {
 
     const [startPolling, cancelPolling] = useInterval(handleChange, pollingInterval);
 
-    // Restart or stop polling when the polling flag changes
     useEffect(
       () => {
         cancelPolling();
@@ -116,8 +115,6 @@ function createStorageHook(getStorage: () => Storage | null) {
 
     useEventListener(windowRef, "storage", handleChange);
 
-    // When the key changes: stop the previous polling, re-read the storage,
-    // and restart polling if needed
     useUpdate(() => {
       cancelPolling();
       setValue(getStoredValue());
@@ -126,8 +123,6 @@ function createStorageHook(getStorage: () => Storage | null) {
       }
     }, [key]);
 
-    // When the default value changes and the key is absent from storage,
-    // sync the state to the new default value
     useUpdate(() => {
       if (storage?.getItem(key) == null && !compare(defaultValue, value)) {
         setValue(defaultValue);

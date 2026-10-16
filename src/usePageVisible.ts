@@ -19,7 +19,7 @@ function usePageVisible() {
     setVisible(isPageVisible());
   });
 
-  // `visibilitychange` does not fire when restoring from bfcache, so also listen to `pageshow` to re-detect
+  // `visibilitychange` does not fire when restoring from bfcache, so also listen to `pageshow` to re-detect.
   useEventListener(windowRef, "pageshow", () => {
     setVisible(isPageVisible());
   });

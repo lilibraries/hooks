@@ -16,7 +16,7 @@ interface UseTitleOptions {
  */
 function useTitle(title: string | null, options?: UseTitleOptions) {
   const oldTitleRef = useRef("");
-  // Capture the original title on the first render only, for restoration via the `restore` option
+  // Capture the original title on the first render only, for restoration via the `restore` option.
   const capturedRef = useRef(false);
 
   useEffect(() => {

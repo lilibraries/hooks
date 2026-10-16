@@ -27,7 +27,7 @@ interface UseCookieOptions {
  * @param options.polling Whether to poll for cookie changes.
  * @param options.pollingInterval The polling interval (milliseconds).
  * @param options.validate A validation function.
- * @returns Returns a `[value, setCookie]` tuple.
+ * @returns Returns a `[value, setCookie]` tuple: `value` is the cookie value and `setCookie` sets it, or removes the cookie when passed `undefined`.
  */
 function useCookie(
   name: string,
@@ -103,8 +103,6 @@ function useCookie(name: string, options?: UseCookieOptions) {
     [polling], // eslint-disable-line
   );
 
-  // When the name changes: stop the previous polling, re-read the cookie,
-  // and restart polling if needed
   useUpdate(() => {
     cancelPolling();
     setValue(getCookie());
@@ -113,8 +111,6 @@ function useCookie(name: string, options?: UseCookieOptions) {
     }
   }, [name]);
 
-  // When the default value changes and the cookie is absent,
-  // sync the state to the new default value
   useUpdate(() => {
     if (Cookies.get(name) === undefined && defaultValue !== value) {
       setValue(defaultValue);

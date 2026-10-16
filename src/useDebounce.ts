@@ -24,7 +24,7 @@ export interface UseDebounceOptions {
  * @param options.maxWait The maximum wait time (milliseconds).
  * @param options.leading Whether to invoke at the start.
  * @param options.trailing Whether to invoke at the end.
- * @returns Returns a `[debounced, { flush, cancel }]` tuple.
+ * @returns Returns a `[debounced, { flush, cancel }]` tuple: `debounced` is the debounced function, `flush` runs the pending invocation immediately, and `cancel` aborts it.
  */
 function useDebounce<T extends (...args: any[]) => any>(callback: T, options?: number | UseDebounceOptions) {
   let wait = 0;

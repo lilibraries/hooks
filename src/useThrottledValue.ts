@@ -11,7 +11,7 @@ import useUpdate from "./useUpdate";
  *
  * @param value The value to throttle.
  * @param options The throttle wait time (milliseconds), or an options object (same as `useThrottle`).
- * @returns Returns a `[throttledValue, { flush, cancel }]` tuple.
+ * @returns Returns a `[throttledValue, { flush, cancel }]` tuple: `flush` applies the latest value immediately (or `finalValue` if given) and `cancel` aborts the pending update.
  */
 function useThrottledValue<T>(value: T, options?: number | UseThrottleOptions) {
   const valueRef = useLatestRef(value);

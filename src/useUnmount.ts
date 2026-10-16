@@ -7,7 +7,7 @@ import { useEffect, useRef } from "react";
  */
 function useUnmount(effect: () => void) {
   const effectRef = useRef(effect);
-  // Track the latest effect on every render so the newest function (not the first render's closure) runs on unmount
+  // Track the latest effect on every render so the newest function (not the first render's closure) runs on unmount.
   effectRef.current = effect;
 
   useEffect(() => {

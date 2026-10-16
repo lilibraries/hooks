@@ -46,7 +46,7 @@ function useIntersectionObserver(
       observer.disconnect();
     };
     // An array threshold is a new reference on every render, so it is serialized
-    // to a string to keep the dep stable (identical content avoids recreating the observer)
+    // to a string to keep the dep stable (identical content avoids recreating the observer).
   }, [rootMargin, threshold ? threshold.toString() : "0", root, target]);
 }
 

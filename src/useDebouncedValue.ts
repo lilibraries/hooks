@@ -11,7 +11,7 @@ import useUpdate from "./useUpdate";
  *
  * @param value The value to debounce.
  * @param options The debounce wait time (milliseconds), or an options object (same as `useDebounce`).
- * @returns Returns a `[debouncedValue, { flush, cancel }]` tuple.
+ * @returns Returns a `[debouncedValue, { flush, cancel }]` tuple: `flush` applies the latest value immediately (or `finalValue` if given) and `cancel` aborts the pending update.
  */
 function useDebouncedValue<T>(value: T, options?: number | UseDebounceOptions) {
   const valueRef = useLatestRef(value);

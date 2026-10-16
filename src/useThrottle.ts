@@ -22,7 +22,7 @@ export interface UseThrottleOptions {
  * @param options.wait The throttle wait time (milliseconds).
  * @param options.leading Whether to invoke at the start.
  * @param options.trailing Whether to invoke at the end.
- * @returns Returns a `[throttled, { flush, cancel }]` tuple.
+ * @returns Returns a `[throttled, { flush, cancel }]` tuple: `throttled` is the throttled function, `flush` runs the pending invocation immediately, and `cancel` aborts it.
  */
 function useThrottle<T extends (...args: any[]) => any>(callback: T, options?: number | UseThrottleOptions) {
   let wait = 0;

@@ -11,8 +11,8 @@ import useUnmount from "./useUnmount";
  * by default, falling back to `setTimeout` when unavailable.
  *
  * @param callback The callback invoked when idle.
- * @param options `IdleRequestOptions` options.
- * @returns Returns a `[start, cancel]` tuple.
+ * @param options The options passed to `window.requestIdleCallback`.
+ * @returns Returns a `[start, cancel]` tuple: `start` schedules the callback and `cancel` aborts it.
  */
 function useIdle(callback: () => void, options?: IdleRequestOptions) {
   const timerRef = useRef<number | undefined>(undefined);

@@ -8,7 +8,7 @@ import useUnmount from "./useUnmount";
  *
  * @param callback The callback to execute after the delay.
  * @param timeout The delay (milliseconds).
- * @returns Returns a `[start, cancel]` tuple.
+ * @returns Returns a `[start, cancel]` tuple: `start` begins the timer and `cancel` aborts it.
  */
 function useTimeout(callback: () => void, timeout?: number) {
   const handler = usePersist(callback);

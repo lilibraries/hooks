@@ -16,7 +16,7 @@ interface UseAnimateOptions {
 /**
  * Run JavaScript animations with this hook.
  *
- * @param callback The animation step function, receives a percentage number (0~1) as its first argument.
+ * @param callback The animation step function, receives a percentage number between 0 and 1 as its first argument.
  * @param options The animation duration (milliseconds), or an options object.
  * @param options.duration The duration (milliseconds) in options-object form, required; ignored when a number is passed directly.
  * @param options.algorithm An optional easing function. The animation runs linearly by default; use this option to override that behavior.

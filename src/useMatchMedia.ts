@@ -19,7 +19,7 @@ function useMatchMedia(query: string, defaultValue?: boolean) {
   const mediaRef = useLatestRef(media);
   const [matches, setMatches] = useState(media ? media.matches : !!defaultValue);
 
-  // The media object is rebuilt when the query changes; sync the latest match result
+  // The media object is rebuilt when the query changes; sync the latest match result.
   useUpdate(() => {
     setMatches(media ? media.matches : !!defaultValue);
   }, [media]);

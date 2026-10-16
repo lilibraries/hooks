@@ -6,7 +6,7 @@ import { useRef } from "react";
  * event listeners) to avoid stale closures.
  *
  * @param value The latest value.
- * @returns Returns a ref object.
+ * @returns Returns a ref object whose `current` always points to the latest `value`.
  */
 function useLatestRef<T>(value: T) {
   const ref = useRef(value);

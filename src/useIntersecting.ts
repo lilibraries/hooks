@@ -30,7 +30,7 @@ function useIntersecting(target: Element | RefObject<Element | null>, options?: 
   // Reset the intersecting state when the target element becomes invalid to avoid
   // stale values; the dep is the element dereferenced during render, so this
   // effect fires both when the target is rebound and when it unmounts (unref
-  // yields null)
+  // yields null).
   useUpdate(() => {
     if (!unref(target)) {
       setIntersecting(false);

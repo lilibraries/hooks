@@ -27,7 +27,7 @@ function useClickOutside<E extends Event = Event>(
   const eventNames = Array.isArray(eventName) ? eventName : [eventName];
   const listenerRef = useLatestRef(listener);
   // Resolve target elements only when the event fires, so lazily mounted targets
-  // (refs assigned just before the event) still work correctly
+  // (refs assigned just before the event) still work correctly.
   const targetsRef = useLatestRef(Array.isArray(target) ? target : [target]);
 
   useRefEffect(() => {

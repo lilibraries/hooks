@@ -47,9 +47,6 @@ function useDelayedValue<T>(value: T, options: number | UseDelayedValueOptions) 
   const [state, setState] = useSafeState(value);
   const [update, cancelUpdate] = useTimeout(() => setState(value), delay);
 
-  // Handle only values that differ from the current one: schedule a timed update
-  // when the delay condition holds, otherwise sync immediately; cancel the pending
-  // update when the value is unchanged
   useUpdate(() => {
     if (!compare(value, state)) {
       if (shouldDelay(value)) {

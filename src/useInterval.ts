@@ -7,7 +7,7 @@ import useTimeout from "./useTimeout";
  *
  * @param callback The callback to invoke repeatedly.
  * @param interval The interval (milliseconds).
- * @returns Returns a `[start, cancel]` tuple; `start` clears any previous loop before starting a new one.
+ * @returns Returns a `[start, cancel]` tuple: `start` begins the loop, clearing any previous one, and `cancel` stops it.
  */
 function useInterval(callback: () => void, interval?: number) {
   const startRef = useRef<(() => void) | undefined>(undefined);

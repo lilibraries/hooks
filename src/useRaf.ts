@@ -10,7 +10,7 @@ import useUnmount from "./useUnmount";
  * Invoke a callback before the browser repaints, via `requestAnimationFrame`.
  *
  * @param callback The callback invoked before the browser repaints.
- * @returns Returns a `[start, cancel]` tuple.
+ * @returns Returns a `[start, cancel]` tuple: `start` schedules the callback and `cancel` aborts it.
  */
 function useRaf(callback: () => void) {
   const timerRef = useRef<number | undefined>(undefined);

@@ -13,13 +13,13 @@ import inBrowser from "./utils/inBrowser";
  * @param options.validate A validation function.
  * @param options.serialize The serialization function, defaults to `JSON.stringify`.
  * @param options.deserialize The deserialization function, defaults to `JSON.parse`.
- * @returns Returns a `[value, setStorage]` tuple.
+ * @returns Returns a `[value, setStorage]` tuple: `value` is the deserialized value and `setStorage` writes it back, or removes the entry when passed `undefined`.
  */
 const useLocalStorage = createStorageHook(() => {
   try {
     return inBrowser ? window.localStorage : null;
   } catch {
-    // Accessing localStorage in private-browsing or restricted environments throws a SecurityError; fall back to no storage
+    // Accessing localStorage in private-browsing or restricted environments throws a SecurityError; fall back to no storage.
     return null;
   }
 });
