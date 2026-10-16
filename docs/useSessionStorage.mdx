@@ -30,16 +30,16 @@ Params:
 - **`key`:** `sessionStorage` key.
 - **`options`:** Options object.
   - **`options.defaultValue`:** Default value.
-  - **`options.polling`:** Pollingly update value. Default is `false`.
+  - **`options.polling`:** Whether to poll for storage changes. Default is `false`.
   - **`options.pollingInterval`:** Polling interval time, in milliseconds. Default is `100`.
-  - **`options.compare`:** The comparison function in polling. Use deep comparison by default.
+  - **`options.compare`:** A function to determine whether the new and old values are equal. Defaults to deep comparison.
   - **`options.validate`:** Validate the value got from `sessionStorage` which is deserialized by the `deserialize` function. If this function returns `false`, the `defaultValue` will be used.
   - **`options.serialize`:** Serialization function. Default is `JSON.stringify`.
   - **`options.deserialize`:** Deserialization function. Default is `JSON.parse`.
 
 Results:
 
-- **`value`:** Parsed by the deserialization function.
+- **`value`:** The value parsed by the deserialization function.
 - **`setSessionStorage`:** Set `sessionStorage`. If the `newValue` is `undefined`, the entry will be removed and the `defaultValue` will be returned.
 
 ## Example

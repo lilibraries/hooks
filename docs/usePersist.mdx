@@ -1,4 +1,4 @@
-It returns the same function identity no matter whether the `callback` parameter is changed or not. The returned function is used in the same way as the `callback`.
+Return the same function identity regardless of how the `callback` argument changes. The returned function behaves exactly like `callback`.
 
 ## API
 
@@ -9,7 +9,6 @@ function usePersist<T extends (...args: any[]) => any>(callback: T): (...args: P
 ## Example
 
 ```tsx
-import React from "react";
 import { usePersist } from "@lilib/hooks";
 
 function Example() {

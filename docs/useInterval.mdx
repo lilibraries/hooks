@@ -14,12 +14,12 @@ function useInterval(callback: () => void, interval?: number): [start: () => voi
 Params:
 
 - **`callback`:** A function to be called at intervals.
-- **`interval`:** Optional interval time, in milliseconds.
+- **`interval`:** The interval, in milliseconds.
 
 Results:
 
-- **`start`:** Start loop. Automatically clear the previous loop.
-- **`cancel`:** Cancel loop.
+- **`start`:** Starts the loop. It clears any previous loop first.
+- **`cancel`:** Cancels the loop.
 
 ## Example
 

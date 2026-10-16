@@ -8,17 +8,16 @@ function useRaf(callback: () => void): [start: () => void, cancel: () => void];
 
 Params:
 
-- **`callback`:** A function that will be invoked.
+- **`callback`:** The callback invoked before the browser repaints.
 
 Results:
 
-- **`start`:** Start function.
-- **`cancel`:** Cancel function.
+- **`start`:** Starts the animation frame.
+- **`cancel`:** Cancels the animation frame.
 
 ## Example
 
 ```tsx
-import React from "react";
 import { useRaf } from "@lilib/hooks";
 
 function Example() {

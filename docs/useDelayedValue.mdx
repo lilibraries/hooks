@@ -23,10 +23,10 @@ function useDelayedValue<T>(
 Params:
 
 - **`value`:** The value whose updates will be delayed.
-- **`options`:** Accepts a positive number as the delay time or an object as the options.
+- **`options`:** The delay time (milliseconds) or an options object.
   - **`options.delay`:** Delay time, in milliseconds. It must be a positive number.
   - **`options.shouldDelay`:** A function that determines whether an update should be delayed. Returning `false` updates immediately and synchronously. Any value is delayed by default.
-  - **`options.compare`:** It is used to compare whether two values are equal to determine whether to update the value. Default is `Object.is`.
+  - **`options.compare`:** A function to determine whether the new and old values are equal, defaults to `Object.is`.
 
 ## Example
 

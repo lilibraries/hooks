@@ -27,9 +27,9 @@ Params:
 - **`key`:** Cache key. Any value except `null` and `undefined`.
 - **`options`:** Options object.
   - **`options.defaultValue`:** Default value when the cache value does not exist.
-  - **`options.cache`:** Cache instance. Create it with `new LRUCache({ max, ttl, ... })`. If not specified, a shared internal instance is created.
+  - **`options.cache`:** Cache instance. Create it with `new LRUCache({ max, ttl, ... })`. If not specified, a shared internal instance is used.
   - **`options.cacheTime`:** Cache time, in milliseconds. Default is 5 minutes. The TTL is set per entry, so it works regardless of the `ttl` option of the cache instance. You can set a permanent cache by setting this option to `Infinity`. Non-positive values are normalized to 1 ms, so the entry expires on the next read.
-  - **`options.cacheSync`:** Synchronize data on set and/or delete data. Default is `false`. It can be an object to synchronize data in different events.
+  - **`options.cacheSync`:** Whether to synchronize data between components on set and/or delete events. Default is `false`. It can be an object to enable synchronization for each event separately.
     - **`options.cacheSync.set`:** Synchronize data on set cache.
     - **`options.cacheSync.delete`:** Synchronize data on delete cache or when cache time expires.
   - **`options.validate`:** Validate the cache value. If it returns falsy, the `defaultValue` will be used.
@@ -39,7 +39,7 @@ Params:
 Results:
 
 - **`value`:** Cache value or default value.
-- **`setCache`:** The function to set cache. It the `newValue` param is `undefined`, the cache will be deleted.
+- **`setCache`:** The function to set cache. If the `newValue` param is `undefined`, the cache will be deleted.
 
 Note: `LRUCache` expires entries lazily. Expired entries are only removed and notified when they are read, so an expired cache may still occupy memory until the next read. The shared internal cache enables `ttlAutopurge` to purge expired entries in the background; enable it on your own cache instance if needed.
 

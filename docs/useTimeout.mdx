@@ -3,7 +3,7 @@ import ExampleBlock from "./components/ExampleBlock";
 import Example from "./examples/UseTimeout";
 import ExampleCode from "!!raw-loader!./examples/UseTimeout";
 
-Delay running a callback.
+Execute a callback after a delay.
 
 ## API
 
@@ -11,15 +11,15 @@ Delay running a callback.
 function useTimeout(callback: () => void, timeout?: number): [start: () => void, cancel: () => void];
 ```
 
-### Params
+Params:
 
-- **`callback`:** A function to be executed after `timeout` time.
+- **`callback`:** The callback to execute after the delay.
 - **`timeout`:** Optional delay time, in milliseconds.
 
-### Results
+Results:
 
-- **`start`:** Set a timer. Automatically clear the previous timer.
-- **`cancel`:** Cancel timer.
+- **`start`:** Starts the timer. It clears any previous timer first.
+- **`cancel`:** Cancels the timer.
 
 ## Example
 

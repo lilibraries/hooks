@@ -3,7 +3,7 @@ import ExampleBlock from "./components/ExampleBlock";
 import Example from "./examples/UseTitle";
 import ExampleCode from "!!raw-loader!./examples/UseTitle";
 
-Set document title.
+Set the document title.
 
 ## API
 
@@ -13,9 +13,9 @@ function useTitle(title: string | null, options?: { restore?: boolean }): void;
 
 Params:
 
-- **`title`:** The document title. If it is `null`, do nothing.
+- **`title`:** The document title. Pass `null` to not set one.
 - **`options`:** Options object.
-  - **`options.restore`:** Whether to restore the original title on the component unmount.
+  - **`options.restore`:** Whether to restore the previous title on unmount.
 
 ## Example
 

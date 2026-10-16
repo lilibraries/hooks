@@ -16,15 +16,15 @@ function useAnimate(
 
 Params:
 
-- **`callback`:** The animation step function. It receives a percent number (0~1) as the first param.
+- **`callback`:** The animation step function. It receives a percent number between 0 and 1 as the first param.
 - **`options`:** The animation duration time, or an options object.
-  - **`options.duration`:** Required animation duration time, in milliseconds.
+  - **`options.duration`:** The duration in milliseconds. Required in the options-object form; ignored when a number is passed directly.
   - **`options.algorithm`:** Optional easing function. The animation runs linearly by default, use this option to override the default behavior.
 
 Results:
 
-- **`start`:** Start function.
-- **`cancel`:** Cancel function.
+- **`start`:** Starts the animation.
+- **`cancel`:** Cancels the animation.
 
 ## Example
 

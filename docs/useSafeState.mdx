@@ -1,4 +1,4 @@
-This hook is used in the same way as React.useState, except that calling `setState` after the component is unmounted has no effect rather than throwing an error.
+This hook is used in the same way as `React.useState`, except that calling `setState` after the component is unmounted has no effect rather than throwing an error.
 
 ## API
 
@@ -11,7 +11,6 @@ function useSafeState<S>(
 ## Example
 
 ```tsx
-import React from "react";
 import { useMount, useSafeState } from "@lilib/hooks";
 
 function Example() {

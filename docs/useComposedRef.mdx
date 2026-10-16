@@ -9,7 +9,7 @@ function useComposedRef<T>(...refs: (React.Ref<T> | undefined)[]): React.RefCall
 ## Example
 
 ```tsx
-import React, { forwardRef, useRef } from "react";
+import { forwardRef, useRef } from "react";
 import { useComposedRef } from "@lilib/hooks";
 
 const Component = forwardRef<HTMLDivElement, any>((props, ref) => {

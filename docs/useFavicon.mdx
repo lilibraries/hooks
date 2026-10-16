@@ -1,4 +1,4 @@
-Set document favicon.
+Set the document favicon.
 
 ## API
 
@@ -8,15 +8,14 @@ function useFavicon(href: string | null, options?: { mime?: string; restore?: bo
 
 Params:
 
-- **`href`:** The favicon URL. If it is `null`, do nothing.
+- **`href`:** The favicon URL. Pass `null` to not set one.
 - **`options`:** Options object.
   - **`options.mime`:** Specify the MIME type. It is inferred from the `href` extname by default (support `.png`, `.gif`, `.jpg`, `.jpeg`, `.svg`, `.webp` and `.ico`).
-  - **`options.restore`:** Whether to restore the original favicon on the component unmount.
+  - **`options.restore`:** Whether to restore the previous favicon on unmount.
 
 ## Example
 
 ```tsx
-import React from "react";
 import { useFavicon } from "@lilib/hooks";
 
 function Example() {

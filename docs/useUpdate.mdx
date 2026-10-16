@@ -1,4 +1,4 @@
-Run an effect after the component is updated or the deps are changed, but ignore it on mount.
+Run an effect after the component updates or the dependencies change (the initial mount is skipped).
 
 ## API
 
@@ -9,7 +9,7 @@ function useUpdate(effect: React.EffectCallback, deps?: React.DependencyList): v
 ## Example
 
 ```tsx
-import React from "react";
+import { useState } from "react";
 import { useUpdate } from "@lilib/hooks";
 
 function Example() {
