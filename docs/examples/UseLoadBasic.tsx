@@ -1,14 +1,9 @@
-import React from "react";
 import { useLoad } from "@lilib/hooks";
 
 const getData = () => {
-  return new Promise<string>((resolve, reject) => {
+  return new Promise<string>((resolve) => {
     setTimeout(() => {
-      if (Math.random() >= 0.5) {
-        resolve("@lilib/hooks");
-      } else {
-        reject(new Error("rejected"));
-      }
+      resolve("@lilib/hooks");
     }, 1000);
   });
 };

@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import { useRef } from "react";
 import { useLoad } from "@lilib/hooks";
 
 const getCount = (count: number) => {

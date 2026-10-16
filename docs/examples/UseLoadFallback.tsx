@@ -1,4 +1,3 @@
-import React from "react";
 import { useLoad } from "@lilib/hooks";
 
 const getNumberError = () => {

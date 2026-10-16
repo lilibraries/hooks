@@ -1,7 +1,9 @@
 import { act, waitFor } from "@testing-library/react";
+import { LRUCache } from "lru-cache";
 import renderHook from "./helpers/renderHook";
 
 import useLoad from "../src/useLoad";
+import { getDefaultCache } from "../src/utils/cache";
 
 function deferred<T>() {
   let resolve!: (value: T) => void;
@@ -34,6 +36,7 @@ describe("useLoad", () => {
 
   afterEach(() => {
     jest.clearAllTimers();
+    getDefaultCache().clear();
   });
 
   it("loads automatically on mount and updates data", async () => {
@@ -916,6 +919,173 @@ describe("useLoad", () => {
     await act(async () => {
       await jest.advanceTimersByTimeAsync(1000);
     });
+    expect(callback).toHaveBeenCalledTimes(1);
+  });
+
+  it("reads from and writes to a custom cache instance when options.cache is provided", async () => {
+    const customCache = new LRUCache({ maxSize: 100, sizeCalculation: () => 1 });
+    const cacheKey = Symbol("cache-key");
+    customCache.set(cacheKey, "preloaded", { ttl: 0 });
+
+    const callback = jest.fn(async () => "loaded");
+    const { result, unmount } = renderHook(() =>
+      useLoad(callback, [], { cache: customCache, cacheKey, cacheTime: Infinity }),
+    );
+
+    // The initial data is read from the custom cache instance.
+    expect(result.current.data).toBe("preloaded");
+
+    await waitFor(() => expect(result.current.data).toBe("loaded"));
+    expect(customCache.get(cacheKey)).toBe("loaded");
+    // The shared default cache is untouched.
+    expect(getDefaultCache().has(cacheKey)).toBe(false);
+
+    unmount();
+  });
+
+  it("reads cached data on mount and writes loaded data to the cache", async () => {
+    const cacheKey = Symbol("cache-key");
+    getDefaultCache().set(cacheKey, "cached", { ttl: Infinity });
+
+    const callback = jest.fn(async () => "loaded");
+    const { result, unmount } = renderHook(() => useLoad(callback, [], { cacheKey, cacheTime: Infinity }));
+
+    // The initial data comes from the cache.
+    expect(result.current.data).toBe("cached");
+
+    await waitFor(() => expect(result.current.data).toBe("loaded"));
+    expect(callback).toHaveBeenCalledTimes(1);
+    expect(getDefaultCache().get(cacheKey)).toBe("loaded");
+
+    unmount();
+
+    // A second instance reads the cached data again on mount.
+    const secondCallback = jest.fn(async () => "second");
+    const { result: second } = renderHook(() => useLoad(secondCallback, [], { cacheKey, cacheTime: Infinity }));
+    expect(second.current.data).toBe("loaded");
+
+    await waitFor(() => expect(second.current.data).toBe("second"));
+    expect(getDefaultCache().get(cacheKey)).toBe("second");
+  });
+
+  it("staleTime: resolves fresh cached data without a request, force bypasses it", async () => {
+    const cacheKey = Symbol("cache-key");
+    getDefaultCache().set(cacheKey, "cached", { ttl: 60 * 1000 });
+
+    const callback = jest.fn(async () => "loaded");
+    const { result } = renderHook(() =>
+      useLoad(callback, [], {
+        imperative: true,
+        cacheKey,
+        cacheTime: 60 * 1000,
+        staleTime: 30 * 1000,
+      }),
+    );
+
+    expect(typeof result.current.force).toBe("function");
+    // The cached data is fresh (written just now), so load() resolves it directly without a request.
+    expect(result.current.data).toBe("cached");
+
+    let promise!: Promise<string>;
+    act(() => {
+      promise = result.current.load();
+    });
+    await expect(promise).resolves.toBe("cached");
+    expect(callback).not.toHaveBeenCalled();
+    expect(result.current.data).toBe("cached");
+
+    // reload() also hits the fresh cache.
+    act(() => {
+      result.current.reload();
+    });
+    expect(callback).not.toHaveBeenCalled();
+
+    // force() bypasses the staleTime cache hit.
+    await act(async () => {
+      await result.current.force();
+    });
+    expect(callback).toHaveBeenCalledTimes(1);
+    expect(result.current.data).toBe("loaded");
+
+    // reload({ force: true }) bypasses it too.
+    act(() => {
+      result.current.reload({ force: true });
+    });
+    await waitFor(() => expect(callback).toHaveBeenCalledTimes(2));
+    expect(result.current.data).toBe("loaded");
+  });
+
+  it("staleTime: sends a request once the cache entry is no longer fresh", async () => {
+    const cacheKey = Symbol("cache-key");
+    getDefaultCache().set(cacheKey, "cached", { ttl: 60 * 1000 });
+
+    // Let the entry age beyond `staleTime` (real timers: lru-cache measures TTL with performance.now,
+    // which is excluded from jest's fake timers config).
+    await new Promise((resolve) => setTimeout(resolve, 5));
+
+    const callback = jest.fn(async () => "loaded");
+    const { result } = renderHook(() =>
+      useLoad(callback, [], {
+        imperative: true,
+        cacheKey,
+        cacheTime: 60 * 1000,
+        staleTime: 1,
+      }),
+    );
+
+    expect(result.current.data).toBe("cached");
+
+    act(() => {
+      result.current.load();
+    });
+    await waitFor(() => expect(result.current.data).toBe("loaded"));
+    expect(callback).toHaveBeenCalledTimes(1);
+  });
+
+  it("cacheValidate: rejects invalid cached data and falls back to initialData", async () => {
+    const cacheKey = Symbol("cache-key");
+    getDefaultCache().set(cacheKey, "invalid", { ttl: 60 * 1000 });
+
+    const callback = jest.fn(async () => "loaded");
+    const { result } = renderHook(() =>
+      useLoad(callback, [], {
+        cacheKey,
+        cacheTime: 60 * 1000,
+        initialData: "initial",
+        cacheValidate: (data) => data === "valid",
+      }),
+    );
+
+    expect(result.current.data).toBe("initial");
+
+    await waitFor(() => expect(result.current.data).toBe("loaded"));
+    expect(callback).toHaveBeenCalledTimes(1);
+    expect(getDefaultCache().get(cacheKey)).toBe("loaded");
+  });
+
+  it("staleTime: sends a request when cacheValidate rejects the only fresh cached data", async () => {
+    const cacheKey = Symbol("cache-key");
+    getDefaultCache().set(cacheKey, "invalid", { ttl: 60 * 1000 });
+
+    const callback = jest.fn(async () => "loaded");
+    const { result } = renderHook(() =>
+      useLoad(callback, [], {
+        imperative: true,
+        cacheKey,
+        cacheTime: 60 * 1000,
+        staleTime: 30 * 1000,
+        cacheValidate: (data) => data === "valid",
+      }),
+    );
+
+    expect(result.current.data).toBeUndefined();
+
+    // The fresh cache entry is rejected by cacheValidate and there is no initialData,
+    // so load() must fall through and send the request instead of resolving undefined.
+    act(() => {
+      result.current.load();
+    });
+    await waitFor(() => expect(result.current.data).toBe("loaded"));
     expect(callback).toHaveBeenCalledTimes(1);
   });
 });

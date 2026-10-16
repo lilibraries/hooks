@@ -1,4 +1,3 @@
-import React from "react";
 import { useLoad } from "@lilib/hooks";
 
 const getNumber = () => {
@@ -35,7 +34,7 @@ function Example() {
 
   return (
     <div>
-      <button onClick={() => load()}>Load</button>
+      <button onClick={() => load().catch(() => {})}>Load</button>
       {loading ? "loading" : error ? error.message : data}
     </div>
   );

@@ -1,4 +1,3 @@
-import React from "react";
 import { useLoad, useReload } from "@lilib/hooks";
 
 const getNumber = () => {

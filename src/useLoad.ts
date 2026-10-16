@@ -4,8 +4,10 @@ import { useDebugValue, useEffect, useRef, type DependencyList } from "react";
 
 import isFunction from "lodash/isFunction";
 import isObject from "lodash/isObject";
+import type { LRUCache } from "lru-cache";
 import warning from "warning";
 
+import { getDefaultCache } from "./utils/cache";
 import getLoadStore from "./utils/getLoadStore";
 import useLatestRef from "./useLatestRef";
 import useMountedRef from "./useMountedRef";
@@ -37,6 +39,16 @@ interface UseLoadOptions<Callback extends LoadCallback> {
   initialData?: LoadData<Callback>;
   /** Default params. Used by the first load or by `reload` when no params have been passed via `load(...params)` yet. */
   defaultParams?: Parameters<Callback>;
+  /** Cache instance. If not specified, the shared internal instance (the same one used by `useCache`) is used. */
+  cache?: LRUCache<any, any>;
+  /** Cache key to enable caching. The resolved data is written to the cache, and on mount the initial `data` is read back from it. Must be an immutable value. */
+  cacheKey?: NonNullable<unknown>;
+  /** Cache time in milliseconds, defaults to 5 minutes. Set `Infinity` for a permanent cache. */
+  cacheTime?: number;
+  /** Stale time in milliseconds, defaults to 0. Must be used with `cacheKey`. Within `staleTime` after a cache write, `load`/`reload` and automatic reloads resolve the cached data directly without sending a request; bypass with `force(...params)` or `reload({ force: true })`. */
+  staleTime?: number;
+  /** Validate the cached value. If it returns falsy, `initialData` is used instead. */
+  cacheValidate?: (data: any) => boolean;
   /** Whether to automatically retry on failure (at most `retryLimit` times). Pass a function to decide per failure: it receives the error and returns whether to retry. */
   retry?: boolean | ((error: any) => boolean);
   /** Maximum number of automatic retries, defaults to 3. */
@@ -86,8 +98,10 @@ interface Results<Callback extends LoadCallback> {
   initializing: boolean;
   /** Manual load function: its params are passed to `callback` as is and it returns a Promise (resolves with the data on success, rejects with the error on failure). Note: calling it before the component mounts returns a Promise that never settles, so do not call it during `useLayoutEffect`. */
   load: (...params: Parameters<Callback>) => ReturnType<Callback>;
-  /** Reload function: cancels the in-flight request (including retries, polling, etc.) first, then reloads with the params from the most recent `load` call (or `defaultParams` if none were ever passed). */
-  reload: () => void;
+  /** Force load function: like `load`, but skips the `staleTime` cache hit and always sends the request. */
+  force: (...params: Parameters<Callback>) => ReturnType<Callback>;
+  /** Reload function: cancels the in-flight request (including retries, polling, etc.) first, then reloads with the params from the most recent `load` call (or `defaultParams` if none were ever passed). Pass `{ force: true }` to skip the `staleTime` cache hit. */
+  reload: (options?: { force?: boolean }) => void;
   /** Local update function: mutates `data` directly (no request), accepts a new value or a function computed from the old value. */
   update: (newData: LoadData<Callback> | ((prevData?: LoadData<Callback>) => LoadData<Callback>)) => void;
   /** Cancel function: aborts the current load and stops all pending tasks such as retries and polling. The Promise returned by the cancelled `load` stays pending forever (neither resolves nor rejects). */
@@ -110,7 +124,11 @@ function resolveRetryOption(option: boolean | ((error: any) => boolean), error: 
   return isFunction(option) ? option(error) : option;
 }
 
+const DEFAULT_CACHE_TIME = 5 * 60 * 1000;
+
 const defaultLoadOptions = {
+  cacheTime: DEFAULT_CACHE_TIME,
+  staleTime: 0,
   retry: false,
   retryLimit: 3,
   retryInterval: getRetryInterval,
@@ -132,6 +150,7 @@ const defaultLoadOptions = {
  *
  * Key features:
  * - Shared loading: multiple instances with the same `key` merge duplicate requests and share results
+ * - Caching (`cacheKey`, `cacheTime`, `staleTime`, `cacheValidate`)
  * - Failure retry (`retry`) and failure fallback (`fallback`)
  * - Polling (`polling`)
  * - Automatic reload when the page becomes visible / the window gains focus / the network recovers
@@ -143,7 +162,7 @@ const defaultLoadOptions = {
  * @param callback The loader; its params are forwarded by `load`, must return a Promise; the resolved value becomes `data`.
  * @param deps The dependency array; any change triggers an automatic reload; defaults to `[]` (load once after mount).
  * @param options The options object, see `UseLoadOptions`.
- * @returns Returns { load, reload, update, cancel, data, error, loading, reloading, initializing }.
+ * @returns Returns an object with the load state (`data`, `error`, `loading`, `reloading`, `initializing`) and the control functions (`load`, `force`, `reload`, `update`, `cancel`).
  */
 function useLoad<Callback extends LoadCallback>(
   callback: Callback,
@@ -172,6 +191,11 @@ function useLoad<Callback extends LoadCallback>(
     fallback,
     initialData,
     defaultParams,
+    cache: customCache,
+    cacheKey,
+    cacheTime,
+    staleTime,
+    cacheValidate,
     retry,
     retryLimit,
     retryInterval,
@@ -189,8 +213,31 @@ function useLoad<Callback extends LoadCallback>(
   } = mergeDefined(defaultLoadOptions, options);
   const isAssociated = key != null && !independent;
 
+  // The default cache instance is shared with `useCache`: data cached by this hook can be read by `useCache` and vice versa.
+  const cache = customCache ?? getDefaultCache();
+  // `LRUCache` treats `ttl: 0` as "never expires" (and `NaN` silently behaves the same), while a non-positive
+  // `cacheTime` meant "expire immediately" in v1. Normalize finite values to a minimum of 1 ms, map `Infinity` to
+  // `ttl: 0` (never expires, without registering an autopurge timer that would spin in Node), and fall back to
+  // the default for `NaN`.
+  const normalizedCacheTime = Number.isNaN(cacheTime)
+    ? DEFAULT_CACHE_TIME
+    : cacheTime === Infinity
+      ? 0
+      : Math.max(cacheTime, 1);
+
+  /** Read the cached data for `cacheKey`: returns `initialData` when there is no valid cache entry or when `cacheValidate` rejects the cached value. `peek` is a pure read, safe during render. */
+  const getCachedData = usePersist(() => {
+    if (cacheKey != null) {
+      const cachedData = cache.peek(cacheKey) as LoadData<Callback> | undefined;
+      if (cachedData !== undefined) {
+        return cacheValidate && !cacheValidate(cachedData) ? initialData : cachedData;
+      }
+    }
+    return initialData;
+  });
+
   const [state, setState] = useSetState<State<LoadData<Callback>>>(() => ({
-    data: initialData,
+    data: getCachedData(),
     error: null,
     loading: !imperative,
   }));
@@ -204,6 +251,8 @@ function useLoad<Callback extends LoadCallback>(
   const idRef = useRef(0);
   /** Whether `load()` has started at least once: polling and automatic reloads are allowed only when `true` */
   const readyRef = useRef(false);
+  /** Whether the next `load` should bypass the `staleTime` cache hit, set by `force()` / `reload({ force: true })` */
+  const forceRef = useRef(false);
   const paramsRef = useRef<Parameters<Callback> | undefined>(undefined);
   const loadingRef = useRef<{ key: NonNullable<unknown>; load: AnyFunction; store: typeof store } | undefined>(
     undefined,
@@ -215,7 +264,7 @@ function useLoad<Callback extends LoadCallback>(
   const reloadRef = useRef<(() => void) | undefined>(undefined);
   const loadRef = useRef<((...params: Parameters<Callback>) => ReturnType<Callback>) | undefined>(undefined);
 
-  // leading and non-trailing: among consecutive triggers (e.g. rapid visibility toggles) only the first runs, later triggers within autoReloadWaitTime are ignored
+  // leading and non-trailing: among consecutive triggers (e.g. rapid visibility toggles) only the first runs, later triggers within autoReloadWaitTime are ignored.
   const [autoReload] = useThrottle(
     () => {
       if (readyRef.current && !state.loading) {
@@ -225,7 +274,7 @@ function useLoad<Callback extends LoadCallback>(
     { wait: autoReloadWaitTime, leading: true, trailing: false },
   );
 
-  // Terminate all pending tasks of this instance: the in-flight request, retry/polling timers, the idle callback, and the shared-request listeners
+  // Terminate all pending tasks of this instance: the in-flight request, retry/polling timers, the idle callback, and the shared-request listeners.
   const clearPending = usePersist(() => {
     idRef.current++;
     readyRef.current = false;
@@ -280,19 +329,49 @@ function useLoad<Callback extends LoadCallback>(
       return new Promise(() => {}) as ReturnType<Callback>;
     }
 
+    const force = forceRef.current;
+    if (force) {
+      forceRef.current = false;
+    }
+
+    // Fresh cache hit within `staleTime` (the write happened no longer ago than `staleTime`): resolve the cached
+    // data directly without sending a request. `getRemainingTTL() >= cacheTime - staleTime` is equivalent to
+    // "elapsed time since the write <= staleTime" and also holds for an infinite `cacheTime`.
+    if (!force && staleTime > 0 && cacheKey != null && cache.has(cacheKey) && state.error == null) {
+      if (cache.getRemainingTTL(cacheKey) >= cacheTime - staleTime) {
+        const data = state.data !== undefined ? state.data : getCachedData();
+        // Only resolve directly when there is usable data; otherwise fall through to send the request
+        // (e.g. `cacheValidate` rejected the cached value and no `initialData` was provided).
+        if (data !== undefined) {
+          if (state.data === undefined) {
+            setState({ data, loading: false });
+          } else if (state.loading) {
+            setState({ loading: false });
+          }
+          return new Promise((resolve) => {
+            resolve(data);
+          }) as ReturnType<Callback>;
+        }
+      }
+    }
+
     if (isAssociated && !store.isLoading(key)) {
       store.setLoading(key, currentLoad);
       loadingRef.current = { key, load: currentLoad, store };
     }
 
-    if (!state.loading) {
+    // The fresh-cache branch above already resolved when the entry is still within `staleTime`.
+    const cachedData =
+      state.data === undefined && cacheKey != null && cache.has(cacheKey) ? getCachedData() : undefined;
+    if (cachedData !== undefined) {
+      setState({ data: cachedData, loading: true });
+    } else if (!state.loading) {
       setState({ loading: true });
     }
 
     const id = idRef.current;
     const isCanceled = () => id !== idRef.current;
 
-    // Schedule the next poll after a request settles: pollingInterval while the page is visible, the hidden interval when hidden and pollingInPageHidden is enabled
     const checkPolling = () => {
       if (readyRef.current) {
         if (isPageVisible()) {
@@ -380,8 +459,8 @@ function useLoad<Callback extends LoadCallback>(
         if (isCanceled()) {
           return;
         }
-        // Failure handling order: retry the primary loader -> then try the fallback function -> optionally retry the fallback after it fails -> finally reject
-        // `retry`/`fallbackRetry` accept a boolean or a function receiving the error and returning whether to retry; once the fallback has been invoked the primary loader is never retried again
+        // Failure handling order: retry the primary loader -> then try the fallback function -> optionally retry the fallback after it fails -> finally reject.
+        // `retry`/`fallbackRetry` accept a boolean or a function receiving the error and returning whether to retry; once the fallback has been invoked the primary loader is never retried again.
         if (!fallbackInvoked && resolveRetryOption(retry, error) && ++retryCount <= retryLimit) {
           const delay = isFunction(retryInterval) ? retryInterval(retryCount) : retryInterval;
           if (delay > 0) {
@@ -440,6 +519,9 @@ function useLoad<Callback extends LoadCallback>(
         if (isCanceled()) {
           return new Promise(() => {});
         }
+        if (cacheKey != null) {
+          cache.set(cacheKey, data, { ttl: normalizedCacheTime });
+        }
         if (isAssociated && store.isLoading(key, currentLoad)) {
           store.deleteLoading(key, currentLoad);
           store.for(key).emit("success", data);
@@ -472,12 +554,18 @@ function useLoad<Callback extends LoadCallback>(
 
   loadRef.current = load;
 
-  const reload = usePersist(() => {
+  const force = usePersist((...params: Parameters<Callback>) => {
+    forceRef.current = true;
+    return load(...params);
+  });
+
+  const reload = usePersist((options?: { force?: boolean }) => {
     const params = paramsRef.current || defaultParams;
     warning(
       !callback.length || params !== undefined,
       "[useLoad] You should provide params by setting `defaultParams` option or calling the `load(...params)` method.",
     );
+    forceRef.current = !!options && !!options.force;
     if (params) {
       load(...params);
     } else {
@@ -495,12 +583,12 @@ function useLoad<Callback extends LoadCallback>(
 
   const cancel = usePersist(() => {
     clearPending();
+    forceRef.current = false;
     if (!unmountedRef.current && state.loading) {
       setState({ loading: false });
     }
   });
 
-  // Reload automatically on page visibility changes per the options
   useEffect(() => {
     if (autoReloadOnPageShow || polling || pollingInPageHidden) {
       const listener = () => {
@@ -521,7 +609,6 @@ function useLoad<Callback extends LoadCallback>(
     }
   }, [autoReloadOnPageShow, polling, pollingInPageHidden, autoReload]);
 
-  // Automatically reload when the window regains focus
   useEffect(() => {
     if (autoReloadOnWindowFocus) {
       window.addEventListener("focus", autoReload);
@@ -531,7 +618,6 @@ function useLoad<Callback extends LoadCallback>(
     }
   }, [autoReloadOnWindowFocus, autoReload]);
 
-  // Automatically reload when the network recovers (online event)
   useEffect(() => {
     if (autoReloadOnNetworkReconnect) {
       window.addEventListener("online", autoReload);
@@ -541,7 +627,8 @@ function useLoad<Callback extends LoadCallback>(
     }
   }, [autoReloadOnNetworkReconnect, autoReload]);
 
-  // Listen to other instances under the same key and sync their results to this instance; requests fired by this instance itself are handled inside load(), so they are excluded here via loadingRef
+  // Requests fired by this instance itself are handled inside load(), so they are
+  // excluded here via loadingRef.
   useEffect(() => {
     if (isAssociated) {
       const handleSuccess = (data: LoadData<Callback>) => {
@@ -581,7 +668,7 @@ function useLoad<Callback extends LoadCallback>(
     deps, // eslint-disable-line
   );
 
-  // `key` must be immutable (see UseLoadOptions.key); warn when it changes to avoid corrupting shared state
+  // `key` must be immutable (see UseLoadOptions.key); warn when it changes to avoid corrupting shared state.
   useUpdate(() => {
     warning(false, "[useLoad] You should provide an immutable value for the `key` option.");
   }, [key]);
@@ -591,6 +678,7 @@ function useLoad<Callback extends LoadCallback>(
 
   return {
     load,
+    force,
     reload,
     update,
     cancel,
