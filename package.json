@@ -1,10 +1,19 @@
 {
   "name": "@lilib/hooks",
   "version": "1.1.0",
-  "description": "React hook library.",
+  "description": "A collection of practical React hooks covering state, effects, refs, async data and browser APIs, with TypeScript, SSR and StrictMode support.",
   "keywords": [
     "react",
-    "hooks"
+    "hooks",
+    "react-hooks",
+    "typescript",
+    "ssr",
+    "strict-mode",
+    "async",
+    "debounce",
+    "throttle",
+    "animation",
+    "storage"
   ],
   "author": {
     "name": "李蔚生 (LeeWeisheng)",
