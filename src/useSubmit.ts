@@ -1,4 +1,4 @@
-import useLoad, { type LoadCallback, type LoadData } from "./useLoad";
+import useLoad, { type LoadCallback } from "./useLoad";
 
 interface UseSubmitOptions<Callback, Data> {
   /** Whether to run the submit while the browser is idle (via `requestIdleCallback`). Can be `true` or an idle-callback options object. */
@@ -51,7 +51,7 @@ const defaultOptions = {
  */
 function useSubmit<Callback extends LoadCallback>(
   callback: Callback,
-  options?: UseSubmitOptions<Callback, LoadData<Callback>>,
+  options?: UseSubmitOptions<Callback, Awaited<ReturnType<Callback>>>,
 ) {
   const {
     force: submit,

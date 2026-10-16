@@ -22,7 +22,6 @@ import mergeDefined from "./utils/mergeDefined";
 import type { AnyFunction } from "./utils/types";
 
 export type LoadCallback = (...args: any[]) => Promise<any>;
-export type LoadData<T extends LoadCallback> = Awaited<ReturnType<T>>;
 
 interface UseLoadOptions<Callback extends LoadCallback> {
   /** A shared key. Multiple `useLoad` instances with the same `key` merge duplicate requests and share the loaded result, and can all be reloaded together via `useReload(key)`. Note: `key` must be an immutable value; changing it triggers a warning and may corrupt shared state. */
@@ -36,7 +35,7 @@ interface UseLoadOptions<Callback extends LoadCallback> {
   /** A fallback loader invoked when the primary loader still fails after retries are exhausted; usually points to an alternate data source. */
   fallback?: Callback;
   /** Initial data. When set, `data` starts with this value and the returned `data` type no longer includes `undefined`. */
-  initialData?: LoadData<Callback>;
+  initialData?: Awaited<ReturnType<Callback>>;
   /** Default params. Used by the first load or by `reload` when no params have been passed via `load(...params)` yet. */
   defaultParams?: Parameters<Callback>;
   /** Cache instance. If not specified, the shared internal instance (the same one used by `useCache`) is used. */
@@ -78,7 +77,7 @@ interface UseLoadOptions<Callback extends LoadCallback> {
   /** Whether to automatically reload when the network recovers (online event). */
   autoReloadOnNetworkReconnect?: boolean;
   /** Called on success with the loaded data. */
-  onSuccess?: (data: LoadData<Callback>) => void;
+  onSuccess?: (data: Awaited<ReturnType<Callback>>) => void;
   /** Called on failure with the error object. */
   onFailure?: (error: any) => void;
   /** Called when loading settles (success or failure). */
@@ -87,7 +86,7 @@ interface UseLoadOptions<Callback extends LoadCallback> {
 
 interface Results<Callback extends LoadCallback> {
   /** The loaded data; `undefined` until a load has succeeded. */
-  data: LoadData<Callback> | undefined;
+  data: Awaited<ReturnType<Callback>> | undefined;
   /** The error of the most recent failure, `null` on success. */
   error: any;
   /** Whether a load is in progress (includes the initial load and reloads). */
@@ -103,7 +102,10 @@ interface Results<Callback extends LoadCallback> {
   /** Reload function: cancels the in-flight request (including retries, polling, etc.) first, then reloads with the params from the most recent `load` call (or `defaultParams` if none were ever passed). Pass `{ force: true }` to skip the `staleTime` cache hit. */
   reload: (options?: { force?: boolean }) => void;
   /** Local update function: mutates `data` directly (no request), accepts a new value or a function computed from the old value. */
-  update: (newData: LoadData<Callback> | ((prevData?: LoadData<Callback>) => LoadData<Callback>)) => void;
+  update: (
+    newData:
+      Awaited<ReturnType<Callback>> | ((prevData?: Awaited<ReturnType<Callback>>) => Awaited<ReturnType<Callback>>),
+  ) => void;
   /** Cancel function: aborts the current load and stops all pending tasks such as retries and polling. The Promise returned by the cancelled `load` stays pending forever (neither resolves nor rejects). */
   cancel: () => void;
 }
@@ -167,8 +169,8 @@ const defaultLoadOptions = {
 function useLoad<Callback extends LoadCallback>(
   callback: Callback,
   deps: DependencyList,
-  options: UseLoadOptions<Callback> & { initialData: LoadData<Callback> },
-): Readonly<Results<Callback> & { data: LoadData<Callback> }>;
+  options: UseLoadOptions<Callback> & { initialData: Awaited<ReturnType<Callback>> },
+): Readonly<Results<Callback> & { data: Awaited<ReturnType<Callback>> }>;
 
 function useLoad<Callback extends LoadCallback>(
   callback: Callback,
@@ -228,7 +230,7 @@ function useLoad<Callback extends LoadCallback>(
   /** Read the cached data for `cacheKey`: returns `initialData` when there is no valid cache entry or when `cacheValidate` rejects the cached value. `peek` is a pure read, safe during render. */
   const getCachedData = usePersist(() => {
     if (cacheKey != null) {
-      const cachedData = cache.peek(cacheKey) as LoadData<Callback> | undefined;
+      const cachedData = cache.peek(cacheKey) as Awaited<ReturnType<Callback>> | undefined;
       if (cachedData !== undefined) {
         return cacheValidate && !cacheValidate(cachedData) ? initialData : cachedData;
       }
@@ -236,7 +238,7 @@ function useLoad<Callback extends LoadCallback>(
     return initialData;
   });
 
-  const [state, setState] = useSetState<State<LoadData<Callback>>>(() => ({
+  const [state, setState] = useSetState<State<Awaited<ReturnType<Callback>>>>(() => ({
     data: getCachedData(),
     error: null,
     loading: !imperative,
@@ -298,7 +300,7 @@ function useLoad<Callback extends LoadCallback>(
     }
   });
 
-  const triggerSuccess = usePersist((data: LoadData<Callback>) => {
+  const triggerSuccess = usePersist((data: Awaited<ReturnType<Callback>>) => {
     if (options.onSuccess) {
       options.onSuccess(data);
     }
@@ -396,7 +398,7 @@ function useLoad<Callback extends LoadCallback>(
 
     // Another instance is already loading the same key: merge the request and wait for its result instead of firing a duplicate.
     if (isAssociated && store.isLoading(key) && !store.isLoading(key, currentLoad)) {
-      return new Promise<LoadData<Callback>>((resolve, reject) => {
+      return new Promise<Awaited<ReturnType<Callback>>>((resolve, reject) => {
         const unlisten = () => {
           unlistenRef.current = undefined;
           store.for(key).off("cancel", handleCancel);
@@ -410,7 +412,7 @@ function useLoad<Callback extends LoadCallback>(
             reloadRef.current?.();
           }
         };
-        const handleResolve = (data: LoadData<Callback>) => {
+        const handleResolve = (data: Awaited<ReturnType<Callback>>) => {
           unlisten();
           if (!isCanceled()) {
             resolve(data);
@@ -450,7 +452,7 @@ function useLoad<Callback extends LoadCallback>(
       ) as ReturnType<Callback>;
     }
 
-    return new Promise<LoadData<Callback>>((resolve, reject) => {
+    return new Promise<Awaited<ReturnType<Callback>>>((resolve, reject) => {
       let retryCount = 0;
       let fallbackInvoked = false;
       let fallbackRetryCount = 0;
@@ -575,11 +577,16 @@ function useLoad<Callback extends LoadCallback>(
 
   reloadRef.current = reload;
 
-  const update = usePersist((newData: LoadData<Callback> | ((prevData?: LoadData<Callback>) => LoadData<Callback>)) => {
-    setState((prevState) => ({
-      data: isFunction(newData) ? newData(prevState.data) : newData,
-    }));
-  });
+  const update = usePersist(
+    (
+      newData:
+        Awaited<ReturnType<Callback>> | ((prevData?: Awaited<ReturnType<Callback>>) => Awaited<ReturnType<Callback>>),
+    ) => {
+      setState((prevState) => ({
+        data: isFunction(newData) ? newData(prevState.data) : newData,
+      }));
+    },
+  );
 
   const cancel = usePersist(() => {
     clearPending();
@@ -631,7 +638,7 @@ function useLoad<Callback extends LoadCallback>(
   // excluded here via loadingRef.
   useEffect(() => {
     if (isAssociated) {
-      const handleSuccess = (data: LoadData<Callback>) => {
+      const handleSuccess = (data: Awaited<ReturnType<Callback>>) => {
         if (!loadingRef.current || loadingRef.current.load !== load) {
           setState({ data, error: null, loading: false });
         }
