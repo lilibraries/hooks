@@ -14,10 +14,12 @@ Every hook must support React 16.8+ / 17 / 18 / 19, as well as SSR and StrictMod
 ## Code Rules
 
 - Compose new functionality from the library's own primitive hooks (`useLatestRef`, `usePersist`, `useSafeState`, `useUnmount`, `useMountedRef`/`useUnmountedRef`, `useUpdate`, etc.) instead of reimplementing their logic.
+- One hook per file; return tuples/objects with `as const`.
 - lodash must be imported via subpaths (`lodash/isEqual`); importing the whole package is forbidden.
-- One hook per file; return tuples/objects with `as const`; document all parameters with JSDoc (`@param`, `@returns`).
 - Published code may only import from within `src/` (the published package contains only `src` and `dist`).
 - Docs and comments are written in English by default and must follow English writing conventions; when authoring docs for a specific language, write in that language with its corresponding conventions.
+- Every hook must have reasonable and accurate JSDoc comments describing its purpose, parameters, and return values (`@param`, `@returns`) — explain what the hook does, what each parameter means, and what each returned value represents.
+- Except for hook API documentation (JSDoc), comments must be as concise and accurate as possible — only add comments where necessary; do not comment self-evident logic.
 
 ## Adding a Hook
 
@@ -33,6 +35,7 @@ Adding a new hook requires modifying five places — missing any one of them bre
 
 - The test matrix runs React 16/17/18/19 in parallel; 16–18 use the generated `.test-deps/`, 19 uses root dependencies, redirected via `moduleNameMapper`. Always keep the entire matrix green.
 - Use `tests/helpers/renderHook` (it selects the testing library per React version at runtime) — never import `@testing-library/*` render functions directly.
+- New hook tests must cover cleanup on unmount and StrictMode idempotency — mount/cleanup pairs must survive double invocation.
 - `useLoad.test.tsx` is whitelisted for unhandled promise rejections in `tests/helpers/environment.ts` (the hook surfaces failures through its `error` state rather than rejecting). Only add a file to `FILES_WITH_EXPECTED_REJECTIONS` for an equally justified reason.
 - Timer-related tests use `jest.useFakeTimers()` (rAF / requestIdleCallback remain real per the jest config).
 - SSR-specific behavior goes into files marked `/** @jest-environment node */` or `*.ssr.test.ts`.
