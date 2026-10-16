@@ -94,8 +94,8 @@ function Example() {
         </a>
       </td>
       <td>
-        Run an effect after the component is updated or the deps are changed,
-        but ignore it on mount.
+        Run an effect after the component updates or the deps change (the
+        initial mount is skipped).
       </td>
     </tr>
     <tr>
@@ -104,7 +104,7 @@ function Example() {
           <code>useUnmount</code>
         </a>
       </td>
-      <td>Run an effect on the component unmount.</td>
+      <td>Run an effect when the component unmounts.</td>
     </tr>
     <tr>
       <td>
@@ -445,7 +445,7 @@ function Example() {
           <code>useWindowSize</code>
         </a>
       </td>
-      <td>Get window size.</td>
+      <td>Get the window size.</td>
     </tr>
     <tr>
       <td>
@@ -453,7 +453,7 @@ function Example() {
           <code>useElementSize</code>
         </a>
       </td>
-      <td>Get DOM element size.</td>
+      <td>Get the size of a DOM element.</td>
     </tr>
     <tr>
       <td>

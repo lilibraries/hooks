@@ -27,7 +27,6 @@ pnpm add @lilib/hooks
 ## Example
 
 ```tsx
-import React from "react";
 import { useLoad } from "@lilib/hooks";
 
 function Example() {
@@ -89,7 +88,7 @@ function Example() {
           <code>useUpdate</code>
         </a>
       </td>
-      <td>Run an effect after the component is updated or the deps are changed, but ignore it on mount.</td>
+      <td>Run an effect after the component updates or the deps change (the initial mount is skipped).</td>
     </tr>
     <tr>
       <td>
@@ -97,7 +96,7 @@ function Example() {
           <code>useUnmount</code>
         </a>
       </td>
-      <td>Run an effect on the component unmount.</td>
+      <td>Run an effect when the component unmounts.</td>
     </tr>
     <tr>
       <td>
@@ -422,7 +421,7 @@ function Example() {
           <code>useWindowSize</code>
         </a>
       </td>
-      <td>Get window size.</td>
+      <td>Get the window size.</td>
     </tr>
     <tr>
       <td>
@@ -430,7 +429,7 @@ function Example() {
           <code>useElementSize</code>
         </a>
       </td>
-      <td>Get DOM element size.</td>
+      <td>Get the size of a DOM element.</td>
     </tr>
     <tr>
       <td>
