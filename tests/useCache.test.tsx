@@ -6,9 +6,7 @@ import renderHook from "./helpers/renderHook";
 import useCache from "../src/useCache";
 
 function createCache() {
-  // `LRUCache` captures `performance.now` as its clock at module load, before
-  // jest fake timers install, so point it at `Date.now`, which jest fakes by default.
-  return new LRUCache<any, any>({ max: 100, perf: { now: () => Date.now() } });
+  return new LRUCache<any, any>({ max: 100 });
 }
 
 describe("useCache", () => {
@@ -92,7 +90,10 @@ describe("useCache", () => {
     expect(cache.getRemainingTTL(key)).toBeLessThanOrEqual(5 * 60 * 1000);
   });
 
-  it("delete cache after cacheTime", () => {
+  it("delete cache after cacheTime", async () => {
+    // `LRUCache` captures its clock (`performance.now`) at module load, so
+    // jest's fake timers cannot advance it; let the entry age for real.
+    jest.useRealTimers();
     const cache = createCache();
     const key = Symbol();
     const { result } = renderHook(() => useCache(key, { cache, cacheTime: 100 }));
@@ -102,16 +103,18 @@ describe("useCache", () => {
     });
     expect(cache.get(key)).toBe("value");
 
-    jest.advanceTimersByTime(101);
+    await new Promise((resolve) => setTimeout(resolve, 110));
+
     expect(cache.get(key)).toBe(undefined);
 
     const { result: newResult } = renderHook(() => useCache(key, { cache }));
     expect(newResult.current[0]).toBe(undefined);
   });
 
-  it("expires on the next read with a non-positive cacheTime", () => {
+  it("expires on the next read with a non-positive cacheTime", async () => {
     // `LRUCache` treats `ttl: 0` as "never expires", so the hook normalizes
     // non-positive `cacheTime` values to 1 ms to keep the v1 semantics.
+    jest.useRealTimers();
     const cache = createCache();
     const key = Symbol();
     const { result: writer } = renderHook(() => useCache(key, { cache, cacheTime: 0 }));
@@ -119,7 +122,7 @@ describe("useCache", () => {
     act(() => {
       writer.current[1]("value");
     });
-    jest.advanceTimersByTime(1);
+    await new Promise((resolve) => setTimeout(resolve, 5));
 
     const { result: reader } = renderHook(() => useCache(key, { cache, defaultValue: "default" }));
     expect(reader.current[0]).toBe("default");
@@ -193,7 +196,8 @@ describe("useCache", () => {
     expect(onDelete).toHaveBeenCalledWith("value");
   });
 
-  it("notify subscribers when an expired entry is read", () => {
+  it("notify subscribers when an expired entry is read", async () => {
+    jest.useRealTimers();
     const cache = createCache();
     const key = Symbol();
     const onDelete = jest.fn();
@@ -204,7 +208,7 @@ describe("useCache", () => {
       writer.current[1]("value");
     });
 
-    jest.advanceTimersByTime(101);
+    await new Promise((resolve) => setTimeout(resolve, 110));
 
     // Reading the expired entry lazily removes it and notifies subscribers.
     const { result: reader } = renderHook(() => useCache(key, { cache }));
@@ -213,7 +217,8 @@ describe("useCache", () => {
     expect(cache.has(key)).toBe(false);
   });
 
-  it("notifies subscribers only once for an expired entry under StrictMode", () => {
+  it("notifies subscribers only once for an expired entry under StrictMode", async () => {
+    jest.useRealTimers();
     const cache = createCache();
     const key = Symbol();
     const onDelete = jest.fn();
@@ -224,7 +229,7 @@ describe("useCache", () => {
       writer.current[1]("value");
     });
 
-    jest.advanceTimersByTime(101);
+    await new Promise((resolve) => setTimeout(resolve, 110));
 
     // Removing the expired entry is deferred to the mount effect, so the
     // double effect invocation under StrictMode is idempotent and notifies

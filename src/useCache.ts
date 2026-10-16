@@ -177,7 +177,7 @@ function useCache<T>(key: NonNullable<unknown>, options: CacheHookOptions<T> = {
     setValue(getCachedData());
   }, [key, cache]);
 
-  // `key` must be immutable; warn when it changes to avoid corrupting shared state
+  // `key` must be immutable; warn when it changes to avoid corrupting shared state.
   useUpdate(() => {
     warning(false, "[useCache] You should provide an immutable value for the `key` option.");
   }, [key]);
