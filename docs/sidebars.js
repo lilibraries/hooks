@@ -4,11 +4,13 @@ module.exports = {
     {
       type: "category",
       label: "Async",
+      collapsed: false,
       items: ["useLoad", "useReload", "useSubmit"],
     },
     {
       type: "category",
       label: "Effects",
+      collapsed: false,
       items: [
         "useMount",
         "useUpdate",
@@ -25,6 +27,7 @@ module.exports = {
     {
       type: "category",
       label: "States",
+      collapsed: false,
       items: [
         "useCache",
         "useToggle",
@@ -39,6 +42,7 @@ module.exports = {
     {
       type: "category",
       label: "Callbacks",
+      collapsed: false,
       items: [
         "useRaf",
         "useIdle",
@@ -54,11 +58,13 @@ module.exports = {
     {
       type: "category",
       label: "Refs",
+      collapsed: false,
       items: ["useLatestRef", "usePreviousRef", "useComposedRef", "useMountedRef", "useUnmountedRef"],
     },
     {
       type: "category",
       label: "Browser",
+      collapsed: false,
       items: [
         "useTitle",
         "useFavicon",
