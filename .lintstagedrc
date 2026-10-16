@@ -2,7 +2,7 @@
   "*.{ts,tsx}": [
     "tsc-files --noEmit docs/assets.d.ts",
     "eslint --fix",
-    "jest --bail --findRelatedTests",
+    "jest --bail --findRelatedTests --passWithNoTests",
     "prettier --write"
   ],
   "*.{js,jsx}": ["eslint --fix", "prettier --write"],
