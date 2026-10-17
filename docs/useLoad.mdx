@@ -231,13 +231,6 @@ Results:
   - **`update`:** Update the `data` locally without sending a request. It accepts a new value or a function computed from the old value.
   - **`cancel`:** Cancel everything, including the executing request, polling, automatic loading, etc. The promise returned by the cancelled `load` stays pending forever.
 
-## Notes
-
-- `key` and `cacheKey` must be immutable values: changing them triggers a warning and may corrupt shared state.
-- `staleTime` requires `cacheKey`, and all readers and writers of the same `cacheKey` should use a consistent `cacheTime` (see [Cache freshness](#cache-freshness)).
-- Do not call `load`/`force` during `useLayoutEffect` — before the component mounts they return a promise that never settles.
-- After `cancel()`, the promise returned by the cancelled `load`/`force` stays pending forever — do not rely on `.finally()` on it.
-
 ## Examples
 
 ### Basics

@@ -15,11 +15,6 @@ Parameters:
 
 - **`effect`:** The effect to run after the component mounts. It may return a cleanup function.
 
-## Notes
-
-- Runs before the browser paints; avoid heavy computation to not delay rendering.
-- During SSR it falls back to `useEffect` via `useIsomorphicLayoutEffect`.
-
 ## Example
 
 The following example measures the element width before the browser paints.

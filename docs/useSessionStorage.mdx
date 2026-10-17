@@ -64,8 +64,3 @@ The following example sets and removes a value with polling enabled, which keeps
   <Example />
 </ExampleBlock>
 <CodeBlock language="tsx">{ExampleCode}</CodeBlock>
-
-## Troubleshooting
-
-- **Symptom**: A component updates the value, but another component in the same tab still shows the old value. **Cause**: the `storage` event does not fire in the document that made the change, and `polling` is disabled by default. **Solution**: enable `polling`, or share the same `useSessionStorage` call through context.
-- **Symptom**: A stored `Date` is returned as a string. **Cause**: the default serialization uses `JSON.stringify`. **Solution**: pass custom `serialize`/`deserialize` functions.

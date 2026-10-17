@@ -9,7 +9,6 @@ function useComposedRef<T>(...refs: (React.Ref<T> | undefined)[]): React.RefCall
 ## Notes
 
 - The returned callback changes identity on every render, so React detaches the previous callback (with `null`) and re-attaches the composed refs after each re-render; callback refs passed in are therefore invoked on every render.
-- Refs are assigned in the order they are passed.
 
 ## Example
 

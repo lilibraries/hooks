@@ -77,8 +77,3 @@ The following example sets and removes a cookie; open this page in another tab t
   <Example />
 </ExampleBlock>
 <CodeBlock language="tsx">{ExampleCode}</CodeBlock>
-
-## Troubleshooting
-
-- **Symptom**: `setCookie(undefined)` does not remove the cookie. **Cause**: removal must use the same `path`/`domain` attributes the cookie was set with. **Solution**: pass the identical attributes, e.g. `setCookie(undefined, { path: "/" })`.
-- **Symptom**: The value does not update when the server sets or removes the cookie. **Cause**: js-cookie has no event system and `polling` defaults to `false`. **Solution**: set `polling: true`.
