@@ -78,20 +78,34 @@ The following example writes to a shared [`LRUCache`](https://github.com/isaacs/
 
 `StorageCache` persists to `localStorage` by default; pass `sessionStorage` via the `storage` option for a session-scoped cache. Because the persistence lives inside the cache subclass, every write is persisted automatically, including writes made directly through `cache.set` — no per-hook `onSet`/`onDelete` options are needed. The same instance can be shared with [`useLoad`](./useLoad#persist-cached-data-to-storage) through its `cache` option.
 
-<CodeBlock language="tsx">{StorageCacheCode}</CodeBlock>
-
 <ExampleBlock>
   <StorageExample />
 </ExampleBlock>
 <CodeBlock language="tsx">{StorageExampleCode}</CodeBlock>
 
+<details>
+<summary>The full <code>StorageCache</code> implementation</summary>
+
+<CodeBlock language="tsx" title="StorageCache.ts">
+  {StorageCacheCode}
+</CodeBlock>
+
+</details>
+
 ### Persist to IndexedDB
 
 IndexedDB is asynchronous, so `IndexedDBCache` cannot restore persisted entries in its constructor: call `hydrate` in an effect after mount, and render the `useCache` call only after hydration finishes. `useCache` reads the cache exactly once on its first render, so calling it before hydration would permanently miss the persisted value. The write-through layer is the same as in `StorageCache`, except that the IndexedDB operations are async and fire-and-forget. The same instance can be shared with [`useLoad`](./useLoad#persist-cached-data-to-indexeddb) through its `cache` option.
-
-<CodeBlock language="tsx">{IndexedDBCacheCode}</CodeBlock>
 
 <ExampleBlock>
   <IndexedDBExample />
 </ExampleBlock>
 <CodeBlock language="tsx">{IndexedDBExampleCode}</CodeBlock>
+
+<details>
+<summary>The full <code>IndexedDBCache</code> implementation</summary>
+
+<CodeBlock language="tsx" title="IndexedDBCache.ts">
+  {IndexedDBCacheCode}
+</CodeBlock>
+
+</details>
