@@ -49,6 +49,14 @@ Results:
 - **`value`:** The value parsed by the deserialization function.
 - **`setLocalStorage`:** Set `localStorage`. The `newValue` can also be a function that returns the new value. If it is `undefined`, the entry will be removed and the `defaultValue` will be returned.
 
+## Notes
+
+- **Important**: The `storage` event fires only in other tabs/windows — it never fires in the document that made the change. Components in the same page only stay in sync when they use the same hook instance, or with `polling: true`.
+- The default serialization is `JSON.stringify`/`JSON.parse`: `Date` becomes a string, `NaN` and `Infinity` become `null`, `Map`/`Set`/circular references are lost, and `undefined` array items become `null`. Use `serialize`/`deserialize` for custom types.
+- In private-browsing or restricted environments, accessing `localStorage` may throw; the hook then falls back to in-memory state and writes are not persisted.
+- Returns `defaultValue` in non-browser environments.
+- Do not store sensitive data such as tokens: `localStorage` is readable by any script on the page.
+
 ## Example
 
 The following example sets and removes a value; open this page in another tab to see polling keep the values in sync.
@@ -57,3 +65,8 @@ The following example sets and removes a value; open this page in another tab to
   <Example />
 </ExampleBlock>
 <CodeBlock language="tsx">{ExampleCode}</CodeBlock>
+
+## Troubleshooting
+
+- **Symptom**: A component updates the value, but another component in the same tab still shows the old value. **Cause**: the `storage` event only fires in other tabs/windows, and `polling` is disabled by default. **Solution**: enable `polling`, or share the same `useLocalStorage` call through context.
+- **Symptom**: A stored `Date` is returned as a string. **Cause**: the default serialization uses `JSON.stringify`. **Solution**: pass custom `serialize`/`deserialize` functions.

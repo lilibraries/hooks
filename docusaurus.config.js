@@ -40,7 +40,7 @@ module.exports = {
       ],
     },
     footer: {
-      copyright: `Copyright © 2021-${new Date().getFullYear()} <a href="https://github.com/LeeWeisheng" target="_blank" rel="noopener noreferrer">李蔚生 (LeeWeisheng)</a> · <a href="https://github.com/lilibraries/hooks/blob/master/LICENSE" target="_blank" rel="noopener noreferrer">MIT License</a>`,
+      copyright: `Copyright © 2021-present <a href="https://github.com/LeeWeisheng" target="_blank" rel="noopener noreferrer">李蔚生 (LeeWeisheng)</a> · <a href="https://github.com/lilibraries/hooks/blob/master/LICENSE" target="_blank" rel="noopener noreferrer">MIT License</a>`,
     },
   },
   presets: [

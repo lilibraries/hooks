@@ -15,6 +15,10 @@ Parameters:
 
 - **`effect`:** The effect to run when the component unmounts.
 
+## Notes
+
+- The latest `effect` runs on unmount (it is updated on every render), not the first render's closure.
+
 ## Example
 
 The following example records when the child component unmounts.

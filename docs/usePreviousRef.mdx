@@ -11,6 +11,10 @@ Return a ref object whose `.current` property points to the value from the previ
 function usePreviousRef<T>(value: T): React.MutableRefObject<T | undefined>;
 ```
 
+## Notes
+
+- Comparison is by reference (`!==`): an object with a new identity counts as changed even if its content is equal. Use a deep-comparing hook such as `useMemoizedValue` when needed.
+
 ## Example
 
 The following example shows the value of the previous render.

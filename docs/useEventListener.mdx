@@ -23,6 +23,11 @@ Parameters:
 - **`listener`:** Listener function.
 - **`options`:** Similar to the third parameter of the [`addEventListener`](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener) function, but only the `capture`, `once` and `passive` options are used.
 
+## Notes
+
+- When `target` is a ref, the listener is attached when the referenced node appears and re-attached when it changes; nothing happens while it is `null`.
+- The `listener` is always the latest render's function, so it never reads stale closures.
+
 ## Example
 
 The following example counts clicks on a button.

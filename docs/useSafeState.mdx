@@ -19,6 +19,10 @@ Results:
 - **`state`:** The current state.
 - **`setState`:** Update the state. Calling it after the component unmounts has no effect and never errors.
 
+## Notes
+
+- Updates after unmount are silently ignored — no warning is emitted.
+
 ## Example
 
 A typical use: fetch data asynchronously and call `setState` after the request finishes; it is safe even if the component unmounts in the meantime.

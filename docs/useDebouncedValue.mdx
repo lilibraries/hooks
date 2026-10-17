@@ -36,6 +36,11 @@ Results:
   - **`actions.flush`:** Flush function. The `finalValue` will be returned as `debouncedValue` if it is specified.
   - **`actions.cancel`:** Cancel debounce timer.
 
+## Notes
+
+- The initial render returns `value` immediately; only subsequent changes are debounced.
+- The pending update is cancelled on unmount.
+
 ## Example
 
 The following example shows a search box; requests are only sent when the debounced value changes.

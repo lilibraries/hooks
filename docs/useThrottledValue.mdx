@@ -35,6 +35,12 @@ Results:
   - **`actions.flush`:** Flush function. The `finalValue` will be returned as `throttledValue` if it is specified.
   - **`actions.cancel`:** Cancel throttle timer.
 
+## Notes
+
+- The initial render returns `value` immediately; only subsequent changes are throttled.
+- With the default `leading: false`, updates land on the trailing edge only.
+- The pending update is cancelled on unmount.
+
 ## Example
 
 The following example shows a search box; requests are only sent when the throttled value changes.

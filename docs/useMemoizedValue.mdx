@@ -15,6 +15,11 @@ Results:
 
 - Returns the previous value if unchanged, otherwise the current value.
 
+## Notes
+
+- The default comparison is a deep comparison, which can be costly for large values; pass a custom `compare` for cheap cases.
+- The first render always returns the initial value.
+
 ## Example
 
 A typical use: building a `useMemo` with deep-compared dependencies.

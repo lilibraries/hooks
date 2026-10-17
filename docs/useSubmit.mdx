@@ -72,6 +72,10 @@ Results:
 - **`error`:** The error of the most recent failure, `null` on success.
 - **`submit`:** Submit function. Its params are passed to the `callback` as is. Each submission cancels the previous pending submission and always sends the request.
 
+## Notes
+
+- The pending submission is cancelled when the component unmounts; its returned promise then never settles.
+
 ## Example
 
 Refresh a list after submit — the typical create/update/delete workflow. `onSuccess` receives the result and calls `update` (local) and `reload` on the list's `useLoad`.

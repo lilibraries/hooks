@@ -26,6 +26,12 @@ Results:
 - **`start`:** Starts the animation.
 - **`cancel`:** Cancels the animation.
 
+## Notes
+
+- The `duration` option must be a positive number; a warning is emitted otherwise.
+- `start` cancels a running animation and restarts it from the beginning.
+- `algorithm` receives the linear percent and should map it back to the `[0, 1]` range.
+
 ## Example
 
 The following example animates a progress bar with a TweenJS easing function.

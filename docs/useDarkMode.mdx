@@ -15,6 +15,11 @@ Results:
 
 - Returns `true` if the system prefers dark mode, otherwise `false`.
 
+## Notes
+
+- This hook is read-only: it reflects the system preference and cannot be toggled programmatically. To implement a user-overridable theme, manage the state yourself (e.g. with `useLocalStorage`).
+- Returns `false` in non-browser environments and in browsers without `prefers-color-scheme` support.
+
 ## Example
 
 The following example switches a card between light and dark themes based on the system preference.

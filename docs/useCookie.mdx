@@ -62,6 +62,13 @@ Results:
   - **`newValue`:** The new cookie value. If it is `undefined` or a function that returns `undefined`, the named cookie will be cleared, and the `options.defaultValue` will be returned as `value`.
   - **`attributes`:** Cookie attributes. See [js-cookie attributes](https://github.com/js-cookie/js-cookie#cookie-attributes).
 
+## Notes
+
+- **Important**: Removing a cookie requires the same `attributes` as when it was set (especially `path` and `domain`); otherwise the removal silently fails.
+- Cookie changes made elsewhere (server responses, other scripts) are not pushed to the hook; enable `polling: true` to detect them.
+- Values are strings — no serialization is applied. Use `JSON.stringify` together with `validate` for structured data.
+- Returns `defaultValue` in non-browser environments.
+
 ## Example
 
 The following example sets and removes a cookie; open this page in another tab to see polling keep the values in sync.
@@ -70,3 +77,8 @@ The following example sets and removes a cookie; open this page in another tab t
   <Example />
 </ExampleBlock>
 <CodeBlock language="tsx">{ExampleCode}</CodeBlock>
+
+## Troubleshooting
+
+- **Symptom**: `setCookie(undefined)` does not remove the cookie. **Cause**: removal must use the same `path`/`domain` attributes the cookie was set with. **Solution**: pass the identical attributes, e.g. `setCookie(undefined, { path: "/" })`.
+- **Symptom**: The value does not update when the server sets or removes the cookie. **Cause**: js-cookie has no event system and `polling` defaults to `false`. **Solution**: set `polling: true`.

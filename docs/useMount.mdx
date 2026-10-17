@@ -15,6 +15,10 @@ Parameters:
 
 - **`effect`:** The effect to run after the component mounts. It may return a cleanup function.
 
+## Notes
+
+- In StrictMode, the effect runs twice: mount → cleanup → mount. Keep the effect idempotent.
+
 ## Example
 
 The following example focuses an input when the component mounts.

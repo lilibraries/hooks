@@ -5,8 +5,6 @@ import ExampleCode from "!!raw-loader!./examples/UseLayoutRefEffect";
 
 This hook is similar to [`useRefEffect`](./useRefEffect), but it runs synchronously before the browser paints (layout phase), which suits cases that need immediate DOM reads or writes. It is built on [`useIsomorphicLayoutEffect`](./useIsomorphicLayoutEffect) internally.
 
-Note: plain objects with a `current` property are treated as ReactRefs and dereferenced, so they cannot be used as dependency values directly.
-
 ## API
 
 ```ts
@@ -17,6 +15,11 @@ Parameters:
 
 - **`effect`:** The effect function. It may return a cleanup function.
 - **`deps`:** The dependency array. Its elements can be plain values or ReactRefs. If omitted, the effect re-runs after every update.
+
+## Notes
+
+- Plain objects with a `current` property are treated as ReactRefs and dereferenced, so they cannot be used as dependency values directly.
+- Runs before the browser paints; avoid heavy computation to not delay rendering.
 
 ## Example
 

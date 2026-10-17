@@ -20,6 +20,11 @@ Results:
 
 - Returns `true` if the document matches the query, otherwise `false`.
 
+## Notes
+
+- `defaultValue` only applies in non-browser environments; on the client the result comes from `window.matchMedia`. Mind hydration mismatches when the default differs from the client result.
+- Prefer CSS media queries for style-only changes; use this hook when JavaScript logic depends on the match.
+
 ## Example
 
 The following example switches the layout when the viewport is narrower than 600px.

@@ -21,6 +21,12 @@ Results:
 - **`start`:** Starts the loop. It clears any previous loop first.
 - **`cancel`:** Cancels the loop.
 
+## Notes
+
+- Nothing runs automatically; the loop starts only when `start` is called.
+- Calling `start` again clears the previous loop first.
+- The loop is cancelled on unmount.
+
 ## Example
 
 The following example shows an elapsed-seconds clock that starts automatically on mount.

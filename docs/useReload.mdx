@@ -33,6 +33,11 @@ Results:
 
 - A function to reload all of the associated requests. It also accepts an options object; the `force` passed on call overrides the hook-level one.
 
+## Notes
+
+- Only mounted instances are reloaded: instances that have unmounted are removed from the shared store.
+- Object keys are matched by reference — pass the same object (or a primitive value) as in `useLoad`.
+
 ## Example
 
 _One click reloads both components. `independent: true` keeps their requests separate so each shows its own data._

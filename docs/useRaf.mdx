@@ -20,6 +20,11 @@ Results:
 - **`start`:** Starts the animation frame.
 - **`cancel`:** Cancels the animation frame.
 
+## Notes
+
+- Calling `start` again cancels the previous animation frame.
+- The pending callback is cancelled on unmount.
+
 ## Example
 
 The following example animates a progress bar with requestAnimationFrame.

@@ -22,6 +22,10 @@ Results:
 - **`state`:** The current state object.
 - **`setState`:** Update part of the state; the patch will be merged with the old state. The `patch` can be an object or a function computed from the previous state.
 
+## Notes
+
+- Merging is shallow: patching a nested object replaces the whole nested value. Use the functional form with a manual spread to merge deeply.
+
 ## Example
 
 The following example manages a form's fields in one state object, updating one field at a time.

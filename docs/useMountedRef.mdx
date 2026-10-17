@@ -11,6 +11,11 @@ It returns a ref object that is used to determine whether the component is mount
 function useMountedRef(): React.MutableRefObject<boolean>;
 ```
 
+## Notes
+
+- The flag is set by `useEffect`: during the first render and inside `useLayoutEffect`, `current` is still `false`.
+- In StrictMode, the cleanup resets the flag during the simulated unmount.
+
 ## Example
 
 The following example loads fake data asynchronously; click Load and unmount the loader before it finishes to see the update being skipped.

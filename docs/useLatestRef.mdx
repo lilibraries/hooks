@@ -11,6 +11,10 @@ Return a ref object whose `.current` property always points to the latest value.
 function useLatestRef<T>(value: T): React.MutableRefObject<T>;
 ```
 
+## Notes
+
+- The ref is written during render and does not trigger re-renders; use state for reactive values.
+
 ## Example
 
 The following example shows an interval that always reads the latest input value.

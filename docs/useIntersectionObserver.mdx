@@ -25,6 +25,12 @@ Parameters:
 - **`listener`:** Listener function.
 - **`options`:** See [IntersectionObserver](https://developer.mozilla.org/en-US/docs/Web/API/IntersectionObserver/IntersectionObserver) options.
 
+## Notes
+
+- Observes through a layout effect: the observer is created before the browser paints.
+- The observer attaches once the target element is mounted; a ref that is still `null` is fine.
+- An array `threshold` is compared by content, so inline arrays do not recreate the observer on every render.
+
 ## Example
 
 The following example scrolls a container and highlights the target when it is fully visible.

@@ -6,6 +6,11 @@ This hook composes multiple refs into one. Ref objects, ref callbacks, `null` an
 function useComposedRef<T>(...refs: (React.Ref<T> | undefined)[]): React.RefCallback<T>;
 ```
 
+## Notes
+
+- The returned callback changes identity on every render, so React detaches the previous callback (with `null`) and re-attaches the composed refs after each re-render; callback refs passed in are therefore invoked on every render.
+- Refs are assigned in the order they are passed.
+
 ## Example
 
 A typical use: composing the forwarded ref and an internal ref in a library component.

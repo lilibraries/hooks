@@ -26,6 +26,13 @@ Parameters:
   - **`options.container`:** The element (or its ref) that receives the event listener. Default is `document`.
   - **`options.eventName`:** Event name or names. Default is `"mousedown"`.
 
+## Notes
+
+- The default event is `mousedown`, not `click`: interactions that only produce a `click` event will not trigger the listener. Pass `eventName: ["mousedown", "click"]` if needed.
+- Taps on touch devices do not always produce a `mousedown` event; add `"touchstart"` or `"pointerdown"` to `eventName` to support them.
+- The `container` option receives the event listener, so it must be an ancestor of the click source for the event to bubble to it.
+- The listener only fires when at least one target element is valid; all-invalid targets are treated as not ready.
+
 ## Example
 
 The following example counts clicks outside the button (typical for closing dropdowns).
@@ -34,3 +41,8 @@ The following example counts clicks outside the button (typical for closing drop
   <Example />
 </ExampleBlock>
 <CodeBlock language="tsx">{ExampleCode}</CodeBlock>
+
+## Troubleshooting
+
+- **Symptom**: The listener never fires on mobile. **Cause**: taps do not always produce a `mousedown` event. **Solution**: add `"touchstart"` or `"pointerdown"` to `eventName`.
+- **Symptom**: The listener does not fire while the target element is not mounted yet. **Cause**: all-invalid targets are treated as not ready. **Solution**: wait for the target element to mount, or pass the container element directly.

@@ -21,6 +21,11 @@ Results:
 - **`start`:** Starts the idle callback.
 - **`cancel`:** Cancels the idle callback.
 
+## Notes
+
+- Calling `start` again cancels the previous idle callback.
+- The pending callback is cancelled on unmount.
+
 ## Example
 
 The following example runs a low-priority task (e.g. analytics) when the browser is idle.

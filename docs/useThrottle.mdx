@@ -35,6 +35,13 @@ Results:
   - **`actions.flush`:** Flush function. Run callback immediately.
   - **`actions.cancel`:** Cancel throttle timer.
 
+## Notes
+
+- The pending trailing invocation is cancelled on unmount — it never runs.
+- With the default `leading: false`, the first call is delayed until the wait elapses.
+- Changing the options mid-flight immediately flushes the pending invocation of the old throttled function.
+- The returned function returns `undefined` when the invocation is deferred.
+
 ## Example
 
 The following example shows how many times the callback actually runs after clicking the button rapidly.

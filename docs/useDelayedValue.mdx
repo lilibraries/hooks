@@ -32,6 +32,12 @@ Results:
 
 - Returns the delayed value.
 
+## Notes
+
+- The initial render returns `value` immediately; only subsequent updates are delayed.
+- `shouldDelay` returning `false` applies the update immediately and synchronously.
+- The default `compare` is `Object.is`: a new object each render triggers an update every time.
+
 ## Example
 
 In the following example, showing `"Loading..."` is delayed for 500ms after the value changes to `true`; changes to `false` are applied immediately.

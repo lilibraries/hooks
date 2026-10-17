@@ -11,6 +11,11 @@ This hook returns a function that you can use to re-render the component. It is 
 function useRerender(): () => void;
 ```
 
+## Notes
+
+- This is an escape hatch for mutable data; prefer state for values that affect rendering.
+- Do not call it during render.
+
 ## Example
 
 The following example updates a mutable value outside React state and re-renders to display it.

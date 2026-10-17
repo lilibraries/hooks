@@ -5,8 +5,6 @@ import ExampleCode from "!!raw-loader!./examples/UseRefUpdate";
 
 This hook is similar to [`useUpdate`](./useUpdate), but it is built on [`useRefEffect`](./useRefEffect) internally, so ReactRefs in the dependency array are dereferenced to `ref.current` before comparison. It is useful when the ref target itself is an update dependency.
 
-Note: plain objects with a `current` property are treated as ReactRefs and dereferenced, so they cannot be used as dependency values directly.
-
 ## API
 
 ```ts
@@ -17,6 +15,10 @@ Parameters:
 
 - **`effect`:** The effect to run after an update. It may return a cleanup function.
 - **`deps`:** The dependency array. Its elements can be plain values or ReactRefs.
+
+## Notes
+
+- Plain objects with a `current` property are treated as ReactRefs and dereferenced, so they cannot be used as dependency values directly.
 
 ## Example
 

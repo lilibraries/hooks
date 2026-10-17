@@ -30,6 +30,11 @@ Results:
   - **`actions.toggleOn`:** Set the `value` to `true`.
   - **`actions.toggleOff`:** Set the `value` to `false`.
 
+## Notes
+
+- `toggle(newValue)` sets the value instead of toggling when `newValue` is provided.
+- `initialValue` is coerced to a boolean with `!!`.
+
 ## Example
 
 The following example controls a details panel with the toggle actions.

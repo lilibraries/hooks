@@ -15,6 +15,11 @@ Results:
 
 - Returns `true` if the network is online, otherwise `false`.
 
+## Notes
+
+- `navigator.onLine` only reports whether the device is connected to a network (e.g. a router); it does not guarantee internet access.
+- Returns `true` in non-browser environments.
+
 ## Example
 
 The following example shows a banner when the network goes offline.
@@ -23,3 +28,7 @@ The following example shows a banner when the network goes offline.
   <Example />
 </ExampleBlock>
 <CodeBlock language="tsx">{ExampleCode}</CodeBlock>
+
+## Troubleshooting
+
+- **Symptom**: The hook reports online while pages fail to load. **Cause**: `navigator.onLine` reflects the network link, not internet connectivity. **Solution**: treat the value as a hint, and verify reachability with an actual request when it matters.

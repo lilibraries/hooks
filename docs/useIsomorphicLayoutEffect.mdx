@@ -11,6 +11,10 @@ In the DOM environment, this hook is the same as `React.useLayoutEffect`. In the
 function useIsomorphicLayoutEffect(effect: React.EffectCallback, deps?: React.DependencyList): void;
 ```
 
+## Notes
+
+- During SSR it falls back to `useEffect`: the effect runs after hydration instead of before paint, which can cause a flash of unstyled or mismeasured content. Keep the effect idempotent across both phases.
+
 ## Example
 
 The following example measures the element height; the same code runs safely during SSR.

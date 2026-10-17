@@ -5,8 +5,6 @@ import ExampleCode from "!!raw-loader!./examples/UseLayoutRefUpdate";
 
 This hook is similar to [`useLayoutUpdate`](./useLayoutUpdate), but it is built on [`useLayoutRefEffect`](./useLayoutRefEffect) internally, so ReactRefs in the dependency array are dereferenced to `ref.current` before comparison. It runs synchronously before the browser paints (layout phase).
 
-Note: plain objects with a `current` property are treated as ReactRefs and dereferenced, so they cannot be used as dependency values directly.
-
 ## API
 
 ```ts
@@ -17,6 +15,11 @@ Parameters:
 
 - **`effect`:** The effect to run after an update. It may return a cleanup function.
 - **`deps`:** The dependency array. Its elements can be plain values or ReactRefs.
+
+## Notes
+
+- Plain objects with a `current` property are treated as ReactRefs and dereferenced, so they cannot be used as dependency values directly.
+- Runs before the browser paints; avoid heavy computation to not delay rendering.
 
 ## Example
 

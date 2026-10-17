@@ -17,6 +17,11 @@ Parameters:
 - **`options`:** Options object.
   - **`options.restore`:** Whether to restore the previous title on unmount.
 
+## Notes
+
+- With `restore`, the original title is captured on the hook's first render; when several components restore, the last one to unmount wins.
+- `null` is a no-op — the title is left unchanged.
+
 ## Example
 
 The following example syncs the browser tab title with the input.

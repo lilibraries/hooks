@@ -23,6 +23,11 @@ Results:
 - **`width`:** Element width, or `undefined` when the target is invalid.
 - **`height`:** Element height, or `undefined` when the target is invalid.
 
+## Notes
+
+- The size comes from `getBoundingClientRect`: it includes padding and border, excludes margin, is affected by transforms, and may be fractional.
+- Both values are `undefined` until the target element is mounted.
+
 ## Example
 
 The following example shows the element size; click Toggle size to see it change.

@@ -19,6 +19,11 @@ Results:
 - **`width`:** Window width, or `undefined` outside the browser.
 - **`height`:** Window height, or `undefined` outside the browser.
 
+## Notes
+
+- The size comes from `window.innerWidth`/`innerHeight`, which include scrollbars.
+- On mobile, collapsing or expanding the address bar changes the viewport without firing a window `resize`; the hook also listens to `visualViewport.resize` for that.
+
 ## Example
 
 The following example switches the layout based on the window width; resize the browser window to see the effect.

@@ -5,8 +5,6 @@ import ExampleCode from "!!raw-loader!./examples/UseRefEffect";
 
 This hook is similar to [`React.useEffect`](https://react.dev/reference/react/useEffect), but ReactRefs in the dependency array are dereferenced to `ref.current` before comparison. The effect re-runs when the value a ref points to changes (such as a DOM node), which makes it useful when a DOM node itself is an effect dependency.
 
-Note: plain objects with a `current` property are treated as ReactRefs and dereferenced, so they cannot be used as dependency values directly.
-
 ## API
 
 ```ts
@@ -17,6 +15,10 @@ Parameters:
 
 - **`effect`:** The effect function. It may return a cleanup function.
 - **`deps`:** The dependency array. Its elements can be plain values or ReactRefs. If omitted, the effect re-runs after every update.
+
+## Notes
+
+- Plain objects with a `current` property are treated as ReactRefs and dereferenced, so they cannot be used as dependency values directly.
 
 ## Example
 

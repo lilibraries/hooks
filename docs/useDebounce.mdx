@@ -36,6 +36,13 @@ Results:
   - **`actions.flush`:** Flush function. Run callback immediately.
   - **`actions.cancel`:** Cancel debounce timer.
 
+## Notes
+
+- The pending trailing invocation is cancelled on unmount — it never runs.
+- Changing the options mid-flight immediately flushes the pending invocation of the old debounced function.
+- The returned function returns `undefined` when the invocation is deferred.
+- With `leading: false` and `trailing: false`, the callback never runs.
+
 ## Example
 
 The following example shows how many times the callback actually runs after clicking the button rapidly.

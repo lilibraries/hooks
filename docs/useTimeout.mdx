@@ -21,6 +21,12 @@ Results:
 - **`start`:** Starts the timer. It clears any previous timer first.
 - **`cancel`:** Cancels the timer.
 
+## Notes
+
+- The timer starts only when `start` is called.
+- Calling `start` again resets the timer.
+- The timer is cancelled on unmount.
+
 ## Example
 
 The following example shows a toast message that disappears automatically after a delay.

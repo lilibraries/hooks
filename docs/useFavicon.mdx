@@ -13,6 +13,12 @@ Parameters:
   - **`options.mime`:** Specify the MIME type. It is inferred from the `href` extname by default (support `.png`, `.gif`, `.jpg`, `.jpeg`, `.svg`, `.webp` and `.ico`).
   - **`options.restore`:** Whether to restore the previous favicon on unmount.
 
+## Notes
+
+- The first `link[rel*='icon']` element in `<head>` is reused (which may be an `apple-touch-icon` or similar); a new link is created only when none exists.
+- `null` is a no-op — the favicon is left unchanged.
+- With `restore`, the original favicon is captured on the hook's first render; multiple instances will override each other.
+
 ## Example
 
 The following example switches the favicon together with the title when the brand changes.

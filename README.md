@@ -4,7 +4,7 @@
 [![npm downloads](https://img.shields.io/npm/dm/@lilib/hooks?style=flat-square)](https://www.npmjs.com/package/@lilib/hooks)
 [![license](https://img.shields.io/npm/l/@lilib/hooks?style=flat-square)](https://github.com/lilibraries/hooks/blob/master/LICENSE)
 
-A collection of practical React hooks covering async data, states, effects, callbacks, refs and browser APIs — written in TypeScript and designed to work everywhere: React 16.8+, 17, 18 and 19, SSR and StrictMode included.
+A collection of practical React hooks covering async data, states, effects, callbacks, refs and browser APIs — written in TypeScript, compatible with React 16.8+, 17, 18 and 19, and safe for SSR and StrictMode.
 
 - [Documentation](https://lilibraries.github.io/hooks/) — full API reference with live examples
 - [Changelog](https://github.com/lilibraries/hooks/blob/master/CHANGELOG.md)
@@ -14,11 +14,10 @@ A collection of practical React hooks covering async data, states, effects, call
 
 - More than 50 hooks covering async data, effects, states, callbacks, refs and browser APIs.
 - Works with React 16.8+, 17, 18 and 19.
-- SSR-safe — hooks fall back gracefully outside the browser instead of crashing.
-- StrictMode-safe — effects are idempotent, and timers, listeners and subscriptions are cleaned up on unmount.
-- Fully typed — written in TypeScript with JSDoc comments and shipped with type definitions.
+- SSR and StrictMode safe — graceful fallbacks outside the browser, and idempotent effects with proper cleanup.
+- Fully typed — written in TypeScript.
 - Ships ESM, CJS and UMD builds.
-- Tree-shakeable — published with `sideEffects: false`, so unused hooks add no bundle weight.
+- Tree-shakeable — bundlers can drop unused hooks from the ESM build.
 
 ## Install
 
