@@ -10,12 +10,17 @@ function createCache() {
 }
 
 describe("useCache", () => {
+  let fakeTimersInstalled = true;
+
   beforeEach(() => {
     // `LRUCache` measures TTLs with `performance.now()`, which jest does not fake by default.
+    fakeTimersInstalled = true;
     jest.useFakeTimers({ doNotFake: ["nextTick", "setImmediate", "queueMicrotask"] });
   });
   afterEach(() => {
-    jest.runOnlyPendingTimers();
+    if (fakeTimersInstalled) {
+      jest.runOnlyPendingTimers();
+    }
     jest.useRealTimers();
   });
 
@@ -93,6 +98,7 @@ describe("useCache", () => {
   it("delete cache after cacheTime", async () => {
     // `LRUCache` captures its clock (`performance.now`) at module load, so
     // jest's fake timers cannot advance it; let the entry age for real.
+    fakeTimersInstalled = false;
     jest.useRealTimers();
     const cache = createCache();
     const key = Symbol();
@@ -114,6 +120,7 @@ describe("useCache", () => {
   it("expires on the next read with a non-positive cacheTime", async () => {
     // `LRUCache` treats `ttl: 0` as "never expires", so the hook normalizes
     // non-positive `cacheTime` values to 1 ms to keep the v1 semantics.
+    fakeTimersInstalled = false;
     jest.useRealTimers();
     const cache = createCache();
     const key = Symbol();
@@ -197,6 +204,7 @@ describe("useCache", () => {
   });
 
   it("notify subscribers when an expired entry is read", async () => {
+    fakeTimersInstalled = false;
     jest.useRealTimers();
     const cache = createCache();
     const key = Symbol();
@@ -218,6 +226,7 @@ describe("useCache", () => {
   });
 
   it("notifies subscribers only once for an expired entry under StrictMode", async () => {
+    fakeTimersInstalled = false;
     jest.useRealTimers();
     const cache = createCache();
     const key = Symbol();
