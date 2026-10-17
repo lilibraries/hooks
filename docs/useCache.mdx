@@ -1,7 +1,13 @@
 import CodeBlock from "@theme/CodeBlock";
 import ExampleBlock from "./components/ExampleBlock";
 import Example from "./examples/UseCache";
+import StorageExample from "./examples/UseCacheStorage";
+import IndexedDBExample from "./examples/UseCacheIndexedDB";
 import ExampleCode from "!!raw-loader!./examples/UseCache";
+import StorageExampleCode from "!!raw-loader!./examples/UseCacheStorage";
+import IndexedDBExampleCode from "!!raw-loader!./examples/UseCacheIndexedDB";
+import StorageCacheCode from "!!raw-loader!./examples/StorageCache";
+import IndexedDBCacheCode from "!!raw-loader!./examples/IndexedDBCache";
 
 Cache data for a certain period of time, and synchronize data between components sharing the same [`LRUCache`](https://github.com/isaacs/node-lru-cache) instance. Pass a cache instance via `options.cache`, otherwise a shared internal instance is used.
 
@@ -34,7 +40,7 @@ Parameters:
 - **`key`:** Cache key. Any value except `null` and `undefined`.
 - **`options`:** Options object.
   - **`options.defaultValue`:** Default value when the cache value does not exist. When set, the returned `value` type no longer includes `undefined`.
-  - **`options.cache`:** Cache instance. Create it with `new LRUCache({ max, ttl, ... })`. If not specified, a shared internal instance is used.
+  - **`options.cache`:** Cache instance. Create it with `new LRUCache({ max, ttl, ... })` from [`lru-cache`](https://github.com/isaacs/node-lru-cache). If not specified, a shared internal instance is used.
   - **`options.cacheTime`:** Cache time, in milliseconds. Default is 5 minutes. The TTL is set per entry, so it works regardless of the `ttl` option of the cache instance. You can set a permanent cache by setting this option to `Infinity`. Non-positive values are normalized to 1 ms, so the entry expires on the next read. A `NaN` value falls back to the default.
   - **`options.cacheSync`:** Whether to synchronize data between components on set and/or delete events. Default is `false`. It can be an object to enable synchronization for each event separately.
     - **`options.cacheSync.set`:** Synchronize data on set cache.
@@ -48,13 +54,44 @@ Results:
 - **`value`:** Cache value or default value.
 - **`setCache`:** The function to set cache. If the `newValue` param is `undefined`, the cache will be deleted.
 
-Note: `LRUCache` expires entries lazily. Expired entries are only removed and notified when they are read, so an expired cache may still occupy memory until the next read. The shared internal cache enables `ttlAutopurge` to purge expired entries in the background; enable it on your own cache instance if needed.
+## Notes
 
-## Example
+- **Important**: `key` must be an immutable value: changing it triggers a warning and may corrupt shared state.
+- The default cache is a shared internal instance, so keys are global across the whole app. Pass your own `LRUCache` instance to isolate groups of components.
+- `cacheSync` only synchronizes components that share the same cache instance.
+- [`LRUCache`](https://github.com/isaacs/node-lru-cache) expires entries lazily: expired entries are only removed and notified when they are read, so an expired cache may still occupy memory until the next read. The shared internal cache enables `ttlAutopurge` to purge expired entries in the background; enable it on your own cache instance if needed.
 
-The following example writes to a shared cache and reads it back with synchronization enabled.
+## Examples
+
+### Basic usage
+
+The following example writes to a shared [`LRUCache`](https://github.com/isaacs/node-lru-cache) instance and reads it back with synchronization enabled.
 
 <ExampleBlock>
   <Example />
 </ExampleBlock>
 <CodeBlock language="tsx">{ExampleCode}</CodeBlock>
+
+### Persist to storage
+
+`useCache` stores data in memory only. To make the cache survive page reloads, extend [`LRUCache`](https://github.com/isaacs/node-lru-cache) with a write-through subclass: `set` writes the value back to the storage, and the `dispose` hook removes the persisted copy whenever an entry leaves the in-memory cache (delete, eviction, expiry purge or overwrite). The subclass restores persisted entries in its constructor and stores an `expiresAt` timestamp per entry, so expired data is dropped on restore.
+
+`StorageCache` persists to `localStorage` by default; pass `sessionStorage` via the `storage` option for a session-scoped cache. Because the persistence lives inside the cache subclass, every write is persisted automatically, including writes made directly through `cache.set` — no per-hook `onSet`/`onDelete` options are needed. The same instance can be shared with [`useLoad`](./useLoad#persist-cached-data-to-storage) through its `cache` option.
+
+<CodeBlock language="tsx">{StorageCacheCode}</CodeBlock>
+
+<ExampleBlock>
+  <StorageExample />
+</ExampleBlock>
+<CodeBlock language="tsx">{StorageExampleCode}</CodeBlock>
+
+### Persist to IndexedDB
+
+IndexedDB is asynchronous, so `IndexedDBCache` cannot restore persisted entries in its constructor: call `hydrate` in an effect after mount, and render the `useCache` call only after hydration finishes. `useCache` reads the cache exactly once on its first render, so calling it before hydration would permanently miss the persisted value. The write-through layer is the same as in `StorageCache`, except that the IndexedDB operations are async and fire-and-forget. The same instance can be shared with [`useLoad`](./useLoad#persist-cached-data-to-indexeddb) through its `cache` option.
+
+<CodeBlock language="tsx">{IndexedDBCacheCode}</CodeBlock>
+
+<ExampleBlock>
+  <IndexedDBExample />
+</ExampleBlock>
+<CodeBlock language="tsx">{IndexedDBExampleCode}</CodeBlock>

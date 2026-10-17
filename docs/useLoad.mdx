@@ -16,6 +16,8 @@ import AutoReloadExample from "./examples/UseLoadAutoReload";
 import EventsExample from "./examples/UseLoadEvents";
 import CachingExample from "./examples/UseLoadCaching";
 import StaleExample from "./examples/UseLoadStale";
+import StorageCacheExample from "./examples/UseLoadStorageCache";
+import IndexedDBCacheExample from "./examples/UseLoadIndexedDBCache";
 import InfiniteListExample from "./examples/UseLoadInfiniteList";
 import SearchExample from "./examples/UseLoadSearch";
 import BasicExampleCode from "!!raw-loader!./examples/UseLoadBasic";
@@ -34,6 +36,8 @@ import AutoReloadExampleCode from "!!raw-loader!./examples/UseLoadAutoReload";
 import EventsExampleCode from "!!raw-loader!./examples/UseLoadEvents";
 import CachingExampleCode from "!!raw-loader!./examples/UseLoadCaching";
 import StaleExampleCode from "!!raw-loader!./examples/UseLoadStale";
+import StorageCacheExampleCode from "!!raw-loader!./examples/UseLoadStorageCache";
+import IndexedDBCacheExampleCode from "!!raw-loader!./examples/UseLoadIndexedDBCache";
 import InfiniteListExampleCode from "!!raw-loader!./examples/UseLoadInfiniteList";
 import SearchExampleCode from "!!raw-loader!./examples/UseLoadSearch";
 
@@ -182,7 +186,7 @@ Parameters:
     - **`options.key`:** A shared key that can be any data type except `null` and `undefined`, and must be immutable. By default, if multiple requests for the same key appear on the page, only the first one will be sent, and the others will get the data by listening to internal events. You can prevent the default behavior by setting the `independent` option to `true`. Another use of the `key` option is reloading all associated requests together with the [`useReload`](./useReload) hook.
     - **`options.independent`:** When `true`, duplicate requests are not merged even if `key` is set: each instance fires its own request, but `useReload(key)` can still reload it.
   - **Caching:**
-    - **`options.cache`:** Cache instance. Create it with `new LRUCache({ max, ttl, ... })`. If not specified, a shared internal instance (the same one used by [`useCache`](./useCache)) is used. Pass the same instance to `useCache` to let the two hooks share data.
+    - **`options.cache`:** Cache instance. Create it with `new LRUCache({ max, ttl, ... })` from [`lru-cache`](https://github.com/isaacs/node-lru-cache). If not specified, a shared internal instance (the same one used by [`useCache`](./useCache)) is used. Pass the same instance to `useCache` to let the two hooks share data.
     - **`options.cacheKey`:** Cache key to enable caching. It can be any type except `null` and `undefined`, and must be immutable. The resolved data is written to the cache, and the initial `data` is read back from it on mount.
     - **`options.cacheTime`:** Cache time, in milliseconds. Default is 5 minutes. Set `Infinity` for a permanent cache. A `NaN` value falls back to the default.
     - **`options.staleTime`:** Stale time, in milliseconds. Default is `0`. It must be used with `cacheKey`. Within the `staleTime` period after a cache write, the data is considered fresh: calling `load(...params)`, `reload()` or automatic reloads resolves the cached data directly without sending a request. You can bypass the `staleTime` option by calling `force(...params)` or `reload({ force: true })`. Note: the reader and the writer of the same `cacheKey` should use a consistent `cacheTime`, since freshness is derived from the entry's remaining TTL.
@@ -337,6 +341,28 @@ _Within 5 seconds, Load reuses the cached number without a new request; Force al
   <StaleExample />
 </ExampleBlock>
 <CodeBlock language="tsx">{StaleExampleCode}</CodeBlock>
+
+#### Persist cached data to storage
+
+`useLoad` reads the initial `data` from the cache and writes resolved data with `cache.set`, so a write-through cache subclass persists both automatically. This example uses [`StorageCache`](./useCache#persist-to-storage) from the `useCache` docs; `staleTime` equals the cache time, so the cached number is restored without a new request.
+
+_Reload the page — the number appears instantly and the request counter stays at 0._
+
+<ExampleBlock>
+  <StorageCacheExample />
+</ExampleBlock>
+<CodeBlock language="tsx">{StorageCacheExampleCode}</CodeBlock>
+
+#### Persist cached data to IndexedDB
+
+The async [`IndexedDBCache`](./useCache#persist-to-indexeddb) needs hydration before the first render — gate the component the same way as in the `useCache` docs.
+
+_Reload the page — the number is restored from IndexedDB instantly and the request counter stays at 0._
+
+<ExampleBlock>
+  <IndexedDBCacheExample />
+</ExampleBlock>
+<CodeBlock language="tsx">{IndexedDBCacheExampleCode}</CodeBlock>
 
 ### Resilience
 
