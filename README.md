@@ -14,7 +14,8 @@ A collection of practical React hooks covering async data, states, effects, call
 
 - More than 50 hooks covering async data, effects, states, callbacks, refs and browser APIs.
 - Works with React 16.8+, 17, 18 and 19.
-- SSR and StrictMode safe — graceful fallbacks outside the browser, and idempotent effects with proper cleanup.
+- SSR-safe — graceful fallbacks outside the browser.
+- StrictMode-safe — idempotent effects with proper cleanup.
 - Fully typed — written in TypeScript.
 - Ships ESM, CJS and UMD builds.
 - Tree-shakeable — bundlers can drop unused hooks from the ESM build.
