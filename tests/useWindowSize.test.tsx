@@ -61,6 +61,27 @@ describe("useWindowSize", () => {
     expect(result.current).toEqual({ width: 500, height: 500 });
   });
 
+  it("does not re-render when the visualViewport fires resize with an unchanged size", () => {
+    setWindowSize(1024, 768);
+    const renders = jest.fn();
+    const { result } = renderHook(() => {
+      renders();
+      return useWindowSize();
+    });
+
+    expect(renders).toHaveBeenCalledTimes(1);
+
+    act(() => {
+      const viewport = window.visualViewport as unknown as {
+        dispatchEvent: (event: Event) => void;
+      };
+      viewport.dispatchEvent(new Event("resize"));
+    });
+
+    expect(renders).toHaveBeenCalledTimes(1);
+    expect(result.current).toEqual({ width: 1024, height: 768 });
+  });
+
   it("stops responding to events after unmount", () => {
     setWindowSize(1024, 768);
     const { result, unmount } = renderHook(() => useWindowSize());

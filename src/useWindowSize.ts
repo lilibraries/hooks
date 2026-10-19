@@ -20,12 +20,17 @@ function useWindowSize() {
   const viewportRef = useRef<VisualViewport | null>(inBrowser ? window.visualViewport : null);
 
   function listener() {
-    setState({ width: window.innerWidth, height: window.innerHeight });
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+    // Bail out when the size is unchanged: the visualViewport may fire resize
+    // (e.g. on pinch-zoom) while the window size stays the same.
+    setState((prevState) => (prevState.width === width && prevState.height === height ? prevState : { width, height }));
   }
 
   useEventListener(windowRef, "resize", listener);
   useEventListener(windowRef, "orientationchange", listener);
-  // On mobile, collapsing/expanding the address bar changes the visualViewport size without firing a window resize.
+  // On mobile, collapsing/expanding the address bar can resize the layout
+  // viewport without firing a window resize, so also listen to visualViewport.
   useEventListener(viewportRef, "resize", listener);
 
   useDebugValue({ width, height });
