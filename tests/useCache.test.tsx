@@ -136,6 +136,28 @@ describe("useCache", () => {
     expect(cache.has(key)).toBe(false);
   });
 
+  it("never expires with cacheTime: Infinity", async () => {
+    // Real timers, see "delete cache after cacheTime".
+    fakeTimersInstalled = false;
+    jest.useRealTimers();
+    const cache = createCache();
+    const key = Symbol();
+    const { result } = renderHook(() => useCache(key, { cache, cacheTime: Infinity }));
+
+    act(() => {
+      result.current[1]("value");
+    });
+
+    // `Infinity` is mapped to `ttl: 0`, which `LRUCache` treats as "never expires"
+    expect(cache.getRemainingTTL(key)).toBe(Infinity);
+
+    await new Promise((resolve) => setTimeout(resolve, 50));
+
+    expect(cache.get(key)).toBe("value");
+    const { result: reader } = renderHook(() => useCache(key, { cache }));
+    expect(reader.current[0]).toBe("value");
+  });
+
   it("sync data correctly", () => {
     const cache = createCache();
     const key = Symbol();

@@ -41,7 +41,7 @@ Parameters:
 - **`options`:** Options object.
   - **`options.defaultValue`:** Default value when the cache value does not exist. When set, the returned `value` type no longer includes `undefined`.
   - **`options.cache`:** Cache instance. Create it with `new LRUCache({ max, ttl, ... })` from [`lru-cache`](https://github.com/isaacs/node-lru-cache). If not specified, a shared internal instance is used.
-  - **`options.cacheTime`:** Cache time, in milliseconds. Default is 5 minutes. The TTL is set per entry, so it works regardless of the `ttl` option of the cache instance. You can set a permanent cache by setting this option to `Infinity`. Non-positive values are normalized to 1 ms, so the entry expires on the next read. A `NaN` value falls back to the default.
+  - **`options.cacheTime`:** Cache time, in milliseconds. Default is 5 minutes. The TTL is set per entry, so it works regardless of the `ttl` option of the cache instance. You can set a permanent cache by setting this option to `Infinity` (mapped to `ttl: 0`, so no expiry timer is registered). Non-positive values are normalized to 1 ms, so the entry expires on the next read. A `NaN` value falls back to the default.
   - **`options.cacheSync`:** Whether to synchronize data between components on set and/or delete events. Default is `false`. It can be an object to enable synchronization for each event separately.
     - **`options.cacheSync.set`:** Synchronize data on set cache.
     - **`options.cacheSync.delete`:** Synchronize data on delete cache or when cache time expires.

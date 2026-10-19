@@ -53,11 +53,15 @@ function useCache<T>(key: NonNullable<unknown>, options: CacheHookOptions<T> = {
   // `LRUCache` treats `ttl: 0` as "never expires" (and `NaN` silently behaves
   // the same), while a non-positive `cacheTime` meant "expire immediately" in
   // v1. Normalize finite values to a minimum of 1 ms (so they expire on the
-  // next read), keep `Infinity` as-is, and fall back to the default for `NaN`.
+  // next read), map `Infinity` to `ttl: 0` (permanent, without registering a
+  // pointless one-shot autopurge timer per write), and fall back to the default
+  // for `NaN`.
   const cacheTime =
     options.cacheTime === undefined || Number.isNaN(options.cacheTime)
       ? DEFAULT_CACHE_TIME
-      : Math.max(options.cacheTime, 1);
+      : options.cacheTime === Infinity
+        ? 0
+        : Math.max(options.cacheTime, 1);
   const cacheSync = options.cacheSync ?? false;
 
   let cacheSyncOnSet = false;
@@ -101,7 +105,7 @@ function useCache<T>(key: NonNullable<unknown>, options: CacheHookOptions<T> = {
     const expiredData = peekExpiredEntry();
     if (expiredData !== undefined) {
       cache.delete(key);
-      getCacheEmitter(cache).for(key).emit("delete", expiredData);
+      getCacheEmitter(cache).peek(key)?.emit("delete", expiredData);
       return defaultValue;
     }
     return readCacheValue(cache.get(key));
@@ -113,11 +117,11 @@ function useCache<T>(key: NonNullable<unknown>, options: CacheHookOptions<T> = {
       if (cache.has(key)) {
         const oldValue = cache.peek(key);
         cache.delete(key);
-        getCacheEmitter(cache).for(key).emit("delete", oldValue);
+        getCacheEmitter(cache).peek(key)?.emit("delete", oldValue);
       }
     } else {
       cache.set(key, newValue, { ttl: cacheTime });
-      getCacheEmitter(cache).for(key).emit("set", newValue);
+      getCacheEmitter(cache).peek(key)?.emit("set", newValue);
     }
   });
 
