@@ -23,6 +23,13 @@ class KeyedEmitter extends EventEmitter {
     return emitter;
   }
 
+  // Non-creating lookup for emit-only paths: returns `undefined` when no
+  // listener was ever attached for the key, so unused keys do not create
+  // throwaway emitter instances.
+  peek(key: NonNullable<unknown>) {
+    return this._emitters.get(key);
+  }
+
   on(name: Name, listener: Listener): this {
     super.on(name, listener);
     this._attach();

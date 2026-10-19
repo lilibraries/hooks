@@ -219,7 +219,7 @@ function useLoad<Callback extends LoadCallback>(
   const cache = customCache ?? getDefaultCache();
   // `LRUCache` treats `ttl: 0` as "never expires" (and `NaN` silently behaves the same), while a non-positive
   // `cacheTime` meant "expire immediately" in v1. Normalize finite values to a minimum of 1 ms, map `Infinity` to
-  // `ttl: 0` (never expires, without registering an autopurge timer that would spin in Node), and fall back to
+  // `ttl: 0` (never expires, without registering a pointless one-shot autopurge timer per write), and fall back to
   // the default for `NaN`.
   const normalizedCacheTime = Number.isNaN(cacheTime)
     ? DEFAULT_CACHE_TIME
@@ -261,8 +261,8 @@ function useLoad<Callback extends LoadCallback>(
   );
   const unlistenRef = useRef<(() => void) | undefined>(undefined);
   const idleTimerRef = useRef(0);
-  const retryTimerRef = useRef(0);
-  const pollingTimerRef = useRef(0);
+  const retryTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const pollingTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const reloadRef = useRef<(() => void) | undefined>(undefined);
   const loadRef = useRef<((...params: Parameters<Callback>) => ReturnType<Callback>) | undefined>(undefined);
 
@@ -289,7 +289,7 @@ function useLoad<Callback extends LoadCallback>(
       const { key, load, store } = loadingRef.current;
       if (store.isLoading(key, load)) {
         store.deleteLoading(key, load);
-        store.for(key).emit("cancel");
+        store.peek(key)?.emit("cancel");
       }
       loadingRef.current = undefined;
     }
@@ -336,6 +336,31 @@ function useLoad<Callback extends LoadCallback>(
       forceRef.current = false;
     }
 
+    const id = idRef.current;
+    const isCanceled = () => id !== idRef.current;
+
+    const checkPolling = () => {
+      if (readyRef.current) {
+        if (isPageVisible()) {
+          if (polling) {
+            pollingTimerRef.current = setTimeout(() => {
+              if (!isCanceled()) {
+                reloadRef.current?.();
+              }
+            }, pollingInterval);
+          }
+        } else {
+          if (pollingInPageHidden) {
+            pollingTimerRef.current = setTimeout(() => {
+              if (!isCanceled()) {
+                reloadRef.current?.();
+              }
+            }, pollingIntervalInPageHidden);
+          }
+        }
+      }
+    };
+
     // Fresh cache hit within `staleTime` (the write happened no longer ago than `staleTime`): resolve the cached
     // data directly without sending a request. `getRemainingTTL() >= cacheTime - staleTime` is equivalent to
     // "elapsed time since the write <= staleTime" and also holds for an infinite `cacheTime`.
@@ -350,6 +375,9 @@ function useLoad<Callback extends LoadCallback>(
           } else if (state.loading) {
             setState({ loading: false });
           }
+          // A fresh hit skips only the request, not the next poll: keep the
+          // polling chain alive (the request paths call this on settlement).
+          checkPolling();
           return new Promise((resolve) => {
             resolve(data);
           }) as ReturnType<Callback>;
@@ -370,31 +398,6 @@ function useLoad<Callback extends LoadCallback>(
     } else if (!state.loading) {
       setState({ loading: true });
     }
-
-    const id = idRef.current;
-    const isCanceled = () => id !== idRef.current;
-
-    const checkPolling = () => {
-      if (readyRef.current) {
-        if (isPageVisible()) {
-          if (polling) {
-            pollingTimerRef.current = +setTimeout(() => {
-              if (!isCanceled()) {
-                reloadRef.current?.();
-              }
-            }, pollingInterval);
-          }
-        } else {
-          if (pollingInPageHidden) {
-            pollingTimerRef.current = +setTimeout(() => {
-              if (!isCanceled()) {
-                reloadRef.current?.();
-              }
-            }, pollingIntervalInPageHidden);
-          }
-        }
-      }
-    };
 
     // Another instance is already loading the same key: merge the request and wait for its result instead of firing a duplicate.
     if (isAssociated && store.isLoading(key) && !store.isLoading(key, currentLoad)) {
@@ -466,7 +469,7 @@ function useLoad<Callback extends LoadCallback>(
         if (!fallbackInvoked && resolveRetryOption(retry, error) && ++retryCount <= retryLimit) {
           const delay = isFunction(retryInterval) ? retryInterval(retryCount) : retryInterval;
           if (delay > 0) {
-            retryTimerRef.current = +setTimeout(() => {
+            retryTimerRef.current = setTimeout(() => {
               if (!isCanceled()) {
                 callbackRef.current(...params).then(resolve, handleReject);
               }
@@ -487,7 +490,7 @@ function useLoad<Callback extends LoadCallback>(
             ? fallbackRetryInterval(fallbackRetryCount)
             : fallbackRetryInterval;
           if (delay > 0) {
-            retryTimerRef.current = +setTimeout(() => {
+            retryTimerRef.current = setTimeout(() => {
               if (!isCanceled()) {
                 if (fallbackRef.current) {
                   fallbackRef.current(...params).then(resolve, handleReject);
@@ -497,7 +500,11 @@ function useLoad<Callback extends LoadCallback>(
               }
             }, delay);
           } else {
-            fallbackRef.current(...params).then(resolve, handleReject);
+            if (fallbackRef.current) {
+              fallbackRef.current(...params).then(resolve, handleReject);
+            } else {
+              reject(error);
+            }
           }
         } else {
           reject(error);
@@ -526,7 +533,7 @@ function useLoad<Callback extends LoadCallback>(
         }
         if (isAssociated && store.isLoading(key, currentLoad)) {
           store.deleteLoading(key, currentLoad);
-          store.for(key).emit("success", data);
+          store.peek(key)?.emit("success", data);
           loadingRef.current = undefined;
         }
         setState({ data, error: null, loading: false });
@@ -542,7 +549,7 @@ function useLoad<Callback extends LoadCallback>(
         }
         if (isAssociated && store.isLoading(key, currentLoad)) {
           store.deleteLoading(key, currentLoad);
-          store.for(key).emit("failure", error);
+          store.peek(key)?.emit("failure", error);
           loadingRef.current = undefined;
         }
         setState({ error, loading: false });
@@ -680,7 +687,12 @@ function useLoad<Callback extends LoadCallback>(
     warning(false, "[useLoad] You should provide an immutable value for the `key` option.");
   }, [key]);
 
-  useUnmount(cancel);
+  // On unmount, terminate the pending tasks without updating state, so no state
+  // update is scheduled on an unmounting component.
+  useUnmount(() => {
+    clearPending();
+    forceRef.current = false;
+  });
   useDebugValue(state);
 
   return {

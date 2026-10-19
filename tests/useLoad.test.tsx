@@ -1,5 +1,6 @@
 import { act, waitFor } from "@testing-library/react";
 import { LRUCache } from "lru-cache";
+import { StrictMode } from "react";
 import renderHook from "./helpers/renderHook";
 
 import useLoad from "../src/useLoad";
@@ -197,6 +198,27 @@ describe("useLoad", () => {
       await Promise.resolve();
     });
     expect(result.current.data).toBeUndefined();
+  });
+
+  it("unmount cancels the pending load without updating state", async () => {
+    const pending = deferred<string>();
+    const callback = jest.fn(() => pending.promise);
+    const errorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+
+    const { unmount } = renderHook(() => useLoad(callback));
+
+    await waitFor(() => expect(callback).toHaveBeenCalledTimes(1));
+
+    unmount();
+
+    pending.resolve("late");
+    await act(async () => {
+      await Promise.resolve();
+    });
+
+    expect(callback).toHaveBeenCalledTimes(1);
+    expect(errorSpy).not.toHaveBeenCalled();
+    errorSpy.mockRestore();
   });
 
   it("onSuccess/onFailure/onFinally callbacks", async () => {
@@ -680,6 +702,28 @@ describe("useLoad", () => {
     expect(callback).toHaveBeenCalledTimes(5);
   });
 
+  it("polling: the polling chain survives staleTime cache hits", async () => {
+    const callback = jest.fn(async () => "data");
+    const cacheKey = Symbol("cache-key");
+    const { unmount } = renderHook(() =>
+      useLoad(callback, [], {
+        cacheKey,
+        cacheTime: 60000,
+        staleTime: 100,
+        polling: true,
+        pollingInterval: 50,
+      }),
+    );
+
+    // The first polls land within `staleTime` and resolve the fresh cache
+    // without a request, but the chain must stay alive: polls outside
+    // `staleTime` send requests again.
+    await waitFor(() => expect(callback).toHaveBeenCalledTimes(2));
+    await waitFor(() => expect(callback).toHaveBeenCalledTimes(3));
+
+    unmount();
+  });
+
   it("fallbackRetry: automatically retries the fallback until success", async () => {
     const callback = jest.fn(async () => {
       throw new Error("primary-fail");
@@ -882,6 +926,45 @@ describe("useLoad", () => {
       await jest.advanceTimersByTimeAsync(1);
     });
     expect(fallback).toHaveBeenCalledTimes(3);
+  });
+
+  it("fallbackRetry: rejects with the last error when the fallback option is removed while a retry is pending", async () => {
+    jest.useFakeTimers();
+    const error = new Error("fallback-fail");
+    const callback = jest.fn(async () => {
+      throw new Error("primary-fail");
+    });
+    const fallback = jest.fn(async () => {
+      throw error;
+    });
+    const { result, rerender } = renderHook(
+      ({ fallbackOption }) =>
+        useLoad(callback, [], {
+          fallback: fallbackOption,
+          fallbackRetry: true,
+          fallbackRetryInterval: 100,
+        }),
+      {
+        initialProps: { fallbackOption: fallback as jest.Mock<Promise<never>, []> | undefined },
+      },
+    );
+
+    await act(async () => {
+      await jest.advanceTimersByTimeAsync(0);
+    });
+    expect(fallback).toHaveBeenCalledTimes(1);
+
+    // The option is removed before the delayed retry fires: the guarded path
+    // rejects with the original error instead of invoking an undefined fallback.
+    rerender({ fallbackOption: undefined });
+
+    await act(async () => {
+      await jest.advanceTimersByTimeAsync(100);
+    });
+
+    expect(result.current.loading).toBe(false);
+    expect(result.current.error).toBe(error);
+    expect(fallback).toHaveBeenCalledTimes(1);
   });
 
   it("cancel stops pending retries", async () => {
@@ -1087,5 +1170,107 @@ describe("useLoad", () => {
     });
     await waitFor(() => expect(result.current.data).toBe("loaded"));
     expect(callback).toHaveBeenCalledTimes(1);
+  });
+
+  // React 18+ StrictMode invokes effects twice (mount -> cleanup -> mount); React 16/17 invoke them once.
+  // The assertions below only check idempotency properties that hold in both cases, so they never
+  // hard-code the callback call count.
+  it("settles to the correct state under StrictMode without warnings", async () => {
+    const pending = deferred<string>();
+    const callback = jest.fn(() => pending.promise);
+    const errorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+
+    const { result } = renderHook(() => useLoad(callback, []), { wrapper: StrictMode });
+    await waitFor(() => expect(callback).toHaveBeenCalled());
+
+    // While pending, the cancelled first effect run must not have settled the state.
+    expect(result.current.loading).toBe(true);
+
+    pending.resolve("strict-data");
+    await waitFor(() => expect(result.current.data).toBe("strict-data"));
+
+    expect(result.current.loading).toBe(false);
+    expect(result.current.error).toBeNull();
+    expect(errorSpy).not.toHaveBeenCalled();
+    errorSpy.mockRestore();
+  });
+
+  it("keeps shared loading consistent under StrictMode and leaves no leaked loading record", async () => {
+    const pending = deferred<string>();
+    const callback = jest.fn(() => pending.promise);
+
+    const { result: first, unmount: unmountFirst } = renderHook(() => useLoad(callback, [], { key: "strict-shared" }), {
+      wrapper: StrictMode,
+    });
+    const { result: second, unmount: unmountSecond } = renderHook(
+      () => useLoad(callback, [], { key: "strict-shared" }),
+      { wrapper: StrictMode },
+    );
+
+    pending.resolve("strict-shared-data");
+    await waitFor(() => expect(first.current.data).toBe("strict-shared-data"));
+    await waitFor(() => expect(second.current.data).toBe("strict-shared-data"));
+    expect(first.current.error).toBeNull();
+    expect(second.current.error).toBeNull();
+
+    unmountFirst();
+    unmountSecond();
+
+    // A fresh instance must fire its own request: a leaked loading record in the
+    // shared store would make it merge into a request that can never settle.
+    const next = deferred<string>();
+    callback.mockImplementation(() => next.promise);
+    const { result: third, unmount: unmountThird } = renderHook(() => useLoad(callback, [], { key: "strict-shared" }), {
+      wrapper: StrictMode,
+    });
+    next.resolve("strict-fresh-data");
+    await waitFor(() => expect(third.current.data).toBe("strict-fresh-data"));
+    unmountThird();
+  });
+
+  it("cancels the pending load on unmount under StrictMode without warnings", async () => {
+    const pending = deferred<string>();
+    const callback = jest.fn(() => pending.promise);
+    const errorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+
+    const { unmount } = renderHook(() => useLoad(callback, []), { wrapper: StrictMode });
+    await waitFor(() => expect(callback).toHaveBeenCalled());
+
+    unmount();
+    pending.resolve("late-data");
+    await act(async () => {
+      await Promise.resolve();
+    });
+
+    expect(errorSpy).not.toHaveBeenCalled();
+    errorSpy.mockRestore();
+  });
+
+  it("stops polling after unmount under StrictMode (no timers leaked by the double cleanup)", async () => {
+    jest.useFakeTimers();
+    const callback = jest.fn(async () => "data");
+    const { unmount } = renderHook(() => useLoad(callback, [], { polling: true, pollingInterval: 100 }), {
+      wrapper: StrictMode,
+    });
+
+    await act(async () => {
+      await jest.advanceTimersByTimeAsync(0);
+    });
+    expect(callback).toHaveBeenCalled();
+
+    // The polling chain is alive while mounted.
+    await act(async () => {
+      await jest.advanceTimersByTimeAsync(100);
+    });
+    expect(callback.mock.calls.length).toBeGreaterThan(1);
+
+    unmount();
+
+    // No polling timer may survive the mount/cleanup pairs: the call count must not grow.
+    const callsAtUnmount = callback.mock.calls.length;
+    await act(async () => {
+      await jest.advanceTimersByTimeAsync(1000);
+    });
+    expect(callback.mock.calls.length).toBe(callsAtUnmount);
   });
 });

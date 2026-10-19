@@ -14,6 +14,24 @@ describe("KeyedEmitter", () => {
     expect(emitter.for("key")).toBe(child);
   });
 
+  it("peek returns the registered child emitter without creating one", () => {
+    expect(emitter.peek("key")).toBeUndefined();
+
+    const child = emitter.for("key");
+    child.on("event", () => {});
+
+    expect(emitter.peek("key")).toBe(child);
+  });
+
+  it("peek returns undefined again after the child emitter is pruned", () => {
+    const child = emitter.for("key");
+    const listener = () => {};
+    child.on("event", listener);
+    child.off("event", listener);
+
+    expect(emitter.peek("key")).toBeUndefined();
+  });
+
   it("does not cache child emitters without listeners", () => {
     const first = emitter.for("key");
 
