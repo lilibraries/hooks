@@ -4,6 +4,7 @@ import Cookies from "js-cookie";
 import isFunction from "lodash/isFunction";
 
 import useInterval from "./useInterval";
+import useLayoutMount from "./useLayoutMount";
 import useLatestRef from "./useLatestRef";
 import usePersist from "./usePersist";
 import useSafeState from "./useSafeState";
@@ -64,8 +65,18 @@ function useCookie(name: string, options?: UseCookieOptions) {
     }
   }
 
-  const [value, setValue] = useSafeState(getCookie);
+  // The state starts with the default value so server-rendered and
+  // client-hydrated output are consistent; the cookie is read in right after
+  // mounting (before paint), avoiding hydration mismatches and flashes.
+  const [value, setValue] = useSafeState(defaultValue);
   const valueRef = useLatestRef(value);
+
+  useLayoutMount(() => {
+    const newValue = getCookie();
+    if (newValue !== valueRef.current) {
+      setValue(newValue);
+    }
+  });
 
   const setCookie = usePersist(
     (

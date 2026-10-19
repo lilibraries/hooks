@@ -5,6 +5,7 @@ import isFunction from "lodash/isFunction";
 
 import useEventListener from "../useEventListener";
 import useInterval from "../useInterval";
+import useLayoutMount from "../useLayoutMount";
 import useLatestRef from "../useLatestRef";
 import useMemoizedValue from "../useMemoizedValue";
 import usePersist from "../usePersist";
@@ -71,8 +72,18 @@ function createStorageHook(getStorage: () => Storage | null) {
       return defaultValue;
     }
 
-    const [value, setValue] = useSafeState<T | undefined>(getStoredValue);
+    // The state starts with the default value so server-rendered and
+    // client-hydrated output are consistent; the stored value is read in right
+    // after mounting (before paint), avoiding hydration mismatches and flashes.
+    const [value, setValue] = useSafeState<T | undefined>(defaultValue);
     const valueRef = useLatestRef(value);
+
+    useLayoutMount(() => {
+      const newValue = getStoredValue();
+      if (!compare(newValue, valueRef.current)) {
+        setValue(newValue);
+      }
+    });
 
     const setStorage = usePersist((newValue: T | undefined | ((prevValue: T | undefined) => T | undefined)) => {
       const resolved = isFunction(newValue) ? newValue(valueRef.current) : newValue;

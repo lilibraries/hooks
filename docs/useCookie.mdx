@@ -67,7 +67,7 @@ Results:
 - **Important**: Removing a cookie requires the same `attributes` as when it was set (especially `path` and `domain`); otherwise the removal silently fails.
 - Cookie changes made elsewhere (server responses, other scripts) are not pushed to the hook; enable `polling: true` to detect them.
 - Values are strings — no serialization is applied. Use `JSON.stringify` together with `validate` for structured data.
-- Returns `defaultValue` in non-browser environments.
+- Returns `defaultValue` in non-browser environments. The `value` starts with `defaultValue` on the first render and is synchronized with the cookie right after mounting (before the browser paints), so server-rendered and client-hydrated output stay consistent.
 
 ## Example
 
