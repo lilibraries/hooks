@@ -28,6 +28,7 @@
     "url": "https://github.com/lilibraries/hooks/issues"
   },
   "homepage": "https://lilibraries.github.io/hooks/",
+  "packageManager": "pnpm@12.14.0",
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org/"
@@ -79,7 +80,6 @@
     "@types/js-cookie": "^3.0.6",
     "@types/lodash": "^4.17.26",
     "@types/raf": "^3.4.3",
-    "@types/use-sync-external-store": "^1.7.0",
     "@types/warning": "^3.0.4",
     "eventemitter3": "^5.0.4",
     "intersection-observer": "^0.12.2",
@@ -89,7 +89,6 @@
     "raf": "^3.4.1",
     "requestidlecallback": "^0.3.0",
     "resize-observer-polyfill": "^1.5.1",
-    "use-sync-external-store": "^1.7.0",
     "warning": "^4.0.3"
   },
   "devDependencies": {
