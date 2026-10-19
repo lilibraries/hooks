@@ -28,9 +28,15 @@ module.exports = {
   },
   organizationName: "lilibraries",
   projectName: "hooks",
+  favicon: "favicon.svg",
   themeConfig: {
     navbar: {
       title: "Hooks",
+      logo: {
+        alt: "Lilib",
+        src: "logo.svg",
+        srcDark: "logo-dark.svg",
+      },
       items: [
         {
           href: "https://github.com/lilibraries/hooks",
