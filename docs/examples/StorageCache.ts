@@ -3,7 +3,7 @@ import { LRUCache } from "lru-cache";
 export interface StorageCacheOptions {
   /** Storage to persist to. Defaults to `window.localStorage`. Pass `window.sessionStorage` for a session-scoped cache. */
   storage?: Storage | null;
-  /** Key prefix in the storage. Default is `"useCache:"`. */
+  /** Key prefix in the storage. Default is `"lilib:"`. Pass a distinct prefix when multiple cache instances share the same storage. */
   prefix?: string;
   /** Cache time in milliseconds, used to compute the persisted TTL. Default is 5 minutes. */
   cacheTime?: number;
@@ -33,7 +33,7 @@ export class StorageCache extends LRUCache<string, any> {
   private prefix: string;
 
   constructor(options: StorageCacheOptions = {}) {
-    const { storage, prefix = "useCache:", cacheTime = 5 * 60 * 1000, max = 100 } = options;
+    const { storage, prefix = "lilib:", cacheTime = 5 * 60 * 1000, max = 100 } = options;
     super({
       max,
       dispose: (_value, key) => this.removePersistedEntry(key),

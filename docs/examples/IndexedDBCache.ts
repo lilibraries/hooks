@@ -1,9 +1,9 @@
 import { LRUCache } from "lru-cache";
 
 export interface IndexedDBCacheOptions {
-  /** Database name. Default is `"useCacheExample"`. */
+  /** Database name. Default is `"lilib"`. Pass a distinct name when multiple apps share the same origin. */
   databaseName?: string;
-  /** Object store name. Default is `"cache"`. */
+  /** Object store name. Default is `"hooks"`. */
   storeName?: string;
   /** Cache time in milliseconds, used to compute the persisted TTL. Default is 5 minutes. */
   cacheTime?: number;
@@ -31,7 +31,7 @@ export class IndexedDBCache extends LRUCache<string, any> {
   private databasePromise: Promise<IDBDatabase> | undefined;
 
   constructor(options: IndexedDBCacheOptions = {}) {
-    const { databaseName = "useCacheExample", storeName = "cache", cacheTime = 5 * 60 * 1000, max = 100 } = options;
+    const { databaseName = "lilib", storeName = "hooks", cacheTime = 5 * 60 * 1000, max = 100 } = options;
     super({
       max,
       // Remove the persisted copy whenever an entry leaves the in-memory

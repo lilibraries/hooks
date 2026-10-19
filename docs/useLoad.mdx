@@ -38,6 +38,8 @@ import CachingExampleCode from "!!raw-loader!./examples/UseLoadCaching";
 import StaleExampleCode from "!!raw-loader!./examples/UseLoadStale";
 import StorageCacheExampleCode from "!!raw-loader!./examples/UseLoadStorageCache";
 import IndexedDBCacheExampleCode from "!!raw-loader!./examples/UseLoadIndexedDBCache";
+import StorageCacheCode from "!!raw-loader!./examples/StorageCache";
+import IndexedDBCacheCode from "!!raw-loader!./examples/IndexedDBCache";
 import InfiniteListExampleCode from "!!raw-loader!./examples/UseLoadInfiniteList";
 import SearchExampleCode from "!!raw-loader!./examples/UseLoadSearch";
 
@@ -337,7 +339,7 @@ _Within 5 seconds, Load reuses the cached number without a new request; Force al
 
 #### Persist cached data to storage
 
-`useLoad` reads the initial `data` from the cache and writes resolved data with `cache.set`, so a write-through cache subclass persists both automatically. This example uses [`StorageCache`](./useCache#persist-to-storage) from the `useCache` docs; `staleTime` equals the cache time, so the cached number is restored without a new request.
+`useLoad` reads the initial `data` from the cache and writes resolved data with `cache.set`, so a write-through cache subclass persists both automatically. This example uses the `StorageCache` implementation shown below; `staleTime` equals the cache time, so the cached number is restored without a new request.
 
 _Reload the page — the number appears instantly and the request counter stays at 0._
 
@@ -346,9 +348,18 @@ _Reload the page — the number appears instantly and the request counter stays 
 </ExampleBlock>
 <CodeBlock language="tsx">{StorageCacheExampleCode}</CodeBlock>
 
+<details>
+<summary>The full <code>StorageCache</code> implementation</summary>
+
+<CodeBlock language="tsx" title="StorageCache.ts">
+  {StorageCacheCode}
+</CodeBlock>
+
+</details>
+
 #### Persist cached data to IndexedDB
 
-The async [`IndexedDBCache`](./useCache#persist-to-indexeddb) needs hydration before the first render — gate the component the same way as in the `useCache` docs.
+The async `IndexedDBCache` (implementation shown below) needs hydration before the first render — the example gates the component until the cache is hydrated.
 
 _Reload the page — the number is restored from IndexedDB instantly and the request counter stays at 0._
 
@@ -356,6 +367,15 @@ _Reload the page — the number is restored from IndexedDB instantly and the req
   <IndexedDBCacheExample />
 </ExampleBlock>
 <CodeBlock language="tsx">{IndexedDBCacheExampleCode}</CodeBlock>
+
+<details>
+<summary>The full <code>IndexedDBCache</code> implementation</summary>
+
+<CodeBlock language="tsx" title="IndexedDBCache.ts">
+  {IndexedDBCacheCode}
+</CodeBlock>
+
+</details>
 
 ### Resilience
 
