@@ -36,10 +36,10 @@ export class IndexedDBCache extends LRUCache<string, any> {
       max,
       // Remove the persisted copy whenever an entry leaves the in-memory
       // cache (delete, eviction, expiry purge or overwrite). IndexedDB writes
-      // are async, so the removals are fire-and-forget — the in-memory cache
-      // remains the source of truth.
+      // are async, so the removals are fire-and-forget (failures are ignored)
+      // — the in-memory cache remains the source of truth.
       dispose: (_value, key) => {
-        void this.removeEntry(key);
+        void this.removeEntry(key).catch(() => {});
       },
     });
     this.databaseName = databaseName;
@@ -49,7 +49,12 @@ export class IndexedDBCache extends LRUCache<string, any> {
 
   override set(key: string, value: any, options?: LRUCache.SetOptions<string, any, unknown>): this {
     const result = super.set(key, value, options);
-    void this.writeEntry(key, { value, expiresAt: IndexedDBCache.toExpiresAt(options?.ttl ?? this.cacheTime) });
+    // `LRUCache` treats `set(key, undefined)` as `delete(key)` — nothing to persist.
+    if (value !== undefined) {
+      void this.writeEntry(key, { value, expiresAt: IndexedDBCache.toExpiresAt(options?.ttl ?? this.cacheTime) }).catch(
+        () => {},
+      );
+    }
     return result;
   }
 
@@ -75,7 +80,7 @@ export class IndexedDBCache extends LRUCache<string, any> {
         // `super.set` restores the entry without persisting it again.
         super.set(key, entry.value, { ttl });
       } else {
-        void this.removeEntry(key);
+        void this.removeEntry(key).catch(() => {});
       }
     }
   }
@@ -84,18 +89,44 @@ export class IndexedDBCache extends LRUCache<string, any> {
   // on a connection, so operations run in the order they are created.
   private getDatabase(): Promise<IDBDatabase> {
     if (!this.databasePromise) {
-      this.databasePromise = new Promise((resolve, reject) => {
-        const request = indexedDB.open(this.databaseName, 1);
-        request.onupgradeneeded = () => {
-          if (!request.result.objectStoreNames.contains(this.storeName)) {
-            request.result.createObjectStore(this.storeName);
+      this.databasePromise = this.openDatabase()
+        .then((db) => {
+          if (db.objectStoreNames.contains(this.storeName)) {
+            return db;
           }
-        };
-        request.onsuccess = () => resolve(request.result);
-        request.onerror = () => reject(request.error);
-      });
+          // The database exists but the store is missing (e.g. it was created
+          // by an older build with a different store name, so no upgrade ever
+          // ran): close it and reopen with a bumped version so
+          // `onupgradeneeded` fires and creates the store.
+          const nextVersion = db.version + 1;
+          db.close();
+          return this.openDatabase(nextVersion);
+        })
+        .catch((error) => {
+          // A transient failure (e.g. the version upgrade is blocked by an
+          // open connection) must not disable persistence forever — allow
+          // the next operation to retry.
+          this.databasePromise = undefined;
+          throw error;
+        });
     }
     return this.databasePromise;
+  }
+
+  private openDatabase(version?: number): Promise<IDBDatabase> {
+    return new Promise((resolve, reject) => {
+      const request = indexedDB.open(this.databaseName, version);
+      request.onupgradeneeded = () => {
+        if (!request.result.objectStoreNames.contains(this.storeName)) {
+          request.result.createObjectStore(this.storeName);
+        }
+      };
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+      request.onblocked = () => {
+        reject(new Error(`Upgrading the "${this.databaseName}" database is blocked by another connection.`));
+      };
+    });
   }
 
   private async readAllEntries(): Promise<Array<[string, PersistedEntry]>> {

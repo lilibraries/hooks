@@ -38,7 +38,7 @@ export class StorageCache extends LRUCache<string, any> {
       max,
       dispose: (_value, key) => this.removePersistedEntry(key),
     });
-    this.storage = storage ?? (typeof window !== "undefined" ? window.localStorage : null);
+    this.storage = storage ?? StorageCache.getDefaultStorage();
     this.prefix = prefix;
     this.cacheTime = cacheTime;
     // Storage reads are synchronous, so persisted entries can be restored
@@ -48,11 +48,27 @@ export class StorageCache extends LRUCache<string, any> {
     }
   }
 
+  // Accessing `window.localStorage` can throw (blocked storage, private
+  // browsing) — fall back to a disabled cache instead of crashing.
+  private static getDefaultStorage(): Storage | null {
+    if (typeof window === "undefined") {
+      return null;
+    }
+    try {
+      return window.localStorage;
+    } catch {
+      return null;
+    }
+  }
+
   override set(key: string, value: any, options?: LRUCache.SetOptions<string, any, unknown>): this {
     const result = super.set(key, value, options);
-    // Write through. Overwrites dispose the old entry first, so the old
-    // persisted copy is removed before the new one is written.
-    this.writePersistedEntry(key, value, StorageCache.toExpiresAt(options?.ttl ?? this.cacheTime));
+    // `LRUCache` treats `set(key, undefined)` as `delete(key)` — nothing to persist.
+    if (value !== undefined) {
+      // Write through. Overwrites dispose the old entry first, so the old
+      // persisted copy is removed before the new one is written.
+      this.writePersistedEntry(key, value, StorageCache.toExpiresAt(options?.ttl ?? this.cacheTime));
+    }
     return result;
   }
 
@@ -71,28 +87,34 @@ export class StorageCache extends LRUCache<string, any> {
     if (!storage) {
       return;
     }
-    for (let i = storage.length - 1; i >= 0; i -= 1) {
-      const storageKey = storage.key(i);
-      if (storageKey && storageKey.startsWith(this.prefix)) {
-        const key = storageKey.slice(this.prefix.length);
-        const entry = this.readPersistedEntry(key);
-        const ttl = (entry?.expiresAt == null ? Infinity : entry.expiresAt) - Date.now();
-        if (entry && ttl > 0) {
-          // `super.set` restores the entry without persisting it again.
-          super.set(key, entry.value, { ttl });
-        } else {
-          this.removePersistedEntry(key);
+    // Storage access can throw (blocked storage, private browsing) — treat
+    // it as an empty cache.
+    try {
+      for (let i = storage.length - 1; i >= 0; i -= 1) {
+        const storageKey = storage.key(i);
+        if (storageKey && storageKey.startsWith(this.prefix)) {
+          const key = storageKey.slice(this.prefix.length);
+          const entry = this.readPersistedEntry(key);
+          const ttl = (entry?.expiresAt == null ? Infinity : entry.expiresAt) - Date.now();
+          if (entry && ttl > 0) {
+            // `super.set` restores the entry without persisting it again.
+            super.set(key, entry.value, { ttl });
+          } else {
+            this.removePersistedEntry(key);
+          }
         }
       }
+    } catch {
+      // The in-memory cache stays empty.
     }
   }
 
   private readPersistedEntry(key: string): PersistedEntry | undefined {
-    const raw = this.storage?.getItem(this.prefix + key);
-    if (raw == null) {
-      return undefined;
-    }
     try {
+      const raw = this.storage?.getItem(this.prefix + key);
+      if (raw == null) {
+        return undefined;
+      }
       return JSON.parse(raw) as PersistedEntry;
     } catch {
       return undefined;
@@ -100,11 +122,22 @@ export class StorageCache extends LRUCache<string, any> {
   }
 
   private writePersistedEntry(key: string, value: any, expiresAt: number) {
-    this.storage?.setItem(this.prefix + key, JSON.stringify({ value, expiresAt }));
+    // Persisting is best-effort: quota errors or non-serializable values
+    // must not break the caller — the in-memory cache remains the source
+    // of truth.
+    try {
+      this.storage?.setItem(this.prefix + key, JSON.stringify({ value, expiresAt }));
+    } catch {
+      // Ignore.
+    }
   }
 
   private removePersistedEntry(key: string) {
-    this.storage?.removeItem(this.prefix + key);
+    try {
+      this.storage?.removeItem(this.prefix + key);
+    } catch {
+      // Ignore.
+    }
   }
 }
 
