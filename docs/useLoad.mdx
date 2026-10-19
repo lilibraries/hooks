@@ -68,19 +68,21 @@ This hook covers the whole lifecycle of a request:
 
 ### Control functions
 
-| Function            | Sends a request                                          | Cancels pending work first                   | Bypasses `staleTime`    |
-| ------------------- | -------------------------------------------------------- | -------------------------------------------- | ----------------------- |
-| `load(...params)`   | Yes                                                      | Yes (this instance's)                        | No                      |
-| `force(...params)`  | Yes                                                      | Yes (this instance's)                        | Yes                     |
-| `reload({ force })` | Yes — reuses the most recent params (or `defaultParams`) | Yes                                          | Only with `force: true` |
-| `update(data)`      | No — mutates `data` locally                              | No                                           | —                       |
-| `cancel()`          | No — stops everything                                    | Yes — request, retries, polling, auto-reload | —                       |
+`useLoad` returns five control functions. `load`, `force` and `reload` trigger a load: before starting, each cancels this instance's pending work — the in-flight request, retries, polling and pending auto-reloads — so only one load per instance runs at a time. `update` and `cancel` never send a request.
 
-Notes:
+- **`load(...params)`** — starts a load and passes `params` to `callback` as is. Returns a Promise that resolves with the data on success or rejects with the error on failure. Honors `staleTime`: a fresh cache hit resolves directly without sending a request.
+- **`force(...params)`** — same as `load`, but bypasses `staleTime` and always sends the request. It does not interrupt an in-flight shared request: if another instance is already loading the same `key`, the request is still merged and waits for that result.
+- **`reload({ force })`** — reloads with the most recent `load` params (or `defaultParams` if `load` was never called with params). Set `force: true` to bypass `staleTime`. Returns nothing.
+- **`update(data)`** — updates `data` locally without sending a request. Accepts a new value or a function computed from the previous value. Returns nothing.
+- **`cancel()`** — stops this instance's pending work: the in-flight request, retries, polling and pending auto-reloads. The Promise returned by the cancelled `load`/`force` stays pending forever — it neither resolves nor rejects.
 
-- `load`/`force` return a Promise that resolves with the data or rejects with the error; the other functions return nothing.
-- `force` does not interrupt an in-flight shared request: if another instance is already loading the same `key`, the request is still merged and waits for that result.
-- After `cancel()`, the Promise returned by the cancelled `load`/`force` stays pending forever — it neither resolves nor rejects.
+| Function            | Sends a request | Cancels pending work | Bypasses `staleTime` |
+| ------------------- | --------------- | -------------------- | -------------------- |
+| `load(...params)`   | Yes             | Yes                  | No                   |
+| `force(...params)`  | Yes             | Yes                  | Yes                  |
+| `reload({ force })` | Yes             | Yes                  | With `force: true`   |
+| `update(data)`      | No              | No                   | —                    |
+| `cancel()`          | No              | Yes                  | —                    |
 
 ### Failure handling
 
@@ -90,11 +92,11 @@ When the `callback` fails, `useLoad` walks a fixed pipeline before surfacing `er
 retry callback (≤ retryLimit) → fallback → retry fallback (≤ fallbackRetryLimit) → error
 ```
 
-`retry`/`fallbackRetry` accept a boolean or a function receiving the error and returning whether to retry. Each retry waits `retryInterval`/`fallbackRetryInterval` (exponential by default). Once the `fallback` is invoked, the primary callback is never retried again.
+`retry`/`fallbackRetry` accept a boolean or a function receiving the error and returning whether to retry. Callback retries wait `retryInterval`, fallback retries wait `fallbackRetryInterval` — both exponential by default. Once the `fallback` is invoked, the primary callback is never retried again.
 
 ### Sharing requests
 
-Instances with the same `key` (and `independent: false`) share one request: only the first instance sends it, and the outcome — success **or** failure — is broadcast to the others, which merge and wait instead of firing duplicates. If the loading instance cancels (it reloads or unmounts), the waiting instances automatically reload with their own params.
+Instances with the same `key` (and `independent: false`) share one request: while one instance is loading, the others merge and wait instead of firing duplicates, and the outcome — success **or** failure — is broadcast to all of them. If the loading instance stops (because it reloads or unmounts), the waiting instances automatically reload with their own params.
 
 A [`useReload`](./useReload) call reloads all associated instances at once.
 
@@ -183,9 +185,9 @@ Parameters:
 - **`options`:** Options object.
   - **Loading control:**
     - **`options.imperative`:** Run the callback manually by calling the `load` function, rather than automatically after the component is mounted.
-    - **`options.defaultParams`:** The default parameter array set for `callback` and `fallback`. Used by the first load, or by `reload` when no params have been passed via `load(...params)` yet.
+    - **`options.defaultParams`:** Default params passed to `callback` and `fallback`. Used by the first load, or by `reload` when `load(...params)` has never been called.
   - **Request sharing:**
-    - **`options.key`:** A shared key that can be any data type except `null` and `undefined`, and must be immutable. By default, if multiple requests for the same key appear on the page, only the first one will be sent, and the others will get the data by listening to internal events. You can prevent the default behavior by setting the `independent` option to `true`. Another use of the `key` option is reloading all associated requests together with the [`useReload`](./useReload) hook.
+    - **`options.key`:** A shared key that can be any data type except `null` and `undefined`, and must be immutable. When multiple instances use the same key, only the first one sends the request, and the others wait for and reuse its result. Set the `independent` option to `true` to disable this behavior. Another use of the `key` option is reloading all associated requests together with the [`useReload`](./useReload) hook.
     - **`options.independent`:** When `true`, duplicate requests are not merged even if `key` is set: each instance fires its own request, but `useReload(key)` can still reload it.
   - **Caching:**
     - **`options.cache`:** Cache instance. Create it with `new LRUCache({ max, ttl, ... })` from [`lru-cache`](https://github.com/isaacs/node-lru-cache). If not specified, a shared internal instance (the same one used by [`useCache`](./useCache)) is used. Pass the same instance to `useCache` to let the two hooks share data.
@@ -202,7 +204,7 @@ Parameters:
     - **`options.fallbackRetryLimit`:** Fallback retry limit. Default is `3`.
     - **`options.fallbackRetryInterval`:** Fallback retry interval, in milliseconds. Defaults to exponential growth like `retryInterval`. It can also be a function.
   - **Polling:**
-    - **`options.polling`:** Enable polling when the page is visible. Default is `false`.
+    - **`options.polling`:** Enable polling when the page is visible: after each request settles, it reloads automatically after `pollingInterval`. Default is `false`.
     - **`options.pollingInterval`:** Polling interval when the page is visible, in milliseconds. Default is `30000`.
     - **`options.pollingInPageHidden`:** Enable polling when the page is hidden. Default is `false`. This option is independent of the `polling` option.
     - **`options.pollingIntervalInPageHidden`:** Polling interval when the page is hidden, in milliseconds. Default is `60000`.
@@ -221,17 +223,17 @@ Parameters:
 Results:
 
 - **State:**
-  - **`data`:** Resolved data. Initial value is `undefined` when `initialData` is not specified.
-  - **`error`:** Rejected error. Initial value is `null`.
-  - **`loading`:** Loading state. Initial value is the opposite of the `imperative` option.
+  - **`data`:** Resolved data. Starts with `initialData` or the value restored from the cache via `cacheKey`; otherwise `undefined` until the first load succeeds.
+  - **`error`:** The error of the most recent failure, `null` on success. Initial value is `null`.
+  - **`loading`:** Loading state. Initial value is `true` by default, or `false` when `imperative: true`.
   - **`reloading`:** Equal to `loading && data !== undefined`. Provided for convenience.
   - **`initializing`:** Equal to `loading && data === undefined`. Provided for convenience.
 - **Actions:**
   - **`load`:** Load function. Its params are passed to the `callback` as is. It returns a promise that resolves with the data on success, or rejects with the error on failure. Note: calling it before the component mounts returns a promise that never settles, so do not call it during `useLayoutEffect`.
   - **`force`:** Similar to the `load` function, but it bypasses the `staleTime` cache hit and always sends the request. Note that it does not interrupt in-flight shared requests: if another instance is already loading the same `key`, the request is still merged and waits for that result.
-  - **`reload`:** Reload function. It cancels the in-flight request (including retries, polling, etc.) first, then reloads with the params from the most recent `load` call (or `defaultParams` if none were ever passed). When the `force` option is set to `true`, the `staleTime` option will be ignored.
+  - **`reload`:** Reload function. It cancels this instance's pending work (the in-flight request, retries, polling and pending auto-reloads) first, then reloads with the params from the most recent `load` call (or `defaultParams` if none were ever passed). When the `force` option is set to `true`, the `staleTime` option will be ignored.
   - **`update`:** Update the `data` locally without sending a request. It accepts a new value or a function computed from the old value.
-  - **`cancel`:** Cancel everything, including the executing request, polling, automatic loading, etc. The promise returned by the cancelled `load` stays pending forever.
+  - **`cancel`:** Cancel this instance's pending work: the in-flight request, retries, polling and pending auto-reloads. The promise returned by the cancelled `load`/`force` stays pending forever.
 
 ## Examples
 
