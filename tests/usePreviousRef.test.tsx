@@ -41,6 +41,18 @@ describe("usePreviousRef", () => {
     expect(result.current.current).not.toBe(newObject);
   });
 
+  it("NaN is treated as equal to NaN (Object.is semantics)", () => {
+    const { result, rerender } = renderHook(({ value }) => usePreviousRef(value), {
+      initialProps: { value: 1 },
+    });
+
+    rerender({ value: NaN });
+    expect(result.current.current).toBe(1); // NaN is a change: previous becomes 1
+
+    rerender({ value: NaN });
+    expect(result.current.current).toBe(1); // unchanged: NaN equals NaN under Object.is
+  });
+
   it("ref object identity is stable", () => {
     const { result, rerender } = renderHook(() => usePreviousRef(1));
     const ref = result.current;

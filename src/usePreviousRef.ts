@@ -10,7 +10,8 @@ function usePreviousRef<T>(value: T) {
   const currentRef = useRef(value);
   const previousRef = useRef<T | undefined>(undefined);
 
-  if (value !== currentRef.current) {
+  // `Object.is` (not `===`) so `NaN` equals `NaN` and `-0` differs from `0`.
+  if (!Object.is(value, currentRef.current)) {
     previousRef.current = currentRef.current;
     currentRef.current = value;
   }
