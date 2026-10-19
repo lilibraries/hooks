@@ -1,0 +1,24 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 1024 1024"
+  width="1024"
+  height="1024"
+  role="img"
+  aria-label="Favicon"
+  shape-rendering="geometricPrecision"
+  focusable="false"
+>
+  <rect width="1024" height="1024" rx="229" fill="#000000" />
+  <g
+    fill="none"
+    stroke="#FFFFFF"
+    stroke-width="71.49"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  >
+    <path d="M 455.83 112 L 455.83 360.51 A 95.32 95.32 0 0 1 360.51 455.83 L 319.66 455.83" />
+    <path d="M 912 455.83 L 663.49 455.83 A 95.32 95.32 0 0 1 568.17 360.51 L 568.17 319.66" />
+    <path d="M 568.17 912 L 568.17 663.49 A 95.32 95.32 0 0 1 663.49 568.17 L 704.34 568.17" />
+    <path d="M 112 568.17 L 360.51 568.17 A 95.32 95.32 0 0 1 455.83 663.49 L 455.83 704.34" />
+  </g>
+</svg>
