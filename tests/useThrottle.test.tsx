@@ -113,6 +113,35 @@ describe("useThrottle", () => {
     expect(callback).toHaveBeenCalledWith("a");
   });
 
+  it("flushes the pending call when the options change", () => {
+    const callback = jest.fn();
+    const { result, rerender } = renderHook(({ wait }) => useThrottle(callback, wait), {
+      initialProps: { wait: 100 },
+    });
+    const [throttled] = result.current;
+
+    act(() => throttled("a"));
+
+    rerender({ wait: 200 });
+
+    // The pending invocation of the old instance is flushed on the options change
+    expect(callback).toHaveBeenCalledTimes(1);
+    expect(callback).toHaveBeenCalledWith("a");
+
+    // The new instance uses the new wait
+    act(() => result.current[0]("b"));
+    act(() => {
+      jest.advanceTimersByTime(100);
+    });
+    expect(callback).toHaveBeenCalledTimes(1);
+
+    act(() => {
+      jest.advanceTimersByTime(100);
+    });
+    expect(callback).toHaveBeenCalledTimes(2);
+    expect(callback).toHaveBeenLastCalledWith("b");
+  });
+
   it("runs the latest callback", () => {
     const first = jest.fn();
     const { result, rerender } = renderHook(({ callback }) => useThrottle(callback, 100), {

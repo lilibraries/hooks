@@ -89,6 +89,35 @@ describe("useDebounce", () => {
     expect(callback).toHaveBeenCalledTimes(1);
   });
 
+  it("flushes the pending call when the options change", () => {
+    const callback = jest.fn();
+    const { result, rerender } = renderHook(({ wait }) => useDebounce(callback, wait), {
+      initialProps: { wait: 100 },
+    });
+    const [debounced] = result.current;
+
+    act(() => debounced("a"));
+
+    rerender({ wait: 200 });
+
+    // The pending invocation of the old instance is flushed on the options change
+    expect(callback).toHaveBeenCalledTimes(1);
+    expect(callback).toHaveBeenCalledWith("a");
+
+    // The new instance uses the new wait
+    act(() => result.current[0]("b"));
+    act(() => {
+      jest.advanceTimersByTime(100);
+    });
+    expect(callback).toHaveBeenCalledTimes(1);
+
+    act(() => {
+      jest.advanceTimersByTime(100);
+    });
+    expect(callback).toHaveBeenCalledTimes(2);
+    expect(callback).toHaveBeenLastCalledWith("b");
+  });
+
   it("leading option: the first call runs immediately", () => {
     const callback = jest.fn();
     const { result } = renderHook(() => useDebounce(callback, { wait: 100, leading: true, trailing: false }));
