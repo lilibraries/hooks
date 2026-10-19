@@ -40,9 +40,6 @@ function createRefEffectHook(useHook: EffectHook) {
       }
     });
 
-    // Run cleanup through the injected useHook on unmount so destruction happens
-    // in the same phase as creation (e.g. useLayoutRefEffect tears down during
-    // the layout phase rather than after paint).
     useHook(() => {
       return () => {
         destroy();

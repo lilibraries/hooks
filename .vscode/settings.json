@@ -13,5 +13,5 @@
   "eslint.format.enable": true,
   "prettier.requireConfig": true,
   "prettier.useEditorConfig": false,
-  "prettier.prettierPath": "./node_modules/prettier/index.js"
+  "prettier.prettierPath": "./node_modules/prettier/index.mjs"
 }

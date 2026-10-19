@@ -20,15 +20,16 @@ Every hook must support React 16.8+ / 17 / 18 / 19, as well as SSR and StrictMod
 - Docs and comments are written in English by default and must follow English writing conventions; when authoring docs for a specific language, write in that language with its corresponding conventions.
 - Every hook must have reasonable and accurate JSDoc comments describing its purpose, parameters, and return values (`@param`, `@returns`) — explain what the hook does, what each parameter means, and what each returned value represents.
 - Except for hook API documentation (JSDoc), comments must be as concise and accurate as possible — only add comments where necessary; do not comment self-evident logic.
+- Format code and comments with Prettier: `printWidth` is 120 (see `.prettierrc`), all other options use Prettier defaults.
 
 ## Adding a Hook
 
-Adding a new hook requires modifying five places — missing any one of them breaks CI or leaves users without docs:
+Adding a new hook touches the following places:
 
 1. `src/useXxx.ts` + export it under the matching category in `src/index.ts` (`tests/index.test.ts` scans `src/` and requires the exports to match it exactly).
-2. Write `tests/useXxx.test.tsx` via `tests/helpers/renderHook`.
+2. Cover the hook with tests via `tests/helpers/renderHook`. Usually a dedicated `tests/useXxx.test.tsx`; when existing suites already cover the hook's behavior (e.g. `useIsomorphicLayoutEffect` is covered by `tests/ssr.test.tsx`), a dedicated file is not mandatory.
 3. Add it to `AllHooks` in `tests/ssr.test.tsx` (and to `BrowserValueHooks` as well if it returns browser-dependent values).
-4. Docs: `docs/useXxx.mdx` (intro + `## API` + `## Example`), `docs/examples/UseXxx.tsx` (default export, importing from `@lilib/hooks`), and register it in `docs/sidebars.js`.
+4. Docs: `docs/useXxx.mdx` (intro + `## API` + `## Example`) registered in `docs/sidebars.js`. An inline code example in the mdx is acceptable for simple hooks; use `docs/examples/UseXxx.tsx` (default export, importing from `@lilib/hooks`) with `ExampleBlock` when an interactive demo adds value.
 5. Update the hooks table in Getting Started and `README.md`.
 
 ## Testing Rules
