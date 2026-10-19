@@ -1,5 +1,90 @@
 # Changelog
 
+## [2.0.0](https://github.com/lilibraries/hooks/compare/v1.1.0...v2.0.0) (2026-10-19)
+
+### ⚠ BREAKING CHANGES
+
+* add `useAnimate` hook
+* add `useLayoutRefEffect` hook
+* add `useLayoutRefUpdate` hook
+* add `useRefEffect` hook
+* add `useRefUpdate` hook
+* drop `force` option from `useReload`
+* lazy-access storage with error handling in `useLocalStorage`
+* lazy-access storage with error handling in `useSessionStorage`
+* move `useFavicon` side effects into `useEffect`
+* remove `createTargetEffectHook` factory
+* remove `useAnimation` hook
+* remove `useCache` hook
+* remove `useLayoutTargetEffect` hook
+* remove `useOnce` hook
+* remove `useTargetEffect` hook
+* remove LoadConfig and rework `useLoad`
+* rename `include` to `shouldDelay` in `useDelayedValue`
+* rework `useClickOutside` with ref-based targets
+* rework `useComposedRef` with stable callback identity
+* rework `useCookie` with fresh-value updates
+* rework `useDebounce` with on-demand rebuild
+* rework `useElementSize` with ref-based targets
+* rework `useEventListener` with ref-based targets
+* rework `useIntersecting` with ref-based targets
+* rework `useIntersectionObserver` with ref-based targets
+* rework `useResizeObserver` with ref-based targets
+* rework `useSubmit` retry and idle options
+* rework `useThrottle` with on-demand rebuild
+* set title via `useEffect` in `useTitle`
+
+### Features
+
+* add `useAnimate` hook ([e79794a](https://github.com/lilibraries/hooks/commit/e79794a7bd45cae5ea57b48620c0122c7dd95781))
+* add `useLayoutRefEffect` hook ([59636a2](https://github.com/lilibraries/hooks/commit/59636a2ce32c34783ec6b68bf822287a391c2637))
+* add `useLayoutRefUpdate` hook ([40a979a](https://github.com/lilibraries/hooks/commit/40a979a5c2ffa4d5df3d8354faefd702ca3d6ff8))
+* add `useRefEffect` hook ([330f8b7](https://github.com/lilibraries/hooks/commit/330f8b77ca5b0e37ca4ceff6ec22ea5ed3f94ba7))
+* add `useRefUpdate` hook ([8c51c27](https://github.com/lilibraries/hooks/commit/8c51c271ebd8c2fa4a31204a55e4e2b01d68a482))
+* add caching and force loading to `useLoad` ([5222c07](https://github.com/lilibraries/hooks/commit/5222c07eb998947d03206b6ac9f2bb5f047f1b2e))
+* detect bfcache restores in `usePageVisible` ([65680e8](https://github.com/lilibraries/hooks/commit/65680e81f1b8ca0aba3f73fd3aba2e41eb26eb96))
+* expose `error` and force each request in `useSubmit` ([996816b](https://github.com/lilibraries/hooks/commit/996816bf644e4242d6cabdaa7d54994b635a40d1))
+* rework `useCache` around `lru-cache` ([1a163ec](https://github.com/lilibraries/hooks/commit/1a163ec9477a495ac12e116fe9666029aa303ee0))
+* support forced reload in `useReload` ([ba81ee8](https://github.com/lilibraries/hooks/commit/ba81ee85f01aea56b676f9e5114e70869915d01d))
+* track visualViewport resizes in `useWindowSize` ([b7da7bd](https://github.com/lilibraries/hooks/commit/b7da7bdbb5578832ecabf7be490ed38cfd08dbe6))
+
+### Bug Fixes
+
+* **`useCache`:** map `cacheTime: Infinity` to `ttl: 0` and emit via `peek` ([6c20431](https://github.com/lilibraries/hooks/commit/6c20431c4bb7e8980cd5a0c7fef8d72bab73152e))
+* **`useCookie`, `useLocalStorage`, `useSessionStorage`:** hydrate stored value after mount ([c5b6477](https://github.com/lilibraries/hooks/commit/c5b64777f6ec11cf620a25f7eb9665f6d7267c21))
+* **`useLoad`:** settle correctly under StrictMode and never set state on unmount ([e496695](https://github.com/lilibraries/hooks/commit/e4966955646dba109d354fbe2a8242b5e1745046))
+* **`usePreviousRef`:** compare values with `Object.is` so `NaN` equals `NaN` ([e487cac](https://github.com/lilibraries/hooks/commit/e487cac01490ff882d43c7c4c334c777fbd234ed))
+* **`useWindowSize`:** skip state update when the size is unchanged ([4473872](https://github.com/lilibraries/hooks/commit/4473872eb241e9f390e50789e311228cdd58ed4b))
+* **deps:** upgrade `@release-it/conventional-changelog` to v12 ([d854348](https://github.com/lilibraries/hooks/commit/d854348225619e7dc75e5d8244d39953aa7d1c0f))
+* **scripts:** run `release-it` dry-run in CI mode ([de1ecfc](https://github.com/lilibraries/hooks/commit/de1ecfce6252c5d9970bd6e896e78ccf0759117a))
+
+### Code Refactoring
+
+* drop `force` option from `useReload` ([c339b2a](https://github.com/lilibraries/hooks/commit/c339b2a1d258f0522a138d61cabbce544dede469))
+* lazy-access storage with error handling in `useLocalStorage` ([88a4ae9](https://github.com/lilibraries/hooks/commit/88a4ae90cea80ee9e760a29357159c7e7e25b7b4))
+* lazy-access storage with error handling in `useSessionStorage` ([238287a](https://github.com/lilibraries/hooks/commit/238287ac2077896e94c7589705bf44503b6cf75f))
+* move `useFavicon` side effects into `useEffect` ([2713a45](https://github.com/lilibraries/hooks/commit/2713a4583c5444d5d99d0b36eb54c8c6bdd71761))
+* remove `createTargetEffectHook` factory ([5c5662e](https://github.com/lilibraries/hooks/commit/5c5662e5e499252c402520f0cb5795478b4a1196))
+* remove `useAnimation` hook ([af83d86](https://github.com/lilibraries/hooks/commit/af83d867a60f34cf80036c41d753ccbb652ed9da))
+* remove `useCache` hook ([98cdafa](https://github.com/lilibraries/hooks/commit/98cdafaa8772a4ca9096c101180f994b2151f0eb))
+* remove `useLayoutTargetEffect` hook ([f2b4b8f](https://github.com/lilibraries/hooks/commit/f2b4b8f53f8338ff3738e77413617da7b552dbec))
+* remove `useOnce` hook ([35ad420](https://github.com/lilibraries/hooks/commit/35ad4202186a8fa48b0f7ad4ee78f3531db2391f))
+* remove `useTargetEffect` hook ([7ddd4cf](https://github.com/lilibraries/hooks/commit/7ddd4cf114bd3cf1ae1d87bb52e4dbaaed636046))
+* remove LoadConfig and rework `useLoad` ([7b07f0e](https://github.com/lilibraries/hooks/commit/7b07f0e64cfa13ad80995390936bc7c729a978ec))
+* rename `include` to `shouldDelay` in `useDelayedValue` ([0bc138f](https://github.com/lilibraries/hooks/commit/0bc138fd54611b9593be7f6f384725883377b102))
+* rework `useClickOutside` with ref-based targets ([02b7e0c](https://github.com/lilibraries/hooks/commit/02b7e0c050ad02b20481741382386ca7b75d5be8))
+* rework `useComposedRef` with stable callback identity ([5bdfa55](https://github.com/lilibraries/hooks/commit/5bdfa55f9b96a99e570f0800e268a6ff04118c7b))
+* rework `useCookie` with fresh-value updates ([a99f9cf](https://github.com/lilibraries/hooks/commit/a99f9cf19f6eab8e787c2619d8e1d78dae783fbb))
+* rework `useDebounce` with on-demand rebuild ([1f06064](https://github.com/lilibraries/hooks/commit/1f06064922a6187c2fbe4fecdd48660176a07ec1))
+* rework `useElementSize` with ref-based targets ([75229a8](https://github.com/lilibraries/hooks/commit/75229a83aff872c5a7628e210b5c184e08edaf67))
+* rework `useEventListener` with ref-based targets ([58f02db](https://github.com/lilibraries/hooks/commit/58f02db7891d371a936729eb52f10032b016258b))
+* rework `useIntersecting` with ref-based targets ([b13ca3d](https://github.com/lilibraries/hooks/commit/b13ca3d642bda29ff1e83d3ef45a773d2b108e5d))
+* rework `useIntersectionObserver` with ref-based targets ([28c8246](https://github.com/lilibraries/hooks/commit/28c82466138970d77799f2f127c6343011450c74))
+* rework `useResizeObserver` with ref-based targets ([2e6e1dc](https://github.com/lilibraries/hooks/commit/2e6e1dc364f33bc34d09ab97f30a82e419bf32e9))
+* rework `useSubmit` retry and idle options ([f496d82](https://github.com/lilibraries/hooks/commit/f496d82234245d7cc62852538d5c85249f87bb32))
+* rework `useThrottle` with on-demand rebuild ([bc45a9a](https://github.com/lilibraries/hooks/commit/bc45a9a8b467fd7ff1543616259bad3056313f2d))
+* set title via `useEffect` in `useTitle` ([7845fb7](https://github.com/lilibraries/hooks/commit/7845fb719f26a1e4c8276417840ecca3cca3d5d8))
+
 ## [1.1.0](https://github.com/lilibraries/hooks/compare/v1.0.3...v1.1.0) (2025-04-07)
 
 
