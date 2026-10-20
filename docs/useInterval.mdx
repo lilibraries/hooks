@@ -8,7 +8,10 @@ Run a callback repeatedly at a fixed interval.
 ## API
 
 ```ts
-function useInterval(callback: () => void, interval?: number): [start: () => void, cancel: () => void];
+function useInterval(
+  callback: () => void,
+  interval?: number,
+): [start: () => void, cancel: () => void];
 ```
 
 Parameters:

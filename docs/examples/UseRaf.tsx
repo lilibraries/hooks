@@ -32,7 +32,9 @@ function Example() {
         <button onClick={handleStart}>Start</button> <button onClick={cancel}>Cancel</button>
       </div>
       <div style={{ height: 8, marginTop: 8, backgroundColor: "rgba(128, 128, 128, 0.2)" }}>
-        <div style={{ width: progress * 100 + "%", height: "100%", backgroundColor: "orange" }}></div>
+        <div
+          style={{ width: progress * 100 + "%", height: "100%", backgroundColor: "orange" }}
+        ></div>
       </div>
     </>
   );

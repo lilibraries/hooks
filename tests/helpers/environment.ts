@@ -30,7 +30,10 @@ class HooksJSDOMEnvironment extends JSDOMEnvironment {
   }
 
   handleTestEvent(event: { name: string }) {
-    if (event.name === "setup" && FILES_WITH_EXPECTED_REJECTIONS.some((file) => this.testPath.endsWith(file))) {
+    if (
+      event.name === "setup" &&
+      FILES_WITH_EXPECTED_REJECTIONS.some((file) => this.testPath.endsWith(file))
+    ) {
       process.removeAllListeners("unhandledRejection");
       process.on("unhandledRejection", this.ignoreRejection);
     }

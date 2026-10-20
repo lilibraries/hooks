@@ -30,7 +30,9 @@ describe("useComposedRef", () => {
 
   it("ignores null and undefined refs", () => {
     const callbackRef = jest.fn();
-    const { result } = renderHook(() => useComposedRef<HTMLDivElement>(null, undefined, callbackRef));
+    const { result } = renderHook(() =>
+      useComposedRef<HTMLDivElement>(null, undefined, callbackRef),
+    );
 
     const element = document.createElement("div");
     expect(() => result.current(element)).not.toThrow();

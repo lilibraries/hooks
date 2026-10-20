@@ -3,7 +3,9 @@ const path = require("path");
 
 const supportedReactVersions = ["16", "17", "18", "19"];
 const reactVersion = process.env.REACT_VERSION;
-const testDepsDir = reactVersion ? path.resolve(__dirname, ".test-deps", `react${reactVersion}`, "node_modules") : null;
+const testDepsDir = reactVersion
+  ? path.resolve(__dirname, ".test-deps", `react${reactVersion}`, "node_modules")
+  : null;
 
 const moduleNameMapper = {
   "@lilib/hooks": "<rootDir>/src",

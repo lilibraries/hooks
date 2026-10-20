@@ -12,7 +12,8 @@ function Example() {
         backgroundColor: isDarkMode ? "#1b1b1d" : "#f5f6f7",
       }}
     >
-      {isDarkMode ? "Dark theme" : "Light theme"} (prefers-color-scheme: {isDarkMode ? "dark" : "light"})
+      {isDarkMode ? "Dark theme" : "Light theme"} (prefers-color-scheme:{" "}
+      {isDarkMode ? "dark" : "light"})
     </div>
   );
 }

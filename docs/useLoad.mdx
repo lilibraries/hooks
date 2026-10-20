@@ -160,7 +160,8 @@ interface UseLoadResults<Callback extends LoadCallback> {
   reload: (options?: { force?: boolean }) => void;
   update: (
     newData:
-      Awaited<ReturnType<Callback>> | ((prevData?: Awaited<ReturnType<Callback>>) => Awaited<ReturnType<Callback>>),
+      | Awaited<ReturnType<Callback>>
+      | ((prevData?: Awaited<ReturnType<Callback>>) => Awaited<ReturnType<Callback>>),
   ) => void;
   cancel: () => void;
 }

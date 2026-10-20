@@ -37,7 +37,9 @@ function Example() {
   return (
     <>
       <div>
-        <button onClick={() => setShow((show) => !show)}>{show ? "Unmount" : "Mount"} loader</button>
+        <button onClick={() => setShow((show) => !show)}>
+          {show ? "Unmount" : "Mount"} loader
+        </button>
       </div>
       {show && <Loader onSkipped={() => setSkipped((skipped) => skipped + 1)} />}
       <div>Updates skipped after unmount: {skipped}</div>

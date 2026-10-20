@@ -40,9 +40,12 @@ describe("useMemoizedValue", () => {
   });
 
   it("supports a custom comparison function", () => {
-    const { result, rerender } = renderHook(({ value }) => useMemoizedValue(value, (x: number, y: number) => x === y), {
-      initialProps: { value: 1 },
-    });
+    const { result, rerender } = renderHook(
+      ({ value }) => useMemoizedValue(value, (x: number, y: number) => x === y),
+      {
+        initialProps: { value: 1 },
+      },
+    );
 
     rerender({ value: 2 });
     expect(result.current).toBe(2);

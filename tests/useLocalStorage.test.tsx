@@ -141,7 +141,9 @@ describe("useLocalStorage", () => {
 
   it("polling detects external changes", () => {
     jest.useFakeTimers();
-    const { result } = renderHook(() => useLocalStorage<number>("count", { polling: true, pollingInterval: 100 }));
+    const { result } = renderHook(() =>
+      useLocalStorage<number>("count", { polling: true, pollingInterval: 100 }),
+    );
 
     window.localStorage.setItem("count", "7");
     act(() => {

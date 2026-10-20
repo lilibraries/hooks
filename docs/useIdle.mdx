@@ -8,7 +8,10 @@ Invoke the callback when the browser is idle. This hook uses [window.requestIdle
 ## API
 
 ```ts
-function useIdle(callback: () => void, options?: IdleRequestOptions): [start: () => void, cancel: () => void];
+function useIdle(
+  callback: () => void,
+  options?: IdleRequestOptions,
+): [start: () => void, cancel: () => void];
 ```
 
 Parameters:

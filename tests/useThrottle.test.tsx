@@ -57,7 +57,9 @@ describe("useThrottle", () => {
 
   it("the last call within the wait does not run when trailing: false", () => {
     const callback = jest.fn();
-    const { result } = renderHook(() => useThrottle(callback, { wait: 100, leading: true, trailing: false }));
+    const { result } = renderHook(() =>
+      useThrottle(callback, { wait: 100, leading: true, trailing: false }),
+    );
     const [throttled] = result.current;
 
     act(() => {

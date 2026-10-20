@@ -42,7 +42,11 @@ function useDelayedValue<T>(value: T, options: number | UseDelayedValueOptions) 
     }
   }
 
-  warning(delay > 0, "[useDelayedValue] The `delay` option must be a positive number, but received `%s`.", delay);
+  warning(
+    delay > 0,
+    "[useDelayedValue] The `delay` option must be a positive number, but received `%s`.",
+    delay,
+  );
 
   const [state, setState] = useSafeState(value);
   const [update, cancelUpdate] = useTimeout(() => setState(value), delay);

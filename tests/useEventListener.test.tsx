@@ -77,9 +77,12 @@ describe("useEventListener", () => {
     document.body.appendChild(element);
     const listener = jest.fn();
 
-    const { rerender } = renderHook(({ eventName }) => useEventListener(element, eventName, listener), {
-      initialProps: { eventName: "click" },
-    });
+    const { rerender } = renderHook(
+      ({ eventName }) => useEventListener(element, eventName, listener),
+      {
+        initialProps: { eventName: "click" },
+      },
+    );
 
     rerender({ eventName: "mouseenter" });
 
@@ -154,9 +157,12 @@ describe("useEventListener", () => {
     const element = document.createElement("div");
     document.body.appendChild(element);
     const first = jest.fn();
-    const { rerender } = renderHook(({ listener }) => useEventListener(element, "click", listener), {
-      initialProps: { listener: first },
-    });
+    const { rerender } = renderHook(
+      ({ listener }) => useEventListener(element, "click", listener),
+      {
+        initialProps: { listener: first },
+      },
+    );
 
     const latest = jest.fn();
     rerender({ listener: latest });

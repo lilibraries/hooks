@@ -40,7 +40,10 @@ function createStorageHook(getStorage: () => Storage | null) {
   function useStorage<T>(
     key: string,
     options?: UseStorageOptions<T>,
-  ): readonly [T | undefined, (value: T | undefined | ((prevValue: T | undefined) => T | undefined)) => void];
+  ): readonly [
+    T | undefined,
+    (value: T | undefined | ((prevValue: T | undefined) => T | undefined)) => void,
+  ];
 
   function useStorage<T>(key: string, options?: UseStorageOptions<T>) {
     const {
@@ -85,23 +88,25 @@ function createStorageHook(getStorage: () => Storage | null) {
       }
     });
 
-    const setStorage = usePersist((newValue: T | undefined | ((prevValue: T | undefined) => T | undefined)) => {
-      const resolved = isFunction(newValue) ? newValue(valueRef.current) : newValue;
+    const setStorage = usePersist(
+      (newValue: T | undefined | ((prevValue: T | undefined) => T | undefined)) => {
+        const resolved = isFunction(newValue) ? newValue(valueRef.current) : newValue;
 
-      if (resolved === undefined) {
-        storage?.removeItem(key);
-        valueRef.current = defaultValue;
-        setValue(defaultValue);
-      } else {
-        try {
-          storage?.setItem(key, serialize(resolved));
-        } catch (error) {
-          console.error(error);
+        if (resolved === undefined) {
+          storage?.removeItem(key);
+          valueRef.current = defaultValue;
+          setValue(defaultValue);
+        } else {
+          try {
+            storage?.setItem(key, serialize(resolved));
+          } catch (error) {
+            console.error(error);
+          }
+          valueRef.current = resolved;
+          setValue(resolved);
         }
-        valueRef.current = resolved;
-        setValue(resolved);
-      }
-    });
+      },
+    );
 
     const handleChange = () => {
       const newValue = getStoredValue();

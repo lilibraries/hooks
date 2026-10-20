@@ -24,7 +24,9 @@ function useWindowSize() {
     const height = window.innerHeight;
     // Bail out when the size is unchanged: the visualViewport may fire resize
     // (e.g. on pinch-zoom) while the window size stays the same.
-    setState((prevState) => (prevState.width === width && prevState.height === height ? prevState : { width, height }));
+    setState((prevState) =>
+      prevState.width === width && prevState.height === height ? prevState : { width, height },
+    );
   }
 
   useEventListener(windowRef, "resize", listener);

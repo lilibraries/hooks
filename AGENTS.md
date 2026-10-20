@@ -20,7 +20,7 @@ Every hook must support React 16.8+ / 17 / 18 / 19, as well as SSR and StrictMod
 - Docs and comments are written in English by default and must follow English writing conventions; when authoring docs for a specific language, write in that language with its corresponding conventions.
 - Every hook must have reasonable and accurate JSDoc comments describing its purpose, parameters, and return values (`@param`, `@returns`) — explain what the hook does, what each parameter means, and what each returned value represents.
 - Except for hook API documentation (JSDoc), comments must be as concise and accurate as possible — only add comments where necessary; do not comment self-evident logic.
-- Format code and comments with Prettier: `printWidth` is 120 (see `.prettierrc`), all other options use Prettier defaults.
+- Format code and comments with Prettier: `printWidth` is 100 (see `.prettierrc`), all other options use Prettier defaults.
 
 ## Adding a Hook
 
@@ -47,6 +47,7 @@ Adding a new hook touches the following places:
 - Adding a hook requires no build config changes (Babel cjs/esm, Rollup umd, tsc types).
 - CHANGELOG.md is generated automatically by release-it from commit history — never edit it by hand.
 - Commit messages must follow Conventional Commits (enforced by commitlint via husky) and be written in English. Hook names and hook parameter names in commit messages must be wrapped in backticks.
+- Only commits that change published source (`src/`) may generate changelog entries, via `feat`, `fix`, `perf`, or a `!`-suffixed type (e.g. `feat!:`/`chore!:` — do not use a `BREAKING CHANGE` footer). Commits that only touch docs, tests, build scripts, or config must use non-changelog types (`docs`, `test`, `build`, `ci`, `chore`) instead.
 
 ## Do Not "Fix"
 

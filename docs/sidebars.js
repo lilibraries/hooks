@@ -59,7 +59,13 @@ module.exports = {
       type: "category",
       label: "Refs",
       collapsed: false,
-      items: ["useLatestRef", "usePreviousRef", "useComposedRef", "useMountedRef", "useUnmountedRef"],
+      items: [
+        "useLatestRef",
+        "usePreviousRef",
+        "useComposedRef",
+        "useMountedRef",
+        "useUnmountedRef",
+      ],
     },
     {
       type: "category",

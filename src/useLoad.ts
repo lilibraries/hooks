@@ -104,7 +104,8 @@ interface Results<Callback extends LoadCallback> {
   /** Local update function: mutates `data` directly (no request), accepts a new value or a function computed from the old value. */
   update: (
     newData:
-      Awaited<ReturnType<Callback>> | ((prevData?: Awaited<ReturnType<Callback>>) => Awaited<ReturnType<Callback>>),
+      | Awaited<ReturnType<Callback>>
+      | ((prevData?: Awaited<ReturnType<Callback>>) => Awaited<ReturnType<Callback>>),
   ) => void;
   /** Cancel function: aborts the current load and stops all pending tasks such as retries and polling. The Promise returned by the cancelled `load` stays pending forever (neither resolves nor rejects). */
   cancel: () => void;
@@ -256,15 +257,17 @@ function useLoad<Callback extends LoadCallback>(
   /** Whether the next `load` should bypass the `staleTime` cache hit, set by `force()` / `reload({ force: true })` */
   const forceRef = useRef(false);
   const paramsRef = useRef<Parameters<Callback> | undefined>(undefined);
-  const loadingRef = useRef<{ key: NonNullable<unknown>; load: AnyFunction; store: typeof store } | undefined>(
-    undefined,
-  );
+  const loadingRef = useRef<
+    { key: NonNullable<unknown>; load: AnyFunction; store: typeof store } | undefined
+  >(undefined);
   const unlistenRef = useRef<(() => void) | undefined>(undefined);
   const idleTimerRef = useRef(0);
   const retryTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const pollingTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const reloadRef = useRef<(() => void) | undefined>(undefined);
-  const loadRef = useRef<((...params: Parameters<Callback>) => ReturnType<Callback>) | undefined>(undefined);
+  const loadRef = useRef<((...params: Parameters<Callback>) => ReturnType<Callback>) | undefined>(
+    undefined,
+  );
 
   // leading and non-trailing: among consecutive triggers (e.g. rapid visibility toggles) only the first runs, later triggers within autoReloadWaitTime are ignored.
   const [autoReload] = useThrottle(
@@ -392,7 +395,9 @@ function useLoad<Callback extends LoadCallback>(
 
     // The fresh-cache branch above already resolved when the entry is still within `staleTime`.
     const cachedData =
-      state.data === undefined && cacheKey != null && cache.has(cacheKey) ? getCachedData() : undefined;
+      state.data === undefined && cacheKey != null && cache.has(cacheKey)
+        ? getCachedData()
+        : undefined;
     if (cachedData !== undefined) {
       setState({ data: cachedData, loading: true });
     } else if (!state.loading) {
@@ -587,7 +592,8 @@ function useLoad<Callback extends LoadCallback>(
   const update = usePersist(
     (
       newData:
-        Awaited<ReturnType<Callback>> | ((prevData?: Awaited<ReturnType<Callback>>) => Awaited<ReturnType<Callback>>),
+        | Awaited<ReturnType<Callback>>
+        | ((prevData?: Awaited<ReturnType<Callback>>) => Awaited<ReturnType<Callback>>),
     ) => {
       setState((prevState) => ({
         data: isFunction(newData) ? newData(prevState.data) : newData,

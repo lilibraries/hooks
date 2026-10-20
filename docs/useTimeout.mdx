@@ -8,7 +8,10 @@ Execute a callback after a delay.
 ## API
 
 ```ts
-function useTimeout(callback: () => void, timeout?: number): [start: () => void, cancel: () => void];
+function useTimeout(
+  callback: () => void,
+  timeout?: number,
+): [start: () => void, cancel: () => void];
 ```
 
 Parameters:

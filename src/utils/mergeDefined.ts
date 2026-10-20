@@ -5,20 +5,24 @@
  */
 function mergeDefined<A extends object>(a: A): A;
 function mergeDefined<A extends object, B extends object>(a: A, b: B): A & B;
-function mergeDefined<A extends object, B extends object, C extends object>(a: A, b: B, c: C): A & B & C;
+function mergeDefined<A extends object, B extends object, C extends object>(
+  a: A,
+  b: B,
+  c: C,
+): A & B & C;
 function mergeDefined<A extends object, B extends object, C extends object, D extends object>(
   a: A,
   b: B,
   c: C,
   d: D,
 ): A & B & C & D;
-function mergeDefined<A extends object, B extends object, C extends object, D extends object, E extends object>(
-  a: A,
-  b: B,
-  c: C,
-  d: D,
-  e: E,
-): A & B & C & D & E;
+function mergeDefined<
+  A extends object,
+  B extends object,
+  C extends object,
+  D extends object,
+  E extends object,
+>(a: A, b: B, c: C, d: D, e: E): A & B & C & D & E;
 function mergeDefined<T extends object>(...args: Partial<T>[]): T;
 function mergeDefined(...args: any[]) {
   const to: any = {};

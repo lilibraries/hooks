@@ -25,8 +25,20 @@ const matrix = {
     "@testing-library/react@12",
     "@testing-library/react-hooks@7",
   ],
-  react18: ["react@18", "react-dom@18", "scheduler@^0.23.2", "@testing-library/dom@10", "@testing-library/react@16"],
-  react19: ["react@19", "react-dom@19", "scheduler@^0.28.0", "@testing-library/dom@10", "@testing-library/react@16"],
+  react18: [
+    "react@18",
+    "react-dom@18",
+    "scheduler@^0.23.2",
+    "@testing-library/dom@10",
+    "@testing-library/react@16",
+  ],
+  react19: [
+    "react@19",
+    "react-dom@19",
+    "scheduler@^0.28.0",
+    "@testing-library/dom@10",
+    "@testing-library/react@16",
+  ],
 };
 
 const target = process.argv.slice(2).find((arg) => !arg.startsWith("--"));

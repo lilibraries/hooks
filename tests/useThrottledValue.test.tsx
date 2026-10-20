@@ -53,9 +53,12 @@ describe("useThrottledValue", () => {
   });
 
   it("the first change updates immediately when leading: true", () => {
-    const { result, rerender } = renderHook(({ value }) => useThrottledValue(value, { wait: 100, leading: true }), {
-      initialProps: { value: "a" },
-    });
+    const { result, rerender } = renderHook(
+      ({ value }) => useThrottledValue(value, { wait: 100, leading: true }),
+      {
+        initialProps: { value: "a" },
+      },
+    );
 
     rerender({ value: "b" });
     expect(result.current[0]).toBe("b");

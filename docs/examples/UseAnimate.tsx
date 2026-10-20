@@ -21,7 +21,10 @@ function Example() {
       <div>
         <button onClick={start}>Start</button> <button onClick={cancel}>Cancel</button>
       </div>
-      <div ref={domRef} style={{ width: 0, height: 8, marginTop: 8, backgroundColor: "orange" }}></div>
+      <div
+        ref={domRef}
+        style={{ width: 0, height: 8, marginTop: 8, backgroundColor: "orange" }}
+      ></div>
     </>
   );
 }

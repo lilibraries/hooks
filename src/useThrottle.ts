@@ -24,7 +24,10 @@ export interface UseThrottleOptions {
  * @param options.trailing Whether to invoke at the end.
  * @returns Returns a `[throttled, { flush, cancel }]` tuple: `throttled` is the throttled function, `flush` runs the pending invocation immediately, and `cancel` aborts it.
  */
-function useThrottle<T extends (...args: any[]) => any>(callback: T, options?: number | UseThrottleOptions) {
+function useThrottle<T extends (...args: any[]) => any>(
+  callback: T,
+  options?: number | UseThrottleOptions,
+) {
   let wait = 0;
   let leading = false;
   let trailing = true;
@@ -62,7 +65,10 @@ function useThrottle<T extends (...args: any[]) => any>(callback: T, options?: n
     );
   }, [wait, leading, trailing, callbackRef]);
 
-  const throttled = usePersist(function (this: any, ...args: Parameters<T>): ReturnType<T> | undefined {
+  const throttled = usePersist(function (
+    this: any,
+    ...args: Parameters<T>
+  ): ReturnType<T> | undefined {
     return throttledRef.current?.apply(this, args);
   });
 

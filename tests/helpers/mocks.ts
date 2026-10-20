@@ -70,15 +70,17 @@ export function installRafMock() {
 /* ------------------------------------------------------------------ */
 
 export function installIdleCallbackMock() {
-  const requestIdleCallback = jest.fn((callback: IdleRequestCallback, options?: IdleRequestOptions) => {
-    const timeout = options?.timeout ?? 0;
-    return setTimeout(() => {
-      callback({
-        didTimeout: false,
-        timeRemaining: () => 50,
-      } as unknown as IdleDeadline);
-    }, timeout) as unknown as number;
-  });
+  const requestIdleCallback = jest.fn(
+    (callback: IdleRequestCallback, options?: IdleRequestOptions) => {
+      const timeout = options?.timeout ?? 0;
+      return setTimeout(() => {
+        callback({
+          didTimeout: false,
+          timeRemaining: () => 50,
+        } as unknown as IdleDeadline);
+      }, timeout) as unknown as number;
+    },
+  );
 
   const cancelIdleCallback = jest.fn((id: number) => {
     clearTimeout(id);

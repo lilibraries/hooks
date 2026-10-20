@@ -35,7 +35,10 @@ function useCookie(
   options: UseCookieOptions & { defaultValue: string },
 ): readonly [
   string,
-  (newValue: string | undefined | ((prevValue: string) => string | undefined), attributes?: CookieAttributes) => void,
+  (
+    newValue: string | undefined | ((prevValue: string) => string | undefined),
+    attributes?: CookieAttributes,
+  ) => void,
 ];
 
 function useCookie(

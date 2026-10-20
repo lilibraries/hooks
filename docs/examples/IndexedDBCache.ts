@@ -31,7 +31,12 @@ export class IndexedDBCache extends LRUCache<string, any> {
   private databasePromise: Promise<IDBDatabase> | undefined;
 
   constructor(options: IndexedDBCacheOptions = {}) {
-    const { databaseName = "lilib", storeName = "hooks", cacheTime = 5 * 60 * 1000, max = 100 } = options;
+    const {
+      databaseName = "lilib",
+      storeName = "hooks",
+      cacheTime = 5 * 60 * 1000,
+      max = 100,
+    } = options;
     super({
       max,
       // Remove the persisted copy whenever an entry leaves the in-memory
@@ -51,9 +56,10 @@ export class IndexedDBCache extends LRUCache<string, any> {
     const result = super.set(key, value, options);
     // `LRUCache` treats `set(key, undefined)` as `delete(key)` — nothing to persist.
     if (value !== undefined) {
-      void this.writeEntry(key, { value, expiresAt: IndexedDBCache.toExpiresAt(options?.ttl ?? this.cacheTime) }).catch(
-        () => {},
-      );
+      void this.writeEntry(key, {
+        value,
+        expiresAt: IndexedDBCache.toExpiresAt(options?.ttl ?? this.cacheTime),
+      }).catch(() => {});
     }
     return result;
   }
@@ -124,7 +130,11 @@ export class IndexedDBCache extends LRUCache<string, any> {
       request.onsuccess = () => resolve(request.result);
       request.onerror = () => reject(request.error);
       request.onblocked = () => {
-        reject(new Error(`Upgrading the "${this.databaseName}" database is blocked by another connection.`));
+        reject(
+          new Error(
+            `Upgrading the "${this.databaseName}" database is blocked by another connection.`,
+          ),
+        );
       };
     });
   }
@@ -132,7 +142,10 @@ export class IndexedDBCache extends LRUCache<string, any> {
   private async readAllEntries(): Promise<Array<[string, PersistedEntry]>> {
     const db = await this.getDatabase();
     return new Promise((resolve, reject) => {
-      const request = db.transaction(this.storeName, "readonly").objectStore(this.storeName).openCursor();
+      const request = db
+        .transaction(this.storeName, "readonly")
+        .objectStore(this.storeName)
+        .openCursor();
       const entries: Array<[string, PersistedEntry]> = [];
       request.onsuccess = () => {
         const cursor = request.result;
@@ -150,7 +163,10 @@ export class IndexedDBCache extends LRUCache<string, any> {
   private async writeEntry(key: string, entry: PersistedEntry): Promise<void> {
     const db = await this.getDatabase();
     return new Promise((resolve, reject) => {
-      const request = db.transaction(this.storeName, "readwrite").objectStore(this.storeName).put(entry, key);
+      const request = db
+        .transaction(this.storeName, "readwrite")
+        .objectStore(this.storeName)
+        .put(entry, key);
       request.onsuccess = () => resolve();
       request.onerror = () => reject(request.error);
     });
@@ -159,7 +175,10 @@ export class IndexedDBCache extends LRUCache<string, any> {
   private async removeEntry(key: string): Promise<void> {
     const db = await this.getDatabase();
     return new Promise((resolve, reject) => {
-      const request = db.transaction(this.storeName, "readwrite").objectStore(this.storeName).delete(key);
+      const request = db
+        .transaction(this.storeName, "readwrite")
+        .objectStore(this.storeName)
+        .delete(key);
       request.onsuccess = () => resolve();
       request.onerror = () => reject(request.error);
     });

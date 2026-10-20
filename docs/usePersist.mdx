@@ -8,7 +8,9 @@ Return the same function identity regardless of how the `callback` argument chan
 ## API
 
 ```ts
-function usePersist<T extends (...args: any[]) => any>(callback: T): (...args: Parameters<T>) => ReturnType<T>;
+function usePersist<T extends (...args: any[]) => any>(
+  callback: T,
+): (...args: Parameters<T>) => ReturnType<T>;
 ```
 
 Parameters:

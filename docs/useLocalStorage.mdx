@@ -21,14 +21,19 @@ interface UseStorageOptions<T> {
 function useLocalStorage<T>(
   key: string,
   options: UseStorageOptions<T> & { defaultValue: T },
-): [value: T, setLocalStorage: (newValue: T | undefined | ((prevValue: T) => T | undefined)) => void];
+): [
+  value: T,
+  setLocalStorage: (newValue: T | undefined | ((prevValue: T) => T | undefined)) => void,
+];
 
 function useLocalStorage<T>(
   key: string,
   options?: UseStorageOptions<T>,
 ): [
   value: T | undefined,
-  setLocalStorage: (newValue: T | undefined | ((prevValue: T | undefined) => T | undefined)) => void,
+  setLocalStorage: (
+    newValue: T | undefined | ((prevValue: T | undefined) => T | undefined),
+  ) => void,
 ];
 ```
 

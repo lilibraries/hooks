@@ -159,7 +159,9 @@ describe("useLoad", () => {
 
   it("initialData provides the initial data", async () => {
     const callback = jest.fn(async () => "loaded");
-    const { result } = renderHook(() => useLoad(callback, [], { initialData: "initial" as string }));
+    const { result } = renderHook(() =>
+      useLoad(callback, [], { initialData: "initial" as string }),
+    );
 
     expect(result.current.data).toBe("initial");
     await waitFor(() => expect(result.current.data).toBe("loaded"));
@@ -276,7 +278,9 @@ describe("useLoad", () => {
     const callback = jest.fn(async () => {
       throw error;
     });
-    const { result } = renderHook(() => useLoad(callback, [], { retry: true, retryLimit: 2, retryInterval: 0 }));
+    const { result } = renderHook(() =>
+      useLoad(callback, [], { retry: true, retryLimit: 2, retryInterval: 0 }),
+    );
 
     await waitFor(() => expect(result.current.loading).toBe(false));
     expect(callback).toHaveBeenCalledTimes(3); // initial + 2 retries
@@ -321,7 +325,9 @@ describe("useLoad", () => {
       throw new Error("primary-fail");
     });
     const fallback = jest.fn(async () => "fallback-data");
-    const { result } = renderHook(() => useLoad(callback, [], { retry: () => false, retryInterval: 0, fallback }));
+    const { result } = renderHook(() =>
+      useLoad(callback, [], { retry: () => false, retryInterval: 0, fallback }),
+    );
 
     await waitFor(() => expect(result.current.data).toBe("fallback-data"));
     expect(callback).toHaveBeenCalledTimes(1);
@@ -338,7 +344,9 @@ describe("useLoad", () => {
     });
     // Returns true for the fallback's error: without the guard this would retry the primary loader instead of rejecting
     const retry = jest.fn((error: unknown) => error === fallbackError);
-    const { result } = renderHook(() => useLoad(callback, [], { retry, retryInterval: 0, fallback }));
+    const { result } = renderHook(() =>
+      useLoad(callback, [], { retry, retryInterval: 0, fallback }),
+    );
 
     await waitFor(() => expect(result.current.loading).toBe(false));
     expect(callback).toHaveBeenCalledTimes(1);
@@ -417,8 +425,12 @@ describe("useLoad", () => {
     const pending = deferred<string>();
     const callback = jest.fn(() => pending.promise);
 
-    const { result: first, unmount: unmountFirst } = renderHook(() => useLoad(callback, [], { key: "shared" }));
-    const { result: second, unmount: unmountSecond } = renderHook(() => useLoad(callback, [], { key: "shared" }));
+    const { result: first, unmount: unmountFirst } = renderHook(() =>
+      useLoad(callback, [], { key: "shared" }),
+    );
+    const { result: second, unmount: unmountSecond } = renderHook(() =>
+      useLoad(callback, [], { key: "shared" }),
+    );
 
     // Both instances share one request; the callback is invoked only once
     await waitFor(() => expect(callback).toHaveBeenCalledTimes(1));
@@ -436,8 +448,12 @@ describe("useLoad", () => {
     const callbackA = jest.fn(async () => "data-a");
     const callbackB = jest.fn(async () => "data-b");
 
-    const { result: first, unmount: unmountFirst } = renderHook(() => useLoad(callbackA, [], { key: "a" }));
-    const { result: second, unmount: unmountSecond } = renderHook(() => useLoad(callbackB, [], { key: "b" }));
+    const { result: first, unmount: unmountFirst } = renderHook(() =>
+      useLoad(callbackA, [], { key: "a" }),
+    );
+    const { result: second, unmount: unmountSecond } = renderHook(() =>
+      useLoad(callbackB, [], { key: "b" }),
+    );
 
     await waitFor(() => expect(first.current.data).toBe("data-a"));
     await waitFor(() => expect(second.current.data).toBe("data-b"));
@@ -472,7 +488,9 @@ describe("useLoad", () => {
     jest.useFakeTimers();
     const callback = jest.fn(async () => "data");
 
-    const { result } = renderHook(() => useLoad(callback, [], { polling: true, pollingInterval: 100 }));
+    const { result } = renderHook(() =>
+      useLoad(callback, [], { polling: true, pollingInterval: 100 }),
+    );
 
     await act(async () => {
       await jest.advanceTimersByTimeAsync(0);
@@ -524,7 +542,9 @@ describe("useLoad", () => {
       .mockImplementationOnce(() => secondPending.promise);
 
     const { unmount: unmountFirst } = renderHook(() => useLoad(callback, [], { key: "shared" }));
-    const { result: second, unmount: unmountSecond } = renderHook(() => useLoad(callback, [], { key: "shared" }));
+    const { result: second, unmount: unmountSecond } = renderHook(() =>
+      useLoad(callback, [], { key: "shared" }),
+    );
 
     // The two instances merge into one request initiated by first
     await waitFor(() => expect(callback).toHaveBeenCalledTimes(1));
@@ -990,7 +1010,9 @@ describe("useLoad", () => {
   it("cancel stops polling", async () => {
     jest.useFakeTimers();
     const callback = jest.fn(async () => "data");
-    const { result } = renderHook(() => useLoad(callback, [], { polling: true, pollingInterval: 100 }));
+    const { result } = renderHook(() =>
+      useLoad(callback, [], { polling: true, pollingInterval: 100 }),
+    );
 
     await act(async () => {
       await jest.advanceTimersByTimeAsync(0);
@@ -1031,7 +1053,9 @@ describe("useLoad", () => {
     getDefaultCache().set(cacheKey, "cached", { ttl: Infinity });
 
     const callback = jest.fn(async () => "loaded");
-    const { result, unmount } = renderHook(() => useLoad(callback, [], { cacheKey, cacheTime: Infinity }));
+    const { result, unmount } = renderHook(() =>
+      useLoad(callback, [], { cacheKey, cacheTime: Infinity }),
+    );
 
     // The initial data comes from the cache.
     expect(result.current.data).toBe("cached");
@@ -1044,7 +1068,9 @@ describe("useLoad", () => {
 
     // A second instance reads the cached data again on mount.
     const secondCallback = jest.fn(async () => "second");
-    const { result: second } = renderHook(() => useLoad(secondCallback, [], { cacheKey, cacheTime: Infinity }));
+    const { result: second } = renderHook(() =>
+      useLoad(secondCallback, [], { cacheKey, cacheTime: Infinity }),
+    );
     expect(second.current.data).toBe("loaded");
 
     await waitFor(() => expect(second.current.data).toBe("second"));
@@ -1199,9 +1225,12 @@ describe("useLoad", () => {
     const pending = deferred<string>();
     const callback = jest.fn(() => pending.promise);
 
-    const { result: first, unmount: unmountFirst } = renderHook(() => useLoad(callback, [], { key: "strict-shared" }), {
-      wrapper: StrictMode,
-    });
+    const { result: first, unmount: unmountFirst } = renderHook(
+      () => useLoad(callback, [], { key: "strict-shared" }),
+      {
+        wrapper: StrictMode,
+      },
+    );
     const { result: second, unmount: unmountSecond } = renderHook(
       () => useLoad(callback, [], { key: "strict-shared" }),
       { wrapper: StrictMode },
@@ -1220,9 +1249,12 @@ describe("useLoad", () => {
     // shared store would make it merge into a request that can never settle.
     const next = deferred<string>();
     callback.mockImplementation(() => next.promise);
-    const { result: third, unmount: unmountThird } = renderHook(() => useLoad(callback, [], { key: "strict-shared" }), {
-      wrapper: StrictMode,
-    });
+    const { result: third, unmount: unmountThird } = renderHook(
+      () => useLoad(callback, [], { key: "strict-shared" }),
+      {
+        wrapper: StrictMode,
+      },
+    );
     next.resolve("strict-fresh-data");
     await waitFor(() => expect(third.current.data).toBe("strict-fresh-data"));
     unmountThird();
@@ -1249,9 +1281,12 @@ describe("useLoad", () => {
   it("stops polling after unmount under StrictMode (no timers leaked by the double cleanup)", async () => {
     jest.useFakeTimers();
     const callback = jest.fn(async () => "data");
-    const { unmount } = renderHook(() => useLoad(callback, [], { polling: true, pollingInterval: 100 }), {
-      wrapper: StrictMode,
-    });
+    const { unmount } = renderHook(
+      () => useLoad(callback, [], { polling: true, pollingInterval: 100 }),
+      {
+        wrapper: StrictMode,
+      },
+    );
 
     await act(async () => {
       await jest.advanceTimersByTimeAsync(0);

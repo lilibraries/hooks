@@ -120,7 +120,9 @@ describe("useDebounce", () => {
 
   it("leading option: the first call runs immediately", () => {
     const callback = jest.fn();
-    const { result } = renderHook(() => useDebounce(callback, { wait: 100, leading: true, trailing: false }));
+    const { result } = renderHook(() =>
+      useDebounce(callback, { wait: 100, leading: true, trailing: false }),
+    );
     const [debounced] = result.current;
 
     act(() => debounced("a"));

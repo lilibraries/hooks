@@ -67,7 +67,11 @@ export class StorageCache extends LRUCache<string, any> {
     if (value !== undefined) {
       // Write through. Overwrites dispose the old entry first, so the old
       // persisted copy is removed before the new one is written.
-      this.writePersistedEntry(key, value, StorageCache.toExpiresAt(options?.ttl ?? this.cacheTime));
+      this.writePersistedEntry(
+        key,
+        value,
+        StorageCache.toExpiresAt(options?.ttl ?? this.cacheTime),
+      );
     }
     return result;
   }

@@ -20,7 +20,10 @@ interface UseReloadOptions {
   force?: boolean;
 }
 
-function useReload(key: NonNullable<unknown>, options?: UseReloadOptions): (options?: UseReloadOptions) => void;
+function useReload(
+  key: NonNullable<unknown>,
+  options?: UseReloadOptions,
+): (options?: UseReloadOptions) => void;
 ```
 
 Parameters:

@@ -21,14 +21,19 @@ interface UseStorageOptions<T> {
 function useSessionStorage<T>(
   key: string,
   options: UseStorageOptions<T> & { defaultValue: T },
-): [value: T, setSessionStorage: (newValue: T | undefined | ((prevValue: T) => T | undefined)) => void];
+): [
+  value: T,
+  setSessionStorage: (newValue: T | undefined | ((prevValue: T) => T | undefined)) => void,
+];
 
 function useSessionStorage<T>(
   key: string,
   options?: UseStorageOptions<T>,
 ): [
   value: T | undefined,
-  setSessionStorage: (newValue: T | undefined | ((prevValue: T | undefined) => T | undefined)) => void,
+  setSessionStorage: (
+    newValue: T | undefined | ((prevValue: T | undefined) => T | undefined),
+  ) => void,
 ];
 ```
 

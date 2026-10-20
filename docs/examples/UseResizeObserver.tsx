@@ -17,7 +17,11 @@ function Example() {
       </div>
       <div
         ref={containerRef}
-        style={{ padding: 16, width: wide ? "100%" : "50%", backgroundColor: "rgba(255, 165, 0, 0.3)" }}
+        style={{
+          padding: 16,
+          width: wide ? "100%" : "50%",
+          backgroundColor: "rgba(255, 165, 0, 0.3)",
+        }}
       >
         Resized times: {count}
       </div>

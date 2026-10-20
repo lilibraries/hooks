@@ -37,7 +37,11 @@ function useAnimate(callback: (percent: number) => void, options: number | UseAn
     }
   }
 
-  warning(duration > 0, "[useAnimate] The `duration` option must be a positive number, but received `%s`.", duration);
+  warning(
+    duration > 0,
+    "[useAnimate] The `duration` option must be a positive number, but received `%s`.",
+    duration,
+  );
 
   const timerRef = useRef(0);
   const startTimeRef = useRef(0);

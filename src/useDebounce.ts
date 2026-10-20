@@ -26,7 +26,10 @@ export interface UseDebounceOptions {
  * @param options.trailing Whether to invoke at the end.
  * @returns Returns a `[debounced, { flush, cancel }]` tuple: `debounced` is the debounced function, `flush` runs the pending invocation immediately, and `cancel` aborts it.
  */
-function useDebounce<T extends (...args: any[]) => any>(callback: T, options?: number | UseDebounceOptions) {
+function useDebounce<T extends (...args: any[]) => any>(
+  callback: T,
+  options?: number | UseDebounceOptions,
+) {
   let wait = 0;
   let maxWait = Infinity;
   let leading = false;
@@ -71,7 +74,10 @@ function useDebounce<T extends (...args: any[]) => any>(callback: T, options?: n
     [wait, maxWait, leading, trailing], // eslint-disable-line
   );
 
-  const debounced = usePersist(function (this: any, ...args: Parameters<T>): ReturnType<T> | undefined {
+  const debounced = usePersist(function (
+    this: any,
+    ...args: Parameters<T>
+  ): ReturnType<T> | undefined {
     return debouncedRef.current?.apply(this, args);
   });
 

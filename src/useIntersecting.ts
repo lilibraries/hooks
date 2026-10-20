@@ -1,6 +1,8 @@
 import { useDebugValue, type RefObject } from "react";
 
-import useIntersectionObserver, { type UseIntersectionObserverOptions } from "./useIntersectionObserver";
+import useIntersectionObserver, {
+  type UseIntersectionObserverOptions,
+} from "./useIntersectionObserver";
 import useSafeState from "./useSafeState";
 import useUpdate from "./useUpdate";
 import unref from "./utils/unref";
@@ -12,7 +14,10 @@ import unref from "./utils/unref";
  * @param options The options object, see IntersectionObserver options.
  * @returns Returns a boolean indicating whether the target element is intersecting.
  */
-function useIntersecting(target: Element | RefObject<Element | null>, options?: UseIntersectionObserverOptions) {
+function useIntersecting(
+  target: Element | RefObject<Element | null>,
+  options?: UseIntersectionObserverOptions,
+) {
   const [intersecting, setIntersecting] = useSafeState(false);
 
   useIntersectionObserver(

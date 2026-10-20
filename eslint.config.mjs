@@ -8,7 +8,14 @@ import prettier from "eslint-config-prettier/flat";
 
 export default defineConfig(
   {
-    ignores: ["dist/**", "build/**", ".docusaurus/**", ".test-deps/**", "coverage/**", ".nyc_output/**"],
+    ignores: [
+      "dist/**",
+      "build/**",
+      ".docusaurus/**",
+      ".test-deps/**",
+      "coverage/**",
+      ".nyc_output/**",
+    ],
   },
   js.configs.recommended,
   {

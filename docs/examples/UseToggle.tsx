@@ -10,7 +10,11 @@ function Example() {
         <button onClick={toggleOff}>Turn off</button>
       </div>
       <div>The switch is {on ? "on" : "off"}</div>
-      {on && <div style={{ padding: 8, marginTop: 8, backgroundColor: "rgba(255, 165, 0, 0.3)" }}>Details panel</div>}
+      {on && (
+        <div style={{ padding: 8, marginTop: 8, backgroundColor: "rgba(255, 165, 0, 0.3)" }}>
+          Details panel
+        </div>
+      )}
     </>
   );
 }

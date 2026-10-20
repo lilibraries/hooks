@@ -164,9 +164,15 @@ describe("useCache", () => {
     const { result: result0 } = renderHook(() => useCache(key, { cache }));
     const { result: result1 } = renderHook(() => useCache(key, { cache, cacheSync: false }));
     const { result: result2 } = renderHook(() => useCache(key, { cache, cacheSync: true }));
-    const { result: result3 } = renderHook(() => useCache(key, { cache, cacheSync: { set: true } }));
-    const { result: result4 } = renderHook(() => useCache(key, { cache, cacheSync: { delete: true } }));
-    const { result: result5 } = renderHook(() => useCache(key, { cache, cacheSync: { set: true, delete: true } }));
+    const { result: result3 } = renderHook(() =>
+      useCache(key, { cache, cacheSync: { set: true } }),
+    );
+    const { result: result4 } = renderHook(() =>
+      useCache(key, { cache, cacheSync: { delete: true } }),
+    );
+    const { result: result5 } = renderHook(() =>
+      useCache(key, { cache, cacheSync: { set: true, delete: true } }),
+    );
 
     act(() => {
       result0.current[1]("value");
