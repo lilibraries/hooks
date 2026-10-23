@@ -42,11 +42,18 @@ Adding a new hook touches the following places:
 - SSR-specific behavior goes into files marked `/** @jest-environment node */` or `*.ssr.test.ts`.
 - lint-staged runs the relevant Jest tests against staged files — keep every commit self-contained and passing.
 
+## Change Validation
+
+- After every code change, check the code for correctness, design soundness, and completeness.
+- Fix confirmed issues directly. For uncertain issues, ask the user and obtain confirmation before making changes.
+- Repeat these checks after each fix until no identified issues remain unresolved.
+
 ## Build & Release Rules
 
 - Adding a hook requires no build config changes (Babel cjs/esm, Rollup umd, tsc types).
 - CHANGELOG.md is generated automatically by release-it from commit history — never edit it by hand.
-- Commit messages must follow Conventional Commits (enforced by commitlint via husky) and be written in English. Hook names and hook parameter names in commit messages must be wrapped in backticks.
+- Commit messages must follow Conventional Commits (enforced by commitlint via husky) and be written in English. Hook names and hook parameter names in commit messages must be wrapped in backticks, except for hook names used as the scope.
+- When modifying an existing hook, use that hook's name as the commit message scope without backticks.
 - Only commits that change published source (`src/`) may generate changelog entries, via `feat`, `fix`, `perf`, or a `!`-suffixed type (e.g. `feat!:`/`chore!:` — do not use a `BREAKING CHANGE` footer). Commits that only touch docs, tests, build scripts, or config must use non-changelog types (`docs`, `test`, `build`, `ci`, `chore`) instead.
 
 ## Do Not "Fix"
