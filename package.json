@@ -1,6 +1,6 @@
 {
   "name": "@lilib/hooks",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "A collection of practical React hooks covering state, effects, refs, async data and browser APIs, with TypeScript, SSR and StrictMode support.",
   "keywords": [
     "react",
