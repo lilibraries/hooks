@@ -4,7 +4,6 @@
 
 ### Bug Fixes
 
-* **deps:** upgrade `release-it` to v21 ([2f6458b](https://github.com/lilibraries/hooks/commit/2f6458b9912055afc3fd9c963be64881a106a274))
 * **useComposedRef:** support React 19 ref cleanup ([e6990de](https://github.com/lilibraries/hooks/commit/e6990dee4027a4763430cfe74d9b310b01441fba))
 
 ## [2.0.0](https://github.com/lilibraries/hooks/compare/v1.1.0...v2.0.0) (2026-10-19)
