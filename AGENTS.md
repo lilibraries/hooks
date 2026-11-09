@@ -55,6 +55,7 @@ No build config changes are needed — the Babel cjs/esm, Rollup umd, and tsc ty
 ## Build & Release Rules
 
 - CHANGELOG.md is generated automatically by release-it from commit history — never edit it by hand. Releases (`pnpm release`) are maintainer-only and also build and deploy the docs site (`gh-pages`); `pnpm release:dry-run` gates them on `lint`, `test`, and `dist`.
+- Before running `git commit`, show the proposed commit message to the user and wait for explicit confirmation; never commit with an unconfirmed message.
 - Commit messages must follow Conventional Commits (enforced by commitlint via husky) and be written in English. Hook names and hook parameter names in commit messages must be wrapped in backticks, except for hook names used as the scope.
 - When modifying an existing hook, use that hook's name as the commit message scope without backticks.
 - Only commits that change published source (`src/`) may generate changelog entries, via `feat`, `fix`, `perf`, or a `!`-suffixed type (e.g. `feat!:`/`chore!:` — do not use a `BREAKING CHANGE` footer). Commits that only touch docs, tests, build scripts, or config must use non-changelog types (`docs`, `test`, `build`, `ci`, `chore`) instead.
