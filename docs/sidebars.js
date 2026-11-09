@@ -86,6 +86,7 @@ module.exports = {
         "useClickOutside",
         "useEventListener",
         "useResizeObserver",
+        "useMutationObserver",
         "useIntersectionObserver",
         "useCookie",
         "useLocalStorage",

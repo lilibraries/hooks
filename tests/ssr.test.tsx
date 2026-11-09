@@ -35,6 +35,7 @@ import {
   useMemoizedValue,
   useMount,
   useMountedRef,
+  useMutationObserver,
   useOnline,
   usePageVisible,
   usePersist,
@@ -127,6 +128,7 @@ function AllHooks() {
   useEventListener(eventTargetRef, "click", () => {});
   useResizeObserver(elementRef, () => {});
   useIntersectionObserver(elementRef, () => {});
+  useMutationObserver(elementRef, () => {});
   useCookie("ssr-cookie");
   useLocalStorage("ssr-local");
   useSessionStorage("ssr-session");

@@ -58,6 +58,7 @@ export { default as useIntersecting } from "./useIntersecting";
 export { default as useClickOutside } from "./useClickOutside";
 export { default as useEventListener } from "./useEventListener";
 export { default as useResizeObserver } from "./useResizeObserver";
+export { default as useMutationObserver } from "./useMutationObserver";
 export { default as useIntersectionObserver } from "./useIntersectionObserver";
 export { default as useCookie } from "./useCookie";
 export { default as useLocalStorage } from "./useLocalStorage";

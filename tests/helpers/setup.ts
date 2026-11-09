@@ -3,10 +3,12 @@ import "@testing-library/react";
 
 import {
   MockIntersectionObserver,
+  MockMutationObserver,
   MockResizeObserver,
   installIdleCallbackMock,
   installIntersectionObserverMock,
   installMatchMediaMock,
+  installMutationObserverMock,
   installRafMock,
   installResizeObserverMock,
   matchMediaMock,
@@ -25,7 +27,7 @@ if (process.env.REACT_VERSION === "16" || process.env.REACT_VERSION === "17") {
 
 /**
  * Global test environment setup:
- * 1. Polyfill/stub browser APIs (rAF, requestIdleCallback, matchMedia, IntersectionObserver, ResizeObserver).
+ * 1. Polyfill/stub browser APIs (rAF, requestIdleCallback, matchMedia, IntersectionObserver, ResizeObserver, MutationObserver).
  *    These stubs are all built on `setTimeout`, so they are fully controllable with fake timers.
  * 2. Packages such as `raf`, `requestidlecallback`, `resize-observer-polyfill`, and
  *    `intersection-observer` read and cache global API references **at module load time**,
@@ -40,6 +42,7 @@ installIdleCallbackMock();
 installMatchMediaMock();
 installIntersectionObserverMock();
 installResizeObserverMock();
+installMutationObserverMock();
 
 beforeEach(() => {
   // Refresh stub and mock state before each test case (cached references held by modules are unaffected)
@@ -48,9 +51,11 @@ beforeEach(() => {
   installMatchMediaMock();
   installIntersectionObserverMock();
   installResizeObserverMock();
+  installMutationObserverMock();
   matchMediaMock.instances = [];
   MockIntersectionObserver.reset();
   MockResizeObserver.reset();
+  MockMutationObserver.reset();
 
   // DOM-dependent state only exists in jsdom; SSR test files run in a plain
   // Node environment where `window` and `document` are undefined
@@ -77,5 +82,6 @@ beforeEach(() => {
 afterEach(() => {
   MockIntersectionObserver.reset();
   MockResizeObserver.reset();
+  MockMutationObserver.reset();
   unstubAllGlobals();
 });

@@ -118,25 +118,26 @@ See the [documentation](https://lilibraries.github.io/hooks/) for the full API r
 
 ### Browser
 
-| Hook                                                                                     | Description                                                                        |
-| ---------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
-| [`useTitle`](https://lilibraries.github.io/hooks/useTitle)                               | Set the document title.                                                            |
-| [`useFavicon`](https://lilibraries.github.io/hooks/useFavicon)                           | Set the document favicon.                                                          |
-| [`useOnline`](https://lilibraries.github.io/hooks/useOnline)                             | Detect whether the network is online.                                              |
-| [`useDarkMode`](https://lilibraries.github.io/hooks/useDarkMode)                         | Detect whether the system prefers a dark color scheme.                             |
-| [`usePageVisible`](https://lilibraries.github.io/hooks/usePageVisible)                   | Detect whether the page is visible, including bfcache restores.                    |
-| [`useWindowFocus`](https://lilibraries.github.io/hooks/useWindowFocus)                   | Detect whether the window has focus.                                               |
-| [`useMatchMedia`](https://lilibraries.github.io/hooks/useMatchMedia)                     | Determine whether the document matches a media query.                              |
-| [`useWindowSize`](https://lilibraries.github.io/hooks/useWindowSize)                     | Get the window size.                                                               |
-| [`useElementSize`](https://lilibraries.github.io/hooks/useElementSize)                   | Get the size of a DOM element.                                                     |
-| [`useIntersecting`](https://lilibraries.github.io/hooks/useIntersecting)                 | Detect whether an element intersects the viewport or a specified root.             |
-| [`useClickOutside`](https://lilibraries.github.io/hooks/useClickOutside)                 | Trigger a callback when clicking outside the target area.                          |
-| [`useEventListener`](https://lilibraries.github.io/hooks/useEventListener)               | Set up an event listener on the target.                                            |
-| [`useResizeObserver`](https://lilibraries.github.io/hooks/useResizeObserver)             | Observe an element's size changes.                                                 |
-| [`useIntersectionObserver`](https://lilibraries.github.io/hooks/useIntersectionObserver) | Observe changes in an element's intersection with another element or the viewport. |
-| [`useCookie`](https://lilibraries.github.io/hooks/useCookie)                             | Get, set and/or remove cookies.                                                    |
-| [`useLocalStorage`](https://lilibraries.github.io/hooks/useLocalStorage)                 | Get, set and/or remove `localStorage`.                                             |
-| [`useSessionStorage`](https://lilibraries.github.io/hooks/useSessionStorage)             | Get, set and/or remove `sessionStorage`.                                           |
+| Hook                                                                                     | Description                                                                            |
+| ---------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| [`useTitle`](https://lilibraries.github.io/hooks/useTitle)                               | Set the document title.                                                                |
+| [`useFavicon`](https://lilibraries.github.io/hooks/useFavicon)                           | Set the document favicon.                                                              |
+| [`useOnline`](https://lilibraries.github.io/hooks/useOnline)                             | Detect whether the network is online.                                                  |
+| [`useDarkMode`](https://lilibraries.github.io/hooks/useDarkMode)                         | Detect whether the system prefers a dark color scheme.                                 |
+| [`usePageVisible`](https://lilibraries.github.io/hooks/usePageVisible)                   | Detect whether the page is visible, including bfcache restores.                        |
+| [`useWindowFocus`](https://lilibraries.github.io/hooks/useWindowFocus)                   | Detect whether the window has focus.                                                   |
+| [`useMatchMedia`](https://lilibraries.github.io/hooks/useMatchMedia)                     | Determine whether the document matches a media query.                                  |
+| [`useWindowSize`](https://lilibraries.github.io/hooks/useWindowSize)                     | Get the window size.                                                                   |
+| [`useElementSize`](https://lilibraries.github.io/hooks/useElementSize)                   | Get the size of a DOM element.                                                         |
+| [`useIntersecting`](https://lilibraries.github.io/hooks/useIntersecting)                 | Detect whether an element intersects the viewport or a specified root.                 |
+| [`useClickOutside`](https://lilibraries.github.io/hooks/useClickOutside)                 | Trigger a callback when clicking outside the target area.                              |
+| [`useEventListener`](https://lilibraries.github.io/hooks/useEventListener)               | Set up an event listener on the target.                                                |
+| [`useResizeObserver`](https://lilibraries.github.io/hooks/useResizeObserver)             | Observe an element's size changes.                                                     |
+| [`useMutationObserver`](https://lilibraries.github.io/hooks/useMutationObserver)         | Observe changes to a DOM node, such as inserted or removed child nodes and attributes. |
+| [`useIntersectionObserver`](https://lilibraries.github.io/hooks/useIntersectionObserver) | Observe changes in an element's intersection with another element or the viewport.     |
+| [`useCookie`](https://lilibraries.github.io/hooks/useCookie)                             | Get, set and/or remove cookies.                                                        |
+| [`useLocalStorage`](https://lilibraries.github.io/hooks/useLocalStorage)                 | Get, set and/or remove `localStorage`.                                                 |
+| [`useSessionStorage`](https://lilibraries.github.io/hooks/useSessionStorage)             | Get, set and/or remove `sessionStorage`.                                               |
 
 ## Changelog
 

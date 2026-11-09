@@ -283,6 +283,69 @@ export function installResizeObserverMock() {
 }
 
 /* ------------------------------------------------------------------ */
+/* MutationObserver */
+/* ------------------------------------------------------------------ */
+
+export class MockMutationObserver {
+  static instances: MockMutationObserver[] = [];
+
+  readonly callback: MutationCallback;
+  options: MutationObserverInit = {};
+  observed: Node[] = [];
+  disconnected = false;
+
+  constructor(callback: MutationCallback) {
+    this.callback = callback;
+    MockMutationObserver.instances.push(this);
+  }
+
+  observe(target: Node, options?: MutationObserverInit) {
+    this.options = options || {};
+    if (!this.observed.includes(target)) {
+      this.observed.push(target);
+    }
+  }
+
+  takeRecords(): MutationRecord[] {
+    return [];
+  }
+
+  disconnect() {
+    this.disconnected = true;
+    this.observed = [];
+  }
+
+  /** Test helper: invoke the callback manually, simulating a mutation. */
+  trigger(target?: Node, type: MutationRecordType = "childList") {
+    const targets = target ? [target] : this.observed;
+    const records = targets.map(
+      (item) =>
+        ({
+          type,
+          target: item,
+          addedNodes: [],
+          removedNodes: [],
+          previousSibling: null,
+          nextSibling: null,
+          attributeName: null,
+          attributeNamespace: null,
+          oldValue: null,
+        }) as unknown as MutationRecord,
+    );
+    this.callback(records, this as unknown as globalThis.MutationObserver);
+  }
+
+  static reset() {
+    MockMutationObserver.instances = [];
+  }
+}
+
+export function installMutationObserverMock() {
+  stubGlobal("MutationObserver", MockMutationObserver);
+  return MockMutationObserver;
+}
+
+/* ------------------------------------------------------------------ */
 /* Common DOM test helpers */
 /* ------------------------------------------------------------------ */
 

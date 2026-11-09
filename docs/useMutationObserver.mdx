@@ -1,0 +1,36 @@
+import CodeBlock from "@theme/CodeBlock";
+import ExampleBlock from "./components/ExampleBlock";
+import Example from "./examples/UseMutationObserver";
+import ExampleCode from "!!raw-loader!./examples/UseMutationObserver";
+
+Observe changes to a DOM node, such as inserted or removed child nodes and changed attributes.
+
+## API
+
+```ts
+function useMutationObserver(
+  target: Node | React.RefObject<Node | null>,
+  listener: (records: MutationRecord[]) => void,
+  options?: MutationObserverInit,
+): void;
+```
+
+Parameters:
+
+- **`target`:** A DOM node to observe, or a ref object that references it.
+- **`listener`:** Listener function invoked with the mutation records.
+- **`options`:** See [MutationObserver](https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver/observe) options. Omitted, it defaults to `{ childList: true, attributes: true, characterData: true }`; when provided, it replaces the defaults instead of merging with them.
+
+## Notes
+
+- When `options` is provided, it replaces the defaults instead of merging with them, so at least one of `childList`, `attributes` and `characterData` must end up enabled, otherwise `observe` throws a `TypeError`.
+- `attributeFilter` is compared by content, so inline arrays do not recreate the observer on every render.
+
+## Example
+
+The following example reports the type of the latest mutation of a text node.
+
+<ExampleBlock>
+  <Example />
+</ExampleBlock>
+<CodeBlock language="tsx">{ExampleCode}</CodeBlock>
