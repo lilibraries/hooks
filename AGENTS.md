@@ -27,6 +27,7 @@ Every hook must support React 16.8+ / 17 / 18 / 19, as well as SSR and StrictMod
 - lodash must be imported via subpaths (`lodash/isEqual`); importing the whole package is forbidden.
 - Published code may only import from within `src/` (the published package contains only `src` and `dist`).
 - Docs and comments are written in English by default and must follow English writing conventions; when authoring docs for a specific language, write in that language with its corresponding conventions.
+- Hook docs must only include necessary notes: a `## Notes` section is optional and limited to non-obvious, hook-specific behavior (defaults, caveats, performance); never restate behavior already documented by the native API or describe obvious implementation details.
 - Every hook must have reasonable and accurate JSDoc comments describing its purpose, parameters, and return values (`@param`, `@returns`) — explain what the hook does, what each parameter means, and what each returned value represents.
 - When a change alters a hook's behavior, options, or return values, update its JSDoc, `docs/useXxx.mdx`, and its row in both the Getting Started and `README.md` tables in the same commit.
 - Except for hook API documentation (JSDoc), comments must be as concise and accurate as possible — only add comments where necessary; do not comment self-evident logic.
