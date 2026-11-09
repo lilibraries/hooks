@@ -1,0 +1,90 @@
+# @lilib/hooks
+
+> A collection of practical React hooks covering state, effects, refs, async data and browser APIs, with TypeScript, SSR and StrictMode support.
+
+- Install: `pnpm add @lilib/hooks`
+- React peer dependency: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+- Repository: https://github.com/lilibraries/hooks
+- Every page below is also available as raw Markdown (the `.md` links).
+
+## Getting Started
+
+- [Getting Started](https://lilibraries.github.io/hooks/index.md): Install @lilib/hooks and start using more than 50 practical React hooks for async data, state, effects, callbacks, refs and browser APIs.
+
+## Async
+
+- [useLoad](https://lilibraries.github.io/hooks/useLoad.md): Load async data in React with request sharing, caching, retries, polling and automatic reloads.
+- [useReload](https://lilibraries.github.io/hooks/useReload.md): Reload every useLoad request that shares the same key, all at once.
+- [useSubmit](https://lilibraries.github.io/hooks/useSubmit.md): Run create, update and delete requests imperatively with loading and error state.
+
+## Effects
+
+- [useMount](https://lilibraries.github.io/hooks/useMount.md): Run an effect once after the component mounts.
+- [useUpdate](https://lilibraries.github.io/hooks/useUpdate.md): Run an effect after the component updates, skipping the initial mount.
+- [useUnmount](https://lilibraries.github.io/hooks/useUnmount.md): Run an effect when the component unmounts.
+- [useRefEffect](https://lilibraries.github.io/hooks/useRefEffect.md): Like React.useEffect, but refs in the dependency array are compared by ref.current.
+- [useRefUpdate](https://lilibraries.github.io/hooks/useRefUpdate.md): Like useUpdate, but refs in the dependency array are compared by ref.current.
+- [useLayoutMount](https://lilibraries.github.io/hooks/useLayoutMount.md): Like useMount, but runs synchronously before the browser paints.
+- [useLayoutUpdate](https://lilibraries.github.io/hooks/useLayoutUpdate.md): Like useUpdate, but runs synchronously before the browser paints.
+- [useLayoutRefEffect](https://lilibraries.github.io/hooks/useLayoutRefEffect.md): Like useRefEffect, but runs synchronously before the browser paints.
+- [useLayoutRefUpdate](https://lilibraries.github.io/hooks/useLayoutRefUpdate.md): Like useRefUpdate, but runs synchronously before the browser paints.
+- [useIsomorphicLayoutEffect](https://lilibraries.github.io/hooks/useIsomorphicLayoutEffect.md): Use React.useLayoutEffect in the DOM and React.useEffect during server-side rendering.
+
+## States
+
+- [useCache](https://lilibraries.github.io/hooks/useCache.md): Cache data for a fixed time and keep components sharing the same cache instance in sync.
+- [useToggle](https://lilibraries.github.io/hooks/useToggle.md): Manage a boolean value with toggle, toggleOn and toggleOff actions.
+- [useSetState](https://lilibraries.github.io/hooks/useSetState.md): Merge partial state updates like this.setState in class components.
+- [useSafeState](https://lilibraries.github.io/hooks/useSafeState.md): Like React.useState, but setting state after unmount has no effect.
+- [useControllableState](https://lilibraries.github.io/hooks/useControllableState.md): Manage a value that can be either controlled or uncontrolled.
+- [useDelayedValue](https://lilibraries.github.io/hooks/useDelayedValue.md): Delay updates to a value.
+- [useMemoizedValue](https://lilibraries.github.io/hooks/useMemoizedValue.md): Keep the previous value until the new value actually changes, using deep comparison.
+- [useThrottledValue](https://lilibraries.github.io/hooks/useThrottledValue.md): Throttle a value so it updates at most once per wait time.
+- [useDebouncedValue](https://lilibraries.github.io/hooks/useDebouncedValue.md): Debounce a value so it updates only after it stops changing.
+
+## Callbacks
+
+- [useRaf](https://lilibraries.github.io/hooks/useRaf.md): Invoke a callback before the browser repaints with requestAnimationFrame.
+- [useIdle](https://lilibraries.github.io/hooks/useIdle.md): Invoke a callback when the browser is idle, falling back to setTimeout.
+- [useAnimate](https://lilibraries.github.io/hooks/useAnimate.md): Run JavaScript animations with a percent-based step callback and an optional easing function.
+- [useTimeout](https://lilibraries.github.io/hooks/useTimeout.md): Execute a callback after a delay, with start and cancel controls.
+- [useInterval](https://lilibraries.github.io/hooks/useInterval.md): Run a callback repeatedly at a fixed interval, with start and cancel controls.
+- [usePersist](https://lilibraries.github.io/hooks/usePersist.md): Keep a stable function identity while always calling the latest logic.
+- [useRerender](https://lilibraries.github.io/hooks/useRerender.md): Re-render the component manually, usually for mutable data.
+- [useThrottle](https://lilibraries.github.io/hooks/useThrottle.md): Create a throttled version of a callback.
+- [useDebounce](https://lilibraries.github.io/hooks/useDebounce.md): Create a debounced version of a callback with flush and cancel controls.
+
+## Refs
+
+- [useLatestRef](https://lilibraries.github.io/hooks/useLatestRef.md): Keep a ref pointing to the latest value to avoid stale closures.
+- [usePreviousRef](https://lilibraries.github.io/hooks/usePreviousRef.md): Keep a ref pointing to the value from the previous update.
+- [useComposedRef](https://lilibraries.github.io/hooks/useComposedRef.md): Compose multiple refs, including callback refs, into a single ref.
+- [useMountedRef](https://lilibraries.github.io/hooks/useMountedRef.md): Get a ref that tells whether the component is mounted.
+- [useUnmountedRef](https://lilibraries.github.io/hooks/useUnmountedRef.md): Get a ref that tells whether the component is unmounted.
+
+## Browser
+
+- [useTitle](https://lilibraries.github.io/hooks/useTitle.md): Set the document title.
+- [useFavicon](https://lilibraries.github.io/hooks/useFavicon.md): Set the document favicon.
+- [useOnline](https://lilibraries.github.io/hooks/useOnline.md): Detect whether the browser is online.
+- [useDarkMode](https://lilibraries.github.io/hooks/useDarkMode.md): Detect whether the system prefers a dark color scheme.
+- [usePageVisible](https://lilibraries.github.io/hooks/usePageVisible.md): Detect whether the page is visible, including restores from the bfcache.
+- [useWindowFocus](https://lilibraries.github.io/hooks/useWindowFocus.md): Detect whether the window has focus.
+- [useMatchMedia](https://lilibraries.github.io/hooks/useMatchMedia.md): Determine whether the document matches a media query.
+- [useWindowSize](https://lilibraries.github.io/hooks/useWindowSize.md): Get the window size and update on resize.
+- [useElementSize](https://lilibraries.github.io/hooks/useElementSize.md): Observe the size of a DOM element.
+- [useIntersecting](https://lilibraries.github.io/hooks/useIntersecting.md): Detect whether an element intersects the viewport or a given root element.
+- [useClickOutside](https://lilibraries.github.io/hooks/useClickOutside.md): Trigger a callback when a click happens outside the target area.
+- [useEventListener](https://lilibraries.github.io/hooks/useEventListener.md): Attach an event listener to a target and clean it up automatically.
+- [useResizeObserver](https://lilibraries.github.io/hooks/useResizeObserver.md): Observe size changes of an element with ResizeObserver.
+- [useMutationObserver](https://lilibraries.github.io/hooks/useMutationObserver.md): Observe DOM mutations such as inserted or removed nodes and changed attributes.
+- [useIntersectionObserver](https://lilibraries.github.io/hooks/useIntersectionObserver.md): Observe changes in the intersection of an element with another element or the viewport.
+- [useCookie](https://lilibraries.github.io/hooks/useCookie.md): Get, set and remove cookies, using js-cookie as the parser.
+- [useLocalStorage](https://lilibraries.github.io/hooks/useLocalStorage.md): Get, set and remove localStorage values.
+- [useSessionStorage](https://lilibraries.github.io/hooks/useSessionStorage.md): Get, set and remove sessionStorage values.
+
+## Optional
+
+- [Full documentation](https://lilibraries.github.io/hooks/llms-full.txt): all pages above in a single file.
+- [Changelog](https://github.com/lilibraries/hooks/blob/master/CHANGELOG.md)
+- [AGENTS.md](https://github.com/lilibraries/hooks/blob/master/AGENTS.md): repository conventions for AI coding agents.

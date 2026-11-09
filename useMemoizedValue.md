@@ -1,0 +1,38 @@
+# useMemoizedValue
+
+Return the previous value when the value has not changed. Use deep comparison by default.
+
+## API
+
+```ts
+function useMemoizedValue<T>(value: T, compare?: (x: any, y: any) => boolean): T;
+```
+
+Parameters:
+
+- **`value`:** The value.
+- **`compare`:** A function to determine whether the new and old values are equal, defaults to deep comparison.
+
+Results:
+
+- Returns the previous value if unchanged, otherwise the current value.
+
+## Notes
+
+- The default comparison is a deep comparison, which can be costly for large values; pass a custom `compare` for cheap cases.
+- The first render always returns the initial value.
+
+## Example
+
+A typical use: building a `useMemo` with deep-compared dependencies.
+
+```ts
+import { useMemo, DependencyList } from "react";
+import { useMemoizedValue } from "@lilib/hooks";
+
+function useDeepCompareMemo<T>(factory: () => T, deps?: DependencyList): T {
+  return useMemo(factory, useMemoizedValue(deps));
+}
+
+export default useDeepCompareMemo;
+```

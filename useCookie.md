@@ -1,0 +1,94 @@
+# useCookie
+
+This hook uses [js-cookie](https://github.com/js-cookie/js-cookie) as the parser. You can use this hook to get, set and/or remove cookies.
+
+## API
+
+```ts
+interface UseCookieOptions {
+  defaultValue?: string;
+  polling?: boolean;
+  pollingInterval?: number;
+  validate?: (value: string) => boolean;
+}
+
+function useCookie(
+  name: string,
+  options: UseCookieOptions & { defaultValue: string },
+): [
+  value: string,
+  setCookie: (
+    newValue: string | undefined | ((prevValue: string) => string | undefined),
+    attributes?: CookieAttributes,
+  ) => void,
+];
+
+function useCookie(
+  name: string,
+  options?: UseCookieOptions,
+): [
+  value: string | undefined,
+  setCookie: (
+    newValue: string | undefined | ((prevValue: string | undefined) => string | undefined),
+    attributes?: CookieAttributes,
+  ) => void,
+];
+
+interface CookieAttributes {
+  path?: string;
+  domain?: string;
+  secure?: boolean;
+  expires?: number | Date;
+  sameSite?: "strict" | "Strict" | "lax" | "Lax" | "none" | "None";
+}
+```
+
+Parameters:
+
+- **`name`:** Cookie name.
+- **`options`:** Options object.
+  - **`options.defaultValue`:** Default value. It will be returned when the specified cookie doesn't exist. When set, the returned `value` type no longer includes `undefined`.
+  - **`options.polling`:** Whether to poll for cookie changes. Default is `false`.
+  - **`options.pollingInterval`:** Polling interval time, in milliseconds. Default is `100`.
+  - **`options.validate`:** Validate the value got from the cookie. If this function returns `false`, the `defaultValue` will be used.
+
+Results:
+
+- **`value`:** Cookie value.
+- **`setCookie`:** A function that can set or remove the named cookie. It accepts two params:
+  - **`newValue`:** The new cookie value. If it is `undefined` or a function that returns `undefined`, the named cookie will be cleared, and the `options.defaultValue` will be returned as `value`.
+  - **`attributes`:** Cookie attributes. See [js-cookie attributes](https://github.com/js-cookie/js-cookie#cookie-attributes).
+
+## Notes
+
+- **Important**: Removing a cookie requires the same `attributes` as when it was set (especially `path` and `domain`); otherwise the removal silently fails.
+- Cookie changes made elsewhere (server responses, other scripts) are not pushed to the hook; enable `polling: true` to detect them.
+- Values are strings — no serialization is applied. Use `JSON.stringify` together with `validate` for structured data.
+- Returns `defaultValue` in non-browser environments. The `value` starts with `defaultValue` on the first render and is synchronized with the cookie right after mounting (before the browser paints), so server-rendered and client-hydrated output stay consistent.
+
+## Example
+
+The following example sets and removes a cookie; open this page in another tab to see polling keep the values in sync.
+
+```tsx
+import { useCookie } from "@lilib/hooks";
+
+function Example() {
+  const [value, setCookie] = useCookie("name", {
+    polling: true,
+    defaultValue: "default value",
+  });
+
+  return (
+    <>
+      <div>
+        <button onClick={() => setCookie(Math.random().toString())}>Set random cookie</button>{" "}
+        <button onClick={() => setCookie(undefined)}>Remove</button>
+      </div>
+      <div>Cookie value: {value}</div>
+    </>
+  );
+}
+
+export default Example;
+```

@@ -1,0 +1,121 @@
+# useSubmit
+
+This hook is built on [`useLoad`](useLoad.md) with a trimmed feature set: it supports only a few options and never runs automatically. It is typically used for network requests such as create, update, and delete.
+
+Compared to `useLoad`, these capabilities are intentionally unavailable:
+
+- **No automatic loading** — `submit` is the only trigger; nothing runs on mount.
+- **No request sharing** — `key` is unavailable; every submission is independent.
+- **No caching** — `cacheKey`/`staleTime` are unavailable; `submit` always sends the request.
+- **No polling or auto-reload** — the `polling*` and `autoReload*` options are unavailable.
+- **No `initialData` or `defaultParams`.**
+
+The returned `submit` is implemented by `useLoad`'s `force`, so each submission cancels the previous pending submission and always sends the request.
+
+## How it works
+
+`submit(...params)` forwards the params to the `callback` and returns a promise that resolves with the success data or rejects with the error. On failure, the same retry/fallback pipeline as `useLoad` applies — see [Failure handling](useLoad.md#failure-handling).
+
+## API
+
+```ts
+type LoadCallback = (...args: any[]) => Promise<any>;
+
+interface UseSubmitOptions<Callback extends LoadCallback> {
+  idle?: boolean | IdleRequestOptions;
+  fallback?: Callback;
+
+  retry?: boolean | ((error: any) => boolean);
+  retryLimit?: number;
+  retryInterval?: number | ((count: number) => number);
+  fallbackRetry?: boolean | ((error: any) => boolean);
+  fallbackRetryLimit?: number;
+  fallbackRetryInterval?: number | ((count: number) => number);
+
+  onSuccess?: (data: Awaited<ReturnType<Callback>>) => void;
+  onFailure?: (error: any) => void;
+  onFinally?: () => void;
+}
+
+function useSubmit<Callback extends LoadCallback>(
+  callback: Callback,
+  options?: UseSubmitOptions<Callback>,
+): {
+  submitting: boolean;
+  error: any;
+  submit: (...params: Parameters<Callback>) => ReturnType<Callback>;
+};
+```
+
+Parameters:
+
+- **`callback`:** The submit function; its params are forwarded by `submit`. It must return a promise; the resolved value is the success data.
+- **`options`:** Options object. All options are shared with `useLoad` and behave identically — the summaries below are kept short; see [`useLoad`'s options](useLoad.md#api) for the full semantics.
+  - **`options.idle`:** Run the callback during the browser's idle periods. You can pass an `IdleRequestOptions` object to limit the max waiting time.
+  - **`options.fallback`:** An alternate source called after the retries of `callback` are exhausted.
+  - **`options.retry`:** Enable retrying the callback. Default is `false`. It can be a function that receives the error and returns whether to retry.
+  - **`options.retryLimit`:** Callback retry limit. Default is `3`.
+  - **`options.retryInterval`:** Callback retry interval, in milliseconds. Defaults to exponential growth: the `count`-th retry waits 2^(count-1) × 1000 ms. It can also be a function computing the wait from the retry number.
+  - **`options.fallbackRetry`:** Enable retrying the fallback function after it fails too. Default is `false`. It can be a function that receives the error and returns whether to retry.
+  - **`options.fallbackRetryLimit`:** Fallback retry limit. Default is `3`.
+  - **`options.fallbackRetryInterval`:** Fallback retry interval, in milliseconds. Defaults to exponential growth like `retryInterval`. It can also be a function.
+  - **`options.onSuccess`:** Called on submit success with the data.
+  - **`options.onFailure`:** Called on submit failure with the error object.
+  - **`options.onFinally`:** Called when the submit settles (success or failure).
+
+Results:
+
+- **`submitting`:** Submitting state. Initial value is `false`.
+- **`error`:** The error of the most recent failure, `null` on success.
+- **`submit`:** Submit function. Its params are passed to the `callback` as is. Each submission cancels the previous pending submission and always sends the request.
+
+## Notes
+
+- The pending submission is cancelled when the component unmounts; its returned promise then never settles.
+
+## Example
+
+Refresh a list after submit — the typical create/update/delete workflow. `onSuccess` receives the result and calls `update` (local) and `reload` on the list's `useLoad`.
+
+_Click Submit — the number updates to the submitted result, then reloads._
+
+```tsx
+import { useLoad, useSubmit } from "@lilib/hooks";
+
+const fetchNumber = () => {
+  return new Promise<number>((resolve) => {
+    setTimeout(() => {
+      resolve(Math.random());
+    }, 1000);
+  });
+};
+
+const submitNumber = () => {
+  return new Promise<number>((resolve) => {
+    setTimeout(() => {
+      resolve(Math.random());
+    }, 1000);
+  });
+};
+
+function Example() {
+  const { data, loading, update, reload } = useLoad(fetchNumber);
+
+  const { submit, submitting, error } = useSubmit(submitNumber, {
+    onSuccess: (result) => {
+      update(result);
+      reload();
+    },
+  });
+
+  return (
+    <div>
+      <button onClick={() => submit()}>{submitting ? "Submitting" : "Submit"}</button>
+      {error && <div>Error: {error.message}</div>}
+      Number: {data} {loading ? "(Loading...)" : ""}
+    </div>
+  );
+}
+
+export default Example;
+```

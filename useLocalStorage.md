@@ -1,0 +1,86 @@
+# useLocalStorage
+
+Get, set and/or remove `localStorage`.
+
+## API
+
+```ts
+interface UseStorageOptions<T> {
+  defaultValue?: T;
+  polling?: boolean;
+  pollingInterval?: number;
+  compare?: (x: any, y: any) => boolean;
+  validate?: (value: any) => boolean;
+  serialize?: (value: T) => string;
+  deserialize?: (raw: string) => T;
+}
+
+function useLocalStorage<T>(
+  key: string,
+  options: UseStorageOptions<T> & { defaultValue: T },
+): [
+  value: T,
+  setLocalStorage: (newValue: T | undefined | ((prevValue: T) => T | undefined)) => void,
+];
+
+function useLocalStorage<T>(
+  key: string,
+  options?: UseStorageOptions<T>,
+): [
+  value: T | undefined,
+  setLocalStorage: (
+    newValue: T | undefined | ((prevValue: T | undefined) => T | undefined),
+  ) => void,
+];
+```
+
+Parameters:
+
+- **`key`:** `localStorage` key.
+- **`options`:** Options object.
+  - **`options.defaultValue`:** Default value. When set, the returned `value` type no longer includes `undefined`.
+  - **`options.polling`:** Whether to poll for storage changes. Default is `false`.
+  - **`options.pollingInterval`:** Polling interval time, in milliseconds. Default is `100`.
+  - **`options.compare`:** A function to determine whether the new and old values are equal. Defaults to deep comparison.
+  - **`options.validate`:** Validate the value got from `localStorage` which is deserialized by the `deserialize` function. If this function returns `false`, the `defaultValue` will be used.
+  - **`options.serialize`:** Serialization function. Default is `JSON.stringify`.
+  - **`options.deserialize`:** Deserialization function. Default is `JSON.parse`.
+
+Results:
+
+- **`value`:** The value parsed by the deserialization function.
+- **`setLocalStorage`:** Set `localStorage`. The `newValue` can also be a function that returns the new value. If it is `undefined`, the entry will be removed and the `defaultValue` will be returned.
+
+## Notes
+
+- **Important**: The `storage` event fires only in other tabs/windows — it never fires in the document that made the change. Components in the same page only stay in sync when they use the same hook instance, or with `polling: true`.
+- The default serialization is `JSON.stringify`/`JSON.parse`: `Date` becomes a string, `NaN` and `Infinity` become `null`, `Map`/`Set`/circular references are lost, and `undefined` array items become `null`. Use `serialize`/`deserialize` for custom types.
+- In private-browsing or restricted environments, accessing `localStorage` may throw; the hook then falls back to in-memory state and writes are not persisted.
+- Returns `defaultValue` in non-browser environments. The `value` starts with `defaultValue` on the first render and is synchronized with the stored value right after mounting (before the browser paints), so server-rendered and client-hydrated output stay consistent.
+
+## Example
+
+The following example sets and removes a value; open this page in another tab to see polling keep the values in sync.
+
+```tsx
+import { useLocalStorage } from "@lilib/hooks";
+
+function Example() {
+  const [value, setLocalStorage] = useLocalStorage("key", {
+    polling: true,
+    defaultValue: "default value",
+  });
+
+  return (
+    <>
+      <div>
+        <button onClick={() => setLocalStorage(Math.random().toString())}>Set random value</button>{" "}
+        <button onClick={() => setLocalStorage(undefined)}>Remove</button>
+      </div>
+      <div>The value is: {value}</div>
+    </>
+  );
+}
+
+export default Example;
+```

@@ -1,0 +1,55 @@
+# useFavicon
+
+Set the document favicon.
+
+## API
+
+```ts
+function useFavicon(href: string | null, options?: { mime?: string; restore?: boolean }): void;
+```
+
+Parameters:
+
+- **`href`:** The favicon URL. Pass `null` to not set one.
+- **`options`:** Options object.
+  - **`options.mime`:** Specify the MIME type. It is inferred from the `href` extname by default (support `.png`, `.gif`, `.jpg`, `.jpeg`, `.svg`, `.webp` and `.ico`).
+  - **`options.restore`:** Whether to restore the previous favicon on unmount.
+
+## Notes
+
+- The first `link[rel*='icon']` element in `<head>` is reused (which may be an `apple-touch-icon` or similar); a new link is created only when none exists.
+- With `restore`, the original favicon is captured on the hook's first render; multiple instances will override each other.
+
+## Example
+
+The following example switches the favicon together with the title when the brand changes.
+
+```tsx
+import { useState } from "react";
+import { useFavicon, useTitle } from "@lilib/hooks";
+
+const brands = {
+  lilib: { title: "Lilib", icon: "https://lilib.dev/favicon.ico" },
+  react: { title: "React", icon: "https://react.dev/favicon.ico" },
+};
+
+function Example() {
+  const [brand, setBrand] = useState<keyof typeof brands>("lilib");
+  const meta = brands[brand];
+
+  useTitle(meta.title);
+  useFavicon(meta.icon, { restore: true });
+
+  return (
+    <select
+      value={brand}
+      onChange={(event) => {
+        setBrand(event.target.value as keyof typeof brands);
+      }}
+    >
+      <option value="lilib">Lilib</option>
+      <option value="react">React</option>
+    </select>
+  );
+}
+```

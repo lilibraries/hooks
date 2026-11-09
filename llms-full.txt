@@ -1,0 +1,5442 @@
+# @lilib/hooks — Full Documentation
+
+> A collection of practical React hooks covering state, effects, refs, async data and browser APIs, with TypeScript, SSR and StrictMode support.
+
+---
+
+# Getting Started
+
+`@lilib/hooks` is a collection of practical React hooks covering async data, states, effects, callbacks, refs and browser APIs — written in TypeScript, compatible with React 16.8+, 17, 18 and 19, and safe for SSR and StrictMode.
+
+## Features
+
+- More than 50 hooks covering async data, effects, states, callbacks, refs and browser APIs.
+- Works with React 16.8+, 17, 18 and 19.
+- SSR-safe — graceful fallbacks outside the browser.
+- StrictMode-safe — idempotent effects with proper cleanup.
+- Fully typed — written in TypeScript.
+- Ships ESM, CJS and UMD builds.
+- Tree-shakeable — bundlers can drop unused hooks from the ESM build.
+
+## Install
+
+```shell
+npm install @lilib/hooks
+```
+```shell
+pnpm add @lilib/hooks
+```
+
+## Quick start
+
+```tsx
+import { useLoad } from "@lilib/hooks";
+
+function UserProfile({ userId }: { userId: string }) {
+  const { data, error, loading } = useLoad(
+    () => fetch(`/users/${userId}`).then((response) => response.json()),
+    [userId],
+  );
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Something went wrong.</div>;
+  }
+
+  return <div>Hello, {data.name}!</div>;
+}
+```
+
+For the full API reference and live examples, check out the docs of each hook listed below.
+
+## Hooks
+
+### Async
+
+| Hook                       | Description                                                |
+| -------------------------- | ---------------------------------------------------------- |
+| [`useLoad`](useLoad.md)     | Load async data, typically for network requests.           |
+| [`useReload`](useReload.md) | Reload all `useLoad` requests that share the same `key`.   |
+| [`useSubmit`](useSubmit.md) | Submit network requests such as create, update and delete. |
+
+### Effects
+
+| Hook                                                       | Description                                                                                            |
+| ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| [`useMount`](useMount.md)                                   | Run an effect after the component is mounted.                                                          |
+| [`useUpdate`](useUpdate.md)                                 | Run an effect after the component updates (the initial mount is skipped).                              |
+| [`useUnmount`](useUnmount.md)                               | Run an effect when the component unmounts.                                                             |
+| [`useRefEffect`](useRefEffect.md)                           | Like `React.useEffect`, but ReactRefs in the deps are dereferenced to `ref.current` before comparison. |
+| [`useRefUpdate`](useRefUpdate.md)                           | Like `useUpdate`, but ReactRefs in the deps are dereferenced to `ref.current` before comparison.       |
+| [`useLayoutMount`](useLayoutMount.md)                       | Like `useMount`, but runs before the browser paints.                                                   |
+| [`useLayoutUpdate`](useLayoutUpdate.md)                     | Like `useUpdate`, but runs before the browser paints.                                                  |
+| [`useLayoutRefEffect`](useLayoutRefEffect.md)               | Like `useRefEffect`, but runs before the browser paints.                                               |
+| [`useLayoutRefUpdate`](useLayoutRefUpdate.md)               | Like `useRefUpdate`, but runs before the browser paints.                                               |
+| [`useIsomorphicLayoutEffect`](useIsomorphicLayoutEffect.md) | `React.useLayoutEffect` in the DOM, `React.useEffect` during SSR.                                      |
+
+### States
+
+| Hook                                             | Description                                                                                                     |
+| ------------------------------------------------ | --------------------------------------------------------------------------------------------------------------- |
+| [`useCache`](useCache.md)                         | Cache data for a certain period of time, with optional sync between components sharing the same cache instance. |
+| [`useToggle`](useToggle.md)                       | Manage a boolean value.                                                                                         |
+| [`useSetState`](useSetState.md)                   | Like `this.setState` of class components, merging partial state updates.                                        |
+| [`useSafeState`](useSafeState.md)                 | Like `React.useState`, but setting state after unmount is safe.                                                 |
+| [`useControllableState`](useControllableState.md) | Manage a value that can be either controlled or uncontrolled.                                                   |
+| [`useDelayedValue`](useDelayedValue.md)           | Delay updates to a value.                                                                                       |
+| [`useMemoizedValue`](useMemoizedValue.md)         | Return the previous value until the value actually changes (deep comparison).                                   |
+| [`useThrottledValue`](useThrottledValue.md)       | Throttle a value.                                                                                               |
+| [`useDebouncedValue`](useDebouncedValue.md)       | Debounce a value.                                                                                               |
+
+### Callbacks
+
+| Hook                           | Description                                                            |
+| ------------------------------ | ---------------------------------------------------------------------- |
+| [`useRaf`](useRaf.md)           | Invoke a callback before the browser repaints.                         |
+| [`useIdle`](useIdle.md)         | Invoke a callback when the browser is idle.                            |
+| [`useAnimate`](useAnimate.md)   | Run JavaScript animations.                                             |
+| [`useTimeout`](useTimeout.md)   | Execute a callback after a delay.                                      |
+| [`useInterval`](useInterval.md) | Run a callback repeatedly at a fixed interval.                         |
+| [`usePersist`](usePersist.md)   | Keep a stable function identity while always calling the latest logic. |
+| [`useRerender`](useRerender.md) | Re-render the component manually, usually for mutable data.            |
+| [`useThrottle`](useThrottle.md) | Use a throttled callback.                                              |
+| [`useDebounce`](useDebounce.md) | Use a debounced callback.                                              |
+
+### Refs
+
+| Hook                                   | Description                                                                                    |
+| -------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| [`useLatestRef`](useLatestRef.md)       | A ref that always points to the latest value, avoiding stale closures in long-lived callbacks. |
+| [`usePreviousRef`](usePreviousRef.md)   | A ref that points to the value from the previous update.                                       |
+| [`useComposedRef`](useComposedRef.md)   | Compose multiple refs (objects or callbacks) into one.                                         |
+| [`useMountedRef`](useMountedRef.md)     | A ref that tells whether the component is mounted.                                             |
+| [`useUnmountedRef`](useUnmountedRef.md) | A ref that tells whether the component is unmounted.                                           |
+
+### Browser
+
+| Hook                                                   | Description                                                                            |
+| ------------------------------------------------------ | -------------------------------------------------------------------------------------- |
+| [`useTitle`](useTitle.md)                               | Set the document title.                                                                |
+| [`useFavicon`](useFavicon.md)                           | Set the document favicon.                                                              |
+| [`useOnline`](useOnline.md)                             | Detect whether the network is online.                                                  |
+| [`useDarkMode`](useDarkMode.md)                         | Detect whether the system prefers a dark color scheme.                                 |
+| [`usePageVisible`](usePageVisible.md)                   | Detect whether the page is visible, including bfcache restores.                        |
+| [`useWindowFocus`](useWindowFocus.md)                   | Detect whether the window has focus.                                                   |
+| [`useMatchMedia`](useMatchMedia.md)                     | Determine whether the document matches a media query.                                  |
+| [`useWindowSize`](useWindowSize.md)                     | Get the window size.                                                                   |
+| [`useElementSize`](useElementSize.md)                   | Get the size of a DOM element.                                                         |
+| [`useIntersecting`](useIntersecting.md)                 | Detect whether an element intersects the viewport or a specified root.                 |
+| [`useClickOutside`](useClickOutside.md)                 | Trigger a callback when clicking outside the target area.                              |
+| [`useEventListener`](useEventListener.md)               | Set up an event listener on the target.                                                |
+| [`useResizeObserver`](useResizeObserver.md)             | Observe an element's size changes.                                                     |
+| [`useMutationObserver`](useMutationObserver.md)         | Observe changes to a DOM node, such as inserted or removed child nodes and attributes. |
+| [`useIntersectionObserver`](useIntersectionObserver.md) | Observe changes in an element's intersection with another element or the viewport.     |
+| [`useCookie`](useCookie.md)                             | Get, set and/or remove cookies.                                                        |
+| [`useLocalStorage`](useLocalStorage.md)                 | Get, set and/or remove `localStorage`.                                                 |
+| [`useSessionStorage`](useSessionStorage.md)             | Get, set and/or remove `sessionStorage`.                                               |
+
+## Changelog
+
+See [CHANGELOG.md](https://github.com/lilibraries/hooks/blob/master/CHANGELOG.md) for the full release history.
+
+## License
+
+[MIT](https://github.com/lilibraries/hooks/blob/master/LICENSE)
+
+---
+
+# useLoad
+
+Load async data, typically for network requests. The `callback` function must return a promise. Loads automatically after mount by default (and again when `deps` change); set the `imperative` option to `true` to trigger loading manually via `load` instead.
+
+This hook covers the whole lifecycle of a request:
+
+- **Loading** — automatically or manually, with params (`load(...params)`), or triggered by `deps` changes.
+- **Sharing** — instances with the same `key` merge duplicate requests and share the result; [`useReload`](useReload.md) refreshes them all at once.
+- **Caching** — `cacheKey` persists data across unmounts (shared with [`useCache`](useCache.md)); `staleTime` skips requests while the data is fresh.
+- **Resilience** — automatic retries and an alternate data source via `fallback`.
+- **Keeping fresh** — polling and auto-reload on page show, window focus or network reconnect.
+- **Control** — `cancel` stops everything; `update` mutates `data` locally.
+
+## How it works
+
+### Loading states
+
+| State          | Meaning                      | Typical use                              |
+| -------------- | ---------------------------- | ---------------------------------------- |
+| `loading`      | A request is in flight       | Disable buttons, show a spinner          |
+| `initializing` | `loading` with no data yet   | First-load skeleton screens              |
+| `reloading`    | `loading` with existing data | Keep showing stale data while refreshing |
+
+`initializing` and `reloading` are derived from `loading` and `data` for convenience.
+
+### Control functions
+
+`useLoad` returns five control functions. `load`, `force` and `reload` trigger a load: before starting, each cancels this instance's pending work — the in-flight request, retries, polling and pending auto-reloads — so only one load per instance runs at a time. `update` and `cancel` never send a request.
+
+- **`load(...params)`** — starts a load and passes `params` to `callback` as is. Returns a Promise that resolves with the data on success or rejects with the error on failure. Honors `staleTime`: a fresh cache hit resolves directly without sending a request.
+- **`force(...params)`** — same as `load`, but bypasses `staleTime` and always sends the request. It does not interrupt an in-flight shared request: if another instance is already loading the same `key`, the request is still merged and waits for that result.
+- **`reload({ force })`** — reloads with the most recent `load` params (or `defaultParams` if `load` was never called with params). Set `force: true` to bypass `staleTime`. Returns nothing.
+- **`update(data)`** — updates `data` locally without sending a request. Accepts a new value or a function computed from the previous value. Returns nothing.
+- **`cancel()`** — stops this instance's pending work: the in-flight request, retries, polling and pending auto-reloads. The Promise returned by the cancelled `load`/`force` stays pending forever — it neither resolves nor rejects.
+
+| Function            | Sends a request | Cancels pending work | Bypasses `staleTime` |
+| ------------------- | --------------- | -------------------- | -------------------- |
+| `load(...params)`   | Yes             | Yes                  | No                   |
+| `force(...params)`  | Yes             | Yes                  | Yes                  |
+| `reload({ force })` | Yes             | Yes                  | With `force: true`   |
+| `update(data)`      | No              | No                   | —                    |
+| `cancel()`          | No              | Yes                  | —                    |
+
+### Failure handling
+
+When the `callback` fails, `useLoad` walks a fixed pipeline before surfacing `error`:
+
+```
+retry callback (≤ retryLimit) → fallback → retry fallback (≤ fallbackRetryLimit) → error
+```
+
+`retry`/`fallbackRetry` accept a boolean or a function receiving the error and returning whether to retry. Callback retries wait `retryInterval`, fallback retries wait `fallbackRetryInterval` — both exponential by default. Once the `fallback` is invoked, the primary callback is never retried again.
+
+### Sharing requests
+
+Instances with the same `key` (and `independent: false`) share one request: while one instance is loading, the others merge and wait instead of firing duplicates, and the outcome — success **or** failure — is broadcast to all of them. If the loading instance stops (because it reloads or unmounts), the waiting instances automatically reload with their own params.
+
+A [`useReload`](useReload.md) call reloads all associated instances at once.
+
+### Cache freshness
+
+`staleTime` must be used with `cacheKey`. Within `staleTime` after a cache write, the data is considered fresh: `load`/`reload` and automatic reloads resolve the cached data directly without sending a request. Freshness is derived from the entry's remaining TTL, so all readers and writers of the same `cacheKey` should use a consistent `cacheTime`.
+
+## API
+
+```ts
+type LoadCallback = (...args: any[]) => Promise<any>;
+
+interface UseLoadOptions<Callback extends LoadCallback> {
+  key?: NonNullable<unknown>;
+
+  idle?: boolean | IdleRequestOptions;
+  imperative?: boolean;
+  independent?: boolean;
+
+  fallback?: Callback;
+  initialData?: Awaited<ReturnType<Callback>>;
+  defaultParams?: Parameters<Callback>;
+
+  cache?: LRUCache<any, any>;
+  cacheKey?: NonNullable<unknown>;
+  cacheTime?: number;
+  staleTime?: number;
+  cacheValidate?: (data: any) => boolean;
+
+  retry?: boolean | ((error: any) => boolean);
+  retryLimit?: number;
+  retryInterval?: number | ((count: number) => number);
+  fallbackRetry?: boolean | ((error: any) => boolean);
+  fallbackRetryLimit?: number;
+  fallbackRetryInterval?: number | ((count: number) => number);
+
+  polling?: boolean;
+  pollingInterval?: number;
+  pollingInPageHidden?: boolean;
+  pollingIntervalInPageHidden?: number;
+
+  autoReloadWaitTime?: number;
+  autoReloadOnPageShow?: boolean;
+  autoReloadOnWindowFocus?: boolean;
+  autoReloadOnNetworkReconnect?: boolean;
+
+  onSuccess?: (data: Awaited<ReturnType<Callback>>) => void;
+  onFailure?: (error: any) => void;
+  onFinally?: () => void;
+}
+
+interface UseLoadResults<Callback extends LoadCallback> {
+  data: Awaited<ReturnType<Callback>> | undefined;
+  error: any;
+  loading: boolean;
+  reloading: boolean;
+  initializing: boolean;
+
+  load: (...params: Parameters<Callback>) => ReturnType<Callback>;
+  force: (...params: Parameters<Callback>) => ReturnType<Callback>;
+  reload: (options?: { force?: boolean }) => void;
+  update: (
+    newData:
+      | Awaited<ReturnType<Callback>>
+      | ((prevData?: Awaited<ReturnType<Callback>>) => Awaited<ReturnType<Callback>>),
+  ) => void;
+  cancel: () => void;
+}
+
+function useLoad<Callback extends LoadCallback>(
+  callback: Callback,
+  deps: React.DependencyList,
+  options: UseLoadOptions<Callback> & { initialData: Awaited<ReturnType<Callback>> },
+): Readonly<UseLoadResults<Callback> & { data: Awaited<ReturnType<Callback>> }>;
+
+function useLoad<Callback extends LoadCallback>(
+  callback: Callback,
+  deps?: React.DependencyList,
+  options?: UseLoadOptions<Callback>,
+): Readonly<UseLoadResults<Callback>>;
+```
+
+Parameters:
+
+- **`callback`:** A function that returns a promise. It is automatically called after the component is mounted by default.
+- **`deps`:** The dependency array; any change triggers an automatic reload. Default is `[]` (load once after mount).
+- **`options`:** Options object.
+  - **Loading control:**
+    - **`options.imperative`:** Run the callback manually by calling the `load` function, rather than automatically after the component is mounted.
+    - **`options.defaultParams`:** Default params passed to `callback` and `fallback`. Used by the first load, or by `reload` when `load(...params)` has never been called.
+  - **Request sharing:**
+    - **`options.key`:** A shared key that can be any data type except `null` and `undefined`, and must be immutable. When multiple instances use the same key, only the first one sends the request, and the others wait for and reuse its result. Set the `independent` option to `true` to disable this behavior. Another use of the `key` option is reloading all associated requests together with the [`useReload`](useReload.md) hook.
+    - **`options.independent`:** When `true`, duplicate requests are not merged even if `key` is set: each instance fires its own request, but `useReload(key)` can still reload it.
+  - **Caching:**
+    - **`options.cache`:** Cache instance. Create it with `new LRUCache({ max, ttl, ... })` from [`lru-cache`](https://github.com/isaacs/node-lru-cache). If not specified, a shared internal instance (the same one used by [`useCache`](useCache.md)) is used. Pass the same instance to `useCache` to let the two hooks share data.
+    - **`options.cacheKey`:** Cache key to enable caching. It can be any type except `null` and `undefined`, and must be immutable. The resolved data is written to the cache, and the initial `data` is read back from it on mount.
+    - **`options.cacheTime`:** Cache time, in milliseconds. Default is 5 minutes. Set `Infinity` for a permanent cache. A `NaN` value falls back to the default.
+    - **`options.staleTime`:** Stale time, in milliseconds. Default is `0`. It must be used with `cacheKey`. Within the `staleTime` period after a cache write, the data is considered fresh: calling `load(...params)`, `reload()` or automatic reloads resolves the cached data directly without sending a request. You can bypass the `staleTime` option by calling `force(...params)` or `reload({ force: true })`. Note: the reader and the writer of the same `cacheKey` should use a consistent `cacheTime`, since freshness is derived from the entry's remaining TTL.
+    - **`options.cacheValidate`:** Validate the cache value. If it returns falsy, the `initialData` will be used.
+  - **Failure handling:**
+    - **`options.fallback`:** When the `callback` function rejects an error and the count of retries has been exhausted, the `fallback` function will be called. Usually used for an alternate data source.
+    - **`options.retry`:** Enable retrying the callback. Default is `false`. It can be a function that receives the error and returns whether to retry.
+    - **`options.retryLimit`:** Callback retry limit. Default is `3`.
+    - **`options.retryInterval`:** Callback retry interval, in milliseconds. Defaults to exponential growth: the `count`-th retry waits 2^(count-1) × 1000 ms. You can set a function that returns a number for this option, for example `(count) => Math.pow(2, count)`.
+    - **`options.fallbackRetry`:** Enable retrying the fallback function after it fails too. Default is `false`. It can be a function that receives the error and returns whether to retry.
+    - **`options.fallbackRetryLimit`:** Fallback retry limit. Default is `3`.
+    - **`options.fallbackRetryInterval`:** Fallback retry interval, in milliseconds. Defaults to exponential growth like `retryInterval`. It can also be a function.
+  - **Polling:**
+    - **`options.polling`:** Enable polling when the page is visible: after each request settles, it reloads automatically after `pollingInterval`. Default is `false`.
+    - **`options.pollingInterval`:** Polling interval when the page is visible, in milliseconds. Default is `30000`.
+    - **`options.pollingInPageHidden`:** Enable polling when the page is hidden. Default is `false`. This option is independent of the `polling` option.
+    - **`options.pollingIntervalInPageHidden`:** Polling interval when the page is hidden, in milliseconds. Default is `60000`.
+  - **Auto reload:**
+    - **`options.autoReloadWaitTime`:** Throttle wait time on auto reload, in milliseconds: among consecutive triggers only the first runs, later triggers within the window are ignored. Default is `10000`.
+    - **`options.autoReloadOnPageShow`:** Enable auto reload on page show. Default is `false`.
+    - **`options.autoReloadOnWindowFocus`:** Enable auto reload on window focus. Default is `false`.
+    - **`options.autoReloadOnNetworkReconnect`:** Enable auto reload on network reconnect. Default is `false`.
+  - **Scheduling:**
+    - **`options.idle`:** Run the callback during the browser's idle periods. You can pass an `IdleRequestOptions` object to limit the max waiting time.
+  - **Events:**
+    - **`options.onSuccess`:** Called on success with the loaded data.
+    - **`options.onFailure`:** Called on failure with the error object.
+    - **`options.onFinally`:** Called when loading settles (success or failure).
+
+Results:
+
+- **State:**
+  - **`data`:** Resolved data. Starts with `initialData` or the value restored from the cache via `cacheKey`; otherwise `undefined` until the first load succeeds.
+  - **`error`:** The error of the most recent failure, `null` on success. Initial value is `null`.
+  - **`loading`:** Loading state. Initial value is `true` by default, or `false` when `imperative: true`.
+  - **`reloading`:** Equal to `loading && data !== undefined`. Provided for convenience.
+  - **`initializing`:** Equal to `loading && data === undefined`. Provided for convenience.
+- **Actions:**
+  - **`load`:** Load function. Its params are passed to the `callback` as is. It returns a promise that resolves with the data on success, or rejects with the error on failure. Note: calling it before the component mounts returns a promise that never settles, so do not call it during `useLayoutEffect`.
+  - **`force`:** Similar to the `load` function, but it bypasses the `staleTime` cache hit and always sends the request. Note that it does not interrupt in-flight shared requests: if another instance is already loading the same `key`, the request is still merged and waits for that result.
+  - **`reload`:** Reload function. It cancels this instance's pending work (the in-flight request, retries, polling and pending auto-reloads) first, then reloads with the params from the most recent `load` call (or `defaultParams` if none were ever passed). When the `force` option is set to `true`, the `staleTime` option will be ignored.
+  - **`update`:** Update the `data` locally without sending a request. It accepts a new value or a function computed from the old value.
+  - **`cancel`:** Cancel this instance's pending work: the in-flight request, retries, polling and pending auto-reloads. The promise returned by the cancelled `load`/`force` stays pending forever.
+
+## Examples
+
+### Basics
+
+#### Load async data
+
+_The loader resolves after one second — the `error`, `loading` and `data` states each render in turn._
+
+```tsx
+import { useLoad } from "@lilib/hooks";
+
+const fetchData = () => {
+  return new Promise<string>((resolve) => {
+    setTimeout(() => {
+      resolve("@lilib/hooks");
+    }, 1000);
+  });
+};
+
+function Example() {
+  const { data, error, loading } = useLoad(fetchData);
+
+  if (error) {
+    return <div>Error: {error.message}</div>;
+  }
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+  return <div>Data: {data}</div>;
+}
+
+export default Example;
+```
+
+#### Refresh without hiding the data
+
+_Click Reload — the old number stays visible while the new request is in flight._
+
+```tsx
+import { useLoad } from "@lilib/hooks";
+
+const fetchNumber = () => {
+  return new Promise<number>((resolve) => {
+    setTimeout(() => {
+      resolve(Math.random());
+    }, 1000);
+  });
+};
+
+function Example() {
+  const { data, initializing, reloading, reload } = useLoad(fetchNumber);
+
+  return (
+    <div>
+      {initializing ? "Loading..." : `Number: ${data}`}
+      {reloading ? " (Reloading...)" : ""}
+      <br />
+      <button onClick={() => reload()}>Reload</button>
+    </div>
+  );
+}
+
+export default Example;
+```
+
+#### Reload when dependencies change
+
+_Increase the counter — each change triggers a reload._
+
+```tsx
+import { useState } from "react";
+import { useLoad } from "@lilib/hooks";
+
+const fetchUser = (userId: number) => {
+  return new Promise<string>((resolve) => {
+    setTimeout(() => {
+      resolve(`User ${userId}`);
+    }, 1000);
+  });
+};
+
+function UserCard({ userId }: { userId: number }) {
+  const { data, loading } = useLoad(() => fetchUser(userId), [userId]);
+
+  return <div>User: {loading ? "Loading..." : data}</div>;
+}
+
+function Example() {
+  const [userId, setUserId] = useState(1);
+
+  return (
+    <div>
+      <button onClick={() => setUserId((userId) => (userId % 3) + 1)}>Switch user</button>
+      <UserCard userId={userId} />
+    </div>
+  );
+}
+
+export default Example;
+```
+
+#### Trigger loading manually
+
+_Nothing loads until you click the button._
+
+```tsx
+import { useLoad } from "@lilib/hooks";
+
+const fetchNumber = () => {
+  return new Promise<number>((resolve) => {
+    setTimeout(() => {
+      resolve(Math.random());
+    }, 1000);
+  });
+};
+
+function Example() {
+  const { data, loading, load } = useLoad(fetchNumber, [], { imperative: true });
+
+  return (
+    <div>
+      <button onClick={() => load()}>Load</button>
+      Number: {loading ? "Loading..." : String(data)}
+    </div>
+  );
+}
+
+export default Example;
+```
+
+#### Pass params to the loader
+
+_Pick a multiplier and click Load. `defaultParams` powers the first automatic load; `initialData` is shown before any data arrives._
+
+```tsx
+import { useState } from "react";
+import { useLoad } from "@lilib/hooks";
+
+const fetchCount = (multiplier: number) => {
+  return new Promise<number>((resolve) => {
+    setTimeout(() => {
+      resolve(10 * multiplier);
+    }, 1000);
+  });
+};
+
+function Example() {
+  const [multiplier, setMultiplier] = useState(1);
+
+  // `initialData` is shown before any data arrives; `defaultParams` are used by the first load.
+  const { data, loading, load } = useLoad(fetchCount, [], {
+    initialData: -1,
+    defaultParams: [1],
+  });
+
+  return (
+    <div>
+      <select value={multiplier} onChange={(event) => setMultiplier(Number(event.target.value))}>
+        <option value={1}>×1</option>
+        <option value={2}>×2</option>
+        <option value={3}>×3</option>
+      </select>
+      <button onClick={() => load(multiplier)}>Load</button>
+      Count: {data} {loading ? "(Loading...)" : ""}
+    </div>
+  );
+}
+
+export default Example;
+```
+
+#### Update data locally
+
+_Click +1 locally — no request is sent. Reload fetches a new number from the server. Watch the counter._
+
+```tsx
+import { useLoad } from "@lilib/hooks";
+
+let requestCount = 0;
+
+const fetchNumber = () => {
+  return new Promise<number>((resolve) => {
+    requestCount += 1;
+    setTimeout(() => {
+      resolve(Math.random());
+    }, 1000);
+  });
+};
+
+function Example() {
+  const { data, loading, update, reload } = useLoad(fetchNumber);
+
+  return (
+    <div>
+      Number: {String(data ?? "—")} {loading ? "(Loading...)" : ""}
+      <br />
+      <button onClick={() => update((prev) => (prev ?? 0) + 1)}>+1 locally</button>
+      <button onClick={() => reload()}>Reload from server</button>
+      Requests sent: {requestCount}
+    </div>
+  );
+}
+
+export default Example;
+```
+
+### Sharing requests
+
+The `key` option merges duplicate requests and lets you refresh all associated instances together — pair it with [`useReload`](useReload.md).
+
+#### Share a request across components
+
+_Two components, one request — the counter stays at 1._
+
+```tsx
+import { useLoad, useReload } from "@lilib/hooks";
+
+let requestCount = 0;
+
+const fetchNumber = () => {
+  return new Promise<number>((resolve) => {
+    requestCount += 1;
+    setTimeout(() => {
+      resolve(Math.random());
+    }, 1000);
+  });
+};
+
+function Component() {
+  const { data, loading } = useLoad(fetchNumber, [], { key: "load-key" });
+
+  return <div>Number: {loading ? "Loading..." : data}</div>;
+}
+
+function Example() {
+  const reload = useReload("load-key");
+
+  return (
+    <div>
+      <Component />
+      <Component />
+      Requests sent: {requestCount}
+      <button onClick={() => reload()}>Reload</button>
+    </div>
+  );
+}
+
+export default Example;
+```
+
+#### Keep instances independent
+
+_Each component fires its own request — the counter goes to 2. The Reload button still refreshes both._
+
+```tsx
+import { useLoad, useReload } from "@lilib/hooks";
+
+let requestCount = 0;
+
+const fetchNumber = () => {
+  return new Promise<number>((resolve) => {
+    requestCount += 1;
+    setTimeout(() => {
+      resolve(Math.random());
+    }, 1000);
+  });
+};
+
+function Component() {
+  const { data, loading } = useLoad(fetchNumber, [], {
+    key: "load-independent",
+    independent: true,
+  });
+
+  return <div>Number: {loading ? "Loading..." : data}</div>;
+}
+
+function Example() {
+  const reload = useReload("load-independent");
+
+  return (
+    <div>
+      <Component />
+      <Component />
+      Requests sent: {requestCount}
+      <button onClick={() => reload()}>Reload</button>
+    </div>
+  );
+}
+
+export default Example;
+```
+
+### Caching
+
+`cacheKey` persists the resolved data across unmounts, and `staleTime` skips requests while the data is still fresh.
+
+#### Cache data across unmounts
+
+_Hide and show the component — the cached number appears instantly._
+
+```tsx
+import { useLoad, useToggle } from "@lilib/hooks";
+
+let requestCount = 0;
+
+const fetchNumber = () => {
+  return new Promise<number>((resolve) => {
+    requestCount += 1;
+    setTimeout(() => {
+      resolve(Math.random());
+    }, 1000);
+  });
+};
+
+function Component() {
+  const { data, loading } = useLoad(fetchNumber, [], {
+    cacheKey: "load-cache-key",
+  });
+
+  return (
+    <div>
+      Number: {String(data ?? "—")} {loading ? "(Loading...)" : ""}
+    </div>
+  );
+}
+
+function Example() {
+  const [visible, { toggle }] = useToggle(false);
+
+  return (
+    <div>
+      <button onClick={() => toggle()}>{visible ? "Hide" : "Show"}</button>
+      Requests sent: {requestCount}
+      {visible && <Component />}
+    </div>
+  );
+}
+
+export default Example;
+```
+
+#### Skip requests within the stale time
+
+`staleTime` must be used with `cacheKey`.
+
+_Within 5 seconds, Load reuses the cached number without a new request; Force always fetches._
+
+```tsx
+import { useLoad } from "@lilib/hooks";
+
+let requestCount = 0;
+
+const fetchNumber = () => {
+  return new Promise<number>((resolve) => {
+    requestCount += 1;
+    setTimeout(() => {
+      resolve(Math.random());
+    }, 1000);
+  });
+};
+
+function Example() {
+  const { data, loading, load, force } = useLoad(fetchNumber, [], {
+    imperative: true,
+    cacheKey: "load-stale-time",
+    staleTime: 5000,
+  });
+
+  return (
+    <div>
+      <button onClick={() => load()}>Load</button>
+      <button onClick={() => force()}>Force</button>
+      Number: {loading ? "Loading..." : String(data)}
+      <br />
+      Requests sent: {requestCount}
+    </div>
+  );
+}
+
+export default Example;
+```
+
+#### Persist cached data to storage
+
+`useLoad` reads the initial `data` from the cache and writes resolved data with `cache.set`, so a write-through cache subclass persists both automatically. This example uses the `StorageCache` implementation shown below; `staleTime` equals the cache time, so the cached number is restored without a new request.
+
+_Reload the page — the number appears instantly and the request counter stays at 0._
+
+```tsx
+import { useLoad } from "@lilib/hooks";
+
+import StorageCache from "./StorageCache";
+
+const cache = new StorageCache();
+const CACHE_KEY = "load-cache-key";
+
+let requestCount = 0;
+
+const fetchNumber = () => {
+  return new Promise<number>((resolve) => {
+    requestCount += 1;
+    setTimeout(() => {
+      resolve(Math.random());
+    }, 1000);
+  });
+};
+
+function Example() {
+  // `staleTime` equals the cache time, so no request is sent while the
+  // persisted entry is still fresh: reload the page and the number is
+  // restored from storage instantly (watch the request counter stay at 0).
+  const { data, loading } = useLoad(fetchNumber, [], {
+    cache,
+    cacheKey: CACHE_KEY,
+    cacheTime: cache.cacheTime,
+    staleTime: cache.cacheTime,
+  });
+
+  return (
+    <div>
+      <div>
+        Number: {String(data ?? "—")} {loading ? "(Loading...)" : ""}
+      </div>
+      <div>Requests sent: {requestCount}</div>
+    </div>
+  );
+}
+
+export default Example;
+```
+
+**The full `StorageCache` implementation**
+
+**StorageCache.ts**
+
+```tsx
+import { LRUCache } from "lru-cache";
+
+export interface StorageCacheOptions {
+  /** Storage to persist to. Defaults to `window.localStorage`. Pass `window.sessionStorage` for a session-scoped cache. */
+  storage?: Storage | null;
+  /** Key prefix in the storage. Default is `"lilib:"`. Pass a distinct prefix when multiple cache instances share the same storage. */
+  prefix?: string;
+  /** Cache time in milliseconds, used to compute the persisted TTL. Default is 5 minutes. */
+  cacheTime?: number;
+  /** Maximum number of in-memory entries. Default is `100`. */
+  max?: number;
+}
+
+interface PersistedEntry {
+  value: any;
+  // `JSON.stringify` turns `Infinity` into `null`, so `null` is read back as
+  // `Infinity` (a permanent cache) instead of `NaN`.
+  expiresAt: number | null;
+}
+
+// A write-through `LRUCache` that persists its entries to a `Storage`
+// (`localStorage` by default, or `sessionStorage` via the `storage` option),
+// so the cache survives page reloads. `set` writes the value to the storage,
+// and `dispose` removes the persisted copy whenever an entry leaves the
+// in-memory cache (delete, eviction, expiry purge or overwrite). Persisted
+// entries are restored synchronously in the constructor. Share an instance
+// between `useCache` and `useLoad` through their `cache` option.
+export class StorageCache extends LRUCache<string, any> {
+  /** The cache time used to compute the persisted TTL. Pass it to the `cacheTime` options of `useCache`/`useLoad`. */
+  readonly cacheTime: number;
+
+  private storage: Storage | null;
+  private prefix: string;
+
+  constructor(options: StorageCacheOptions = {}) {
+    const { storage, prefix = "lilib:", cacheTime = 5 * 60 * 1000, max = 100 } = options;
+    super({
+      max,
+      dispose: (_value, key) => this.removePersistedEntry(key),
+    });
+    this.storage = storage ?? StorageCache.getDefaultStorage();
+    this.prefix = prefix;
+    this.cacheTime = cacheTime;
+    // Storage reads are synchronous, so persisted entries can be restored
+    // right in the constructor — no loading state is needed.
+    if (this.storage) {
+      this.hydrate();
+    }
+  }
+
+  // Accessing `window.localStorage` can throw (blocked storage, private
+  // browsing) — fall back to a disabled cache instead of crashing.
+  private static getDefaultStorage(): Storage | null {
+    if (typeof window === "undefined") {
+      return null;
+    }
+    try {
+      return window.localStorage;
+    } catch {
+      return null;
+    }
+  }
+
+  override set(key: string, value: any, options?: LRUCache.SetOptions<string, any, unknown>): this {
+    const result = super.set(key, value, options);
+    // `LRUCache` treats `set(key, undefined)` as `delete(key)` — nothing to persist.
+    if (value !== undefined) {
+      // Write through. Overwrites dispose the old entry first, so the old
+      // persisted copy is removed before the new one is written.
+      this.writePersistedEntry(
+        key,
+        value,
+        StorageCache.toExpiresAt(options?.ttl ?? this.cacheTime),
+      );
+    }
+    return result;
+  }
+
+  // `LRUCache` treats `ttl: 0` and `ttl: Infinity` as "never expires"
+  // (`useLoad` maps an infinite `cacheTime` to `ttl: 0`), so both mean a
+  // permanent entry.
+  private static toExpiresAt(ttl: number) {
+    return ttl > 0 && ttl < Infinity ? Date.now() + ttl : Infinity;
+  }
+
+  // Restore persisted entries, dropping expired ones. Iterate backwards:
+  // removing an expired entry shifts the storage indices, and entries behind
+  // the cursor have already been visited.
+  private hydrate() {
+    const storage = this.storage;
+    if (!storage) {
+      return;
+    }
+    // Storage access can throw (blocked storage, private browsing) — treat
+    // it as an empty cache.
+    try {
+      for (let i = storage.length - 1; i >= 0; i -= 1) {
+        const storageKey = storage.key(i);
+        if (storageKey && storageKey.startsWith(this.prefix)) {
+          const key = storageKey.slice(this.prefix.length);
+          const entry = this.readPersistedEntry(key);
+          const ttl = (entry?.expiresAt == null ? Infinity : entry.expiresAt) - Date.now();
+          if (entry && ttl > 0) {
+            // `super.set` restores the entry without persisting it again.
+            super.set(key, entry.value, { ttl });
+          } else {
+            this.removePersistedEntry(key);
+          }
+        }
+      }
+    } catch {
+      // The in-memory cache stays empty.
+    }
+  }
+
+  private readPersistedEntry(key: string): PersistedEntry | undefined {
+    try {
+      const raw = this.storage?.getItem(this.prefix + key);
+      if (raw == null) {
+        return undefined;
+      }
+      return JSON.parse(raw) as PersistedEntry;
+    } catch {
+      return undefined;
+    }
+  }
+
+  private writePersistedEntry(key: string, value: any, expiresAt: number) {
+    // Persisting is best-effort: quota errors or non-serializable values
+    // must not break the caller — the in-memory cache remains the source
+    // of truth.
+    try {
+      this.storage?.setItem(this.prefix + key, JSON.stringify({ value, expiresAt }));
+    } catch {
+      // Ignore.
+    }
+  }
+
+  private removePersistedEntry(key: string) {
+    try {
+      this.storage?.removeItem(this.prefix + key);
+    } catch {
+      // Ignore.
+    }
+  }
+}
+
+export default StorageCache;
+```
+
+#### Persist cached data to IndexedDB
+
+The async `IndexedDBCache` (implementation shown below) needs hydration before the first render — the example gates the component until the cache is hydrated.
+
+_Reload the page — the number is restored from IndexedDB instantly and the request counter stays at 0._
+
+```tsx
+import { useLoad, useMount, useSafeState } from "@lilib/hooks";
+
+import IndexedDBCache from "./IndexedDBCache";
+
+const cache = new IndexedDBCache();
+const CACHE_KEY = "load-cache-key";
+
+let requestCount = 0;
+
+const fetchNumber = () => {
+  return new Promise<number>((resolve) => {
+    requestCount += 1;
+    setTimeout(() => {
+      resolve(Math.random());
+    }, 1000);
+  });
+};
+
+function Component() {
+  // `staleTime` equals the cache time, so no request is sent while the
+  // persisted entry is still fresh: reload the page and the number is
+  // restored from IndexedDB instantly (watch the request counter stay at 0).
+  const { data, loading } = useLoad(fetchNumber, [], {
+    cache,
+    cacheKey: CACHE_KEY,
+    cacheTime: cache.cacheTime,
+    staleTime: cache.cacheTime,
+  });
+
+  return (
+    <div>
+      <div>
+        Number: {String(data ?? "—")} {loading ? "(Loading...)" : ""}
+      </div>
+      <div>Requests sent: {requestCount}</div>
+    </div>
+  );
+}
+
+function Example() {
+  const [hydrated, setHydrated] = useSafeState(false);
+
+  useMount(() => {
+    cache
+      .hydrate()
+      .catch((error) => {
+        // IndexedDB may be unavailable (private browsing, etc.) — proceed
+        // with an empty cache instead of blocking forever.
+        console.error(error);
+      })
+      .then(() => setHydrated(true));
+  });
+
+  if (!hydrated) {
+    return <div>Loading persisted data…</div>;
+  }
+
+  return <Component />;
+}
+
+export default Example;
+```
+
+**The full `IndexedDBCache` implementation**
+
+**IndexedDBCache.ts**
+
+```tsx
+import { LRUCache } from "lru-cache";
+
+export interface IndexedDBCacheOptions {
+  /** Database name. Default is `"lilib"`. Pass a distinct name when multiple apps share the same origin. */
+  databaseName?: string;
+  /** Object store name. Default is `"hooks"`. */
+  storeName?: string;
+  /** Cache time in milliseconds, used to compute the persisted TTL. Default is 5 minutes. */
+  cacheTime?: number;
+  /** Maximum number of in-memory entries. Default is `100`. */
+  max?: number;
+}
+
+interface PersistedEntry {
+  value: any;
+  expiresAt: number;
+}
+
+// A write-through `LRUCache` that persists its entries to IndexedDB, so the
+// cache survives page reloads. Unlike `StorageCache`, IndexedDB is
+// asynchronous, so the cache cannot be restored in the constructor: call
+// `hydrate` before rendering any `useCache`/`useLoad` call that uses this
+// instance. Share an instance between `useCache` and `useLoad` through their
+// `cache` option.
+export class IndexedDBCache extends LRUCache<string, any> {
+  /** The cache time used to compute the persisted TTL. Pass it to the `cacheTime` options of `useCache`/`useLoad`. */
+  readonly cacheTime: number;
+
+  private databaseName: string;
+  private storeName: string;
+  private databasePromise: Promise<IDBDatabase> | undefined;
+
+  constructor(options: IndexedDBCacheOptions = {}) {
+    const {
+      databaseName = "lilib",
+      storeName = "hooks",
+      cacheTime = 5 * 60 * 1000,
+      max = 100,
+    } = options;
+    super({
+      max,
+      // Remove the persisted copy whenever an entry leaves the in-memory
+      // cache (delete, eviction, expiry purge or overwrite). IndexedDB writes
+      // are async, so the removals are fire-and-forget (failures are ignored)
+      // — the in-memory cache remains the source of truth.
+      dispose: (_value, key) => {
+        void this.removeEntry(key).catch(() => {});
+      },
+    });
+    this.databaseName = databaseName;
+    this.storeName = storeName;
+    this.cacheTime = cacheTime;
+  }
+
+  override set(key: string, value: any, options?: LRUCache.SetOptions<string, any, unknown>): this {
+    const result = super.set(key, value, options);
+    // `LRUCache` treats `set(key, undefined)` as `delete(key)` — nothing to persist.
+    if (value !== undefined) {
+      void this.writeEntry(key, {
+        value,
+        expiresAt: IndexedDBCache.toExpiresAt(options?.ttl ?? this.cacheTime),
+      }).catch(() => {});
+    }
+    return result;
+  }
+
+  // `LRUCache` treats `ttl: 0` and `ttl: Infinity` as "never expires"
+  // (`useLoad` maps an infinite `cacheTime` to `ttl: 0`), so both mean a
+  // permanent entry.
+  private static toExpiresAt(ttl: number) {
+    return ttl > 0 && ttl < Infinity ? Date.now() + ttl : Infinity;
+  }
+
+  // Restore persisted entries into the cache, dropping expired ones. Skip
+  // entries that a previous run (e.g. StrictMode's double invocation) has
+  // already restored: overwriting them would dispose and delete the persisted
+  // copy.
+  async hydrate() {
+    const entries = await this.readAllEntries();
+    for (const [key, entry] of entries) {
+      if (this.has(key)) {
+        continue;
+      }
+      const ttl = entry.expiresAt - Date.now();
+      if (ttl > 0) {
+        // `super.set` restores the entry without persisting it again.
+        super.set(key, entry.value, { ttl });
+      } else {
+        void this.removeEntry(key).catch(() => {});
+      }
+    }
+  }
+
+  // One lazy connection for all operations. IndexedDB serializes transactions
+  // on a connection, so operations run in the order they are created.
+  private getDatabase(): Promise<IDBDatabase> {
+    if (!this.databasePromise) {
+      this.databasePromise = this.openDatabase()
+        .then((db) => {
+          if (db.objectStoreNames.contains(this.storeName)) {
+            return db;
+          }
+          // The database exists but the store is missing (e.g. it was created
+          // by an older build with a different store name, so no upgrade ever
+          // ran): close it and reopen with a bumped version so
+          // `onupgradeneeded` fires and creates the store.
+          const nextVersion = db.version + 1;
+          db.close();
+          return this.openDatabase(nextVersion);
+        })
+        .catch((error) => {
+          // A transient failure (e.g. the version upgrade is blocked by an
+          // open connection) must not disable persistence forever — allow
+          // the next operation to retry.
+          this.databasePromise = undefined;
+          throw error;
+        });
+    }
+    return this.databasePromise;
+  }
+
+  private openDatabase(version?: number): Promise<IDBDatabase> {
+    return new Promise((resolve, reject) => {
+      const request = indexedDB.open(this.databaseName, version);
+      request.onupgradeneeded = () => {
+        if (!request.result.objectStoreNames.contains(this.storeName)) {
+          request.result.createObjectStore(this.storeName);
+        }
+      };
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+      request.onblocked = () => {
+        reject(
+          new Error(
+            `Upgrading the "${this.databaseName}" database is blocked by another connection.`,
+          ),
+        );
+      };
+    });
+  }
+
+  private async readAllEntries(): Promise<Array<[string, PersistedEntry]>> {
+    const db = await this.getDatabase();
+    return new Promise((resolve, reject) => {
+      const request = db
+        .transaction(this.storeName, "readonly")
+        .objectStore(this.storeName)
+        .openCursor();
+      const entries: Array<[string, PersistedEntry]> = [];
+      request.onsuccess = () => {
+        const cursor = request.result;
+        if (cursor) {
+          entries.push([cursor.key as string, cursor.value as PersistedEntry]);
+          cursor.continue();
+        } else {
+          resolve(entries);
+        }
+      };
+      request.onerror = () => reject(request.error);
+    });
+  }
+
+  private async writeEntry(key: string, entry: PersistedEntry): Promise<void> {
+    const db = await this.getDatabase();
+    return new Promise((resolve, reject) => {
+      const request = db
+        .transaction(this.storeName, "readwrite")
+        .objectStore(this.storeName)
+        .put(entry, key);
+      request.onsuccess = () => resolve();
+      request.onerror = () => reject(request.error);
+    });
+  }
+
+  private async removeEntry(key: string): Promise<void> {
+    const db = await this.getDatabase();
+    return new Promise((resolve, reject) => {
+      const request = db
+        .transaction(this.storeName, "readwrite")
+        .objectStore(this.storeName)
+        .delete(key);
+      request.onsuccess = () => resolve();
+      request.onerror = () => reject(request.error);
+    });
+  }
+}
+
+export default IndexedDBCache;
+```
+
+### Resilience
+
+Retry automatically on failure and/or fall back to an alternate source. See [Failure handling](#failure-handling) for the exact order.
+
+#### Handle errors and retry manually
+
+_The first click always fails — click Retry to recover._
+
+```tsx
+import { useEffect } from "react";
+import { useLoad } from "@lilib/hooks";
+
+let shouldFail = true;
+
+const fetchData = () => {
+  return new Promise<string>((resolve, reject) => {
+    setTimeout(() => {
+      if (shouldFail) {
+        shouldFail = false;
+        reject(new Error("network error"));
+      } else {
+        resolve("recovered data");
+      }
+    }, 1000);
+  });
+};
+
+function Example() {
+  useEffect(() => {
+    shouldFail = true;
+  }, []);
+
+  const { data, error, loading, load } = useLoad(fetchData, [], { imperative: true });
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+  if (error) {
+    return (
+      <div>
+        Error: {error.message}
+        <button onClick={() => load()}>Retry</button>
+      </div>
+    );
+  }
+  return <div>Data: {data}</div>;
+}
+
+export default Example;
+```
+
+#### Retry on failure
+
+_The first two attempts fail, the third succeeds._
+
+```tsx
+import { useEffect } from "react";
+import { useLoad } from "@lilib/hooks";
+
+let attempt = 0;
+
+const fetchData = () => {
+  attempt += 1;
+  return new Promise<string>((resolve, reject) => {
+    setTimeout(() => {
+      if (attempt >= 3) {
+        resolve("resolved");
+      } else {
+        reject(new Error(`attempt ${attempt} failed`));
+      }
+    }, 1000);
+  });
+};
+
+function Example() {
+  useEffect(() => {
+    attempt = 0;
+  }, []);
+
+  const { data, error, loading, load } = useLoad(fetchData, [], {
+    imperative: true,
+    retry: true,
+    retryInterval: 1000,
+  });
+
+  return (
+    <div>
+      <button
+        onClick={() => {
+          attempt = 0;
+          load().catch(() => {});
+        }}
+      >
+        Load
+      </button>
+      {attempt > 0 && <div>Attempt: {attempt}</div>}
+      {loading ? "Loading..." : error ? `Error: ${error.message}` : data}
+    </div>
+  );
+}
+
+export default Example;
+```
+
+#### Fall back to an alternate source
+
+_The primary source always fails — the data always comes from the fallback._
+
+```tsx
+import { useLoad } from "@lilib/hooks";
+
+const fetchFromPrimary = () => {
+  return new Promise<string>((resolve, reject) => {
+    setTimeout(() => {
+      reject(new Error("primary source failed"));
+    }, 1000);
+  });
+};
+
+const fetchFromFallback = () => {
+  return new Promise<string>((resolve) => {
+    setTimeout(() => {
+      resolve("data from fallback");
+    }, 1000);
+  });
+};
+
+function Example() {
+  // The primary source always fails, so the data always comes from the fallback.
+  const { data, error, loading } = useLoad(fetchFromPrimary, [], {
+    fallback: fetchFromFallback,
+  });
+
+  if (error) {
+    return <div>Error: {error.message}</div>;
+  }
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+  return <div>Data: {data}</div>;
+}
+
+export default Example;
+```
+
+### Polling and auto reload
+
+Keep the data fresh with polling, or reload when the user returns to the page.
+
+#### Poll for updates
+
+_Click Start and watch the counter tick every 3 seconds; Cancel stops it._
+
+```tsx
+import { useLoad } from "@lilib/hooks";
+
+let count = 0;
+const fetchCount = () => {
+  return new Promise<number>((resolve) => {
+    setTimeout(() => {
+      resolve(++count);
+    }, 1000);
+  });
+};
+
+function Example() {
+  const { data, loading, load, cancel } = useLoad(fetchCount, [], {
+    imperative: true,
+    polling: true,
+    pollingInterval: 3000,
+  });
+
+  return (
+    <div>
+      <button onClick={() => load()}>Start</button>
+      <button onClick={() => cancel()}>Cancel</button>
+      Count: {data} {loading ? "(Loading...)" : ""}
+    </div>
+  );
+}
+
+export default Example;
+```
+
+#### Reload on page show, focus or reconnect
+
+_Switch to another tab and come back — the request count increases._
+
+```tsx
+import { useLoad } from "@lilib/hooks";
+
+let count = 0;
+const fetchCount = () => {
+  return new Promise<number>((resolve) => {
+    setTimeout(() => {
+      resolve(++count);
+    }, 1000);
+  });
+};
+
+function Example() {
+  const { data, loading } = useLoad(fetchCount, [], {
+    autoReloadOnPageShow: true,
+    autoReloadOnWindowFocus: true,
+    autoReloadOnNetworkReconnect: true,
+  });
+
+  return (
+    <div>
+      Requests: {data} {loading ? "(Loading...)" : ""}
+      <br />
+      Switch to another tab and come back to see it reload.
+    </div>
+  );
+}
+
+export default Example;
+```
+
+### Advanced
+
+#### Watch load events
+
+_Each click prints the callback order on the page._
+
+```tsx
+import { useState } from "react";
+import { useLoad } from "@lilib/hooks";
+
+const fetchData = () => {
+  return new Promise<string>((resolve, reject) => {
+    setTimeout(() => {
+      if (Math.random() >= 0.5) {
+        resolve("resolved");
+      } else {
+        reject(new Error("rejected"));
+      }
+    }, 1000);
+  });
+};
+
+function Example() {
+  const [logs, setLogs] = useState<string[]>([]);
+
+  const { load } = useLoad(fetchData, [], {
+    imperative: true,
+    onSuccess: () => {
+      setLogs((logs) => [...logs, "onSuccess"]);
+    },
+    onFailure: () => {
+      setLogs((logs) => [...logs, "onFailure"]);
+    },
+    onFinally: () => {
+      setLogs((logs) => [...logs, "onFinally"]);
+    },
+  });
+
+  function handleClick() {
+    setLogs([]);
+    load()
+      .then(() => {
+        setLogs((logs) => [...logs, "then"]);
+      })
+      .catch(() => {
+        setLogs((logs) => [...logs, "catch"]);
+      });
+  }
+
+  return (
+    <div>
+      <button onClick={handleClick}>Load</button>
+      <ul>
+        {logs.map((log, index) => (
+          <li key={index}>{log}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+export default Example;
+```
+
+#### Append results to a list
+
+_Each load appends the next item to the list._
+
+```tsx
+import { useState } from "react";
+import { useLoad } from "@lilib/hooks";
+
+// Each load fetches the next page (in a real app, triggered by scrolling).
+const fetchPage = (page: number) => {
+  return new Promise<number>((resolve) => {
+    setTimeout(() => {
+      resolve(page);
+    }, 1000);
+  });
+};
+
+function Example() {
+  const [list, setList] = useState<number[]>([]);
+  const [page, setPage] = useState(0);
+
+  const { loading, load } = useLoad(fetchPage, [], {
+    imperative: true,
+    onSuccess: (page) => {
+      setList((list) => [...list, page]);
+      setPage(page);
+    },
+  });
+
+  return (
+    <div>
+      <button onClick={() => load(page + 1)}>Load page</button>
+      <ul>
+        {list.map((item) => (
+          <li key={item}>Page {item}</li>
+        ))}
+        {loading && <li key="loading">Loading...</li>}
+      </ul>
+    </div>
+  );
+}
+
+export default Example;
+```
+
+#### Search with automatic request cancellation
+
+_Type quickly — earlier requests are cancelled, and only the latest result is shown._
+
+```tsx
+import { useState } from "react";
+import { useLoad } from "@lilib/hooks";
+
+let requestCount = 0;
+
+const search = (keyword: string) => {
+  return new Promise<string>((resolve) => {
+    requestCount += 1;
+    setTimeout(() => {
+      resolve(`results for "${keyword}"`);
+    }, 1000);
+  });
+};
+
+function Example() {
+  const [keyword, setKeyword] = useState("");
+
+  const { data, loading, load } = useLoad(search, [], { imperative: true });
+
+  return (
+    <div>
+      <input
+        value={keyword}
+        onChange={(event) => {
+          const value = event.target.value;
+          setKeyword(value);
+          if (value) {
+            load(value);
+          }
+        }}
+        placeholder="Type to search..."
+      />
+      <div>Requests sent: {requestCount}</div>
+      {keyword ? <div>{loading ? "Searching..." : data}</div> : <div>No keyword yet.</div>}
+    </div>
+  );
+}
+
+export default Example;
+```
+
+---
+
+# useReload
+
+This hook returns a function to reload all requests that share the same `key` in [`useLoad`](useLoad.md). It is the companion of `useLoad`'s [`key` option](useLoad.md#api): set the same `key` in multiple `useLoad` instances, and call the returned function from anywhere to refresh them all at once.
+
+Typical use case: after a create/update/delete operation succeeds, all components showing data of the same origin must be refreshed — the [`useSubmit`](useSubmit.md) example demonstrates such a workflow.
+
+## How it works
+
+- Every mounted `useLoad` instance with a `key` registers its own `reload` in a shared store.
+- The function returned by `useReload(key)` calls `reload` on every registered instance with that key. Each instance reloads with its own most recent params (or `defaultParams`).
+- The returned function also accepts an options object; the `force` passed on call overrides the hook-level one. With `force: true`, the reload bypasses the `staleTime` cache hit of the associated instances.
+
+## API
+
+```ts
+interface UseReloadOptions {
+  force?: boolean;
+}
+
+function useReload(
+  key: NonNullable<unknown>,
+  options?: UseReloadOptions,
+): (options?: UseReloadOptions) => void;
+```
+
+Parameters:
+
+- **`key`:** The key set in `useLoad`, matching the instances to reload. It can be any value except `null` and `undefined`, and must be immutable.
+- **`options`:** Options object.
+  - **`options.force`:** Whether to reload forcibly, bypassing the `staleTime` cache hit of the associated [`useLoad`](useLoad.md) instances.
+
+Results:
+
+- A function to reload all of the associated requests. It also accepts an options object; the `force` passed on call overrides the hook-level one.
+
+## Notes
+
+- Only mounted instances are reloaded: instances that have unmounted are removed from the shared store.
+- Object keys are matched by reference — pass the same object (or a primitive value) as in `useLoad`.
+
+## Example
+
+_One click reloads both components. `independent: true` keeps their requests separate so each shows its own data._
+
+```tsx
+import { useLoad, useReload } from "@lilib/hooks";
+
+const fetchUserCount = () => {
+  return new Promise<number>((resolve) => {
+    setTimeout(() => {
+      resolve(Math.floor(Math.random() * 1000));
+    }, 1000);
+  });
+};
+
+const fetchUserId = () => {
+  return new Promise<string>((resolve) => {
+    setTimeout(() => {
+      resolve(`user-${Math.floor(Math.random() * 100)}`);
+    }, 1000);
+  });
+};
+
+// The same `key` links both instances for group reload; `independent: true` keeps their requests separate.
+function UserCount() {
+  const { data, loading } = useLoad(fetchUserCount, [], {
+    key: "user-data",
+    independent: true,
+  });
+
+  return <div>Users: {loading ? "Loading..." : data}</div>;
+}
+
+function UserId() {
+  const { data, loading } = useLoad(fetchUserId, [], {
+    key: "user-data",
+    independent: true,
+  });
+
+  return <div>User ID: {loading ? "Loading..." : data}</div>;
+}
+
+function Example() {
+  const reload = useReload("user-data");
+
+  return (
+    <div>
+      <UserCount />
+      <UserId />
+      <button onClick={() => reload()}>Reload</button>
+    </div>
+  );
+}
+
+export default Example;
+```
+
+---
+
+# useSubmit
+
+This hook is built on [`useLoad`](useLoad.md) with a trimmed feature set: it supports only a few options and never runs automatically. It is typically used for network requests such as create, update, and delete.
+
+Compared to `useLoad`, these capabilities are intentionally unavailable:
+
+- **No automatic loading** — `submit` is the only trigger; nothing runs on mount.
+- **No request sharing** — `key` is unavailable; every submission is independent.
+- **No caching** — `cacheKey`/`staleTime` are unavailable; `submit` always sends the request.
+- **No polling or auto-reload** — the `polling*` and `autoReload*` options are unavailable.
+- **No `initialData` or `defaultParams`.**
+
+The returned `submit` is implemented by `useLoad`'s `force`, so each submission cancels the previous pending submission and always sends the request.
+
+## How it works
+
+`submit(...params)` forwards the params to the `callback` and returns a promise that resolves with the success data or rejects with the error. On failure, the same retry/fallback pipeline as `useLoad` applies — see [Failure handling](useLoad.md#failure-handling).
+
+## API
+
+```ts
+type LoadCallback = (...args: any[]) => Promise<any>;
+
+interface UseSubmitOptions<Callback extends LoadCallback> {
+  idle?: boolean | IdleRequestOptions;
+  fallback?: Callback;
+
+  retry?: boolean | ((error: any) => boolean);
+  retryLimit?: number;
+  retryInterval?: number | ((count: number) => number);
+  fallbackRetry?: boolean | ((error: any) => boolean);
+  fallbackRetryLimit?: number;
+  fallbackRetryInterval?: number | ((count: number) => number);
+
+  onSuccess?: (data: Awaited<ReturnType<Callback>>) => void;
+  onFailure?: (error: any) => void;
+  onFinally?: () => void;
+}
+
+function useSubmit<Callback extends LoadCallback>(
+  callback: Callback,
+  options?: UseSubmitOptions<Callback>,
+): {
+  submitting: boolean;
+  error: any;
+  submit: (...params: Parameters<Callback>) => ReturnType<Callback>;
+};
+```
+
+Parameters:
+
+- **`callback`:** The submit function; its params are forwarded by `submit`. It must return a promise; the resolved value is the success data.
+- **`options`:** Options object. All options are shared with `useLoad` and behave identically — the summaries below are kept short; see [`useLoad`'s options](useLoad.md#api) for the full semantics.
+  - **`options.idle`:** Run the callback during the browser's idle periods. You can pass an `IdleRequestOptions` object to limit the max waiting time.
+  - **`options.fallback`:** An alternate source called after the retries of `callback` are exhausted.
+  - **`options.retry`:** Enable retrying the callback. Default is `false`. It can be a function that receives the error and returns whether to retry.
+  - **`options.retryLimit`:** Callback retry limit. Default is `3`.
+  - **`options.retryInterval`:** Callback retry interval, in milliseconds. Defaults to exponential growth: the `count`-th retry waits 2^(count-1) × 1000 ms. It can also be a function computing the wait from the retry number.
+  - **`options.fallbackRetry`:** Enable retrying the fallback function after it fails too. Default is `false`. It can be a function that receives the error and returns whether to retry.
+  - **`options.fallbackRetryLimit`:** Fallback retry limit. Default is `3`.
+  - **`options.fallbackRetryInterval`:** Fallback retry interval, in milliseconds. Defaults to exponential growth like `retryInterval`. It can also be a function.
+  - **`options.onSuccess`:** Called on submit success with the data.
+  - **`options.onFailure`:** Called on submit failure with the error object.
+  - **`options.onFinally`:** Called when the submit settles (success or failure).
+
+Results:
+
+- **`submitting`:** Submitting state. Initial value is `false`.
+- **`error`:** The error of the most recent failure, `null` on success.
+- **`submit`:** Submit function. Its params are passed to the `callback` as is. Each submission cancels the previous pending submission and always sends the request.
+
+## Notes
+
+- The pending submission is cancelled when the component unmounts; its returned promise then never settles.
+
+## Example
+
+Refresh a list after submit — the typical create/update/delete workflow. `onSuccess` receives the result and calls `update` (local) and `reload` on the list's `useLoad`.
+
+_Click Submit — the number updates to the submitted result, then reloads._
+
+```tsx
+import { useLoad, useSubmit } from "@lilib/hooks";
+
+const fetchNumber = () => {
+  return new Promise<number>((resolve) => {
+    setTimeout(() => {
+      resolve(Math.random());
+    }, 1000);
+  });
+};
+
+const submitNumber = () => {
+  return new Promise<number>((resolve) => {
+    setTimeout(() => {
+      resolve(Math.random());
+    }, 1000);
+  });
+};
+
+function Example() {
+  const { data, loading, update, reload } = useLoad(fetchNumber);
+
+  const { submit, submitting, error } = useSubmit(submitNumber, {
+    onSuccess: (result) => {
+      update(result);
+      reload();
+    },
+  });
+
+  return (
+    <div>
+      <button onClick={() => submit()}>{submitting ? "Submitting" : "Submit"}</button>
+      {error && <div>Error: {error.message}</div>}
+      Number: {data} {loading ? "(Loading...)" : ""}
+    </div>
+  );
+}
+
+export default Example;
+```
+
+---
+
+# useMount
+
+Run an effect after the component is mounted.
+
+## API
+
+```ts
+function useMount(effect: React.EffectCallback): void;
+```
+
+Parameters:
+
+- **`effect`:** The effect to run after the component mounts. It may return a cleanup function.
+
+## Notes
+
+- In StrictMode, the effect runs twice: mount → cleanup → mount. Keep the effect idempotent.
+
+## Example
+
+The following example focuses an input when the component mounts.
+
+```tsx
+import { useRef } from "react";
+import { useMount } from "@lilib/hooks";
+
+function Example() {
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useMount(() => {
+    inputRef.current?.focus();
+  });
+
+  return <input ref={inputRef} placeholder="Focused on mount" />;
+}
+
+export default Example;
+```
+
+---
+
+# useUpdate
+
+Run an effect after the component updates or the dependencies change (the initial mount is skipped).
+
+## API
+
+```ts
+function useUpdate(effect: React.EffectCallback, deps?: React.DependencyList): void;
+```
+
+Parameters:
+
+- **`effect`:** The effect to run after an update. It may return a cleanup function.
+- **`deps`:** The dependency array. If omitted, the effect runs after every render; an empty array means the effect never runs.
+
+## Example
+
+The following example shows that the effect runs after updates and skips the initial mount.
+
+```tsx
+import { useState } from "react";
+import { useUpdate } from "@lilib/hooks";
+
+function Example() {
+  const [value, setValue] = useState(0);
+  const [runs, setRuns] = useState(0);
+
+  useUpdate(() => {
+    setRuns((runs) => runs + 1);
+  }, [value]);
+
+  return (
+    <>
+      <button onClick={() => setValue((value) => value + 1)}>Change value</button>
+      <div>Value: {value}</div>
+      <div>Effect ran: {runs} time(s)</div>
+    </>
+  );
+}
+
+export default Example;
+```
+
+---
+
+# useUnmount
+
+Run an effect when the component unmounts.
+
+## API
+
+```ts
+function useUnmount(effect: () => void): void;
+```
+
+Parameters:
+
+- **`effect`:** The effect to run when the component unmounts.
+
+## Notes
+
+- The latest `effect` runs on unmount (it is updated on every render), not the first render's closure.
+
+## Example
+
+The following example records when the child component unmounts.
+
+```tsx
+import { useState } from "react";
+import { useUnmount } from "@lilib/hooks";
+
+function Child({ onUnmount }: { onUnmount: (time: string) => void }) {
+  useUnmount(() => {
+    onUnmount(new Date().toLocaleTimeString());
+  });
+
+  return <div>Child component</div>;
+}
+
+function Example() {
+  const [show, setShow] = useState(true);
+  const [unmountedAt, setUnmountedAt] = useState("");
+  const [count, setCount] = useState(0);
+
+  return (
+    <>
+      <div>
+        <button onClick={() => setShow((show) => !show)}>{show ? "Unmount" : "Mount"} child</button>
+      </div>
+      {show && (
+        <Child
+          onUnmount={(time) => {
+            setUnmountedAt(time);
+            setCount((count) => count + 1);
+          }}
+        />
+      )}
+      <div>Unmounted times: {count}</div>
+      <div>Last unmounted at: {unmountedAt || "Never"}</div>
+    </>
+  );
+}
+
+export default Example;
+```
+
+---
+
+# useRefEffect
+
+This hook is similar to [`React.useEffect`](https://react.dev/reference/react/useEffect), but ReactRefs in the dependency array are dereferenced to `ref.current` before comparison. The effect re-runs when the value a ref points to changes (such as a DOM node), which makes it useful when a DOM node itself is an effect dependency.
+
+## API
+
+```ts
+function useRefEffect(effect: React.EffectCallback, deps?: React.DependencyList): void;
+```
+
+Parameters:
+
+- **`effect`:** The effect function. It may return a cleanup function.
+- **`deps`:** The dependency array. Its elements can be plain values or ReactRefs. If omitted, the effect re-runs after every update.
+
+## Notes
+
+- Plain objects with a `current` property are treated as ReactRefs and dereferenced, so they cannot be used as dependency values directly.
+
+## Example
+
+The following example binds hover listeners as soon as the DOM node is attached.
+
+```tsx
+import { useRef, useState } from "react";
+import { useRefEffect } from "@lilib/hooks";
+
+function Example() {
+  const domRef = useRef<HTMLDivElement>(null);
+  const [hovering, setHovering] = useState(false);
+
+  useRefEffect(() => {
+    const element = domRef.current;
+    if (!element) {
+      return;
+    }
+    const onEnter = () => setHovering(true);
+    const onLeave = () => setHovering(false);
+    element.addEventListener("mouseenter", onEnter);
+    element.addEventListener("mouseleave", onLeave);
+    return () => {
+      element.removeEventListener("mouseenter", onEnter);
+      element.removeEventListener("mouseleave", onLeave);
+    };
+  }, [domRef]);
+
+  return (
+    <div
+      ref={domRef}
+      style={{
+        padding: 16,
+        textAlign: "center",
+        border: "1px solid rgba(128, 128, 128, 0.25)",
+        backgroundColor: hovering ? "rgba(255, 165, 0, 0.3)" : "transparent",
+      }}
+    >
+      {hovering ? "Mouse is inside" : "Hover me"}
+    </div>
+  );
+}
+
+export default Example;
+```
+
+---
+
+# useRefUpdate
+
+This hook is similar to [`useUpdate`](useUpdate.md), but it is built on [`useRefEffect`](useRefEffect.md) internally, so ReactRefs in the dependency array are dereferenced to `ref.current` before comparison. It is useful when the ref target itself is an update dependency.
+
+## API
+
+```ts
+function useRefUpdate(effect: React.EffectCallback, deps?: React.DependencyList): void;
+```
+
+Parameters:
+
+- **`effect`:** The effect to run after an update. It may return a cleanup function.
+- **`deps`:** The dependency array. Its elements can be plain values or ReactRefs.
+
+## Notes
+
+- Plain objects with a `current` property are treated as ReactRefs and dereferenced, so they cannot be used as dependency values directly.
+
+## Example
+
+The following example measures the width whenever the element is re-attached.
+
+```tsx
+import { useRef, useState } from "react";
+import { useRefUpdate } from "@lilib/hooks";
+
+function Example() {
+  const [show, setShow] = useState(true);
+  const domRef = useRef<HTMLDivElement>(null);
+  const [width, setWidth] = useState<number>();
+
+  useRefUpdate(() => {
+    // Re-runs whenever the element that `domRef` points to is (re)attached.
+    if (domRef.current) {
+      setWidth(domRef.current.offsetWidth);
+    }
+  }, [domRef]);
+
+  return (
+    <>
+      <div>
+        <button onClick={() => setShow((show) => !show)}>Toggle element</button>
+      </div>
+      {show && <div ref={domRef}>Measured element</div>}
+      <div>Width: {width ?? "not measured yet"}</div>
+    </>
+  );
+}
+
+export default Example;
+```
+
+---
+
+# useLayoutMount
+
+It's similar to [`useMount`](useMount.md), but it runs synchronously before the browser paints. It uses [`useIsomorphicLayoutEffect`](useIsomorphicLayoutEffect.md) internally.
+
+## API
+
+```ts
+function useLayoutMount(effect: React.EffectCallback): void;
+```
+
+Parameters:
+
+- **`effect`:** The effect to run after the component mounts. It may return a cleanup function.
+
+## Example
+
+The following example measures the element width before the browser paints.
+
+```tsx
+import { useRef, useState } from "react";
+import { useLayoutMount } from "@lilib/hooks";
+
+function Example() {
+  const domRef = useRef<HTMLDivElement>(null);
+  const [width, setWidth] = useState<number>();
+
+  useLayoutMount(() => {
+    // Runs before the browser paints, so the size is available in the first paint.
+    if (domRef.current) {
+      setWidth(domRef.current.offsetWidth);
+    }
+  });
+
+  return (
+    <>
+      <div ref={domRef} style={{ padding: 16, backgroundColor: "rgba(255, 165, 0, 0.3)" }}>
+        Measured element
+      </div>
+      <div>Measured width: {width ?? "—"}px</div>
+    </>
+  );
+}
+
+export default Example;
+```
+
+---
+
+# useLayoutUpdate
+
+It's similar to [`useUpdate`](useUpdate.md), but it runs synchronously before the browser paints. It uses [`useIsomorphicLayoutEffect`](useIsomorphicLayoutEffect.md) internally.
+
+## API
+
+```ts
+function useLayoutUpdate(effect: React.EffectCallback, deps?: React.DependencyList): void;
+```
+
+Parameters:
+
+- **`effect`:** The effect to run after an update. It may return a cleanup function.
+- **`deps`:** The dependency array. If omitted, the effect runs after every render; an empty array means the effect never runs.
+
+## Example
+
+The following example measures the width after the content changes, before the browser paints.
+
+```tsx
+import { useRef, useState } from "react";
+import { useLayoutUpdate } from "@lilib/hooks";
+
+function Example() {
+  const [long, setLong] = useState(false);
+  const domRef = useRef<HTMLDivElement>(null);
+  const [width, setWidth] = useState<number>();
+
+  useLayoutUpdate(() => {
+    // Read the DOM size synchronously before the browser paints to avoid flicker.
+    if (domRef.current) {
+      setWidth(domRef.current.offsetWidth);
+    }
+  }, [long]);
+
+  return (
+    <>
+      <div>
+        <button onClick={() => setLong((long) => !long)}>Toggle content</button>
+      </div>
+      <div ref={domRef} style={{ padding: 16, backgroundColor: "rgba(255, 165, 0, 0.3)" }}>
+        {long ? "A much longer piece of content" : "Short"}
+      </div>
+      <div>Measured width: {width ?? "—"}px</div>
+    </>
+  );
+}
+
+export default Example;
+```
+
+---
+
+# useLayoutRefEffect
+
+This hook is similar to [`useRefEffect`](useRefEffect.md), but it runs synchronously before the browser paints (layout phase), which suits cases that need immediate DOM reads or writes. It is built on [`useIsomorphicLayoutEffect`](useIsomorphicLayoutEffect.md) internally.
+
+## API
+
+```ts
+function useLayoutRefEffect(effect: React.EffectCallback, deps?: React.DependencyList): void;
+```
+
+Parameters:
+
+- **`effect`:** The effect function. It may return a cleanup function.
+- **`deps`:** The dependency array. Its elements can be plain values or ReactRefs. If omitted, the effect re-runs after every update.
+
+## Notes
+
+- Plain objects with a `current` property are treated as ReactRefs and dereferenced, so they cannot be used as dependency values directly.
+
+## Example
+
+The following example measures the element size as soon as the DOM node is attached.
+
+```tsx
+import { useRef, useState } from "react";
+import { useLayoutRefEffect } from "@lilib/hooks";
+
+function Example() {
+  const domRef = useRef<HTMLDivElement>(null);
+  const [size, setSize] = useState<{ width: number; height: number }>();
+
+  useLayoutRefEffect(() => {
+    const element = domRef.current;
+    if (!element) {
+      return;
+    }
+    const measure = () => {
+      setSize({ width: element.offsetWidth, height: element.offsetHeight });
+    };
+    measure();
+    window.addEventListener("resize", measure);
+    return () => {
+      window.removeEventListener("resize", measure);
+    };
+  }, [domRef]);
+
+  return (
+    <>
+      <div ref={domRef} style={{ padding: 16, backgroundColor: "rgba(255, 165, 0, 0.3)" }}>
+        Measured element (resize the window)
+      </div>
+      <div>Measured size: {size ? `${size.width} x ${size.height}` : "—"}</div>
+    </>
+  );
+}
+
+export default Example;
+```
+
+---
+
+# useLayoutRefUpdate
+
+This hook is similar to [`useLayoutUpdate`](useLayoutUpdate.md), but it is built on [`useLayoutRefEffect`](useLayoutRefEffect.md) internally, so ReactRefs in the dependency array are dereferenced to `ref.current` before comparison. It runs synchronously before the browser paints (layout phase).
+
+## API
+
+```ts
+function useLayoutRefUpdate(effect: React.EffectCallback, deps?: React.DependencyList): void;
+```
+
+Parameters:
+
+- **`effect`:** The effect to run after an update. It may return a cleanup function.
+- **`deps`:** The dependency array. Its elements can be plain values or ReactRefs.
+
+## Notes
+
+- Plain objects with a `current` property are treated as ReactRefs and dereferenced, so they cannot be used as dependency values directly.
+
+## Example
+
+The following example measures the height after the content changes, before the browser paints.
+
+```tsx
+import { useRef, useState } from "react";
+import { useLayoutRefUpdate } from "@lilib/hooks";
+
+function Example() {
+  const [long, setLong] = useState(false);
+  const domRef = useRef<HTMLDivElement>(null);
+  const [height, setHeight] = useState<number>();
+
+  useLayoutRefUpdate(() => {
+    // Re-runs when the element that `domRef` points to changes,
+    // measured synchronously before the browser paints.
+    if (domRef.current) {
+      setHeight(domRef.current.offsetHeight);
+    }
+  }, [domRef, long]);
+
+  return (
+    <>
+      <div>
+        <button onClick={() => setLong((long) => !long)}>Toggle content</button>
+      </div>
+      <div ref={domRef} style={{ padding: 16, backgroundColor: "rgba(255, 165, 0, 0.3)" }}>
+        {long ? "A much longer piece of content" : "Short"}
+      </div>
+      <div>Measured height: {height ?? "—"}px</div>
+    </>
+  );
+}
+
+export default Example;
+```
+
+---
+
+# useIsomorphicLayoutEffect
+
+In the DOM environment, this hook is the same as `React.useLayoutEffect`. In the SSR environment, it is the same as `React.useEffect`.
+
+## API
+
+```ts
+function useIsomorphicLayoutEffect(effect: React.EffectCallback, deps?: React.DependencyList): void;
+```
+
+## Notes
+
+- During SSR it falls back to `useEffect`: the effect runs after hydration instead of before paint, which can cause a flash of unstyled or mismeasured content. Keep the effect idempotent across both phases.
+
+## Example
+
+The following example measures the element height; the same code runs safely during SSR.
+
+```tsx
+import { useRef, useState } from "react";
+import { useIsomorphicLayoutEffect } from "@lilib/hooks";
+
+function Example() {
+  const domRef = useRef<HTMLDivElement>(null);
+  const [height, setHeight] = useState<number>();
+
+  useIsomorphicLayoutEffect(() => {
+    if (domRef.current) {
+      setHeight(domRef.current.offsetHeight);
+    }
+  }, []);
+
+  return (
+    <>
+      <div ref={domRef} style={{ padding: 16, backgroundColor: "rgba(255, 165, 0, 0.3)" }}>
+        Measured element
+      </div>
+      <div>Measured height: {height ?? "—"}px</div>
+    </>
+  );
+}
+
+export default Example;
+```
+
+---
+
+# useCache
+
+Cache data for a certain period of time, and synchronize data between components sharing the same [`LRUCache`](https://github.com/isaacs/node-lru-cache) instance. Pass a cache instance via `options.cache`, otherwise a shared internal instance is used.
+
+## API
+
+```ts
+interface UseCacheOptions<T> {
+  defaultValue?: T;
+  cache?: LRUCache<any, any>;
+  cacheTime?: number;
+  cacheSync?: boolean | { set?: boolean; delete?: boolean };
+  validate?: (value: any) => boolean;
+  onSet?: (value: any) => void;
+  onDelete?: (value: any) => void;
+}
+
+function useCache<T>(
+  key: NonNullable<unknown>,
+  options: UseCacheOptions<T> & { defaultValue: T },
+): [value: T, setCache: (newValue: T | undefined) => void];
+
+function useCache<T>(
+  key: NonNullable<unknown>,
+  options?: UseCacheOptions<T>,
+): [value: T | undefined, setCache: (newValue: T | undefined) => void];
+```
+
+Parameters:
+
+- **`key`:** Cache key. Any value except `null` and `undefined`.
+- **`options`:** Options object.
+  - **`options.defaultValue`:** Default value when the cache value does not exist. When set, the returned `value` type no longer includes `undefined`.
+  - **`options.cache`:** Cache instance. Create it with `new LRUCache({ max, ttl, ... })` from [`lru-cache`](https://github.com/isaacs/node-lru-cache). If not specified, a shared internal instance is used.
+  - **`options.cacheTime`:** Cache time, in milliseconds. Default is 5 minutes. The TTL is set per entry, so it works regardless of the `ttl` option of the cache instance. You can set a permanent cache by setting this option to `Infinity` (mapped to `ttl: 0`, so no expiry timer is registered). Non-positive values are normalized to 1 ms, so the entry expires on the next read. A `NaN` value falls back to the default.
+  - **`options.cacheSync`:** Whether to synchronize data between components on set and/or delete events. Default is `false`. It can be an object to enable synchronization for each event separately.
+    - **`options.cacheSync.set`:** Synchronize data on set cache.
+    - **`options.cacheSync.delete`:** Synchronize data on delete cache or when cache time expires.
+  - **`options.validate`:** Validate the cache value. If it returns falsy, the `defaultValue` will be used.
+  - **`options.onSet`:** Data set event. The `value` param will not be validated by the `validate` function.
+  - **`options.onDelete`:** Data delete event. The `value` param will not be validated by the `validate` function.
+
+Results:
+
+- **`value`:** Cache value or default value.
+- **`setCache`:** The function to set cache. If the `newValue` param is `undefined`, the cache will be deleted.
+
+## Notes
+
+- **Important**: `key` must be an immutable value: changing it triggers a warning and may corrupt shared state.
+- The default cache is a shared internal instance, so keys are global across the whole app. Pass your own `LRUCache` instance to isolate groups of components.
+- `cacheSync` only synchronizes components that share the same cache instance.
+- [`LRUCache`](https://github.com/isaacs/node-lru-cache) expires entries lazily: expired entries are only removed and notified when they are read, so an expired cache may still occupy memory until the next read. The shared internal cache enables `ttlAutopurge` to purge expired entries in the background; enable it on your own cache instance if needed.
+
+## Examples
+
+### Basic usage
+
+The following example writes to a shared [`LRUCache`](https://github.com/isaacs/node-lru-cache) instance and reads it back with synchronization enabled.
+
+```tsx
+import { useCache } from "@lilib/hooks";
+import { LRUCache } from "lru-cache";
+
+// A cache instance shared across components.
+const sharedCache = new LRUCache({ max: 100 });
+
+function Example() {
+  // The first hook only writes the cache. Its own value does not update unless
+  // `cacheSync` is enabled, so it is ignored here. The second hook reads the
+  // cache with sync enabled.
+  const [, setCache] = useCache<string>("cache-key", { cache: sharedCache });
+  const [readerValue] = useCache<string>("cache-key", {
+    cache: sharedCache,
+    cacheSync: true,
+    defaultValue: "default value",
+  });
+
+  return (
+    <>
+      <div>
+        <button onClick={() => setCache(Math.random().toString())}>Set random value</button>{" "}
+        <button onClick={() => setCache(undefined)}>Remove</button>
+      </div>
+      <div>The synced reader value is: {readerValue}</div>
+    </>
+  );
+}
+
+export default Example;
+```
+
+### Persist to storage
+
+`useCache` stores data in memory only. To make the cache survive page reloads, extend [`LRUCache`](https://github.com/isaacs/node-lru-cache) with a write-through subclass: `set` writes the value back to the storage, and the `dispose` hook removes the persisted copy whenever an entry leaves the in-memory cache (delete, eviction, expiry purge or overwrite). The subclass restores persisted entries in its constructor and stores an `expiresAt` timestamp per entry, so expired data is dropped on restore.
+
+`StorageCache` persists to `localStorage` by default; pass `sessionStorage` via the `storage` option for a session-scoped cache. Because the persistence lives inside the cache subclass, every write is persisted automatically, including writes made directly through `cache.set` — no per-hook `onSet`/`onDelete` options are needed. The same instance can be shared with [`useLoad`](useLoad.md#persist-cached-data-to-storage) through its `cache` option.
+
+```tsx
+import { useCache } from "@lilib/hooks";
+
+import StorageCache from "./StorageCache";
+
+// Persist to localStorage by default, or pass another storage for a
+// different scope: `new StorageCache({ storage: window.sessionStorage })`.
+const cache = new StorageCache();
+const CACHE_KEY = "cache-key";
+
+function Example() {
+  const [value, setCache] = useCache<string>(CACHE_KEY, {
+    cache,
+    cacheTime: cache.cacheTime,
+    defaultValue: "default value",
+  });
+
+  return (
+    <>
+      <div>
+        <button onClick={() => setCache(Math.random().toString())}>Set random value</button>{" "}
+        <button onClick={() => setCache(undefined)}>Remove</button>
+      </div>
+      <div>The value is: {value}</div>
+      <div>Reload the page — the value survives.</div>
+    </>
+  );
+}
+
+export default Example;
+```
+
+**The full `StorageCache` implementation**
+
+**StorageCache.ts**
+
+```tsx
+import { LRUCache } from "lru-cache";
+
+export interface StorageCacheOptions {
+  /** Storage to persist to. Defaults to `window.localStorage`. Pass `window.sessionStorage` for a session-scoped cache. */
+  storage?: Storage | null;
+  /** Key prefix in the storage. Default is `"lilib:"`. Pass a distinct prefix when multiple cache instances share the same storage. */
+  prefix?: string;
+  /** Cache time in milliseconds, used to compute the persisted TTL. Default is 5 minutes. */
+  cacheTime?: number;
+  /** Maximum number of in-memory entries. Default is `100`. */
+  max?: number;
+}
+
+interface PersistedEntry {
+  value: any;
+  // `JSON.stringify` turns `Infinity` into `null`, so `null` is read back as
+  // `Infinity` (a permanent cache) instead of `NaN`.
+  expiresAt: number | null;
+}
+
+// A write-through `LRUCache` that persists its entries to a `Storage`
+// (`localStorage` by default, or `sessionStorage` via the `storage` option),
+// so the cache survives page reloads. `set` writes the value to the storage,
+// and `dispose` removes the persisted copy whenever an entry leaves the
+// in-memory cache (delete, eviction, expiry purge or overwrite). Persisted
+// entries are restored synchronously in the constructor. Share an instance
+// between `useCache` and `useLoad` through their `cache` option.
+export class StorageCache extends LRUCache<string, any> {
+  /** The cache time used to compute the persisted TTL. Pass it to the `cacheTime` options of `useCache`/`useLoad`. */
+  readonly cacheTime: number;
+
+  private storage: Storage | null;
+  private prefix: string;
+
+  constructor(options: StorageCacheOptions = {}) {
+    const { storage, prefix = "lilib:", cacheTime = 5 * 60 * 1000, max = 100 } = options;
+    super({
+      max,
+      dispose: (_value, key) => this.removePersistedEntry(key),
+    });
+    this.storage = storage ?? StorageCache.getDefaultStorage();
+    this.prefix = prefix;
+    this.cacheTime = cacheTime;
+    // Storage reads are synchronous, so persisted entries can be restored
+    // right in the constructor — no loading state is needed.
+    if (this.storage) {
+      this.hydrate();
+    }
+  }
+
+  // Accessing `window.localStorage` can throw (blocked storage, private
+  // browsing) — fall back to a disabled cache instead of crashing.
+  private static getDefaultStorage(): Storage | null {
+    if (typeof window === "undefined") {
+      return null;
+    }
+    try {
+      return window.localStorage;
+    } catch {
+      return null;
+    }
+  }
+
+  override set(key: string, value: any, options?: LRUCache.SetOptions<string, any, unknown>): this {
+    const result = super.set(key, value, options);
+    // `LRUCache` treats `set(key, undefined)` as `delete(key)` — nothing to persist.
+    if (value !== undefined) {
+      // Write through. Overwrites dispose the old entry first, so the old
+      // persisted copy is removed before the new one is written.
+      this.writePersistedEntry(
+        key,
+        value,
+        StorageCache.toExpiresAt(options?.ttl ?? this.cacheTime),
+      );
+    }
+    return result;
+  }
+
+  // `LRUCache` treats `ttl: 0` and `ttl: Infinity` as "never expires"
+  // (`useLoad` maps an infinite `cacheTime` to `ttl: 0`), so both mean a
+  // permanent entry.
+  private static toExpiresAt(ttl: number) {
+    return ttl > 0 && ttl < Infinity ? Date.now() + ttl : Infinity;
+  }
+
+  // Restore persisted entries, dropping expired ones. Iterate backwards:
+  // removing an expired entry shifts the storage indices, and entries behind
+  // the cursor have already been visited.
+  private hydrate() {
+    const storage = this.storage;
+    if (!storage) {
+      return;
+    }
+    // Storage access can throw (blocked storage, private browsing) — treat
+    // it as an empty cache.
+    try {
+      for (let i = storage.length - 1; i >= 0; i -= 1) {
+        const storageKey = storage.key(i);
+        if (storageKey && storageKey.startsWith(this.prefix)) {
+          const key = storageKey.slice(this.prefix.length);
+          const entry = this.readPersistedEntry(key);
+          const ttl = (entry?.expiresAt == null ? Infinity : entry.expiresAt) - Date.now();
+          if (entry && ttl > 0) {
+            // `super.set` restores the entry without persisting it again.
+            super.set(key, entry.value, { ttl });
+          } else {
+            this.removePersistedEntry(key);
+          }
+        }
+      }
+    } catch {
+      // The in-memory cache stays empty.
+    }
+  }
+
+  private readPersistedEntry(key: string): PersistedEntry | undefined {
+    try {
+      const raw = this.storage?.getItem(this.prefix + key);
+      if (raw == null) {
+        return undefined;
+      }
+      return JSON.parse(raw) as PersistedEntry;
+    } catch {
+      return undefined;
+    }
+  }
+
+  private writePersistedEntry(key: string, value: any, expiresAt: number) {
+    // Persisting is best-effort: quota errors or non-serializable values
+    // must not break the caller — the in-memory cache remains the source
+    // of truth.
+    try {
+      this.storage?.setItem(this.prefix + key, JSON.stringify({ value, expiresAt }));
+    } catch {
+      // Ignore.
+    }
+  }
+
+  private removePersistedEntry(key: string) {
+    try {
+      this.storage?.removeItem(this.prefix + key);
+    } catch {
+      // Ignore.
+    }
+  }
+}
+
+export default StorageCache;
+```
+
+### Persist to IndexedDB
+
+IndexedDB is asynchronous, so `IndexedDBCache` cannot restore persisted entries in its constructor: call `hydrate` in an effect after mount, and render the `useCache` call only after hydration finishes. `useCache` reads the cache exactly once on its first render, so calling it before hydration would permanently miss the persisted value. The write-through layer is the same as in `StorageCache`, except that the IndexedDB operations are async and fire-and-forget. The same instance can be shared with [`useLoad`](useLoad.md#persist-cached-data-to-indexeddb) through its `cache` option.
+
+```tsx
+import { useCache, useMount, useSafeState } from "@lilib/hooks";
+
+import IndexedDBCache from "./IndexedDBCache";
+
+const cache = new IndexedDBCache();
+const CACHE_KEY = "cache-key";
+
+function CachedValue() {
+  const [value, setCache] = useCache<string>(CACHE_KEY, {
+    cache,
+    cacheTime: cache.cacheTime,
+    defaultValue: "default value",
+  });
+
+  return (
+    <>
+      <div>
+        <button onClick={() => setCache(Math.random().toString())}>Set random value</button>{" "}
+        <button onClick={() => setCache(undefined)}>Remove</button>
+      </div>
+      <div>The value is: {value}</div>
+      <div>Reload the page — the value survives.</div>
+    </>
+  );
+}
+
+function Example() {
+  const [hydrated, setHydrated] = useSafeState(false);
+
+  useMount(() => {
+    cache
+      .hydrate()
+      .catch((error) => {
+        // IndexedDB may be unavailable (private browsing, etc.) — proceed
+        // with an empty cache instead of blocking forever.
+        console.error(error);
+      })
+      .then(() => setHydrated(true));
+  });
+
+  if (!hydrated) {
+    return <div>Loading persisted data…</div>;
+  }
+
+  return <CachedValue />;
+}
+
+export default Example;
+```
+
+**The full `IndexedDBCache` implementation**
+
+**IndexedDBCache.ts**
+
+```tsx
+import { LRUCache } from "lru-cache";
+
+export interface IndexedDBCacheOptions {
+  /** Database name. Default is `"lilib"`. Pass a distinct name when multiple apps share the same origin. */
+  databaseName?: string;
+  /** Object store name. Default is `"hooks"`. */
+  storeName?: string;
+  /** Cache time in milliseconds, used to compute the persisted TTL. Default is 5 minutes. */
+  cacheTime?: number;
+  /** Maximum number of in-memory entries. Default is `100`. */
+  max?: number;
+}
+
+interface PersistedEntry {
+  value: any;
+  expiresAt: number;
+}
+
+// A write-through `LRUCache` that persists its entries to IndexedDB, so the
+// cache survives page reloads. Unlike `StorageCache`, IndexedDB is
+// asynchronous, so the cache cannot be restored in the constructor: call
+// `hydrate` before rendering any `useCache`/`useLoad` call that uses this
+// instance. Share an instance between `useCache` and `useLoad` through their
+// `cache` option.
+export class IndexedDBCache extends LRUCache<string, any> {
+  /** The cache time used to compute the persisted TTL. Pass it to the `cacheTime` options of `useCache`/`useLoad`. */
+  readonly cacheTime: number;
+
+  private databaseName: string;
+  private storeName: string;
+  private databasePromise: Promise<IDBDatabase> | undefined;
+
+  constructor(options: IndexedDBCacheOptions = {}) {
+    const {
+      databaseName = "lilib",
+      storeName = "hooks",
+      cacheTime = 5 * 60 * 1000,
+      max = 100,
+    } = options;
+    super({
+      max,
+      // Remove the persisted copy whenever an entry leaves the in-memory
+      // cache (delete, eviction, expiry purge or overwrite). IndexedDB writes
+      // are async, so the removals are fire-and-forget (failures are ignored)
+      // — the in-memory cache remains the source of truth.
+      dispose: (_value, key) => {
+        void this.removeEntry(key).catch(() => {});
+      },
+    });
+    this.databaseName = databaseName;
+    this.storeName = storeName;
+    this.cacheTime = cacheTime;
+  }
+
+  override set(key: string, value: any, options?: LRUCache.SetOptions<string, any, unknown>): this {
+    const result = super.set(key, value, options);
+    // `LRUCache` treats `set(key, undefined)` as `delete(key)` — nothing to persist.
+    if (value !== undefined) {
+      void this.writeEntry(key, {
+        value,
+        expiresAt: IndexedDBCache.toExpiresAt(options?.ttl ?? this.cacheTime),
+      }).catch(() => {});
+    }
+    return result;
+  }
+
+  // `LRUCache` treats `ttl: 0` and `ttl: Infinity` as "never expires"
+  // (`useLoad` maps an infinite `cacheTime` to `ttl: 0`), so both mean a
+  // permanent entry.
+  private static toExpiresAt(ttl: number) {
+    return ttl > 0 && ttl < Infinity ? Date.now() + ttl : Infinity;
+  }
+
+  // Restore persisted entries into the cache, dropping expired ones. Skip
+  // entries that a previous run (e.g. StrictMode's double invocation) has
+  // already restored: overwriting them would dispose and delete the persisted
+  // copy.
+  async hydrate() {
+    const entries = await this.readAllEntries();
+    for (const [key, entry] of entries) {
+      if (this.has(key)) {
+        continue;
+      }
+      const ttl = entry.expiresAt - Date.now();
+      if (ttl > 0) {
+        // `super.set` restores the entry without persisting it again.
+        super.set(key, entry.value, { ttl });
+      } else {
+        void this.removeEntry(key).catch(() => {});
+      }
+    }
+  }
+
+  // One lazy connection for all operations. IndexedDB serializes transactions
+  // on a connection, so operations run in the order they are created.
+  private getDatabase(): Promise<IDBDatabase> {
+    if (!this.databasePromise) {
+      this.databasePromise = this.openDatabase()
+        .then((db) => {
+          if (db.objectStoreNames.contains(this.storeName)) {
+            return db;
+          }
+          // The database exists but the store is missing (e.g. it was created
+          // by an older build with a different store name, so no upgrade ever
+          // ran): close it and reopen with a bumped version so
+          // `onupgradeneeded` fires and creates the store.
+          const nextVersion = db.version + 1;
+          db.close();
+          return this.openDatabase(nextVersion);
+        })
+        .catch((error) => {
+          // A transient failure (e.g. the version upgrade is blocked by an
+          // open connection) must not disable persistence forever — allow
+          // the next operation to retry.
+          this.databasePromise = undefined;
+          throw error;
+        });
+    }
+    return this.databasePromise;
+  }
+
+  private openDatabase(version?: number): Promise<IDBDatabase> {
+    return new Promise((resolve, reject) => {
+      const request = indexedDB.open(this.databaseName, version);
+      request.onupgradeneeded = () => {
+        if (!request.result.objectStoreNames.contains(this.storeName)) {
+          request.result.createObjectStore(this.storeName);
+        }
+      };
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+      request.onblocked = () => {
+        reject(
+          new Error(
+            `Upgrading the "${this.databaseName}" database is blocked by another connection.`,
+          ),
+        );
+      };
+    });
+  }
+
+  private async readAllEntries(): Promise<Array<[string, PersistedEntry]>> {
+    const db = await this.getDatabase();
+    return new Promise((resolve, reject) => {
+      const request = db
+        .transaction(this.storeName, "readonly")
+        .objectStore(this.storeName)
+        .openCursor();
+      const entries: Array<[string, PersistedEntry]> = [];
+      request.onsuccess = () => {
+        const cursor = request.result;
+        if (cursor) {
+          entries.push([cursor.key as string, cursor.value as PersistedEntry]);
+          cursor.continue();
+        } else {
+          resolve(entries);
+        }
+      };
+      request.onerror = () => reject(request.error);
+    });
+  }
+
+  private async writeEntry(key: string, entry: PersistedEntry): Promise<void> {
+    const db = await this.getDatabase();
+    return new Promise((resolve, reject) => {
+      const request = db
+        .transaction(this.storeName, "readwrite")
+        .objectStore(this.storeName)
+        .put(entry, key);
+      request.onsuccess = () => resolve();
+      request.onerror = () => reject(request.error);
+    });
+  }
+
+  private async removeEntry(key: string): Promise<void> {
+    const db = await this.getDatabase();
+    return new Promise((resolve, reject) => {
+      const request = db
+        .transaction(this.storeName, "readwrite")
+        .objectStore(this.storeName)
+        .delete(key);
+      request.onsuccess = () => resolve();
+      request.onerror = () => reject(request.error);
+    });
+  }
+}
+
+export default IndexedDBCache;
+```
+
+---
+
+# useToggle
+
+Manage a boolean value.
+
+## API
+
+```ts
+function useToggle(initialValue?: boolean): [
+  value: boolean,
+  actions: {
+    toggle: (newValue?: boolean) => void;
+    toggleOn: () => void;
+    toggleOff: () => void;
+  },
+];
+```
+
+Parameters:
+
+- **`initialValue`:** Optional initial value. Default is `false`.
+
+Results:
+
+- **`value`:** A boolean value that can be changed by the following actions.
+- **`actions`:** Actions object.
+  - **`actions.toggle`:** Toggle the `value`. If the `newValue` param is not `undefined`, the `value` will be set to `newValue` (cast to boolean).
+  - **`actions.toggleOn`:** Set the `value` to `true`.
+  - **`actions.toggleOff`:** Set the `value` to `false`.
+
+## Example
+
+The following example controls a details panel with the toggle actions.
+
+```tsx
+import { useToggle } from "@lilib/hooks";
+
+function Example() {
+  const [on, { toggle, toggleOn, toggleOff }] = useToggle(true);
+
+  return (
+    <>
+      <div>
+        <button onClick={() => toggle()}>Toggle</button> <button onClick={toggleOn}>Turn on</button>{" "}
+        <button onClick={toggleOff}>Turn off</button>
+      </div>
+      <div>The switch is {on ? "on" : "off"}</div>
+      {on && (
+        <div style={{ padding: 8, marginTop: 8, backgroundColor: "rgba(255, 165, 0, 0.3)" }}>
+          Details panel
+        </div>
+      )}
+    </>
+  );
+}
+
+export default Example;
+```
+
+---
+
+# useSetState
+
+This hook is like the `this.setState` method of class components. It requires an object as the initial state, and can update part of the state. The new state will be merged with the old state.
+
+## API
+
+```ts
+function useSetState<S extends object>(
+  initialState: S | (() => S),
+): [state: S, setState: (patch: Partial<S> | ((prevState: S) => Partial<S>)) => void];
+```
+
+Parameters:
+
+- **`initialState`:** The initial state object, or a function that returns it.
+
+Results:
+
+- **`state`:** The current state object.
+- **`setState`:** Update part of the state; the patch will be merged with the old state. The `patch` can be an object or a function computed from the previous state.
+
+## Notes
+
+- Merging is shallow: patching a nested object replaces the whole nested value. Use the functional form with a manual spread to merge deeply.
+
+## Example
+
+The following example manages a form's fields in one state object, updating one field at a time.
+
+```tsx
+import { useSetState } from "@lilib/hooks";
+
+function Example() {
+  const [state, setState] = useSetState({ firstName: "", lastName: "" });
+
+  return (
+    <>
+      <p>
+        First name:{" "}
+        <input
+          value={state.firstName}
+          onChange={(event) => {
+            setState({ firstName: event.target.value });
+          }}
+        />
+      </p>
+      <p>
+        Last name:{" "}
+        <input
+          value={state.lastName}
+          onChange={(event) => {
+            setState({ lastName: event.target.value });
+          }}
+        />
+      </p>
+      <div>
+        Full name: {state.firstName} {state.lastName}
+      </div>
+    </>
+  );
+}
+
+export default Example;
+```
+
+---
+
+# useSafeState
+
+This hook is used in the same way as `React.useState`, except that calling `setState` after the component is unmounted has no effect rather than throwing an error.
+
+## API
+
+```ts
+function useSafeState<S>(
+  initialState: S | (() => S),
+): [state: S, setState: React.Dispatch<React.SetStateAction<S>>];
+
+function useSafeState<S = undefined>(): [
+  state: S | undefined,
+  setState: React.Dispatch<React.SetStateAction<S | undefined>>,
+];
+```
+
+Parameters:
+
+- **`initialState`:** The initial state, same as `React.useState`. It can be a value or a function that returns the value.
+
+Results:
+
+- **`state`:** The current state.
+- **`setState`:** Update the state. Calling it after the component unmounts has no effect and never errors.
+
+## Example
+
+A typical use: fetch data asynchronously and call `setState` after the request finishes; it is safe even if the component unmounts in the meantime.
+
+```tsx
+import { useMount, useSafeState } from "@lilib/hooks";
+
+function Example() {
+  const [data, setData] = useSafeState<any>();
+
+  useMount(async () => {
+    const response = await fetch("http://example.com/api/getData");
+    setData(await response.json());
+  });
+
+  ...
+}
+```
+
+---
+
+# useControllableState
+
+Unify a value that can be either controlled or uncontrolled, which is the common requirement of form and overlay components.
+
+## API
+
+```ts
+interface UseControllableStateOptions<T> {
+  value?: T;
+  defaultValue?: T;
+  onChange?: (value: T) => void;
+}
+
+function useControllableState<T>(
+  options: UseControllableStateOptions<T> & { defaultValue: T },
+): [state: T, setState: (nextState: T | ((prevState: T) => T)) => void];
+
+function useControllableState<T>(
+  options: UseControllableStateOptions<T> & { value: T },
+): [state: T, setState: (nextState: T | ((prevState: T) => T)) => void];
+
+function useControllableState<T>(
+  options?: UseControllableStateOptions<T>,
+): [
+  state: T | undefined,
+  setState: (nextState: T | undefined | ((prevState: T | undefined) => T | undefined)) => void,
+];
+```
+
+Parameters:
+
+- **`options`:** Options object.
+  - **`options.value`:** The controlled value. The state is controlled whenever `value` is not `undefined`. Keep it defined for the whole lifetime of the component; falling back to `undefined` turns the state into uncontrolled.
+  - **`options.defaultValue`:** The initial value used while the state is uncontrolled. It is ignored when `value` is provided, and later changes to it do not reset the state.
+  - **`options.onChange`:** Called with the next value once it actually changes, in both controlled and uncontrolled modes.
+
+Results:
+
+- **`state`:** The current value: `value` when controlled, the internal state otherwise.
+- **`setState`:** Accepts a new value or an updater function computed from the current value. It calls `onChange` only when the value actually changes and keeps a stable identity.
+
+## Notes
+
+- A controlled component must update `value` in `onChange`; otherwise the state never changes, because `setState` does not touch the internal state while controlled.
+- `value` is compared with the previous one using `Object.is`, so setting an unchanged value does not call `onChange`.
+- Switching between controlled and uncontrolled is supported: the state resumes from the latest value of the previous mode, starting with the very first render after the switch. Prefer keeping a component in one mode for its whole lifetime.
+- `undefined` always means uncontrolled, so it cannot be a controlled value. Use a sentinel such as `null` when a controlled value has to represent "empty".
+- To get `state: T` instead of `T | undefined`, make `defaultValue` non-optional in the type, for example by destructuring it with a default (`{ value, defaultValue = "" }`). Otherwise the last overload is selected and `undefined` is included in the result type.
+
+## Example
+
+The following example renders the same field component in both controlled and uncontrolled modes: the controlled field follows the parent state, while the uncontrolled one keeps its own state.
+
+```tsx
+import { useState } from "react";
+
+import { useControllableState } from "@lilib/hooks";
+
+function Field({
+  value,
+  defaultValue = "",
+  onChange,
+}: {
+  value?: string;
+  defaultValue?: string;
+  onChange?: (value: string) => void;
+}) {
+  const [text, setText] = useControllableState({ value, defaultValue, onChange });
+
+  return <input value={text} onChange={(event) => setText(event.target.value)} />;
+}
+
+function Example() {
+  const [value, setValue] = useState("Controlled value");
+
+  return (
+    <>
+      <div>
+        Controlled: <Field value={value} onChange={setValue} />{" "}
+        <button onClick={() => setValue("Reset from outside")}>Reset</button>
+      </div>
+      <div style={{ marginTop: 8 }}>
+        Uncontrolled: <Field defaultValue="Initial value" />
+      </div>
+      <div style={{ marginTop: 8 }}>Controlled value: {value}</div>
+    </>
+  );
+}
+
+export default Example;
+```
+
+---
+
+# useDelayedValue
+
+Delay updates to a value.
+
+## API
+
+```ts
+function useDelayedValue<T>(
+  value: T,
+  options:
+    | number
+    | {
+        delay: number;
+        shouldDelay?: (value: any) => boolean;
+        compare?: (x: any, y: any) => boolean;
+      },
+): T;
+```
+
+Parameters:
+
+- **`value`:** The value whose updates will be delayed.
+- **`options`:** The delay time (milliseconds) or an options object.
+  - **`options.delay`:** Delay time, in milliseconds. It must be a positive number.
+  - **`options.shouldDelay`:** A function that determines whether an update should be delayed. Returning `false` updates immediately and synchronously. Any value is delayed by default.
+  - **`options.compare`:** A function to determine whether the new and old values are equal, defaults to `Object.is`.
+
+Results:
+
+- Returns the delayed value.
+
+## Notes
+
+- The initial render returns `value` immediately; only subsequent updates are delayed.
+- `shouldDelay` returning `false` applies the update immediately and synchronously.
+- The default `compare` is `Object.is`: a new object each render triggers an update every time.
+
+## Example
+
+In the following example, showing `"Loading..."` is delayed for 500ms after the value changes to `true`; changes to `false` are applied immediately.
+
+```tsx
+import { useDelayedValue, useToggle } from "@lilib/hooks";
+
+function Example() {
+  const [loading, { toggle }] = useToggle(false);
+  const delayedLoading = useDelayedValue(loading, {
+    delay: 500,
+    shouldDelay: (value) => value === true,
+  });
+
+  return (
+    <div>
+      <button onClick={() => toggle()}>Toggle</button>
+      {delayedLoading && "Loading..."}
+    </div>
+  );
+}
+
+export default Example;
+```
+
+---
+
+# useMemoizedValue
+
+Return the previous value when the value has not changed. Use deep comparison by default.
+
+## API
+
+```ts
+function useMemoizedValue<T>(value: T, compare?: (x: any, y: any) => boolean): T;
+```
+
+Parameters:
+
+- **`value`:** The value.
+- **`compare`:** A function to determine whether the new and old values are equal, defaults to deep comparison.
+
+Results:
+
+- Returns the previous value if unchanged, otherwise the current value.
+
+## Notes
+
+- The default comparison is a deep comparison, which can be costly for large values; pass a custom `compare` for cheap cases.
+- The first render always returns the initial value.
+
+## Example
+
+A typical use: building a `useMemo` with deep-compared dependencies.
+
+```ts
+import { useMemo, DependencyList } from "react";
+import { useMemoizedValue } from "@lilib/hooks";
+
+function useDeepCompareMemo<T>(factory: () => T, deps?: DependencyList): T {
+  return useMemo(factory, useMemoizedValue(deps));
+}
+
+export default useDeepCompareMemo;
+```
+
+---
+
+# useThrottledValue
+
+Throttle a value.
+
+## API
+
+```ts
+function useThrottledValue<T>(
+  value: T,
+  options?: number | { wait?: number; leading?: boolean; trailing?: boolean },
+): [
+  throttledValue: T,
+  actions: {
+    flush: (finalValue?: T) => void;
+    cancel: () => void;
+  },
+];
+```
+
+Parameters:
+
+- **`value`:** The value to throttle.
+- **`options`:** Throttle wait time or an options object.
+  - **`options.wait`:** Throttle wait time, in milliseconds. Default is `0`.
+  - **`options.leading`:** Change throttled value on the leading edge. Default is `false`.
+  - **`options.trailing`:** Change throttled value on the trailing edge. Default is `true`.
+
+Results:
+
+- **`throttledValue`:** Throttled value.
+- **`actions`:** Actions object.
+  - **`actions.flush`:** Flush function. The `finalValue` will be returned as `throttledValue` if it is specified.
+  - **`actions.cancel`:** Cancel throttle timer.
+
+## Notes
+
+- The initial render returns `value` immediately; only subsequent changes are throttled.
+- With the default `leading: false`, updates land on the trailing edge only.
+- The pending update is cancelled on unmount.
+
+## Example
+
+The following example shows a search box; requests are only sent when the throttled value changes.
+
+```tsx
+import { useState } from "react";
+import { useThrottledValue, useUpdate } from "@lilib/hooks";
+
+function Example() {
+  const [value, setValue] = useState("");
+  const [throttledValue] = useThrottledValue(value, 500);
+  const [requests, setRequests] = useState(0);
+
+  // Simulate a search request whenever the throttled value changes.
+  useUpdate(() => {
+    setRequests((requests) => requests + 1);
+  }, [throttledValue]);
+
+  return (
+    <>
+      <p>
+        Enter search keywords:{" "}
+        <input
+          value={value}
+          onChange={(event) => {
+            setValue(event.target.value);
+          }}
+        />
+      </p>
+      <div>Throttled keywords: {throttledValue || "—"}</div>
+      <div>Search requests sent: {requests}</div>
+    </>
+  );
+}
+
+export default Example;
+```
+
+---
+
+# useDebouncedValue
+
+Debounce a value.
+
+## API
+
+```ts
+function useDebouncedValue<T>(
+  value: T,
+  options?: number | { wait?: number; maxWait?: number; leading?: boolean; trailing?: boolean },
+): [
+  debouncedValue: T,
+  actions: {
+    flush: (finalValue?: T) => void;
+    cancel: () => void;
+  },
+];
+```
+
+Parameters:
+
+- **`value`:** The value to debounce.
+- **`options`:** Debounce wait time or an options object.
+  - **`options.wait`:** Debounce wait time, in milliseconds. Default is `0`.
+  - **`options.maxWait`:** Max wait time, in milliseconds. Default is `Infinity`.
+  - **`options.leading`:** Change debounced value on the leading edge. Default is `false`.
+  - **`options.trailing`:** Change debounced value on the trailing edge. Default is `true`.
+
+Results:
+
+- **`debouncedValue`:** Debounced value.
+- **`actions`:** Actions object.
+  - **`actions.flush`:** Flush function. The `finalValue` will be returned as `debouncedValue` if it is specified.
+  - **`actions.cancel`:** Cancel debounce timer.
+
+## Notes
+
+- The initial render returns `value` immediately; only subsequent changes are debounced.
+- The pending update is cancelled on unmount.
+
+## Example
+
+The following example shows a search box; requests are only sent when the debounced value changes.
+
+```tsx
+import { useState } from "react";
+import { useDebouncedValue, useUpdate } from "@lilib/hooks";
+
+function Example() {
+  const [value, setValue] = useState("");
+  const [debouncedValue] = useDebouncedValue(value, 500);
+  const [requests, setRequests] = useState(0);
+
+  // Simulate a search request whenever the debounced value changes.
+  useUpdate(() => {
+    setRequests((requests) => requests + 1);
+  }, [debouncedValue]);
+
+  return (
+    <>
+      <p>
+        Enter search keywords:{" "}
+        <input
+          value={value}
+          onChange={(event) => {
+            setValue(event.target.value);
+          }}
+        />
+      </p>
+      <div>Debounced keywords: {debouncedValue || "—"}</div>
+      <div>Search requests sent: {requests}</div>
+    </>
+  );
+}
+
+export default Example;
+```
+
+---
+
+# useRaf
+
+Use [requestAnimationFrame](https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame) to invoke the callback before the browser repaints.
+
+## API
+
+```ts
+function useRaf(callback: () => void): [start: () => void, cancel: () => void];
+```
+
+Parameters:
+
+- **`callback`:** The callback invoked before the browser repaints.
+
+Results:
+
+- **`start`:** Starts the animation frame.
+- **`cancel`:** Cancels the animation frame.
+
+## Notes
+
+- Calling `start` again cancels the previous animation frame.
+- The pending callback is cancelled on unmount.
+
+## Example
+
+The following example animates a progress bar with requestAnimationFrame.
+
+```tsx
+import { useRef, useState } from "react";
+import { useRaf } from "@lilib/hooks";
+
+function Example() {
+  const [progress, setProgress] = useState(0);
+  const startTimeRef = useRef(0);
+  const loopRef = useRef<() => void>(() => {});
+
+  const [start, cancel] = useRaf(() => {
+    if (!startTimeRef.current) {
+      startTimeRef.current = Date.now();
+    }
+    const elapsed = Date.now() - startTimeRef.current;
+    setProgress(Math.min(elapsed / 2000, 1));
+    if (elapsed < 2000) {
+      // Re-schedule until the animation completes.
+      loopRef.current();
+    }
+  });
+
+  loopRef.current = start;
+
+  function handleStart() {
+    startTimeRef.current = 0;
+    setProgress(0);
+    start();
+  }
+
+  return (
+    <>
+      <div>
+        <button onClick={handleStart}>Start</button> <button onClick={cancel}>Cancel</button>
+      </div>
+      <div style={{ height: 8, marginTop: 8, backgroundColor: "rgba(128, 128, 128, 0.2)" }}>
+        <div
+          style={{ width: progress * 100 + "%", height: "100%", backgroundColor: "orange" }}
+        ></div>
+      </div>
+    </>
+  );
+}
+
+export default Example;
+```
+
+---
+
+# useIdle
+
+Invoke the callback when the browser is idle. This hook uses [window.requestIdleCallback](https://developer.mozilla.org/en-US/docs/Web/API/Window/requestIdleCallback) by default. If `window.requestIdleCallback` is unavailable, it falls back to `setTimeout`.
+
+## API
+
+```ts
+function useIdle(
+  callback: () => void,
+  options?: IdleRequestOptions,
+): [start: () => void, cancel: () => void];
+```
+
+Parameters:
+
+- **`callback`:** The callback invoked when idle.
+- **`options`:** The options passed to [window.requestIdleCallback](https://developer.mozilla.org/en-US/docs/Web/API/Window/requestIdleCallback).
+
+Results:
+
+- **`start`:** Starts the idle callback.
+- **`cancel`:** Cancels the idle callback.
+
+## Notes
+
+- Calling `start` again cancels the previous idle callback.
+- The pending callback is cancelled on unmount.
+
+## Example
+
+The following example runs a low-priority task (e.g. analytics) when the browser is idle.
+
+```tsx
+import { useState } from "react";
+import { useIdle } from "@lilib/hooks";
+
+function Example() {
+  const [logs, setLogs] = useState<string[]>([]);
+  const [start, cancel] = useIdle(() => {
+    setLogs((logs) => [...logs, `Idle task done at ${new Date().toLocaleTimeString()}`]);
+  });
+
+  return (
+    <>
+      <div>
+        <button onClick={start}>Start idle task</button> <button onClick={cancel}>Cancel</button>
+      </div>
+      <ul style={{ margin: 0, paddingLeft: 24 }}>
+        {logs.map((log, index) => (
+          <li key={index}>{log}</li>
+        ))}
+      </ul>
+    </>
+  );
+}
+
+export default Example;
+```
+
+---
+
+# useAnimate
+
+Run JavaScript animations with this hook.
+
+## API
+
+```ts
+function useAnimate(
+  callback: (percent: number) => void,
+  options: number | { duration: number; algorithm?: (percent: number) => number },
+): [start: () => void, cancel: () => void];
+```
+
+Parameters:
+
+- **`callback`:** The animation step function. It receives a percent number between 0 and 1 as the first param.
+- **`options`:** The animation duration (milliseconds), or an options object.
+  - **`options.duration`:** The duration in milliseconds. Required in the options-object form; ignored when a number is passed directly.
+  - **`options.algorithm`:** Optional easing function. The animation runs linearly by default, use this option to override the default behavior.
+
+Results:
+
+- **`start`:** Starts the animation.
+- **`cancel`:** Cancels the animation.
+
+## Notes
+
+- The `duration` option must be a positive number; a warning is emitted otherwise.
+- `start` cancels a running animation and restarts it from the beginning.
+- `algorithm` receives the linear percent and should map it back to the `[0, 1]` range.
+
+## Example
+
+The following example animates a progress bar with a TweenJS easing function.
+
+```tsx
+import { useRef } from "react";
+import TweenJS from "@tweenjs/tween.js";
+import { useAnimate } from "@lilib/hooks";
+
+function Example() {
+  const domRef = useRef<HTMLDivElement>(null);
+  const [start, cancel] = useAnimate(
+    (percent) => {
+      if (domRef.current) {
+        domRef.current.style.width = percent * 100 + "%";
+      }
+    },
+    {
+      duration: 1000,
+      algorithm: TweenJS.Easing.Bounce.Out,
+    },
+  );
+
+  return (
+    <>
+      <div>
+        <button onClick={start}>Start</button> <button onClick={cancel}>Cancel</button>
+      </div>
+      <div
+        ref={domRef}
+        style={{ width: 0, height: 8, marginTop: 8, backgroundColor: "orange" }}
+      ></div>
+    </>
+  );
+}
+
+export default Example;
+```
+
+---
+
+# useTimeout
+
+Execute a callback after a delay.
+
+## API
+
+```ts
+function useTimeout(
+  callback: () => void,
+  timeout?: number,
+): [start: () => void, cancel: () => void];
+```
+
+Parameters:
+
+- **`callback`:** The callback to execute after the delay.
+- **`timeout`:** Optional delay time, in milliseconds.
+
+Results:
+
+- **`start`:** Starts the timer. It clears any previous timer first.
+- **`cancel`:** Cancels the timer.
+
+## Notes
+
+- The timer starts only when `start` is called.
+- Calling `start` again resets the timer.
+- The timer is cancelled on unmount.
+
+## Example
+
+The following example shows a toast message that disappears automatically after a delay.
+
+```tsx
+import { useState } from "react";
+import { useTimeout } from "@lilib/hooks";
+
+function Example() {
+  const [show, setShow] = useState(false);
+  const [start, cancel] = useTimeout(() => {
+    setShow(false);
+  }, 1500);
+
+  function handleShow() {
+    setShow(true);
+    start();
+  }
+
+  function handleCancel() {
+    cancel();
+    setShow(false);
+  }
+
+  return (
+    <>
+      <div>
+        <button onClick={handleShow}>Show toast</button>{" "}
+        <button onClick={handleCancel}>Cancel</button>
+      </div>
+      {show && (
+        <div style={{ padding: 8, marginTop: 8, backgroundColor: "rgba(255, 165, 0, 0.3)" }}>
+          A toast message
+        </div>
+      )}
+    </>
+  );
+}
+
+export default Example;
+```
+
+---
+
+# useInterval
+
+Run a callback repeatedly at a fixed interval.
+
+## API
+
+```ts
+function useInterval(
+  callback: () => void,
+  interval?: number,
+): [start: () => void, cancel: () => void];
+```
+
+Parameters:
+
+- **`callback`:** A function to be called at intervals.
+- **`interval`:** The interval, in milliseconds.
+
+Results:
+
+- **`start`:** Starts the loop. It clears any previous loop first.
+- **`cancel`:** Cancels the loop.
+
+## Notes
+
+- The loop is cancelled on unmount.
+
+## Example
+
+The following example shows an elapsed-seconds clock that starts automatically on mount.
+
+```tsx
+import { useState } from "react";
+import { useInterval, useMount } from "@lilib/hooks";
+
+function Example() {
+  const [elapsed, setElapsed] = useState(0);
+  const [start, cancel] = useInterval(() => {
+    setElapsed((elapsed) => elapsed + 1);
+  }, 1000);
+
+  // Start the clock automatically on mount.
+  useMount(start);
+
+  return (
+    <>
+      <div>
+        <button onClick={cancel}>Pause</button> <button onClick={start}>Resume</button>
+      </div>
+      <div>Elapsed seconds: {elapsed}</div>
+    </>
+  );
+}
+
+export default Example;
+```
+
+---
+
+# usePersist
+
+Return the same function identity regardless of how the `callback` argument changes. The returned function behaves exactly like `callback`. A typical use case: the callback must go into a dependency array (e.g. `useEffect`), yet calls should always use the latest logic.
+
+## API
+
+```ts
+function usePersist<T extends (...args: any[]) => any>(
+  callback: T,
+): (...args: Parameters<T>) => ReturnType<T>;
+```
+
+Parameters:
+
+- **`callback`:** The callback function.
+
+## Example
+
+The following example binds a document click listener only once, and it always reads the latest input value.
+
+```tsx
+import { useEffect, useState } from "react";
+import { usePersist } from "@lilib/hooks";
+
+function Example() {
+  const [value, setValue] = useState("");
+  const [lastSeen, setLastSeen] = useState("");
+
+  // The callback identity never changes, so the listener is bound only once.
+  const onClick = usePersist(() => {
+    // Always reads the latest `value` (no stale closure).
+    setLastSeen(value);
+  });
+
+  useEffect(() => {
+    document.addEventListener("click", onClick);
+    return () => {
+      document.removeEventListener("click", onClick);
+    };
+  }, [onClick]);
+
+  return (
+    <>
+      <p>
+        Enter value:{" "}
+        <input
+          value={value}
+          onChange={(event) => {
+            setValue(event.target.value);
+          }}
+        />
+      </p>
+      <div>Last value read on click: {lastSeen || "—"}</div>
+    </>
+  );
+}
+
+export default Example;
+```
+
+---
+
+# useRerender
+
+This hook returns a function that you can use to re-render the component. It is usually used to re-render mutable data.
+
+## API
+
+```ts
+function useRerender(): () => void;
+```
+
+## Notes
+
+- This is an escape hatch for mutable data; prefer state for values that affect rendering.
+- Do not call it during render.
+
+## Example
+
+The following example updates a mutable value outside React state and re-renders to display it.
+
+```tsx
+import { useRef } from "react";
+import { useRerender } from "@lilib/hooks";
+
+function Example() {
+  // A mutable value that lives outside React state.
+  const countRef = useRef(0);
+  const rerender = useRerender();
+
+  function handleClick() {
+    countRef.current++;
+    rerender();
+  }
+
+  return (
+    <>
+      <button onClick={handleClick}>+1</button> {countRef.current}
+    </>
+  );
+}
+
+export default Example;
+```
+
+---
+
+# useThrottle
+
+Use a throttled callback.
+
+## API
+
+```ts
+function useThrottle<T extends (...args: any[]) => any>(
+  callback: T,
+  options?: number | { wait?: number; leading?: boolean; trailing?: boolean },
+): [
+  throttledCallback: (...args: Parameters<T>) => ReturnType<T> | undefined,
+  actions: {
+    flush: () => ReturnType<T> | undefined;
+    cancel: () => void;
+  },
+];
+```
+
+Parameters:
+
+- **`callback`:** Original callback function.
+- **`options`:** Throttle wait time or an options object.
+  - **`options.wait`:** Throttle wait time, in milliseconds. Default is `0`.
+  - **`options.leading`:** Run callback on the leading edge. Default is `false`.
+  - **`options.trailing`:** Run callback on the trailing edge. Default is `true`.
+
+Results:
+
+- **`throttledCallback`:** Throttled callback.
+- **`actions`:** Actions object.
+  - **`actions.flush`:** Flush function. Run callback immediately.
+  - **`actions.cancel`:** Cancel throttle timer.
+
+## Notes
+
+- The pending trailing invocation is cancelled on unmount — it never runs.
+- With the default `leading: false`, the first call is delayed until the wait elapses.
+- Changing the options mid-flight immediately flushes the pending invocation of the old throttled function.
+- The returned function returns `undefined` when the invocation is deferred.
+
+## Example
+
+The following example shows how many times the callback actually runs after clicking the button rapidly.
+
+```tsx
+import { useRef, useState } from "react";
+import { useThrottle } from "@lilib/hooks";
+
+function Example() {
+  const callsRef = useRef(0);
+  const [runs, setRuns] = useState(0);
+
+  const [throttledCall] = useThrottle(
+    () => {
+      callsRef.current++;
+      setRuns(callsRef.current);
+    },
+    { wait: 500 },
+  );
+
+  return (
+    <>
+      <div>
+        <button onClick={() => throttledCall()}>Throttled call</button>
+      </div>
+      <div>Callback actually runs: {runs}</div>
+    </>
+  );
+}
+
+export default Example;
+```
+
+---
+
+# useDebounce
+
+Use a debounced callback.
+
+## API
+
+```ts
+function useDebounce<T extends (...args: any[]) => any>(
+  callback: T,
+  options?: number | { wait?: number; maxWait?: number; leading?: boolean; trailing?: boolean },
+): [
+  debouncedCallback: (...args: Parameters<T>) => ReturnType<T> | undefined,
+  actions: {
+    flush: () => ReturnType<T> | undefined;
+    cancel: () => void;
+  },
+];
+```
+
+Parameters:
+
+- **`callback`:** Original callback function.
+- **`options`:** Debounce wait time or an options object.
+  - **`options.wait`:** Debounce wait time, in milliseconds. Default is `0`.
+  - **`options.maxWait`:** Max wait time, in milliseconds. Default is `Infinity`.
+  - **`options.leading`:** Run callback on the leading edge. Default is `false`.
+  - **`options.trailing`:** Run callback on the trailing edge. Default is `true`.
+
+Results:
+
+- **`debouncedCallback`:** Debounced callback.
+- **`actions`:** Actions object.
+  - **`actions.flush`:** Flush function. Run callback immediately.
+  - **`actions.cancel`:** Cancel debounce timer.
+
+## Notes
+
+- The pending trailing invocation is cancelled on unmount — it never runs.
+- Changing the options mid-flight immediately flushes the pending invocation of the old debounced function.
+- The returned function returns `undefined` when the invocation is deferred.
+- With `leading: false` and `trailing: false`, the callback never runs.
+
+## Example
+
+The following example shows how many times the callback actually runs after clicking the button rapidly.
+
+```tsx
+import { useRef, useState } from "react";
+import { useDebounce } from "@lilib/hooks";
+
+function Example() {
+  const callsRef = useRef(0);
+  const [runs, setRuns] = useState(0);
+
+  const [debouncedCall] = useDebounce(
+    () => {
+      callsRef.current++;
+      setRuns(callsRef.current);
+    },
+    { wait: 500 },
+  );
+
+  return (
+    <>
+      <div>
+        <button onClick={() => debouncedCall()}>Debounced call</button>
+      </div>
+      <div>Callback actually runs: {runs}</div>
+    </>
+  );
+}
+
+export default Example;
+```
+
+---
+
+# useLatestRef
+
+Return a ref object whose `.current` property always points to the latest value. It is typically used to read the latest value inside long-lived callbacks (timers, event listeners) to avoid stale closures.
+
+## API
+
+```ts
+function useLatestRef<T>(value: T): React.MutableRefObject<T>;
+```
+
+## Notes
+
+- The ref is written during render and does not trigger re-renders; use state for reactive values.
+
+## Example
+
+The following example shows an interval that always reads the latest input value.
+
+```tsx
+import { useState } from "react";
+import { useInterval, useLatestRef } from "@lilib/hooks";
+
+function Example() {
+  const [value, setValue] = useState("");
+  const [snapshot, setSnapshot] = useState("");
+  const valueRef = useLatestRef(value);
+
+  const [start, cancel] = useInterval(() => {
+    // The interval callback is bound once, but reads the latest value via the ref.
+    setSnapshot(valueRef.current);
+  }, 1000);
+
+  return (
+    <>
+      <p>
+        Enter value:{" "}
+        <input
+          value={value}
+          onChange={(event) => {
+            setValue(event.target.value);
+          }}
+        />
+      </p>
+      <div>
+        <button onClick={start}>Start</button> <button onClick={cancel}>Cancel</button>
+      </div>
+      <div>Interval snapshot: {snapshot || "—"}</div>
+    </>
+  );
+}
+
+export default Example;
+```
+
+---
+
+# usePreviousRef
+
+Return a ref object whose `.current` property points to the value from the previous update, and is kept while the value is unchanged. The first time is `undefined`.
+
+## API
+
+```ts
+function usePreviousRef<T>(value: T): React.MutableRefObject<T | undefined>;
+```
+
+## Notes
+
+- Comparison is by reference (`!==`): an object with a new identity counts as changed even if its content is equal. Use a deep-comparing hook such as `useMemoizedValue` when needed.
+
+## Example
+
+The following example shows the value of the previous render.
+
+```tsx
+import { useState } from "react";
+import { usePreviousRef } from "@lilib/hooks";
+
+function Example() {
+  const [count, setCount] = useState(0);
+  const previousRef = usePreviousRef(count);
+
+  return (
+    <>
+      <button onClick={() => setCount((count) => count + 1)}>+1</button>
+      <div>Current: {count}</div>
+      <div>Previous: {previousRef.current ?? "—"}</div>
+    </>
+  );
+}
+
+export default Example;
+```
+
+---
+
+# useComposedRef
+
+This hook composes multiple refs into one. Ref objects, ref callbacks, `null` and `undefined` are all accepted, which makes it very useful when developing components.
+
+## API
+
+```ts
+function useComposedRef<T>(...refs: (React.Ref<T> | undefined)[]): React.RefCallback<T>;
+```
+
+## Notes
+
+- The returned callback keeps the same identity while the input refs remain unchanged.
+- In React 19+, detachment invokes returned cleanup functions, passes `null` to callbacks without cleanup, and clears object refs to `null`. In React 16.8–18, use `null`-based cleanup instead of returning a function.
+
+## Example
+
+### Forwarded and internal refs
+
+A typical use: composing the forwarded ref and an internal ref in a library component.
+
+```tsx
+import { forwardRef, useRef } from "react";
+import { useComposedRef } from "@lilib/hooks";
+
+const Component = forwardRef<HTMLDivElement, any>((props, ref) => {
+  const domRef = useRef<HTMLDivElement>(null);
+  const composedRef = useComposedRef(domRef, ref);
+
+  // Do something.
+
+  return <div ref={composedRef}>...</div>;
+});
+```
+
+### Ref cleanup in React 19+
+
+This example combines an object ref with a callback that returns cleanup. It requires React 19+ and a browser with `ResizeObserver` support. When the element detaches, the observer is disconnected and `domRef.current` is cleared to `null`.
+
+```tsx
+import { useCallback, useRef, useState } from "react";
+import { useComposedRef } from "@lilib/hooks";
+
+function Component() {
+  const domRef = useRef<HTMLDivElement>(null);
+  const [width, setWidth] = useState(0);
+  const observeSize = useCallback((node: HTMLDivElement | null) => {
+    if (!node) return;
+
+    const observer = new ResizeObserver(([entry]) => {
+      setWidth(Math.round(entry.contentRect.width));
+    });
+    observer.observe(node);
+
+    return () => observer.disconnect();
+  }, []);
+  const composedRef = useComposedRef(domRef, observeSize);
+
+  return <div ref={composedRef}>Width: {width}px</div>;
+}
+```
+
+---
+
+# useMountedRef
+
+It returns a ref object that is used to determine whether the component is mounted.
+
+## API
+
+```ts
+function useMountedRef(): React.MutableRefObject<boolean>;
+```
+
+## Notes
+
+- The flag is set by `useEffect`: during the first render and inside `useLayoutEffect`, `current` is still `false`.
+- In StrictMode, the cleanup resets the flag during the simulated unmount.
+
+## Example
+
+The following example loads fake data asynchronously; click Load and unmount the loader before it finishes to see the update being skipped.
+
+```tsx
+import { useState } from "react";
+import { useMountedRef } from "@lilib/hooks";
+
+// Simulate a slow request that resolves after one second.
+function fakeRequest(): Promise<string> {
+  return new Promise((resolve) => {
+    setTimeout(() => resolve("Fake data"), 1000);
+  });
+}
+
+function Loader({ onSkipped }: { onSkipped: () => void }) {
+  const mountedRef = useMountedRef();
+  const [result, setResult] = useState("Not loaded");
+
+  async function handleLoad() {
+    setResult("Loading...");
+    const data = await fakeRequest();
+    if (!mountedRef.current) {
+      // The component unmounted while loading, skip the state update.
+      onSkipped();
+      return;
+    }
+    setResult(data);
+  }
+
+  return (
+    <div>
+      <button onClick={handleLoad}>Load</button> {result}
+    </div>
+  );
+}
+
+function Example() {
+  const [show, setShow] = useState(true);
+  const [skipped, setSkipped] = useState(0);
+
+  return (
+    <>
+      <div>
+        <button onClick={() => setShow((show) => !show)}>
+          {show ? "Unmount" : "Mount"} loader
+        </button>
+      </div>
+      {show && <Loader onSkipped={() => setSkipped((skipped) => skipped + 1)} />}
+      <div>Updates skipped after unmount: {skipped}</div>
+    </>
+  );
+}
+
+export default Example;
+```
+
+---
+
+# useUnmountedRef
+
+It returns a ref object that is used to determine whether the component is unmounted.
+
+## API
+
+```ts
+function useUnmountedRef(): React.MutableRefObject<boolean>;
+```
+
+## Notes
+
+- The flag is set by `useEffect`: during the first render and inside `useLayoutEffect`, `current` is still `false`.
+
+## Example
+
+The following example loads fake data asynchronously; click Load and unmount the loader before it finishes to see the update being skipped.
+
+```tsx
+import { useState } from "react";
+import { useUnmountedRef } from "@lilib/hooks";
+
+// Simulate a slow request that resolves after one second.
+function fakeRequest(): Promise<string> {
+  return new Promise((resolve) => {
+    setTimeout(() => resolve("Fake data"), 1000);
+  });
+}
+
+function Loader({ onSkipped }: { onSkipped: () => void }) {
+  const unmountedRef = useUnmountedRef();
+  const [result, setResult] = useState("Not loaded");
+
+  async function handleLoad() {
+    setResult("Loading...");
+    const data = await fakeRequest();
+    if (unmountedRef.current) {
+      // The component unmounted while loading, skip the state update.
+      onSkipped();
+      return;
+    }
+    setResult(data);
+  }
+
+  return (
+    <div>
+      <button onClick={handleLoad}>Load</button> {result}
+    </div>
+  );
+}
+
+function Example() {
+  const [show, setShow] = useState(true);
+  const [skipped, setSkipped] = useState(0);
+
+  return (
+    <>
+      <div>
+        <button onClick={() => setShow((show) => !show)}>
+          {show ? "Unmount" : "Mount"} loader
+        </button>
+      </div>
+      {show && <Loader onSkipped={() => setSkipped((skipped) => skipped + 1)} />}
+      <div>Updates skipped after unmount: {skipped}</div>
+    </>
+  );
+}
+
+export default Example;
+```
+
+---
+
+# useTitle
+
+Set the document title.
+
+## API
+
+```ts
+function useTitle(title: string | null, options?: { restore?: boolean }): void;
+```
+
+Parameters:
+
+- **`title`:** The document title. Pass `null` to not set one.
+- **`options`:** Options object.
+  - **`options.restore`:** Whether to restore the previous title on unmount.
+
+## Notes
+
+- With `restore`, the original title is captured on the hook's first render; when several components restore, the last one to unmount wins.
+
+## Example
+
+The following example syncs the browser tab title with the input.
+
+```tsx
+import { useState } from "react";
+import { useTitle } from "@lilib/hooks";
+
+function Example() {
+  const [title, setTitle] = useState("");
+  useTitle(title, { restore: true });
+
+  return (
+    <input
+      placeholder="Enter title"
+      value={title}
+      onChange={(event) => {
+        setTitle(event.target.value);
+      }}
+    />
+  );
+}
+
+export default Example;
+```
+
+---
+
+# useFavicon
+
+Set the document favicon.
+
+## API
+
+```ts
+function useFavicon(href: string | null, options?: { mime?: string; restore?: boolean }): void;
+```
+
+Parameters:
+
+- **`href`:** The favicon URL. Pass `null` to not set one.
+- **`options`:** Options object.
+  - **`options.mime`:** Specify the MIME type. It is inferred from the `href` extname by default (support `.png`, `.gif`, `.jpg`, `.jpeg`, `.svg`, `.webp` and `.ico`).
+  - **`options.restore`:** Whether to restore the previous favicon on unmount.
+
+## Notes
+
+- The first `link[rel*='icon']` element in `<head>` is reused (which may be an `apple-touch-icon` or similar); a new link is created only when none exists.
+- With `restore`, the original favicon is captured on the hook's first render; multiple instances will override each other.
+
+## Example
+
+The following example switches the favicon together with the title when the brand changes.
+
+```tsx
+import { useState } from "react";
+import { useFavicon, useTitle } from "@lilib/hooks";
+
+const brands = {
+  lilib: { title: "Lilib", icon: "https://lilib.dev/favicon.ico" },
+  react: { title: "React", icon: "https://react.dev/favicon.ico" },
+};
+
+function Example() {
+  const [brand, setBrand] = useState<keyof typeof brands>("lilib");
+  const meta = brands[brand];
+
+  useTitle(meta.title);
+  useFavicon(meta.icon, { restore: true });
+
+  return (
+    <select
+      value={brand}
+      onChange={(event) => {
+        setBrand(event.target.value as keyof typeof brands);
+      }}
+    >
+      <option value="lilib">Lilib</option>
+      <option value="react">React</option>
+    </select>
+  );
+}
+```
+
+---
+
+# useOnline
+
+Detect whether the network is online. In a non-browser environment, it always returns `true`.
+
+## API
+
+```ts
+function useOnline(): boolean;
+```
+
+Results:
+
+- Returns `true` if the network is online, otherwise `false`.
+
+## Notes
+
+- `navigator.onLine` only reports whether the device is connected to a network (e.g. a router); it does not guarantee internet access.
+
+## Example
+
+The following example shows a banner when the network goes offline.
+
+```tsx
+import { useOnline } from "@lilib/hooks";
+
+function Example() {
+  const online = useOnline();
+
+  return (
+    <div style={{ padding: 8, backgroundColor: online ? "#d4edda" : "#f8d7da" }}>
+      {online ? "The network is online" : "You are offline"}
+    </div>
+  );
+}
+
+export default Example;
+```
+
+---
+
+# useDarkMode
+
+Detect whether the preferred color scheme of the system is dark.
+
+## API
+
+```ts
+function useDarkMode(): boolean;
+```
+
+Results:
+
+- Returns `true` if the system prefers dark mode, otherwise `false`.
+
+## Notes
+
+- This hook is read-only: it reflects the system preference and cannot be toggled programmatically. To implement a user-overridable theme, manage the state yourself (e.g. with `useLocalStorage`).
+- Returns `false` in non-browser environments and in browsers without `prefers-color-scheme` support.
+
+## Example
+
+The following example switches a card between light and dark themes based on the system preference.
+
+```tsx
+import { useDarkMode } from "@lilib/hooks";
+
+function Example() {
+  const isDarkMode = useDarkMode();
+
+  return (
+    <div
+      style={{
+        padding: 16,
+        border: "1px solid rgba(128, 128, 128, 0.25)",
+        color: isDarkMode ? "#ffffff" : "#000000",
+        backgroundColor: isDarkMode ? "#1b1b1d" : "#f5f6f7",
+      }}
+    >
+      {isDarkMode ? "Dark theme" : "Light theme"} (prefers-color-scheme:{" "}
+      {isDarkMode ? "dark" : "light"})
+    </div>
+  );
+}
+
+export default Example;
+```
+
+---
+
+# usePageVisible
+
+Detect whether the page is visible. The `visibilitychange` event doesn't fire when restoring from the bfcache, so this hook also listens to the `pageshow` event to re-detect.
+
+## API
+
+```ts
+function usePageVisible(): boolean;
+```
+
+Results:
+
+- Returns `true` if the page is visible, otherwise `false`.
+
+## Notes
+
+- Returns `true` in non-browser environments.
+
+## Example
+
+The following example pauses a timer while the page is hidden (typical for pausing video).
+
+```tsx
+import { useEffect, useState } from "react";
+import { usePageVisible } from "@lilib/hooks";
+
+function Example() {
+  const visible = usePageVisible();
+  const [elapsed, setElapsed] = useState(0);
+
+  useEffect(() => {
+    if (!visible) {
+      // Pause while the page is hidden.
+      return;
+    }
+    const timer = setInterval(() => {
+      setElapsed((elapsed) => elapsed + 1);
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [visible]);
+
+  return (
+    <div>
+      <div>The page is {visible ? "visible" : "hidden"}.</div>
+      <div>Elapsed seconds (pauses while hidden): {elapsed}</div>
+    </div>
+  );
+}
+
+export default Example;
+```
+
+---
+
+# useWindowFocus
+
+Detect whether the `window` has focus. In a non-browser environment, it always returns `false`.
+
+## API
+
+```ts
+function useWindowFocus(): boolean;
+```
+
+Results:
+
+- Returns `true` if the `window` has focus, otherwise `false`.
+
+## Notes
+
+- `document.hasFocus()` also returns `true` when a nested iframe has focus.
+
+## Example
+
+The following example shows a notice when the window loses focus.
+
+```tsx
+import { useWindowFocus } from "@lilib/hooks";
+
+function Example() {
+  const focus = useWindowFocus();
+
+  return (
+    <div style={{ padding: 8, backgroundColor: focus ? "#d4edda" : "#fff3cd" }}>
+      {focus ? "The window has focus" : "The window lost focus"}
+    </div>
+  );
+}
+
+export default Example;
+```
+
+---
+
+# useMatchMedia
+
+Use [`window.matchMedia()`](https://developer.mozilla.org/en-US/docs/Web/API/Window/matchMedia) to determine whether the document matches the media query string.
+
+## API
+
+```ts
+function useMatchMedia(query: string, defaultValue?: boolean): boolean;
+```
+
+Parameters:
+
+- **`query`:** The media query string.
+- **`defaultValue`:** The default return value in non-browser environments. Default is `false`.
+
+Results:
+
+- Returns `true` if the document matches the query, otherwise `false`.
+
+## Notes
+
+- `defaultValue` only applies in non-browser environments; on the client the result comes from `window.matchMedia`. Mind hydration mismatches when the default differs from the client result.
+- Prefer CSS media queries for style-only changes; use this hook when JavaScript logic depends on the match.
+
+## Example
+
+The following example switches the layout when the viewport is narrower than 600px.
+
+```tsx
+import { useMatchMedia } from "@lilib/hooks";
+
+function Example() {
+  const isNarrow = useMatchMedia("(max-width: 600px)");
+
+  return (
+    <div style={{ display: "flex", flexDirection: isNarrow ? "column" : "row", gap: 8 }}>
+      <div style={{ flex: 1, padding: 16, backgroundColor: "rgba(255, 165, 0, 0.4)" }}>Sidebar</div>
+      <div style={{ flex: 2, padding: 16, backgroundColor: "rgba(0, 128, 255, 0.4)" }}>Content</div>
+    </div>
+  );
+}
+
+export default Example;
+```
+
+---
+
+# useWindowSize
+
+Get the window size.
+
+## API
+
+```ts
+function useWindowSize(): {
+  width: number | undefined;
+  height: number | undefined;
+};
+```
+
+Results:
+
+- **`width`:** Window width, or `undefined` outside the browser.
+- **`height`:** Window height, or `undefined` outside the browser.
+
+## Notes
+
+- The size comes from `window.innerWidth`/`innerHeight`, which include scrollbars.
+- On mobile, collapsing or expanding the address bar changes the viewport without firing a window `resize`; the hook also listens to `visualViewport.resize` for that.
+
+## Example
+
+The following example switches the layout based on the window width; resize the browser window to see the effect.
+
+```tsx
+import { useWindowSize } from "@lilib/hooks";
+
+function Example() {
+  const { width = 0 } = useWindowSize();
+
+  return (
+    <>
+      <div>Window width: {width}px</div>
+      <div style={{ display: "flex", flexDirection: width < 600 ? "column" : "row", gap: 8 }}>
+        <div style={{ flex: 1, padding: 16, backgroundColor: "rgba(255, 165, 0, 0.4)" }}>
+          Sidebar
+        </div>
+        <div style={{ flex: 2, padding: 16, backgroundColor: "rgba(0, 128, 255, 0.4)" }}>
+          Content
+        </div>
+      </div>
+    </>
+  );
+}
+
+export default Example;
+```
+
+---
+
+# useElementSize
+
+Get the size of a DOM element.
+
+## API
+
+```ts
+function useElementSize(target: Element | React.RefObject<Element | null>): {
+  width: number | undefined;
+  height: number | undefined;
+};
+```
+
+Parameters:
+
+- **`target`:** A DOM element, or a ref object that references a DOM element.
+
+Results:
+
+- **`width`:** Element width, or `undefined` when the target is invalid.
+- **`height`:** Element height, or `undefined` when the target is invalid.
+
+## Notes
+
+- The size comes from `getBoundingClientRect`: it includes padding and border, excludes margin, is affected by transforms, and may be fractional.
+- Both values are `undefined` until the target element is mounted.
+
+## Example
+
+The following example shows the element size; click Toggle size to see it change.
+
+```tsx
+import { useRef, useState } from "react";
+import { useElementSize } from "@lilib/hooks";
+
+function Example() {
+  const [wide, setWide] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  const { width = 0, height = 0 } = useElementSize(ref);
+
+  return (
+    <>
+      <div>
+        <button onClick={() => setWide((wide) => !wide)}>Toggle size</button>
+      </div>
+      <div
+        ref={ref}
+        style={{
+          padding: 16,
+          width: wide ? "100%" : "50%",
+          border: "1px solid rgba(128, 128, 128, 0.25)",
+        }}
+      >
+        Element size: {JSON.stringify({ width, height })}
+      </div>
+    </>
+  );
+}
+
+export default Example;
+```
+
+---
+
+# useIntersecting
+
+Determine whether the target element intersects the viewport (or the specified `root`).
+
+## API
+
+```ts
+function useIntersecting(
+  target: Element | React.RefObject<Element | null>,
+  options?: {
+    root?: Element | Document | React.RefObject<Element | Document | null>;
+    rootMargin?: string;
+    threshold?: number | number[];
+  },
+): boolean;
+```
+
+Parameters:
+
+- **`target`:** A DOM element to observe, or a ref object that references it.
+- **`options`:** See [IntersectionObserver](https://developer.mozilla.org/en-US/docs/Web/API/IntersectionObserver/IntersectionObserver) options.
+
+Results:
+
+- A boolean indicating whether the target is intersecting with the root.
+
+## Notes
+
+- Returns `false` in non-browser environments.
+- Resets to `false` when the target element becomes invalid.
+
+## Example
+
+The following example scrolls a container and highlights the target when it is fully visible.
+
+```tsx
+import { useRef } from "react";
+import { useIntersecting } from "@lilib/hooks";
+
+function Example() {
+  const rootRef = useRef(null);
+  const targetRef = useRef(null);
+
+  const intersecting = useIntersecting(targetRef, {
+    root: rootRef,
+    threshold: 1,
+  });
+
+  return (
+    <div ref={rootRef} style={{ height: 200, overflow: "auto" }}>
+      <div
+        ref={targetRef}
+        style={{
+          height: 100,
+          marginTop: 150,
+          marginBottom: 150,
+          backgroundColor: intersecting ? "orange" : "transparent",
+        }}
+      >
+        {intersecting ? "Complete intersection" : "Incomplete intersection"}
+      </div>
+    </div>
+  );
+}
+
+export default Example;
+```
+
+---
+
+# useClickOutside
+
+Trigger a callback when a click happens outside the target area.
+
+## API
+
+```ts
+function useClickOutside<E extends Event = Event>(
+  target: Node | React.RefObject<Node | null> | (Node | React.RefObject<Node | null>)[],
+  listener: (event: E) => void,
+  options?: {
+    container?: Element | React.RefObject<Element | null>;
+    eventName?: string | string[];
+  },
+): void;
+```
+
+Parameters:
+
+- **`target`:** The target area: a single element or element ref, or an array of them. The listener fires when a click happens outside all of these targets. It only fires when at least one target element is valid; all-invalid targets are treated as not ready.
+- **`listener`:** The callback invoked when a click happens outside the target area.
+- **`options`:** Options object.
+  - **`options.container`:** The element (or its ref) that receives the event listener. Default is `document`.
+  - **`options.eventName`:** Event name or names. Default is `"mousedown"`.
+
+## Notes
+
+- The default event is `mousedown`, not `click`: interactions that only produce a `click` event will not trigger the listener. Pass `eventName: ["mousedown", "click"]` if needed.
+- Taps on touch devices do not always produce a `mousedown` event; add `"touchstart"` or `"pointerdown"` to `eventName` to support them.
+- The `container` option receives the event listener, so it must be an ancestor of the click source for the event to bubble to it.
+
+## Example
+
+The following example counts clicks outside the button (typical for closing dropdowns).
+
+```tsx
+import { useRef, useState } from "react";
+import { useClickOutside } from "@lilib/hooks";
+
+function Example() {
+  const buttonRef = useRef(null);
+  const [count, setCount] = useState(0);
+
+  useClickOutside(buttonRef, () => {
+    setCount(count + 1);
+  });
+
+  return (
+    <>
+      <button ref={buttonRef}>Click outside</button> Count: {count}
+    </>
+  );
+}
+
+export default Example;
+```
+
+---
+
+# useEventListener
+
+Set up an event listener on the target.
+
+## API
+
+```ts
+function useEventListener<T extends EventTarget = EventTarget, E extends Event = Event>(
+  target: T | React.RefObject<T | null>,
+  eventName: string,
+  listener: (event: E) => void,
+  options?: boolean | { capture?: boolean; once?: boolean; passive?: boolean },
+): void;
+```
+
+Parameters:
+
+- **`target`:** An event target, or a ref object that references an event target (or `null`).
+- **`eventName`:** Event name.
+- **`listener`:** Listener function.
+- **`options`:** Similar to the third parameter of the [`addEventListener`](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener) function, but only the `capture`, `once` and `passive` options are used.
+
+## Notes
+
+- When `target` is a ref, the listener is attached when the referenced node appears and re-attached when it changes; nothing happens while it is `null`.
+- The `listener` is always the latest render's function, so it never reads stale closures.
+
+## Example
+
+The following example counts clicks on a button.
+
+```tsx
+import { useRef, useState } from "react";
+import { useEventListener } from "@lilib/hooks";
+
+function Example() {
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const [count, setCount] = useState(0);
+
+  useEventListener(buttonRef, "click", () => {
+    setCount((count) => count + 1);
+  });
+
+  return (
+    <>
+      <button ref={buttonRef}>Click</button> Count: {count}
+    </>
+  );
+}
+
+export default Example;
+```
+
+---
+
+# useResizeObserver
+
+Observe an element's size changes.
+
+## API
+
+```ts
+function useResizeObserver(
+  target: Element | React.RefObject<Element | null>,
+  listener: (entries: ResizeObserverEntry[]) => void,
+): void;
+```
+
+Parameters:
+
+- **`target`:** A DOM element to observe, or a ref object that references it.
+- **`listener`:** Listener function.
+
+## Notes
+
+- The `resize-observer-polyfill` is always used (it does not delegate to the native implementation); mind the performance cost for high-frequency resizes.
+- The listener attaches once the target element is mounted; a ref that is still `null` is fine.
+
+## Example
+
+The following example counts resize events when the element size changes.
+
+```tsx
+import { useRef, useState } from "react";
+import { useResizeObserver } from "@lilib/hooks";
+
+function Example() {
+  const [wide, setWide] = useState(false);
+  const [count, setCount] = useState(0);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useResizeObserver(containerRef, () => {
+    setCount((count) => count + 1);
+  });
+
+  return (
+    <>
+      <div>
+        <button onClick={() => setWide((wide) => !wide)}>Toggle size</button>
+      </div>
+      <div
+        ref={containerRef}
+        style={{
+          padding: 16,
+          width: wide ? "100%" : "50%",
+          backgroundColor: "rgba(255, 165, 0, 0.3)",
+        }}
+      >
+        Resized times: {count}
+      </div>
+    </>
+  );
+}
+
+export default Example;
+```
+
+---
+
+# useMutationObserver
+
+Observe changes to a DOM node, such as inserted or removed child nodes and changed attributes.
+
+## API
+
+```ts
+function useMutationObserver(
+  target: Node | React.RefObject<Node | null>,
+  listener: (records: MutationRecord[]) => void,
+  options?: MutationObserverInit,
+): void;
+```
+
+Parameters:
+
+- **`target`:** A DOM node to observe, or a ref object that references it.
+- **`listener`:** Listener function invoked with the mutation records.
+- **`options`:** See [MutationObserver](https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver/observe) options. Omitted, it defaults to `{ childList: true, attributes: true, characterData: true }`; when provided, it replaces the defaults instead of merging with them.
+
+## Notes
+
+- When `options` is provided, it replaces the defaults instead of merging with them, so at least one of `childList`, `attributes` and `characterData` must end up enabled, otherwise `observe` throws a `TypeError`.
+- `attributeFilter` is compared by content, so inline arrays do not recreate the observer on every render.
+
+## Example
+
+The following example reports the type of the latest mutation of a text node.
+
+```tsx
+import { useRef, useState } from "react";
+import { useMutationObserver } from "@lilib/hooks";
+
+function Example() {
+  const [content, setContent] = useState("Hello");
+  const [lastMutation, setLastMutation] = useState("None");
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useMutationObserver(
+    containerRef,
+    (records) => {
+      const record = records[0];
+      setLastMutation(record ? record.type : "None");
+    },
+    { childList: true, characterData: true, subtree: true },
+  );
+
+  return (
+    <>
+      <div>
+        <button onClick={() => setContent((content) => (content === "Hello" ? "World" : "Hello"))}>
+          Change text
+        </button>
+      </div>
+      <div
+        ref={containerRef}
+        style={{
+          padding: 16,
+          backgroundColor: "rgba(255, 165, 0, 0.3)",
+        }}
+      >
+        {content}
+      </div>
+      <div>Last mutation: {lastMutation}</div>
+    </>
+  );
+}
+
+export default Example;
+```
+
+---
+
+# useIntersectionObserver
+
+Observe when an element's intersection with another element or the viewport changes.
+
+## API
+
+```ts
+function useIntersectionObserver(
+  target: Element | React.RefObject<Element | null>,
+  listener: (entries: IntersectionObserverEntry[]) => void,
+  options?: {
+    root?: Element | Document | React.RefObject<Element | Document | null>;
+    rootMargin?: string;
+    threshold?: number | number[];
+  },
+): void;
+```
+
+Parameters:
+
+- **`target`:** A DOM element to observe, or a ref object that references it.
+- **`listener`:** Listener function.
+- **`options`:** See [IntersectionObserver](https://developer.mozilla.org/en-US/docs/Web/API/IntersectionObserver/IntersectionObserver) options.
+
+## Notes
+
+- Observes through a layout effect: the observer is created before the browser paints.
+- The observer attaches once the target element is mounted; a ref that is still `null` is fine.
+- An array `threshold` is compared by content, so inline arrays do not recreate the observer on every render.
+
+## Example
+
+The following example scrolls a container and highlights the target when it is fully visible.
+
+```tsx
+import { useRef, useState } from "react";
+import { useIntersectionObserver } from "@lilib/hooks";
+
+function Example() {
+  const [intersecting, setIntersecting] = useState(false);
+  const rootRef = useRef(null);
+  const targetRef = useRef(null);
+
+  useIntersectionObserver(
+    targetRef,
+    (entries) => {
+      if (entries && entries[0] && entries[0].isIntersecting) {
+        setIntersecting(true);
+      } else {
+        setIntersecting(false);
+      }
+    },
+    { root: rootRef, threshold: 1 },
+  );
+
+  return (
+    <div
+      ref={rootRef}
+      style={{
+        height: 200,
+        overflow: "auto",
+      }}
+    >
+      <div
+        ref={targetRef}
+        style={{
+          height: 100,
+          marginTop: 150,
+          marginBottom: 150,
+          backgroundColor: intersecting ? "orange" : "transparent",
+        }}
+      >
+        {intersecting ? "Complete intersection" : "Incomplete intersection"}
+      </div>
+    </div>
+  );
+}
+
+export default Example;
+```
+
+---
+
+# useCookie
+
+This hook uses [js-cookie](https://github.com/js-cookie/js-cookie) as the parser. You can use this hook to get, set and/or remove cookies.
+
+## API
+
+```ts
+interface UseCookieOptions {
+  defaultValue?: string;
+  polling?: boolean;
+  pollingInterval?: number;
+  validate?: (value: string) => boolean;
+}
+
+function useCookie(
+  name: string,
+  options: UseCookieOptions & { defaultValue: string },
+): [
+  value: string,
+  setCookie: (
+    newValue: string | undefined | ((prevValue: string) => string | undefined),
+    attributes?: CookieAttributes,
+  ) => void,
+];
+
+function useCookie(
+  name: string,
+  options?: UseCookieOptions,
+): [
+  value: string | undefined,
+  setCookie: (
+    newValue: string | undefined | ((prevValue: string | undefined) => string | undefined),
+    attributes?: CookieAttributes,
+  ) => void,
+];
+
+interface CookieAttributes {
+  path?: string;
+  domain?: string;
+  secure?: boolean;
+  expires?: number | Date;
+  sameSite?: "strict" | "Strict" | "lax" | "Lax" | "none" | "None";
+}
+```
+
+Parameters:
+
+- **`name`:** Cookie name.
+- **`options`:** Options object.
+  - **`options.defaultValue`:** Default value. It will be returned when the specified cookie doesn't exist. When set, the returned `value` type no longer includes `undefined`.
+  - **`options.polling`:** Whether to poll for cookie changes. Default is `false`.
+  - **`options.pollingInterval`:** Polling interval time, in milliseconds. Default is `100`.
+  - **`options.validate`:** Validate the value got from the cookie. If this function returns `false`, the `defaultValue` will be used.
+
+Results:
+
+- **`value`:** Cookie value.
+- **`setCookie`:** A function that can set or remove the named cookie. It accepts two params:
+  - **`newValue`:** The new cookie value. If it is `undefined` or a function that returns `undefined`, the named cookie will be cleared, and the `options.defaultValue` will be returned as `value`.
+  - **`attributes`:** Cookie attributes. See [js-cookie attributes](https://github.com/js-cookie/js-cookie#cookie-attributes).
+
+## Notes
+
+- **Important**: Removing a cookie requires the same `attributes` as when it was set (especially `path` and `domain`); otherwise the removal silently fails.
+- Cookie changes made elsewhere (server responses, other scripts) are not pushed to the hook; enable `polling: true` to detect them.
+- Values are strings — no serialization is applied. Use `JSON.stringify` together with `validate` for structured data.
+- Returns `defaultValue` in non-browser environments. The `value` starts with `defaultValue` on the first render and is synchronized with the cookie right after mounting (before the browser paints), so server-rendered and client-hydrated output stay consistent.
+
+## Example
+
+The following example sets and removes a cookie; open this page in another tab to see polling keep the values in sync.
+
+```tsx
+import { useCookie } from "@lilib/hooks";
+
+function Example() {
+  const [value, setCookie] = useCookie("name", {
+    polling: true,
+    defaultValue: "default value",
+  });
+
+  return (
+    <>
+      <div>
+        <button onClick={() => setCookie(Math.random().toString())}>Set random cookie</button>{" "}
+        <button onClick={() => setCookie(undefined)}>Remove</button>
+      </div>
+      <div>Cookie value: {value}</div>
+    </>
+  );
+}
+
+export default Example;
+```
+
+---
+
+# useLocalStorage
+
+Get, set and/or remove `localStorage`.
+
+## API
+
+```ts
+interface UseStorageOptions<T> {
+  defaultValue?: T;
+  polling?: boolean;
+  pollingInterval?: number;
+  compare?: (x: any, y: any) => boolean;
+  validate?: (value: any) => boolean;
+  serialize?: (value: T) => string;
+  deserialize?: (raw: string) => T;
+}
+
+function useLocalStorage<T>(
+  key: string,
+  options: UseStorageOptions<T> & { defaultValue: T },
+): [
+  value: T,
+  setLocalStorage: (newValue: T | undefined | ((prevValue: T) => T | undefined)) => void,
+];
+
+function useLocalStorage<T>(
+  key: string,
+  options?: UseStorageOptions<T>,
+): [
+  value: T | undefined,
+  setLocalStorage: (
+    newValue: T | undefined | ((prevValue: T | undefined) => T | undefined),
+  ) => void,
+];
+```
+
+Parameters:
+
+- **`key`:** `localStorage` key.
+- **`options`:** Options object.
+  - **`options.defaultValue`:** Default value. When set, the returned `value` type no longer includes `undefined`.
+  - **`options.polling`:** Whether to poll for storage changes. Default is `false`.
+  - **`options.pollingInterval`:** Polling interval time, in milliseconds. Default is `100`.
+  - **`options.compare`:** A function to determine whether the new and old values are equal. Defaults to deep comparison.
+  - **`options.validate`:** Validate the value got from `localStorage` which is deserialized by the `deserialize` function. If this function returns `false`, the `defaultValue` will be used.
+  - **`options.serialize`:** Serialization function. Default is `JSON.stringify`.
+  - **`options.deserialize`:** Deserialization function. Default is `JSON.parse`.
+
+Results:
+
+- **`value`:** The value parsed by the deserialization function.
+- **`setLocalStorage`:** Set `localStorage`. The `newValue` can also be a function that returns the new value. If it is `undefined`, the entry will be removed and the `defaultValue` will be returned.
+
+## Notes
+
+- **Important**: The `storage` event fires only in other tabs/windows — it never fires in the document that made the change. Components in the same page only stay in sync when they use the same hook instance, or with `polling: true`.
+- The default serialization is `JSON.stringify`/`JSON.parse`: `Date` becomes a string, `NaN` and `Infinity` become `null`, `Map`/`Set`/circular references are lost, and `undefined` array items become `null`. Use `serialize`/`deserialize` for custom types.
+- In private-browsing or restricted environments, accessing `localStorage` may throw; the hook then falls back to in-memory state and writes are not persisted.
+- Returns `defaultValue` in non-browser environments. The `value` starts with `defaultValue` on the first render and is synchronized with the stored value right after mounting (before the browser paints), so server-rendered and client-hydrated output stay consistent.
+
+## Example
+
+The following example sets and removes a value; open this page in another tab to see polling keep the values in sync.
+
+```tsx
+import { useLocalStorage } from "@lilib/hooks";
+
+function Example() {
+  const [value, setLocalStorage] = useLocalStorage("key", {
+    polling: true,
+    defaultValue: "default value",
+  });
+
+  return (
+    <>
+      <div>
+        <button onClick={() => setLocalStorage(Math.random().toString())}>Set random value</button>{" "}
+        <button onClick={() => setLocalStorage(undefined)}>Remove</button>
+      </div>
+      <div>The value is: {value}</div>
+    </>
+  );
+}
+
+export default Example;
+```
+
+---
+
+# useSessionStorage
+
+Get, set and/or remove `sessionStorage`.
+
+## API
+
+```ts
+interface UseStorageOptions<T> {
+  defaultValue?: T;
+  polling?: boolean;
+  pollingInterval?: number;
+  compare?: (x: any, y: any) => boolean;
+  validate?: (value: any) => boolean;
+  serialize?: (value: T) => string;
+  deserialize?: (raw: string) => T;
+}
+
+function useSessionStorage<T>(
+  key: string,
+  options: UseStorageOptions<T> & { defaultValue: T },
+): [
+  value: T,
+  setSessionStorage: (newValue: T | undefined | ((prevValue: T) => T | undefined)) => void,
+];
+
+function useSessionStorage<T>(
+  key: string,
+  options?: UseStorageOptions<T>,
+): [
+  value: T | undefined,
+  setSessionStorage: (
+    newValue: T | undefined | ((prevValue: T | undefined) => T | undefined),
+  ) => void,
+];
+```
+
+Parameters:
+
+- **`key`:** `sessionStorage` key.
+- **`options`:** Options object.
+  - **`options.defaultValue`:** Default value. When set, the returned `value` type no longer includes `undefined`.
+  - **`options.polling`:** Whether to poll for storage changes. Default is `false`.
+  - **`options.pollingInterval`:** Polling interval time, in milliseconds. Default is `100`.
+  - **`options.compare`:** A function to determine whether the new and old values are equal. Defaults to deep comparison.
+  - **`options.validate`:** Validate the value got from `sessionStorage` which is deserialized by the `deserialize` function. If this function returns `false`, the `defaultValue` will be used.
+  - **`options.serialize`:** Serialization function. Default is `JSON.stringify`.
+  - **`options.deserialize`:** Deserialization function. Default is `JSON.parse`.
+
+Results:
+
+- **`value`:** The value parsed by the deserialization function.
+- **`setSessionStorage`:** Set `sessionStorage`. The `newValue` can also be a function that returns the new value. If it is `undefined`, the entry will be removed and the `defaultValue` will be returned.
+
+## Notes
+
+- **Important**: `sessionStorage` is per-tab — values are not shared across tabs at all. The `storage` event fires only in other same-origin documents of the same tab (e.g. iframes), never in the document that made the change; enable `polling: true` to sync components in the same page.
+- The default serialization is `JSON.stringify`/`JSON.parse`: `Date` becomes a string, `NaN` and `Infinity` become `null`, `Map`/`Set`/circular references are lost, and `undefined` array items become `null`. Use `serialize`/`deserialize` for custom types.
+- In private-browsing or restricted environments, accessing `sessionStorage` may throw; the hook then falls back to in-memory state and writes are not persisted.
+- Returns `defaultValue` in non-browser environments. The `value` starts with `defaultValue` on the first render and is synchronized with the stored value right after mounting (before the browser paints), so server-rendered and client-hydrated output stay consistent.
+
+## Example
+
+The following example sets and removes a value with polling enabled, which keeps the value in sync across hook instances in the same tab.
+
+```tsx
+import { useSessionStorage } from "@lilib/hooks";
+
+function Example() {
+  const [value, setSessionStorage] = useSessionStorage("key", {
+    polling: true,
+    defaultValue: "default value",
+  });
+
+  return (
+    <>
+      <div>
+        <button onClick={() => setSessionStorage(Math.random().toString())}>
+          Set random value
+        </button>{" "}
+        <button onClick={() => setSessionStorage(undefined)}>Remove</button>
+      </div>
+      <div>The value is: {value}</div>
+    </>
+  );
+}
+
+export default Example;
+```

@@ -1,0 +1,56 @@
+# useClickOutside
+
+Trigger a callback when a click happens outside the target area.
+
+## API
+
+```ts
+function useClickOutside<E extends Event = Event>(
+  target: Node | React.RefObject<Node | null> | (Node | React.RefObject<Node | null>)[],
+  listener: (event: E) => void,
+  options?: {
+    container?: Element | React.RefObject<Element | null>;
+    eventName?: string | string[];
+  },
+): void;
+```
+
+Parameters:
+
+- **`target`:** The target area: a single element or element ref, or an array of them. The listener fires when a click happens outside all of these targets. It only fires when at least one target element is valid; all-invalid targets are treated as not ready.
+- **`listener`:** The callback invoked when a click happens outside the target area.
+- **`options`:** Options object.
+  - **`options.container`:** The element (or its ref) that receives the event listener. Default is `document`.
+  - **`options.eventName`:** Event name or names. Default is `"mousedown"`.
+
+## Notes
+
+- The default event is `mousedown`, not `click`: interactions that only produce a `click` event will not trigger the listener. Pass `eventName: ["mousedown", "click"]` if needed.
+- Taps on touch devices do not always produce a `mousedown` event; add `"touchstart"` or `"pointerdown"` to `eventName` to support them.
+- The `container` option receives the event listener, so it must be an ancestor of the click source for the event to bubble to it.
+
+## Example
+
+The following example counts clicks outside the button (typical for closing dropdowns).
+
+```tsx
+import { useRef, useState } from "react";
+import { useClickOutside } from "@lilib/hooks";
+
+function Example() {
+  const buttonRef = useRef(null);
+  const [count, setCount] = useState(0);
+
+  useClickOutside(buttonRef, () => {
+    setCount(count + 1);
+  });
+
+  return (
+    <>
+      <button ref={buttonRef}>Click outside</button> Count: {count}
+    </>
+  );
+}
+
+export default Example;
+```

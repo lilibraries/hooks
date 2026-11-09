@@ -1,0 +1,74 @@
+# useDebounce
+
+Use a debounced callback.
+
+## API
+
+```ts
+function useDebounce<T extends (...args: any[]) => any>(
+  callback: T,
+  options?: number | { wait?: number; maxWait?: number; leading?: boolean; trailing?: boolean },
+): [
+  debouncedCallback: (...args: Parameters<T>) => ReturnType<T> | undefined,
+  actions: {
+    flush: () => ReturnType<T> | undefined;
+    cancel: () => void;
+  },
+];
+```
+
+Parameters:
+
+- **`callback`:** Original callback function.
+- **`options`:** Debounce wait time or an options object.
+  - **`options.wait`:** Debounce wait time, in milliseconds. Default is `0`.
+  - **`options.maxWait`:** Max wait time, in milliseconds. Default is `Infinity`.
+  - **`options.leading`:** Run callback on the leading edge. Default is `false`.
+  - **`options.trailing`:** Run callback on the trailing edge. Default is `true`.
+
+Results:
+
+- **`debouncedCallback`:** Debounced callback.
+- **`actions`:** Actions object.
+  - **`actions.flush`:** Flush function. Run callback immediately.
+  - **`actions.cancel`:** Cancel debounce timer.
+
+## Notes
+
+- The pending trailing invocation is cancelled on unmount — it never runs.
+- Changing the options mid-flight immediately flushes the pending invocation of the old debounced function.
+- The returned function returns `undefined` when the invocation is deferred.
+- With `leading: false` and `trailing: false`, the callback never runs.
+
+## Example
+
+The following example shows how many times the callback actually runs after clicking the button rapidly.
+
+```tsx
+import { useRef, useState } from "react";
+import { useDebounce } from "@lilib/hooks";
+
+function Example() {
+  const callsRef = useRef(0);
+  const [runs, setRuns] = useState(0);
+
+  const [debouncedCall] = useDebounce(
+    () => {
+      callsRef.current++;
+      setRuns(callsRef.current);
+    },
+    { wait: 500 },
+  );
+
+  return (
+    <>
+      <div>
+        <button onClick={() => debouncedCall()}>Debounced call</button>
+      </div>
+      <div>Callback actually runs: {runs}</div>
+    </>
+  );
+}
+
+export default Example;
+```

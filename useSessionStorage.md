@@ -1,0 +1,88 @@
+# useSessionStorage
+
+Get, set and/or remove `sessionStorage`.
+
+## API
+
+```ts
+interface UseStorageOptions<T> {
+  defaultValue?: T;
+  polling?: boolean;
+  pollingInterval?: number;
+  compare?: (x: any, y: any) => boolean;
+  validate?: (value: any) => boolean;
+  serialize?: (value: T) => string;
+  deserialize?: (raw: string) => T;
+}
+
+function useSessionStorage<T>(
+  key: string,
+  options: UseStorageOptions<T> & { defaultValue: T },
+): [
+  value: T,
+  setSessionStorage: (newValue: T | undefined | ((prevValue: T) => T | undefined)) => void,
+];
+
+function useSessionStorage<T>(
+  key: string,
+  options?: UseStorageOptions<T>,
+): [
+  value: T | undefined,
+  setSessionStorage: (
+    newValue: T | undefined | ((prevValue: T | undefined) => T | undefined),
+  ) => void,
+];
+```
+
+Parameters:
+
+- **`key`:** `sessionStorage` key.
+- **`options`:** Options object.
+  - **`options.defaultValue`:** Default value. When set, the returned `value` type no longer includes `undefined`.
+  - **`options.polling`:** Whether to poll for storage changes. Default is `false`.
+  - **`options.pollingInterval`:** Polling interval time, in milliseconds. Default is `100`.
+  - **`options.compare`:** A function to determine whether the new and old values are equal. Defaults to deep comparison.
+  - **`options.validate`:** Validate the value got from `sessionStorage` which is deserialized by the `deserialize` function. If this function returns `false`, the `defaultValue` will be used.
+  - **`options.serialize`:** Serialization function. Default is `JSON.stringify`.
+  - **`options.deserialize`:** Deserialization function. Default is `JSON.parse`.
+
+Results:
+
+- **`value`:** The value parsed by the deserialization function.
+- **`setSessionStorage`:** Set `sessionStorage`. The `newValue` can also be a function that returns the new value. If it is `undefined`, the entry will be removed and the `defaultValue` will be returned.
+
+## Notes
+
+- **Important**: `sessionStorage` is per-tab — values are not shared across tabs at all. The `storage` event fires only in other same-origin documents of the same tab (e.g. iframes), never in the document that made the change; enable `polling: true` to sync components in the same page.
+- The default serialization is `JSON.stringify`/`JSON.parse`: `Date` becomes a string, `NaN` and `Infinity` become `null`, `Map`/`Set`/circular references are lost, and `undefined` array items become `null`. Use `serialize`/`deserialize` for custom types.
+- In private-browsing or restricted environments, accessing `sessionStorage` may throw; the hook then falls back to in-memory state and writes are not persisted.
+- Returns `defaultValue` in non-browser environments. The `value` starts with `defaultValue` on the first render and is synchronized with the stored value right after mounting (before the browser paints), so server-rendered and client-hydrated output stay consistent.
+
+## Example
+
+The following example sets and removes a value with polling enabled, which keeps the value in sync across hook instances in the same tab.
+
+```tsx
+import { useSessionStorage } from "@lilib/hooks";
+
+function Example() {
+  const [value, setSessionStorage] = useSessionStorage("key", {
+    polling: true,
+    defaultValue: "default value",
+  });
+
+  return (
+    <>
+      <div>
+        <button onClick={() => setSessionStorage(Math.random().toString())}>
+          Set random value
+        </button>{" "}
+        <button onClick={() => setSessionStorage(undefined)}>Remove</button>
+      </div>
+      <div>The value is: {value}</div>
+    </>
+  );
+}
+
+export default Example;
+```

@@ -1,0 +1,61 @@
+# useComposedRef
+
+This hook composes multiple refs into one. Ref objects, ref callbacks, `null` and `undefined` are all accepted, which makes it very useful when developing components.
+
+## API
+
+```ts
+function useComposedRef<T>(...refs: (React.Ref<T> | undefined)[]): React.RefCallback<T>;
+```
+
+## Notes
+
+- The returned callback keeps the same identity while the input refs remain unchanged.
+- In React 19+, detachment invokes returned cleanup functions, passes `null` to callbacks without cleanup, and clears object refs to `null`. In React 16.8–18, use `null`-based cleanup instead of returning a function.
+
+## Example
+
+### Forwarded and internal refs
+
+A typical use: composing the forwarded ref and an internal ref in a library component.
+
+```tsx
+import { forwardRef, useRef } from "react";
+import { useComposedRef } from "@lilib/hooks";
+
+const Component = forwardRef<HTMLDivElement, any>((props, ref) => {
+  const domRef = useRef<HTMLDivElement>(null);
+  const composedRef = useComposedRef(domRef, ref);
+
+  // Do something.
+
+  return <div ref={composedRef}>...</div>;
+});
+```
+
+### Ref cleanup in React 19+
+
+This example combines an object ref with a callback that returns cleanup. It requires React 19+ and a browser with `ResizeObserver` support. When the element detaches, the observer is disconnected and `domRef.current` is cleared to `null`.
+
+```tsx
+import { useCallback, useRef, useState } from "react";
+import { useComposedRef } from "@lilib/hooks";
+
+function Component() {
+  const domRef = useRef<HTMLDivElement>(null);
+  const [width, setWidth] = useState(0);
+  const observeSize = useCallback((node: HTMLDivElement | null) => {
+    if (!node) return;
+
+    const observer = new ResizeObserver(([entry]) => {
+      setWidth(Math.round(entry.contentRect.width));
+    });
+    observer.observe(node);
+
+    return () => observer.disconnect();
+  }, []);
+  const composedRef = useComposedRef(domRef, observeSize);
+
+  return <div ref={composedRef}>Width: {width}px</div>;
+}
+```
