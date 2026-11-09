@@ -1,6 +1,15 @@
 # AGENTS.md
 
-Non-obvious rules for this repository. Information that can be read directly from the codebase (directory structure, scripts, config files) is intentionally omitted.
+Non-obvious rules for this repository: conventions, invariants, and commands that are easy to get wrong. Directory layout and dependency versions are omitted — read them from the code.
+
+`@lilib/hooks` is a published React hooks library: one hook per module in `src/`, re-exported from `src/index.ts`, documented on a Docusaurus site. Use pnpm for every command (`pnpm install`); npm only appears inside package scripts.
+
+## Commands
+
+- `pnpm test` — the full matrix: React 16/17/18/19 in parallel (16–18 use the generated `.test-deps/`, 19 uses root dependencies), redirected via `moduleNameMapper` in `jest.config.js`. Keep it green.
+- `pnpm test:react19 tests/useXxx.test.tsx` — one file; swap `react19` for `react16`/`react17`/`react18` to reproduce version-specific failures (each of those first re-creates `.test-deps/reactX`).
+- `pnpm lint` — typecheck + ESLint + Prettier check (`pnpm lint:fix` auto-fixes); the default verification for any change.
+- `pnpm dev` — docs site locally. `pnpm build` builds the **docs site**, not the package; `pnpm dist` builds the package.
 
 ## Compatibility Contract (Must Follow)
 
@@ -19,8 +28,8 @@ Every hook must support React 16.8+ / 17 / 18 / 19, as well as SSR and StrictMod
 - Published code may only import from within `src/` (the published package contains only `src` and `dist`).
 - Docs and comments are written in English by default and must follow English writing conventions; when authoring docs for a specific language, write in that language with its corresponding conventions.
 - Every hook must have reasonable and accurate JSDoc comments describing its purpose, parameters, and return values (`@param`, `@returns`) — explain what the hook does, what each parameter means, and what each returned value represents.
+- When a change alters a hook's behavior, options, or return values, update its JSDoc, `docs/useXxx.mdx`, and its row in both the Getting Started and `README.md` tables in the same commit.
 - Except for hook API documentation (JSDoc), comments must be as concise and accurate as possible — only add comments where necessary; do not comment self-evident logic.
-- Format code and comments with Prettier: `printWidth` is 100 (see `.prettierrc`), all other options use Prettier defaults.
 
 ## Adding a Hook
 
@@ -29,32 +38,31 @@ Adding a new hook touches the following places:
 1. `src/useXxx.ts` + export it under the matching category in `src/index.ts` (`tests/index.test.ts` scans `src/` and requires the exports to match it exactly).
 2. Cover the hook with tests via `tests/helpers/renderHook`. Usually a dedicated `tests/useXxx.test.tsx`; when existing suites already cover the hook's behavior (e.g. `useIsomorphicLayoutEffect` is covered by `tests/ssr.test.tsx`), a dedicated file is not mandatory.
 3. Add it to `AllHooks` in `tests/ssr.test.tsx` (and to `BrowserValueHooks` as well if it returns browser-dependent values).
-4. Docs: `docs/useXxx.mdx` (intro + `## API` + `## Example`) registered in `docs/sidebars.js`. An inline code example in the mdx is acceptable for simple hooks; use `docs/examples/UseXxx.tsx` (default export, importing from `@lilib/hooks`) with `ExampleBlock` when an interactive demo adds value.
+4. Docs: `docs/useXxx.mdx` (intro + `## API` + `## Example`, or `## Examples` when there are several) registered in `docs/sidebars.js`. An inline code example in the mdx is acceptable for simple hooks; use `docs/examples/UseXxx.tsx` (default export, importing from `@lilib/hooks`) with `ExampleBlock` when an interactive demo adds value.
 5. Update the hooks table in Getting Started and `README.md`.
+
+No build config changes are needed — the Babel cjs/esm, Rollup umd, and tsc types pipelines pick up new modules automatically.
 
 ## Testing Rules
 
-- The test matrix runs React 16/17/18/19 in parallel; 16–18 use the generated `.test-deps/`, 19 uses root dependencies, redirected via `moduleNameMapper`. Always keep the entire matrix green.
 - Use `tests/helpers/renderHook` (it selects the testing library per React version at runtime) — never import `@testing-library/*` render functions directly.
-- New hook tests must cover cleanup on unmount and StrictMode idempotency — mount/cleanup pairs must survive double invocation.
-- `useLoad.test.tsx` is whitelisted for unhandled promise rejections in `tests/helpers/environment.ts` (the hook surfaces failures through its `error` state rather than rejecting). Only add a file to `FILES_WITH_EXPECTED_REJECTIONS` for an equally justified reason.
+- New hook tests must cover cleanup on unmount and StrictMode double invocation (see the contract above).
 - Timer-related tests use `jest.useFakeTimers()` (rAF / requestIdleCallback remain real per the jest config).
 - SSR-specific behavior goes into files marked `/** @jest-environment node */` or `*.ssr.test.ts`.
+- `useLoad.test.tsx` is whitelisted for unhandled promise rejections in `tests/helpers/environment.ts` (the hook surfaces failures through its `error` state rather than rejecting). Only add a file to `FILES_WITH_EXPECTED_REJECTIONS` for an equally justified reason.
 - lint-staged runs the relevant Jest tests against staged files — keep every commit self-contained and passing.
-
-## Change Validation
-
-- After every code change, check the code for correctness, design soundness, and completeness.
-- Fix confirmed issues directly. For uncertain issues, ask the user and obtain confirmation before making changes.
-- Repeat these checks after each fix until no identified issues remain unresolved.
 
 ## Build & Release Rules
 
-- Adding a hook requires no build config changes (Babel cjs/esm, Rollup umd, tsc types).
-- CHANGELOG.md is generated automatically by release-it from commit history — never edit it by hand.
+- CHANGELOG.md is generated automatically by release-it from commit history — never edit it by hand. Releases (`pnpm release`) are maintainer-only and also build and deploy the docs site (`gh-pages`); `pnpm release:dry-run` gates them on `lint`, `test`, and `dist`.
 - Commit messages must follow Conventional Commits (enforced by commitlint via husky) and be written in English. Hook names and hook parameter names in commit messages must be wrapped in backticks, except for hook names used as the scope.
 - When modifying an existing hook, use that hook's name as the commit message scope without backticks.
 - Only commits that change published source (`src/`) may generate changelog entries, via `feat`, `fix`, `perf`, or a `!`-suffixed type (e.g. `feat!:`/`chore!:` — do not use a `BREAKING CHANGE` footer). Commits that only touch docs, tests, build scripts, or config must use non-changelog types (`docs`, `test`, `build`, `ci`, `chore`) instead.
+
+## Verifying Changes
+
+- After every code change, run `pnpm lint` and the relevant tests.
+- At the end of each round of changes in a conversation, run a code review loop: review the change for correctness, design soundness, and completeness (use a code-review capability or a dedicated reviewer when available), fix every confirmed issue directly, then review again — repeat until a review reports no remaining confirmed issues. Issues that need user confirmation stay unresolved: ask the user instead of auto-fixing them.
 
 ## Do Not "Fix"
 
