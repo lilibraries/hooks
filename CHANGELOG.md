@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.0](https://github.com/lilibraries/hooks/compare/v2.0.1...v2.1.0) (2026-11-09)
+
+### Features
+
+* add `useControllableState` hook for controlled and uncontrolled states ([c265d08](https://github.com/lilibraries/hooks/commit/c265d08a77ad5addd4e8fe20e4f88ebdf275d3af))
+* add `useMutationObserver` hook for DOM mutation observation ([eb0e036](https://github.com/lilibraries/hooks/commit/eb0e036523e9229eb4b26c0aa816d996be981a9c))
+
 ## [2.0.1](https://github.com/lilibraries/hooks/compare/v2.0.0...v2.0.1) (2026-10-23)
 
 ### Bug Fixes
