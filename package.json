@@ -67,7 +67,7 @@
     "dist:esm": "babel src --out-dir dist/esm --config-file ./babel.esm.json --extensions .ts,.tsx --no-babelrc",
     "dist:umd": "cross-env NODE_ENV=development rollup --config && cross-env NODE_ENV=production rollup --config",
     "dist:types": "tsc -p ./tsconfig.build.json",
-    "gh-pages": "npm run build && gh-pages -d build",
+    "gh-pages": "npm run build && gh-pages -d build --nojekyll",
     "release": "npm run release:dry-run && HUSKY=0 release-it && npm run gh-pages",
     "release:dry-run": "npm run lint && npm run test && npm run dist && HUSKY=0 release-it --dry-run --ci"
   },
