@@ -1,0 +1,60 @@
+import CodeBlock from "@theme/CodeBlock";
+import ExampleBlock from "./components/ExampleBlock";
+import Example from "./examples/UseControllableState";
+import ExampleCode from "!!raw-loader!./examples/UseControllableState";
+
+Unify a value that can be either controlled or uncontrolled, which is the common requirement of form and overlay components.
+
+## API
+
+```ts
+interface UseControllableStateOptions<T> {
+  value?: T;
+  defaultValue?: T;
+  onChange?: (value: T) => void;
+}
+
+function useControllableState<T>(
+  options: UseControllableStateOptions<T> & { defaultValue: T },
+): [state: T, setState: (nextState: T | ((prevState: T) => T)) => void];
+
+function useControllableState<T>(
+  options: UseControllableStateOptions<T> & { value: T },
+): [state: T, setState: (nextState: T | ((prevState: T) => T)) => void];
+
+function useControllableState<T>(
+  options?: UseControllableStateOptions<T>,
+): [
+  state: T | undefined,
+  setState: (nextState: T | undefined | ((prevState: T | undefined) => T | undefined)) => void,
+];
+```
+
+Parameters:
+
+- **`options`:** Options object.
+  - **`options.value`:** The controlled value. The state is controlled whenever `value` is not `undefined`. Keep it defined for the whole lifetime of the component; falling back to `undefined` turns the state into uncontrolled.
+  - **`options.defaultValue`:** The initial value used while the state is uncontrolled. It is ignored when `value` is provided, and later changes to it do not reset the state.
+  - **`options.onChange`:** Called with the next value once it actually changes, in both controlled and uncontrolled modes.
+
+Results:
+
+- **`state`:** The current value: `value` when controlled, the internal state otherwise.
+- **`setState`:** Accepts a new value or an updater function computed from the current value. It calls `onChange` only when the value actually changes and keeps a stable identity.
+
+## Notes
+
+- A controlled component must update `value` in `onChange`; otherwise the state never changes, because `setState` does not touch the internal state while controlled.
+- `value` is compared with the previous one using `Object.is`, so setting an unchanged value does not call `onChange`.
+- Switching between controlled and uncontrolled is supported: the state resumes from the latest value of the previous mode, starting with the very first render after the switch. Prefer keeping a component in one mode for its whole lifetime.
+- `undefined` always means uncontrolled, so it cannot be a controlled value. Use a sentinel such as `null` when a controlled value has to represent "empty".
+- To get `state: T` instead of `T | undefined`, make `defaultValue` non-optional in the type, for example by destructuring it with a default (`{ value, defaultValue = "" }`). Otherwise the last overload is selected and `undefined` is included in the result type.
+
+## Example
+
+The following example renders the same field component in both controlled and uncontrolled modes: the controlled field follows the parent state, while the uncontrolled one keeps its own state.
+
+<ExampleBlock>
+  <Example />
+</ExampleBlock>
+<CodeBlock language="tsx">{ExampleCode}</CodeBlock>

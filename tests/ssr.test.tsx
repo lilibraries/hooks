@@ -10,6 +10,7 @@ import {
   useCache,
   useClickOutside,
   useComposedRef,
+  useControllableState,
   useCookie,
   useDarkMode,
   useDebounce,
@@ -84,6 +85,7 @@ function AllHooks() {
 
   // States
   useCache("ssr-cache");
+  useControllableState({ defaultValue: "ssr" });
   useToggle();
   useSetState({ count: 0 });
   useSafeState(0);

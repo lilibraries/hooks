@@ -82,16 +82,17 @@ For the full API reference and live examples, check out the docs of each hook li
 
 ### States
 
-| Hook                                       | Description                                                                                                     |
-| ------------------------------------------ | --------------------------------------------------------------------------------------------------------------- |
-| [`useCache`](./useCache)                   | Cache data for a certain period of time, with optional sync between components sharing the same cache instance. |
-| [`useToggle`](./useToggle)                 | Manage a boolean value.                                                                                         |
-| [`useSetState`](./useSetState)             | Like `this.setState` of class components, merging partial state updates.                                        |
-| [`useSafeState`](./useSafeState)           | Like `React.useState`, but setting state after unmount is safe.                                                 |
-| [`useDelayedValue`](./useDelayedValue)     | Delay updates to a value.                                                                                       |
-| [`useMemoizedValue`](./useMemoizedValue)   | Return the previous value until the value actually changes (deep comparison).                                   |
-| [`useThrottledValue`](./useThrottledValue) | Throttle a value.                                                                                               |
-| [`useDebouncedValue`](./useDebouncedValue) | Debounce a value.                                                                                               |
+| Hook                                             | Description                                                                                                     |
+| ------------------------------------------------ | --------------------------------------------------------------------------------------------------------------- |
+| [`useCache`](./useCache)                         | Cache data for a certain period of time, with optional sync between components sharing the same cache instance. |
+| [`useToggle`](./useToggle)                       | Manage a boolean value.                                                                                         |
+| [`useSetState`](./useSetState)                   | Like `this.setState` of class components, merging partial state updates.                                        |
+| [`useSafeState`](./useSafeState)                 | Like `React.useState`, but setting state after unmount is safe.                                                 |
+| [`useControllableState`](./useControllableState) | Manage a value that can be either controlled or uncontrolled.                                                   |
+| [`useDelayedValue`](./useDelayedValue)           | Delay updates to a value.                                                                                       |
+| [`useMemoizedValue`](./useMemoizedValue)         | Return the previous value until the value actually changes (deep comparison).                                   |
+| [`useThrottledValue`](./useThrottledValue)       | Throttle a value.                                                                                               |
+| [`useDebouncedValue`](./useDebouncedValue)       | Debounce a value.                                                                                               |
 
 ### Callbacks
 

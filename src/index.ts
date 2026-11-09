@@ -20,6 +20,7 @@ export { default as useCache } from "./useCache";
 export { default as useToggle } from "./useToggle";
 export { default as useSetState } from "./useSetState";
 export { default as useSafeState } from "./useSafeState";
+export { default as useControllableState } from "./useControllableState";
 export { default as useDelayedValue } from "./useDelayedValue";
 export { default as useMemoizedValue } from "./useMemoizedValue";
 export { default as useThrottledValue } from "./useThrottledValue";
