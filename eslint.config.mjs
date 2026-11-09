@@ -44,6 +44,7 @@ export default defineConfig(
       "eslint.config.mjs",
       "rollup.config.mjs",
       "scripts/**/*.mjs",
+      "scripts/**/*.js",
     ],
     languageOptions: {
       globals: {

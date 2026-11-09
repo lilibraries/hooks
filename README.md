@@ -7,6 +7,7 @@
 A collection of practical React hooks covering async data, states, effects, callbacks, refs and browser APIs — written in TypeScript, compatible with React 16.8+, 17, 18 and 19, and safe for SSR and StrictMode.
 
 - [Documentation](https://lilibraries.github.io/hooks/) — full API reference with live examples
+- [llms.txt](https://lilibraries.github.io/hooks/llms.txt) — machine-readable index for AI assistants and LLM tooling
 - [Changelog](https://github.com/lilibraries/hooks/blob/master/CHANGELOG.md)
 - [Report an issue](https://github.com/lilibraries/hooks/issues)
 

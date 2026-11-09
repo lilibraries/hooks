@@ -16,7 +16,9 @@ const moduleAliasPlugin = function (context, { alias }) {
 };
 
 module.exports = {
-  title: "Hooks",
+  title: "@lilib/hooks",
+  tagline:
+    "Practical React hooks for async data, state, effects, callbacks, refs and browser APIs.",
   url: "https://lilibraries.github.io/",
   baseUrl: "/hooks/",
   onBrokenLinks: "throw",
@@ -61,6 +63,7 @@ module.exports = {
     ],
   ],
   plugins: [
+    require("./scripts/docsForAi"),
     [
       moduleAliasPlugin,
       {
