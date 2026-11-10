@@ -19,6 +19,7 @@ import {
   useElementSize,
   useEventListener,
   useFavicon,
+  useHotkey,
   useIdle,
   useIntersecting,
   useIntersectionObserver,
@@ -118,14 +119,15 @@ function AllHooks() {
   useFavicon("https://example.com/favicon.ico");
   useOnline();
   useDarkMode();
+  useMatchMedia("(prefers-color-scheme: dark)");
   usePageVisible();
   useWindowFocus();
-  useMatchMedia("(prefers-color-scheme: dark)");
+  useHotkey("mod+k", () => {});
+  useClickOutside(nodeRef, () => {});
+  useEventListener(eventTargetRef, "click", () => {});
   useWindowSize();
   useElementSize(elementRef);
   useIntersecting(elementRef);
-  useClickOutside(nodeRef, () => {});
-  useEventListener(eventTargetRef, "click", () => {});
   useResizeObserver(elementRef, () => {});
   useIntersectionObserver(elementRef, () => {});
   useMutationObserver(elementRef, () => {});
