@@ -1,11 +1,11 @@
 import { useDebugValue, useEffect } from "react";
-import warning from "warning";
 import { LRUCache } from "lru-cache";
 
 import useUpdate from "./useUpdate";
 import usePersist from "./usePersist";
 import useSafeState from "./useSafeState";
 import { getCacheEmitter, getDefaultCache } from "./utils/cache";
+import warn from "./utils/warn";
 
 interface CacheHookOptions<T> {
   /** Default value when the cache value does not exist. */
@@ -183,7 +183,7 @@ function useCache<T>(key: NonNullable<unknown>, options: CacheHookOptions<T> = {
 
   // `key` must be immutable; warn when it changes to avoid corrupting shared state.
   useUpdate(() => {
-    warning(false, "[useCache] You should provide an immutable value for the `key` option.");
+    warn(false, "[useCache] You should provide an immutable value for the `key` option.");
   }, [key]);
 
   useDebugValue(value);

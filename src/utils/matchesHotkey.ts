@@ -1,5 +1,3 @@
-import warning from "warning";
-
 import inBrowser from "./inBrowser";
 import matchesKeystroke from "./matchesKeystroke";
 import parseKeystroke, { type Keystroke } from "./parseKeystroke";
@@ -26,9 +24,6 @@ const MODIFIER_ALIASES = new Map<string, Modifier>([
   ["mod", "mod"],
 ]);
 
-const HOTKEY_CACHE_LIMIT = 200;
-const hotkeyCache = new Map<string, Hotkey | null>();
-
 /**
  * Detect whether `mod` stands for the Meta key (Apple platforms) or the Control key.
  * It is evaluated on every call rather than cached at module scope, so it stays
@@ -38,7 +33,14 @@ function isApplePlatform() {
   return inBrowser && /mac|iphone|ipad|ipod/i.test(navigator.userAgent);
 }
 
-function createHotkey(hotkey: string) {
+/**
+ * Parse a hotkey string such as `"mod+shift+k"` into the modifier flags and the
+ * keystroke it matches. Exported so `useHotkey` can validate its `keys` while rendering.
+ *
+ * @param hotkey The hotkey string.
+ * @returns Returns the parsed hotkey, or `null` when the string is invalid.
+ */
+export function parseHotkey(hotkey: string) {
   const parsed: Hotkey = {
     ctrl: false,
     alt: false,
@@ -67,37 +69,6 @@ function createHotkey(hotkey: string) {
   }
 
   return Object.assign(parsed, parseKeystroke(keystrokeToken));
-}
-
-/**
- * Resolve a hotkey string, reporting an invalid one once. Exported so `useHotkey` can
- * validate its `keys` while rendering and surface a typo at mount instead of at the
- * first key press.
- *
- * @param hotkey The hotkey string.
- * @returns Returns the parsed hotkey, or `null` when the string is invalid.
- */
-export function parseHotkey(hotkey: string) {
-  if (!hotkeyCache.has(hotkey)) {
-    const parsed = createHotkey(hotkey);
-
-    if (!parsed) {
-      warning(
-        false,
-        '[useHotkey] Invalid hotkey `%s`; expected modifiers followed by a single key, e.g. "mod+shift+k".',
-        hotkey,
-      );
-    }
-
-    // Hotkey strings are usually literals; the cap only guards against generated ones.
-    if (hotkeyCache.size >= HOTKEY_CACHE_LIMIT) {
-      hotkeyCache.clear();
-    }
-
-    hotkeyCache.set(hotkey, parsed);
-  }
-
-  return hotkeyCache.get(hotkey) ?? null;
 }
 
 /**

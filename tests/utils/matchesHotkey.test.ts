@@ -85,31 +85,15 @@ describe("matchesHotkey", () => {
   });
 
   it("does not treat inherited object properties as modifiers or keys", () => {
-    const errorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
-
-    try {
-      // The prototype members must not be picked up as modifiers, which would
-      // silently turn these hotkeys into bare "k" and match every press.
-      expect(matchesHotkey(createEvent({ key: "k" }), "constructor+k")).toBe(false);
-      expect(matchesHotkey(createEvent({ key: "k" }), "toString+k")).toBe(false);
-      expect(errorSpy).toHaveBeenCalledWith(
-        expect.stringContaining("Invalid hotkey `constructor+k`"),
-      );
-    } finally {
-      errorSpy.mockRestore();
-    }
+    // The prototype members must not be picked up as modifiers, which would
+    // silently turn these hotkeys into bare "k" and match every press.
+    expect(matchesHotkey(createEvent({ key: "k" }), "constructor+k")).toBe(false);
+    expect(matchesHotkey(createEvent({ key: "k" }), "toString+k")).toBe(false);
   });
 
-  it("returns false for invalid hotkeys and warns about them", () => {
-    const errorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
-
-    try {
-      expect(matchesHotkey(createEvent(), "")).toBe(false);
-      expect(matchesHotkey(createEvent(), "ctrl+shift")).toBe(false);
-      expect(matchesHotkey(createEvent(), "a+b")).toBe(false);
-      expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining("Invalid hotkey `a+b`"));
-    } finally {
-      errorSpy.mockRestore();
-    }
+  it("returns false for invalid hotkeys", () => {
+    expect(matchesHotkey(createEvent(), "")).toBe(false);
+    expect(matchesHotkey(createEvent(), "ctrl+shift")).toBe(false);
+    expect(matchesHotkey(createEvent(), "a+b")).toBe(false);
   });
 });

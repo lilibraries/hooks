@@ -2,9 +2,11 @@ import type { RefObject } from "react";
 
 import useEventListener from "./useEventListener";
 import inBrowser from "./utils/inBrowser";
+import isDevelopment from "./utils/isDevelopment";
 import isEditableTarget from "./utils/isEditableTarget";
 import matchesHotkey, { parseHotkey } from "./utils/matchesHotkey";
 import unref from "./utils/unref";
+import warn from "./utils/warn";
 
 export interface UseHotkeyOptions {
   /** Whether the hotkey is active. Defaults to `true`. */
@@ -56,10 +58,18 @@ function useHotkey(
 
   const hotkeys = Array.isArray(keys) ? keys : [keys];
 
-  // Parse while rendering so an invalid hotkey is reported at mount rather than at the
-  // first key press; `parseHotkey` caches the result, so this stays cheap on re-renders.
-  for (const hotkey of hotkeys) {
-    parseHotkey(hotkey);
+  // Report an invalid hotkey at mount rather than at the first key press. Producing the
+  // warning is the only reason to parse while rendering, so this is dev-only.
+  if (isDevelopment) {
+    for (const hotkey of hotkeys) {
+      if (!parseHotkey(hotkey)) {
+        warn(
+          false,
+          '[useHotkey] Invalid hotkey `%s`; expected modifiers followed by a single key, e.g. "mod+shift+k".',
+          hotkey,
+        );
+      }
+    }
   }
 
   // Resolve the target when the listener is attached instead of while rendering:

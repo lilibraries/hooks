@@ -5,7 +5,6 @@ import { useDebugValue, useEffect, useRef, type DependencyList } from "react";
 import isFunction from "lodash/isFunction";
 import isObject from "lodash/isObject";
 import type { LRUCache } from "lru-cache";
-import warning from "warning";
 
 import { getDefaultCache } from "./utils/cache";
 import getLoadStore from "./utils/getLoadStore";
@@ -20,6 +19,7 @@ import useUpdate from "./useUpdate";
 import isPageVisible from "./utils/isPageVisible";
 import mergeDefined from "./utils/mergeDefined";
 import type { AnyFunction } from "./utils/types";
+import warn from "./utils/warn";
 
 export type LoadCallback = (...args: any[]) => Promise<any>;
 
@@ -330,7 +330,7 @@ function useLoad<Callback extends LoadCallback>(
     paramsRef.current = params;
 
     if (!mountedRef.current) {
-      warning(false, "[useLoad] You should not load data before the component is mounted.");
+      warn(false, "[useLoad] You should not load data before the component is mounted.");
       return new Promise(() => {}) as ReturnType<Callback>;
     }
 
@@ -575,7 +575,7 @@ function useLoad<Callback extends LoadCallback>(
 
   const reload = usePersist((options?: { force?: boolean }) => {
     const params = paramsRef.current || defaultParams;
-    warning(
+    warn(
       !callback.length || params !== undefined,
       "[useLoad] You should provide params by setting `defaultParams` option or calling the `load(...params)` method.",
     );
@@ -690,7 +690,7 @@ function useLoad<Callback extends LoadCallback>(
 
   // `key` must be immutable (see UseLoadOptions.key); warn when it changes to avoid corrupting shared state.
   useUpdate(() => {
-    warning(false, "[useLoad] You should provide an immutable value for the `key` option.");
+    warn(false, "[useLoad] You should provide an immutable value for the `key` option.");
   }, [key]);
 
   // On unmount, terminate the pending tasks without updating state, so no state

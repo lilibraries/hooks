@@ -1,16 +1,16 @@
 import { useDebugValue, useRef } from "react";
 import type { RefObject } from "react";
 
-import warning from "warning";
-
 import useEventListener from "./useEventListener";
 import useLayoutUpdate from "./useLayoutUpdate";
 import useSafeState from "./useSafeState";
 import inBrowser from "./utils/inBrowser";
+import isDevelopment from "./utils/isDevelopment";
 import isPageVisible from "./utils/isPageVisible";
 import matchesKeystroke from "./utils/matchesKeystroke";
 import parseKeystroke from "./utils/parseKeystroke";
 import unref from "./utils/unref";
+import warn from "./utils/warn";
 
 export interface UseKeyPressedOptions {
   /** Whether to track the key. Defaults to `true`. */
@@ -27,36 +27,11 @@ export interface UseKeyPressedOptions {
   eventField?: "key" | "code";
 }
 
-// Key tokens are usually literals, so a plain set is enough to report each typo once.
-const WARNED_KEYS_LIMIT = 200;
-const warnedKeys = new Set<string>();
-
 // A physical position that cannot be identified, like an empty code, cannot be tracked.
 function normalizeCode(code: string) {
   const normalized = code.toLowerCase();
 
   return normalized === "unidentified" ? "" : normalized;
-}
-
-function warnInvalidKeys(keyList: string[]) {
-  for (const key of keyList) {
-    // `"+"` is itself a key; any other token containing `+` is a shortcut, not a key.
-    if (key === "+" || !key.includes("+") || warnedKeys.has(key)) {
-      continue;
-    }
-
-    // The cap only guards against generated tokens, mirroring `parseHotkey`.
-    if (warnedKeys.size >= WARNED_KEYS_LIMIT) {
-      warnedKeys.clear();
-    }
-
-    warnedKeys.add(key);
-    warning(
-      false,
-      "[useKeyPressed] Invalid key `%s`; key tokens do not take modifiers, use `useHotkey` for shortcuts.",
-      key,
-    );
-  }
 }
 
 /**
@@ -77,7 +52,21 @@ function useKeyPressed(keys: string | string[], options?: UseKeyPressedOptions) 
   const keyList = Array.isArray(keys) ? keys : [keys];
   const keystrokes = keyList.map(parseKeystroke);
 
-  warnInvalidKeys(keyList);
+  // Report invalid key tokens while rendering so a typo surfaces at mount instead of on
+  // the first key press; producing the warning is the only reason to scan them, so this
+  // is dev-only.
+  if (isDevelopment) {
+    for (const key of keyList) {
+      // `"+"` is itself a key; any other token containing `+` is a shortcut, not a key.
+      if (key !== "+" && key.includes("+")) {
+        warn(
+          false,
+          "[useKeyPressed] Invalid key `%s`; key tokens do not take modifiers, use `useHotkey` for shortcuts.",
+          key,
+        );
+      }
+    }
+  }
 
   // Maps the physical key a press was recorded with (or its keystroke without a physical
   // key) to the keystroke it matched.

@@ -2,11 +2,11 @@ import { useCallback, useRef } from "react";
 
 import isNumber from "lodash/isNumber";
 import raf from "raf";
-import warning from "warning";
 
 import useLatestRef from "./useLatestRef";
 import usePersist from "./usePersist";
 import useUnmount from "./useUnmount";
+import warn from "./utils/warn";
 
 interface UseAnimateOptions {
   duration: number;
@@ -37,7 +37,7 @@ function useAnimate(callback: (percent: number) => void, options: number | UseAn
     }
   }
 
-  warning(
+  warn(
     duration > 0,
     "[useAnimate] The `duration` option must be a positive number, but received `%s`.",
     duration,

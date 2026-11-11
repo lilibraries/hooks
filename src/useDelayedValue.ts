@@ -2,11 +2,11 @@ import { useDebugValue } from "react";
 
 import isNumber from "lodash/isNumber";
 import isObject from "lodash/isObject";
-import warning from "warning";
 
 import useSafeState from "./useSafeState";
 import useTimeout from "./useTimeout";
 import useUpdate from "./useUpdate";
+import warn from "./utils/warn";
 
 interface UseDelayedValueOptions {
   delay: number;
@@ -42,7 +42,7 @@ function useDelayedValue<T>(value: T, options: number | UseDelayedValueOptions) 
     }
   }
 
-  warning(
+  warn(
     delay > 0,
     "[useDelayedValue] The `delay` option must be a positive number, but received `%s`.",
     delay,
