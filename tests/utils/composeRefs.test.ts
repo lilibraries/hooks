@@ -93,6 +93,43 @@ describe("composeRefs", () => {
     expect(objectRef.current).toBeNull();
   });
 
+  it("keeps detaching the remaining refs when a cleanup throws", () => {
+    const error = new Error("cleanup failed");
+    const throwingRef = jest.fn(() => () => {
+      throw error;
+    });
+    const legacyCallback = jest.fn();
+    const objectRef = { current: null as HTMLDivElement | null };
+    const composed = composeRefs<HTMLDivElement>(throwingRef, objectRef, legacyCallback);
+    const element = document.createElement("div");
+
+    const cleanup = composed(element);
+    expect(objectRef.current).toBe(element);
+
+    expect(() => cleanup?.()).toThrow(error);
+    expect(objectRef.current).toBeNull();
+    expect(legacyCallback).toHaveBeenLastCalledWith(null);
+  });
+
+  it("rethrows only the first cleanup error", () => {
+    const firstError = new Error("first");
+    const secondError = new Error("second");
+    const secondCleanup = jest.fn(() => {
+      throw secondError;
+    });
+    const composed = composeRefs<HTMLDivElement>(
+      () => () => {
+        throw firstError;
+      },
+      () => secondCleanup,
+    );
+
+    const cleanup = composed(document.createElement("div"));
+
+    expect(() => cleanup?.()).toThrow(firstError);
+    expect(secondCleanup).toHaveBeenCalledTimes(1);
+  });
+
   it("does not treat non-function callback return values as cleanup", () => {
     const callbackRef = jest.fn(() => 42) as any;
     const composed = composeRefs<HTMLDivElement>(callbackRef);
