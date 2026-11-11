@@ -117,14 +117,16 @@ For the full API reference and live examples, check out the docs of each hook li
 | [`useFavicon`](useFavicon.md)                           | Set the document favicon.                                                              |
 | [`useOnline`](useOnline.md)                             | Detect whether the network is online.                                                  |
 | [`useDarkMode`](useDarkMode.md)                         | Detect whether the system prefers a dark color scheme.                                 |
+| [`useMatchMedia`](useMatchMedia.md)                     | Determine whether the document matches a media query.                                  |
 | [`usePageVisible`](usePageVisible.md)                   | Detect whether the page is visible, including bfcache restores.                        |
 | [`useWindowFocus`](useWindowFocus.md)                   | Detect whether the window has focus.                                                   |
-| [`useMatchMedia`](useMatchMedia.md)                     | Determine whether the document matches a media query.                                  |
+| [`useHotkey`](useHotkey.md)                             | Bind a keyboard shortcut to a callback.                                                |
+| [`useKeyPressed`](useKeyPressed.md)                     | Detect whether a key is currently held down.                                           |
+| [`useClickOutside`](useClickOutside.md)                 | Trigger a callback when clicking outside the target area.                              |
+| [`useEventListener`](useEventListener.md)               | Set up an event listener on the target.                                                |
 | [`useWindowSize`](useWindowSize.md)                     | Get the window size.                                                                   |
 | [`useElementSize`](useElementSize.md)                   | Get the size of a DOM element.                                                         |
 | [`useIntersecting`](useIntersecting.md)                 | Detect whether an element intersects the viewport or a specified root.                 |
-| [`useClickOutside`](useClickOutside.md)                 | Trigger a callback when clicking outside the target area.                              |
-| [`useEventListener`](useEventListener.md)               | Set up an event listener on the target.                                                |
 | [`useResizeObserver`](useResizeObserver.md)             | Observe an element's size changes.                                                     |
 | [`useMutationObserver`](useMutationObserver.md)         | Observe changes to a DOM node, such as inserted or removed child nodes and attributes. |
 | [`useIntersectionObserver`](useIntersectionObserver.md) | Observe changes in an element's intersection with another element or the viewport.     |

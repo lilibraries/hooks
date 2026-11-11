@@ -68,14 +68,16 @@
 - [useFavicon](https://lilibraries.github.io/hooks/useFavicon.md): Set the document favicon.
 - [useOnline](https://lilibraries.github.io/hooks/useOnline.md): Detect whether the browser is online.
 - [useDarkMode](https://lilibraries.github.io/hooks/useDarkMode.md): Detect whether the system prefers a dark color scheme.
+- [useMatchMedia](https://lilibraries.github.io/hooks/useMatchMedia.md): Determine whether the document matches a media query.
 - [usePageVisible](https://lilibraries.github.io/hooks/usePageVisible.md): Detect whether the page is visible, including restores from the bfcache.
 - [useWindowFocus](https://lilibraries.github.io/hooks/useWindowFocus.md): Detect whether the window has focus.
-- [useMatchMedia](https://lilibraries.github.io/hooks/useMatchMedia.md): Determine whether the document matches a media query.
+- [useHotkey](https://lilibraries.github.io/hooks/useHotkey.md): Bind a keyboard shortcut to a callback.
+- [useKeyPressed](https://lilibraries.github.io/hooks/useKeyPressed.md): Detect whether a key is currently held down.
+- [useClickOutside](https://lilibraries.github.io/hooks/useClickOutside.md): Trigger a callback when a click happens outside the target area.
+- [useEventListener](https://lilibraries.github.io/hooks/useEventListener.md): Attach an event listener to a target and clean it up automatically.
 - [useWindowSize](https://lilibraries.github.io/hooks/useWindowSize.md): Get the window size and update on resize.
 - [useElementSize](https://lilibraries.github.io/hooks/useElementSize.md): Observe the size of a DOM element.
 - [useIntersecting](https://lilibraries.github.io/hooks/useIntersecting.md): Detect whether an element intersects the viewport or a given root element.
-- [useClickOutside](https://lilibraries.github.io/hooks/useClickOutside.md): Trigger a callback when a click happens outside the target area.
-- [useEventListener](https://lilibraries.github.io/hooks/useEventListener.md): Attach an event listener to a target and clean it up automatically.
 - [useResizeObserver](https://lilibraries.github.io/hooks/useResizeObserver.md): Observe size changes of an element with ResizeObserver.
 - [useMutationObserver](https://lilibraries.github.io/hooks/useMutationObserver.md): Observe DOM mutations such as inserted or removed nodes and changed attributes.
 - [useIntersectionObserver](https://lilibraries.github.io/hooks/useIntersectionObserver.md): Observe changes in the intersection of an element with another element or the viewport.

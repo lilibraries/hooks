@@ -1,0 +1,67 @@
+# useKeyPressed
+
+Detect whether keys are currently held down. In a non-browser environment, it always returns `false`.
+
+## API
+
+```ts
+function useKeyPressed(
+  keys: string | string[],
+  options?: {
+    enabled?: boolean;
+    target?: EventTarget | React.RefObject<EventTarget | null>;
+    eventField?: "key" | "code";
+  },
+): boolean;
+```
+
+Parameters:
+
+- **`keys`:** A key token such as `"shift"`, `"space"` or `"a"`, or an array of tokens where any of them being held down reports `true`. A token is a `KeyboardEvent.key` value (or a `KeyboardEvent.code` name when `options.eventField` is `"code"`) and is case-insensitive; the aliases `esc`, `space`, `plus`, `up`, `down`, `left` and `right` are also accepted.
+- **`options`:** Options object.
+  - **`options.enabled`:** Whether to track the keys. Default is `true`.
+  - **`options.target`:** The event target that receives the `keydown` listener: an element, `window`, `document`, or a ref of them. Default is `document`.
+  - **`options.eventField`:** The `KeyboardEvent` field the key token is compared against: `"key"` (the produced character) or `"code"` (the physical key position). Default is `"key"`.
+
+Results:
+
+- Returns `true` if any of the keys is held down, otherwise `false`.
+
+## Notes
+
+- Modifiers are not part of the key token: pressing `k` with any modifier held down still reports `"k"` as pressed. Modifier keys themselves are ordinary keys (`"control"`, `"shift"`, `"alt"`, `"meta"`); `mod` is not supported, use `useHotkey` for shortcuts.
+- Releases are tracked on the document, so a key released after the focus left `target` is still reported as released.
+- The state is reset when the window loses focus or the page becomes hidden, because no `keyup` is delivered then. A repeatable key that is still held down reports `true` again on its next auto-repeat event; keys without auto-repeat, such as `"shift"`, stay `false` until they are pressed again.
+- Unlike `useHotkey`, typing in an editable element is not filtered.
+- Keystrokes produced during an IME composition are ignored.
+- With `eventField: "key"`, a `keyup` may report a different key when a modifier or the layout changed while the key was held (for example `Option` + `C` on macOS); use `eventField: "code"` for layout-independent input.
+- With `eventField: "code"`, tokens are compared with `KeyboardEvent.code`, so logical names that differ from the physical name never match: use the physical names instead, such as `"equal"` or `"shiftleft"`.
+- A key that is already held down when the hook starts tracking reports `false` until its next event.
+
+## Example
+
+The following example highlights the box while Shift is held down.
+
+```tsx
+import { useKeyPressed } from "@lilib/hooks";
+
+function Example() {
+  const shiftPressed = useKeyPressed("shift");
+
+  return (
+    <div
+      style={{
+        padding: 8,
+        borderRadius: 4,
+        transition: "all 150ms",
+        transform: shiftPressed ? "scale(1.1)" : "none",
+        backgroundColor: shiftPressed ? "#d4edda" : "#f8f9fa",
+      }}
+    >
+      {shiftPressed ? "Shift is held down" : "Hold Shift"}
+    </div>
+  );
+}
+
+export default Example;
+```

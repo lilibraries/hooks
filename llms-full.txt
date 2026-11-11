@@ -123,14 +123,16 @@ For the full API reference and live examples, check out the docs of each hook li
 | [`useFavicon`](useFavicon.md)                           | Set the document favicon.                                                              |
 | [`useOnline`](useOnline.md)                             | Detect whether the network is online.                                                  |
 | [`useDarkMode`](useDarkMode.md)                         | Detect whether the system prefers a dark color scheme.                                 |
+| [`useMatchMedia`](useMatchMedia.md)                     | Determine whether the document matches a media query.                                  |
 | [`usePageVisible`](usePageVisible.md)                   | Detect whether the page is visible, including bfcache restores.                        |
 | [`useWindowFocus`](useWindowFocus.md)                   | Detect whether the window has focus.                                                   |
-| [`useMatchMedia`](useMatchMedia.md)                     | Determine whether the document matches a media query.                                  |
+| [`useHotkey`](useHotkey.md)                             | Bind a keyboard shortcut to a callback.                                                |
+| [`useKeyPressed`](useKeyPressed.md)                     | Detect whether a key is currently held down.                                           |
+| [`useClickOutside`](useClickOutside.md)                 | Trigger a callback when clicking outside the target area.                              |
+| [`useEventListener`](useEventListener.md)               | Set up an event listener on the target.                                                |
 | [`useWindowSize`](useWindowSize.md)                     | Get the window size.                                                                   |
 | [`useElementSize`](useElementSize.md)                   | Get the size of a DOM element.                                                         |
 | [`useIntersecting`](useIntersecting.md)                 | Detect whether an element intersects the viewport or a specified root.                 |
-| [`useClickOutside`](useClickOutside.md)                 | Trigger a callback when clicking outside the target area.                              |
-| [`useEventListener`](useEventListener.md)               | Set up an event listener on the target.                                                |
 | [`useResizeObserver`](useResizeObserver.md)             | Observe an element's size changes.                                                     |
 | [`useMutationObserver`](useMutationObserver.md)         | Observe changes to a DOM node, such as inserted or removed child nodes and attributes. |
 | [`useIntersectionObserver`](useIntersectionObserver.md) | Observe changes in an element's intersection with another element or the viewport.     |
@@ -216,6 +218,16 @@ A [`useReload`](useReload.md) call reloads all associated instances at once.
 ```ts
 type LoadCallback = (...args: any[]) => Promise<any>;
 
+interface CacheLike<K = any, V = any> {
+  get(key: K): V | undefined;
+  /** `options.ttl` is the time to live in milliseconds, where `0` means "never expires". */
+  set(key: K, value: V, options?: { ttl?: number }): void;
+  has(key: K): boolean;
+  delete(key: K): void;
+  peek(key: K, options?: { allowStale?: boolean }): V | undefined;
+  getRemainingTTL(key: K): number;
+}
+
 interface UseLoadOptions<Callback extends LoadCallback> {
   key?: NonNullable<unknown>;
 
@@ -227,7 +239,7 @@ interface UseLoadOptions<Callback extends LoadCallback> {
   initialData?: Awaited<ReturnType<Callback>>;
   defaultParams?: Parameters<Callback>;
 
-  cache?: LRUCache<any, any>;
+  cache?: CacheLike;
   cacheKey?: NonNullable<unknown>;
   cacheTime?: number;
   staleTime?: number;
@@ -298,7 +310,7 @@ Parameters:
     - **`options.key`:** A shared key that can be any data type except `null` and `undefined`, and must be immutable. When multiple instances use the same key, only the first one sends the request, and the others wait for and reuse its result. Set the `independent` option to `true` to disable this behavior. Another use of the `key` option is reloading all associated requests together with the [`useReload`](useReload.md) hook.
     - **`options.independent`:** When `true`, duplicate requests are not merged even if `key` is set: each instance fires its own request, but `useReload(key)` can still reload it.
   - **Caching:**
-    - **`options.cache`:** Cache instance. Create it with `new LRUCache({ max, ttl, ... })` from [`lru-cache`](https://github.com/isaacs/node-lru-cache). If not specified, a shared internal instance (the same one used by [`useCache`](useCache.md)) is used. Pass the same instance to `useCache` to let the two hooks share data.
+    - **`options.cache`:** Cache instance. Any object implementing the `CacheLike` shape is accepted, e.g. an `LRUCache` created with `new LRUCache({ max, ttl, ... })` from [`lru-cache`](https://github.com/isaacs/node-lru-cache); the shape's contracts are described in the [`useCache` notes](useCache.md#notes). If not specified, a shared internal instance (the same one used by [`useCache`](useCache.md)) is used. Pass the same instance to `useCache` to let the two hooks share data.
     - **`options.cacheKey`:** Cache key to enable caching. It can be any type except `null` and `undefined`, and must be immutable. The resolved data is written to the cache, and the initial `data` is read back from it on mount.
     - **`options.cacheTime`:** Cache time, in milliseconds. Default is 5 minutes. Set `Infinity` for a permanent cache. A `NaN` value falls back to the default.
     - **`options.staleTime`:** Stale time, in milliseconds. Default is `0`. It must be used with `cacheKey`. Within the `staleTime` period after a cache write, the data is considered fresh: calling `load(...params)`, `reload()` or automatic reloads resolves the cached data directly without sending a request. You can bypass the `staleTime` option by calling `force(...params)` or `reload({ force: true })`. Note: the reader and the writer of the same `cacheKey` should use a consistent `cacheTime`, since freshness is derived from the entry's remaining TTL.
@@ -2333,14 +2345,24 @@ export default Example;
 
 # useCache
 
-Cache data for a certain period of time, and synchronize data between components sharing the same [`LRUCache`](https://github.com/isaacs/node-lru-cache) instance. Pass a cache instance via `options.cache`, otherwise a shared internal instance is used.
+Cache data for a certain period of time, and synchronize data between components sharing the same cache instance. Pass a cache instance via `options.cache` (an [`LRUCache`](https://github.com/isaacs/node-lru-cache) or any object implementing the `CacheLike` shape), otherwise a shared internal instance is used.
 
 ## API
 
 ```ts
+interface CacheLike<K = any, V = any> {
+  get(key: K): V | undefined;
+  /** `options.ttl` is the time to live in milliseconds, where `0` means "never expires". */
+  set(key: K, value: V, options?: { ttl?: number }): void;
+  has(key: K): boolean;
+  delete(key: K): void;
+  peek(key: K, options?: { allowStale?: boolean }): V | undefined;
+  getRemainingTTL(key: K): number;
+}
+
 interface UseCacheOptions<T> {
   defaultValue?: T;
-  cache?: LRUCache<any, any>;
+  cache?: CacheLike;
   cacheTime?: number;
   cacheSync?: boolean | { set?: boolean; delete?: boolean };
   validate?: (value: any) => boolean;
@@ -2364,7 +2386,7 @@ Parameters:
 - **`key`:** Cache key. Any value except `null` and `undefined`.
 - **`options`:** Options object.
   - **`options.defaultValue`:** Default value when the cache value does not exist. When set, the returned `value` type no longer includes `undefined`.
-  - **`options.cache`:** Cache instance. Create it with `new LRUCache({ max, ttl, ... })` from [`lru-cache`](https://github.com/isaacs/node-lru-cache). If not specified, a shared internal instance is used.
+  - **`options.cache`:** Cache instance. Any object implementing the `CacheLike` shape is accepted, e.g. an `LRUCache` created with `new LRUCache({ max, ttl, ... })` from [`lru-cache`](https://github.com/isaacs/node-lru-cache). If not specified, a shared internal instance is used.
   - **`options.cacheTime`:** Cache time, in milliseconds. Default is 5 minutes. The TTL is set per entry, so it works regardless of the `ttl` option of the cache instance. You can set a permanent cache by setting this option to `Infinity` (mapped to `ttl: 0`, so no expiry timer is registered). Non-positive values are normalized to 1 ms, so the entry expires on the next read. A `NaN` value falls back to the default.
   - **`options.cacheSync`:** Whether to synchronize data between components on set and/or delete events. Default is `false`. It can be an object to enable synchronization for each event separately.
     - **`options.cacheSync.set`:** Synchronize data on set cache.
@@ -2381,7 +2403,8 @@ Results:
 ## Notes
 
 - **Important**: `key` must be an immutable value: changing it triggers a warning and may corrupt shared state.
-- The default cache is a shared internal instance, so keys are global across the whole app. Pass your own `LRUCache` instance to isolate groups of components.
+- The default cache is a shared internal instance, so keys are global across the whole app. Pass your own cache instance (such as an `LRUCache`) to isolate groups of components.
+- The passed instance is only used through the `CacheLike` shape, so a custom implementation is fine as long as it keeps these contracts: `set` applies `options.ttl` in milliseconds, where `0` means "never expires"; `peek` is a pure read during render (it must not update the recency or lifetime of an entry) and returns expired entries only when `options.allowStale` is `true`; `has` reports expired entries as missing; `getRemainingTTL` returns a value `<= 0` for a missing or expired entry and `Infinity` for an entry that never expires.
 - `cacheSync` only synchronizes components that share the same cache instance.
 - [`LRUCache`](https://github.com/isaacs/node-lru-cache) expires entries lazily: expired entries are only removed and notified when they are read, so an expired cache may still occupy memory until the next read. The shared internal cache enables `ttlAutopurge` to purge expired entries in the background; enable it on your own cache instance if needed.
 
@@ -4504,6 +4527,53 @@ export default Example;
 
 ---
 
+# useMatchMedia
+
+Use [`window.matchMedia()`](https://developer.mozilla.org/en-US/docs/Web/API/Window/matchMedia) to determine whether the document matches the media query string.
+
+## API
+
+```ts
+function useMatchMedia(query: string, defaultValue?: boolean): boolean;
+```
+
+Parameters:
+
+- **`query`:** The media query string.
+- **`defaultValue`:** The default return value in non-browser environments. Default is `false`.
+
+Results:
+
+- Returns `true` if the document matches the query, otherwise `false`.
+
+## Notes
+
+- `defaultValue` only applies in non-browser environments; on the client the result comes from `window.matchMedia`. Mind hydration mismatches when the default differs from the client result.
+- Prefer CSS media queries for style-only changes; use this hook when JavaScript logic depends on the match.
+
+## Example
+
+The following example switches the layout when the viewport is narrower than 600px.
+
+```tsx
+import { useMatchMedia } from "@lilib/hooks";
+
+function Example() {
+  const isNarrow = useMatchMedia("(max-width: 600px)");
+
+  return (
+    <div style={{ display: "flex", flexDirection: isNarrow ? "column" : "row", gap: 8 }}>
+      <div style={{ flex: 1, padding: 16, backgroundColor: "rgba(255, 165, 0, 0.4)" }}>Sidebar</div>
+      <div style={{ flex: 2, padding: 16, backgroundColor: "rgba(0, 128, 255, 0.4)" }}>Content</div>
+    </div>
+  );
+}
+
+export default Example;
+```
+
+---
+
 # usePageVisible
 
 Detect whether the page is visible. The `visibilitychange` event doesn't fire when restoring from the bfcache, so this hook also listens to the `pageshow` event to re-detect.
@@ -4598,45 +4668,261 @@ export default Example;
 
 ---
 
-# useMatchMedia
+# useHotkey
 
-Use [`window.matchMedia()`](https://developer.mozilla.org/en-US/docs/Web/API/Window/matchMedia) to determine whether the document matches the media query string.
+Bind a keyboard shortcut to a callback.
 
 ## API
 
 ```ts
-function useMatchMedia(query: string, defaultValue?: boolean): boolean;
+function useHotkey(
+  keys: string | string[],
+  listener: (event: KeyboardEvent) => void,
+  options?: {
+    enabled?: boolean;
+    target?: EventTarget | React.RefObject<EventTarget | null>;
+    eventName?: "keydown" | "keyup";
+    eventField?: "key" | "code";
+    repeatable?: boolean;
+    allowInEditable?: boolean;
+    preventDefault?: boolean;
+  },
+): void;
 ```
 
 Parameters:
 
-- **`query`:** The media query string.
-- **`defaultValue`:** The default return value in non-browser environments. Default is `false`.
-
-Results:
-
-- Returns `true` if the document matches the query, otherwise `false`.
+- **`keys`:** A hotkey string, or an array of hotkey strings that all trigger the listener. A hotkey string consists of modifiers joined with `+` followed by a single key, for example `"mod+shift+k"`. Supported modifiers are `ctrl` (`control`), `alt` (`option`), `shift`, `meta` (`cmd`, `command`) and `mod`. The key is a `KeyboardEvent.key` value (or a `KeyboardEvent.code` name when `options.eventField` is `"code"`) and is case-insensitive; the aliases `esc`, `space`, `plus`, `up`, `down`, `left` and `right` are also accepted.
+- **`listener`:** The callback invoked when a hotkey is pressed; it receives the keyboard event.
+- **`options`:** Options object.
+  - **`options.enabled`:** Whether the hotkey is active. Default is `true`.
+  - **`options.target`:** The event target that receives the listener: an element, `window`, `document`, or a ref of them. Default is `document`.
+  - **`options.eventName`:** The keyboard event to listen for. Default is `"keydown"`.
+  - **`options.eventField`:** The `KeyboardEvent` field the key token is compared against: `"key"` (the produced character) or `"code"` (the physical key position). Default is `"key"`.
+  - **`options.repeatable`:** Whether to fire again on key auto-repeat while the key is held down. Default is `false`.
+  - **`options.allowInEditable`:** Whether to fire while the focus is in an editable element, such as a text input, a textarea, a select or a content-editable element. Default is `false`.
+  - **`options.preventDefault`:** Whether to call `preventDefault()` on the matched event. Default is `false`.
 
 ## Notes
 
-- `defaultValue` only applies in non-browser environments; on the client the result comes from `window.matchMedia`. Mind hydration mismatches when the default differs from the client result.
-- Prefer CSS media queries for style-only changes; use this hook when JavaScript logic depends on the match.
+- Modifiers must match exactly: pressing `k` with both Control and Meta held does not fire a `"ctrl+k"` hotkey.
+- `mod` resolves to Command on Apple platforms and to Control everywhere else, so `"mod+k"` works on every operating system.
+- When `target` is a ref that is not assigned yet, no listener is attached: the hotkey never falls back to `document`.
+- Inputs that do not accept text, such as checkboxes, radio buttons and range inputs, do not block hotkeys, so shortcuts keep working while they are focused.
+- A `target` that is itself editable is still filtered by `allowInEditable`: binding a shortcut to a text field needs `allowInEditable: true`.
+- On macOS, Option changes the reported character (`Option` + `C` produces `ç`), so `alt` shortcuts must use `eventField: "code"` to match; prefer letter keys with `mod` or `ctrl` for cross-platform shortcuts.
+- With `eventField: "code"`, key tokens are `KeyboardEvent.code` names: letters and digits are converted automatically (`a` becomes `KeyA`, `1` becomes `Digit1`), while other keys are written as their code, such as `comma`, `equal` and `arrowup`.
+- The `+` key is written as `plus`, and because `+` requires Shift on most layouts, bind it as `shift+plus`. With `eventField: "code"` use the physical name instead, such as `shift+equal`.
+- Keystrokes produced during an IME composition are ignored.
+- Sequences such as `g i` and scopes are not supported. Call the hook once per shortcut and use `enabled` to turn a group of shortcuts on and off together.
 
 ## Example
 
-The following example switches the layout when the viewport is narrower than 600px.
+The following example counts how many times the shortcut is pressed.
 
 ```tsx
-import { useMatchMedia } from "@lilib/hooks";
+import { useState } from "react";
+import { useHotkey } from "@lilib/hooks";
 
 function Example() {
-  const isNarrow = useMatchMedia("(max-width: 600px)");
+  const [count, setCount] = useState(0);
+
+  useHotkey(
+    "mod+a",
+    () => {
+      setCount((value) => value + 1);
+    },
+    { preventDefault: true },
+  );
 
   return (
-    <div style={{ display: "flex", flexDirection: isNarrow ? "column" : "row", gap: 8 }}>
-      <div style={{ flex: 1, padding: 16, backgroundColor: "rgba(255, 165, 0, 0.4)" }}>Sidebar</div>
-      <div style={{ flex: 2, padding: 16, backgroundColor: "rgba(0, 128, 255, 0.4)" }}>Content</div>
+    <>
+      Press <kbd>Ctrl</kbd> + <kbd>A</kbd> (or <kbd>⌘</kbd> + <kbd>A</kbd>) to count: {count}
+    </>
+  );
+}
+
+export default Example;
+```
+
+---
+
+# useKeyPressed
+
+Detect whether keys are currently held down. In a non-browser environment, it always returns `false`.
+
+## API
+
+```ts
+function useKeyPressed(
+  keys: string | string[],
+  options?: {
+    enabled?: boolean;
+    target?: EventTarget | React.RefObject<EventTarget | null>;
+    eventField?: "key" | "code";
+  },
+): boolean;
+```
+
+Parameters:
+
+- **`keys`:** A key token such as `"shift"`, `"space"` or `"a"`, or an array of tokens where any of them being held down reports `true`. A token is a `KeyboardEvent.key` value (or a `KeyboardEvent.code` name when `options.eventField` is `"code"`) and is case-insensitive; the aliases `esc`, `space`, `plus`, `up`, `down`, `left` and `right` are also accepted.
+- **`options`:** Options object.
+  - **`options.enabled`:** Whether to track the keys. Default is `true`.
+  - **`options.target`:** The event target that receives the `keydown` listener: an element, `window`, `document`, or a ref of them. Default is `document`.
+  - **`options.eventField`:** The `KeyboardEvent` field the key token is compared against: `"key"` (the produced character) or `"code"` (the physical key position). Default is `"key"`.
+
+Results:
+
+- Returns `true` if any of the keys is held down, otherwise `false`.
+
+## Notes
+
+- Modifiers are not part of the key token: pressing `k` with any modifier held down still reports `"k"` as pressed. Modifier keys themselves are ordinary keys (`"control"`, `"shift"`, `"alt"`, `"meta"`); `mod` is not supported, use `useHotkey` for shortcuts.
+- Releases are tracked on the document, so a key released after the focus left `target` is still reported as released.
+- The state is reset when the window loses focus or the page becomes hidden, because no `keyup` is delivered then. A repeatable key that is still held down reports `true` again on its next auto-repeat event; keys without auto-repeat, such as `"shift"`, stay `false` until they are pressed again.
+- Unlike `useHotkey`, typing in an editable element is not filtered.
+- Keystrokes produced during an IME composition are ignored.
+- With `eventField: "key"`, a `keyup` may report a different key when a modifier or the layout changed while the key was held (for example `Option` + `C` on macOS); use `eventField: "code"` for layout-independent input.
+- With `eventField: "code"`, tokens are compared with `KeyboardEvent.code`, so logical names that differ from the physical name never match: use the physical names instead, such as `"equal"` or `"shiftleft"`.
+- A key that is already held down when the hook starts tracking reports `false` until its next event.
+
+## Example
+
+The following example highlights the box while Shift is held down.
+
+```tsx
+import { useKeyPressed } from "@lilib/hooks";
+
+function Example() {
+  const shiftPressed = useKeyPressed("shift");
+
+  return (
+    <div
+      style={{
+        padding: 8,
+        borderRadius: 4,
+        transition: "all 150ms",
+        transform: shiftPressed ? "scale(1.1)" : "none",
+        backgroundColor: shiftPressed ? "#d4edda" : "#f8f9fa",
+      }}
+    >
+      {shiftPressed ? "Shift is held down" : "Hold Shift"}
     </div>
+  );
+}
+
+export default Example;
+```
+
+---
+
+# useClickOutside
+
+Trigger a callback when a click happens outside the target area.
+
+## API
+
+```ts
+function useClickOutside<E extends Event = Event>(
+  target: Node | React.RefObject<Node | null> | (Node | React.RefObject<Node | null>)[],
+  listener: (event: E) => void,
+  options?: {
+    container?: Element | React.RefObject<Element | null>;
+    eventName?: string | string[];
+  },
+): void;
+```
+
+Parameters:
+
+- **`target`:** The target area: a single element or element ref, or an array of them. The listener fires when a click happens outside all of these targets. It only fires when at least one target element is valid; all-invalid targets are treated as not ready.
+- **`listener`:** The callback invoked when a click happens outside the target area.
+- **`options`:** Options object.
+  - **`options.container`:** The element (or its ref) that receives the event listener. Default is `document`.
+  - **`options.eventName`:** Event name or names. Default is `"mousedown"`.
+
+## Notes
+
+- The default event is `mousedown`, not `click`: interactions that only produce a `click` event will not trigger the listener. Pass `eventName: ["mousedown", "click"]` if needed.
+- Taps on touch devices do not always produce a `mousedown` event; add `"touchstart"` or `"pointerdown"` to `eventName` to support them.
+- The `container` option receives the event listener, so it must be an ancestor of the click source for the event to bubble to it.
+
+## Example
+
+The following example counts clicks outside the button (typical for closing dropdowns).
+
+```tsx
+import { useRef, useState } from "react";
+import { useClickOutside } from "@lilib/hooks";
+
+function Example() {
+  const buttonRef = useRef(null);
+  const [count, setCount] = useState(0);
+
+  useClickOutside(buttonRef, () => {
+    setCount(count + 1);
+  });
+
+  return (
+    <>
+      <button ref={buttonRef}>Click outside</button> Count: {count}
+    </>
+  );
+}
+
+export default Example;
+```
+
+---
+
+# useEventListener
+
+Set up an event listener on the target.
+
+## API
+
+```ts
+function useEventListener<T extends EventTarget = EventTarget, E extends Event = Event>(
+  target: T | React.RefObject<T | null>,
+  eventName: string,
+  listener: (event: E) => void,
+  options?: boolean | { capture?: boolean; once?: boolean; passive?: boolean },
+): void;
+```
+
+Parameters:
+
+- **`target`:** An event target, or a ref object that references an event target (or `null`).
+- **`eventName`:** Event name.
+- **`listener`:** Listener function.
+- **`options`:** Similar to the third parameter of the [`addEventListener`](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener) function, but only the `capture`, `once` and `passive` options are used.
+
+## Notes
+
+- When `target` is a ref, the listener is attached when the referenced node appears and re-attached when it changes; nothing happens while it is `null`.
+- The `listener` is always the latest render's function, so it never reads stale closures.
+
+## Example
+
+The following example counts clicks on a button.
+
+```tsx
+import { useRef, useState } from "react";
+import { useEventListener } from "@lilib/hooks";
+
+function Example() {
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const [count, setCount] = useState(0);
+
+  useEventListener(buttonRef, "click", () => {
+    setCount((count) => count + 1);
+  });
+
+  return (
+    <>
+      <button ref={buttonRef}>Click</button> Count: {count}
+    </>
   );
 }
 
@@ -4824,120 +5110,6 @@ function Example() {
         {intersecting ? "Complete intersection" : "Incomplete intersection"}
       </div>
     </div>
-  );
-}
-
-export default Example;
-```
-
----
-
-# useClickOutside
-
-Trigger a callback when a click happens outside the target area.
-
-## API
-
-```ts
-function useClickOutside<E extends Event = Event>(
-  target: Node | React.RefObject<Node | null> | (Node | React.RefObject<Node | null>)[],
-  listener: (event: E) => void,
-  options?: {
-    container?: Element | React.RefObject<Element | null>;
-    eventName?: string | string[];
-  },
-): void;
-```
-
-Parameters:
-
-- **`target`:** The target area: a single element or element ref, or an array of them. The listener fires when a click happens outside all of these targets. It only fires when at least one target element is valid; all-invalid targets are treated as not ready.
-- **`listener`:** The callback invoked when a click happens outside the target area.
-- **`options`:** Options object.
-  - **`options.container`:** The element (or its ref) that receives the event listener. Default is `document`.
-  - **`options.eventName`:** Event name or names. Default is `"mousedown"`.
-
-## Notes
-
-- The default event is `mousedown`, not `click`: interactions that only produce a `click` event will not trigger the listener. Pass `eventName: ["mousedown", "click"]` if needed.
-- Taps on touch devices do not always produce a `mousedown` event; add `"touchstart"` or `"pointerdown"` to `eventName` to support them.
-- The `container` option receives the event listener, so it must be an ancestor of the click source for the event to bubble to it.
-
-## Example
-
-The following example counts clicks outside the button (typical for closing dropdowns).
-
-```tsx
-import { useRef, useState } from "react";
-import { useClickOutside } from "@lilib/hooks";
-
-function Example() {
-  const buttonRef = useRef(null);
-  const [count, setCount] = useState(0);
-
-  useClickOutside(buttonRef, () => {
-    setCount(count + 1);
-  });
-
-  return (
-    <>
-      <button ref={buttonRef}>Click outside</button> Count: {count}
-    </>
-  );
-}
-
-export default Example;
-```
-
----
-
-# useEventListener
-
-Set up an event listener on the target.
-
-## API
-
-```ts
-function useEventListener<T extends EventTarget = EventTarget, E extends Event = Event>(
-  target: T | React.RefObject<T | null>,
-  eventName: string,
-  listener: (event: E) => void,
-  options?: boolean | { capture?: boolean; once?: boolean; passive?: boolean },
-): void;
-```
-
-Parameters:
-
-- **`target`:** An event target, or a ref object that references an event target (or `null`).
-- **`eventName`:** Event name.
-- **`listener`:** Listener function.
-- **`options`:** Similar to the third parameter of the [`addEventListener`](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener) function, but only the `capture`, `once` and `passive` options are used.
-
-## Notes
-
-- When `target` is a ref, the listener is attached when the referenced node appears and re-attached when it changes; nothing happens while it is `null`.
-- The `listener` is always the latest render's function, so it never reads stale closures.
-
-## Example
-
-The following example counts clicks on a button.
-
-```tsx
-import { useRef, useState } from "react";
-import { useEventListener } from "@lilib/hooks";
-
-function Example() {
-  const buttonRef = useRef<HTMLButtonElement>(null);
-  const [count, setCount] = useState(0);
-
-  useEventListener(buttonRef, "click", () => {
-    setCount((count) => count + 1);
-  });
-
-  return (
-    <>
-      <button ref={buttonRef}>Click</button> Count: {count}
-    </>
   );
 }
 
