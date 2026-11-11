@@ -25,6 +25,7 @@ import {
   useIntersectionObserver,
   useInterval,
   useIsomorphicLayoutEffect,
+  useKeyPressed,
   useLatestRef,
   useLayoutMount,
   useLayoutRefEffect,
@@ -123,6 +124,7 @@ function AllHooks() {
   usePageVisible();
   useWindowFocus();
   useHotkey("mod+k", () => {});
+  useKeyPressed(["shift", "space"]);
   useClickOutside(nodeRef, () => {});
   useEventListener(eventTargetRef, "click", () => {});
   useWindowSize();
@@ -150,6 +152,7 @@ function BrowserValueHooks() {
   const { width, height } = useWindowSize();
   const darkMode = useDarkMode();
   const matches = useMatchMedia("(prefers-color-scheme: dark)");
+  const keyPressed = useKeyPressed("shift");
   const [cookie] = useCookie("missing");
   const [local] = useLocalStorage("missing");
   const [session] = useSessionStorage("missing");
@@ -165,6 +168,7 @@ function BrowserValueHooks() {
       height,
       darkMode,
       matches,
+      keyPressed,
       cookie,
       local,
       session,
@@ -204,6 +208,7 @@ describe("SSR", () => {
       focused: false,
       darkMode: false,
       matches: false,
+      keyPressed: false,
     });
   });
 });

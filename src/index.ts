@@ -53,6 +53,7 @@ export { default as useMatchMedia } from "./useMatchMedia";
 export { default as usePageVisible } from "./usePageVisible";
 export { default as useWindowFocus } from "./useWindowFocus";
 export { default as useHotkey } from "./useHotkey";
+export { default as useKeyPressed } from "./useKeyPressed";
 export { default as useClickOutside } from "./useClickOutside";
 export { default as useEventListener } from "./useEventListener";
 export { default as useWindowSize } from "./useWindowSize";

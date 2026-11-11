@@ -1,19 +1,17 @@
 import warning from "warning";
 
 import inBrowser from "./inBrowser";
+import matchesKeystroke from "./matchesKeystroke";
+import parseKeystroke, { type Keystroke } from "./parseKeystroke";
 
 type Modifier = "ctrl" | "alt" | "shift" | "meta" | "mod";
 
-interface ParsedHotkey {
+interface Hotkey extends Keystroke {
   ctrl: boolean;
   alt: boolean;
   shift: boolean;
   meta: boolean;
   mod: boolean;
-  /** The normalized logical key, compared with `KeyboardEvent.key`. */
-  key: string;
-  /** The normalized physical key, compared with `KeyboardEvent.code`. */
-  code: string;
 }
 
 const MODIFIER_ALIASES = new Map<string, Modifier>([
@@ -28,19 +26,8 @@ const MODIFIER_ALIASES = new Map<string, Modifier>([
   ["mod", "mod"],
 ]);
 
-// Aliases for the keys that are awkward to write in a hotkey string.
-const KEY_ALIASES = new Map<string, string>([
-  ["esc", "escape"],
-  ["space", " "],
-  ["plus", "+"],
-  ["up", "arrowup"],
-  ["down", "arrowdown"],
-  ["left", "arrowleft"],
-  ["right", "arrowright"],
-]);
-
-const PARSED_CACHE_LIMIT = 200;
-const parsedCache = new Map<string, ParsedHotkey | null>();
+const HOTKEY_CACHE_LIMIT = 200;
+const hotkeyCache = new Map<string, Hotkey | null>();
 
 /**
  * Detect whether `mod` stands for the Meta key (Apple platforms) or the Control key.
@@ -51,26 +38,8 @@ function isApplePlatform() {
   return inBrowser && /mac|iphone|ipad|ipod/i.test(navigator.userAgent);
 }
 
-/**
- * Convert a logical key to its `KeyboardEvent.code` value: letters and digits are
- * prefixed (`s` → `KeyS`), other keys are already spelled like their code (`escape`),
- * and physical names (`keya`, `digit1`, `equal`) are passed through unchanged.
- */
-function toCodeName(key: string) {
-  if (key === " ") {
-    return "space";
-  }
-  if (/^[a-z]$/.test(key)) {
-    return `key${key}`;
-  }
-  if (/^[0-9]$/.test(key)) {
-    return `digit${key}`;
-  }
-  return key;
-}
-
 function createHotkey(hotkey: string) {
-  const parsed: ParsedHotkey = {
+  const parsed: Hotkey = {
     ctrl: false,
     alt: false,
     shift: false,
@@ -79,28 +48,25 @@ function createHotkey(hotkey: string) {
     key: "",
     code: "",
   };
-  let keyToken = "";
+  let keystrokeToken = "";
 
   for (const token of hotkey.toLowerCase().split("+")) {
     const modifier = MODIFIER_ALIASES.get(token);
 
     if (modifier) {
       parsed[modifier] = true;
-    } else if (!token || keyToken) {
+    } else if (!token || keystrokeToken) {
       return null;
     } else {
-      keyToken = token;
+      keystrokeToken = token;
     }
   }
 
-  if (!keyToken) {
+  if (!keystrokeToken) {
     return null;
   }
 
-  parsed.key = KEY_ALIASES.get(keyToken) ?? keyToken;
-  parsed.code = toCodeName(parsed.key);
-
-  return parsed;
+  return Object.assign(parsed, parseKeystroke(keystrokeToken));
 }
 
 /**
@@ -112,7 +78,7 @@ function createHotkey(hotkey: string) {
  * @returns Returns the parsed hotkey, or `null` when the string is invalid.
  */
 export function parseHotkey(hotkey: string) {
-  if (!parsedCache.has(hotkey)) {
+  if (!hotkeyCache.has(hotkey)) {
     const parsed = createHotkey(hotkey);
 
     if (!parsed) {
@@ -124,14 +90,14 @@ export function parseHotkey(hotkey: string) {
     }
 
     // Hotkey strings are usually literals; the cap only guards against generated ones.
-    if (parsedCache.size >= PARSED_CACHE_LIMIT) {
-      parsedCache.clear();
+    if (hotkeyCache.size >= HOTKEY_CACHE_LIMIT) {
+      hotkeyCache.clear();
     }
 
-    parsedCache.set(hotkey, parsed);
+    hotkeyCache.set(hotkey, parsed);
   }
 
-  return parsedCache.get(hotkey) ?? null;
+  return hotkeyCache.get(hotkey) ?? null;
 }
 
 /**
@@ -149,11 +115,6 @@ export default function matchesHotkey(
   hotkey: string,
   eventField: "key" | "code" = "key",
 ) {
-  // Ignore keystrokes produced by an IME composition, such as typing Chinese.
-  if (event.isComposing || event.keyCode === 229) {
-    return false;
-  }
-
   const parsed = parseHotkey(hotkey);
 
   if (!parsed) {
@@ -174,7 +135,5 @@ export default function matchesHotkey(
     return false;
   }
 
-  return eventField === "code"
-    ? event.code.toLowerCase() === parsed.code
-    : event.key.toLowerCase() === parsed.key;
+  return matchesKeystroke(event, parsed, eventField);
 }

@@ -129,6 +129,7 @@ See the [documentation](https://lilibraries.github.io/hooks/) for the full API r
 | [`usePageVisible`](https://lilibraries.github.io/hooks/usePageVisible)                   | Detect whether the page is visible, including bfcache restores.                        |
 | [`useWindowFocus`](https://lilibraries.github.io/hooks/useWindowFocus)                   | Detect whether the window has focus.                                                   |
 | [`useHotkey`](https://lilibraries.github.io/hooks/useHotkey)                             | Bind a keyboard shortcut to a callback.                                                |
+| [`useKeyPressed`](https://lilibraries.github.io/hooks/useKeyPressed)                     | Detect whether a key is currently held down.                                           |
 | [`useClickOutside`](https://lilibraries.github.io/hooks/useClickOutside)                 | Trigger a callback when clicking outside the target area.                              |
 | [`useEventListener`](https://lilibraries.github.io/hooks/useEventListener)               | Set up an event listener on the target.                                                |
 | [`useWindowSize`](https://lilibraries.github.io/hooks/useWindowSize)                     | Get the window size.                                                                   |

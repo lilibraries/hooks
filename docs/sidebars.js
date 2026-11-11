@@ -81,6 +81,7 @@ module.exports = {
         "usePageVisible",
         "useWindowFocus",
         "useHotkey",
+        "useKeyPressed",
         "useClickOutside",
         "useEventListener",
         "useWindowSize",
