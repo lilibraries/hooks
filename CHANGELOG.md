@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.2.0](https://github.com/lilibraries/hooks/compare/v2.1.0...v2.2.0) (2026-11-11)
+
+### Features
+
+* add `useHotkey` hook for keyboard shortcuts ([2d07fec](https://github.com/lilibraries/hooks/commit/2d07feca0248eee661013767367c9cd6e22baae8))
+* add `useKeyPressed` hook for tracking held keys ([ee58483](https://github.com/lilibraries/hooks/commit/ee58483a81b5d5c8311c9a70398f1e4b999ec758))
+
 ## [2.1.0](https://github.com/lilibraries/hooks/compare/v2.0.1...v2.1.0) (2026-11-09)
 
 ### Features
