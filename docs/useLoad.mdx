@@ -114,6 +114,16 @@ A [`useReload`](./useReload) call reloads all associated instances at once.
 ```ts
 type LoadCallback = (...args: any[]) => Promise<any>;
 
+interface CacheLike<K = any, V = any> {
+  get(key: K): V | undefined;
+  /** `options.ttl` is the time to live in milliseconds, where `0` means "never expires". */
+  set(key: K, value: V, options?: { ttl?: number }): void;
+  has(key: K): boolean;
+  delete(key: K): void;
+  peek(key: K, options?: { allowStale?: boolean }): V | undefined;
+  getRemainingTTL(key: K): number;
+}
+
 interface UseLoadOptions<Callback extends LoadCallback> {
   key?: NonNullable<unknown>;
 
@@ -125,7 +135,7 @@ interface UseLoadOptions<Callback extends LoadCallback> {
   initialData?: Awaited<ReturnType<Callback>>;
   defaultParams?: Parameters<Callback>;
 
-  cache?: LRUCache<any, any>;
+  cache?: CacheLike;
   cacheKey?: NonNullable<unknown>;
   cacheTime?: number;
   staleTime?: number;
@@ -196,7 +206,7 @@ Parameters:
     - **`options.key`:** A shared key that can be any data type except `null` and `undefined`, and must be immutable. When multiple instances use the same key, only the first one sends the request, and the others wait for and reuse its result. Set the `independent` option to `true` to disable this behavior. Another use of the `key` option is reloading all associated requests together with the [`useReload`](./useReload) hook.
     - **`options.independent`:** When `true`, duplicate requests are not merged even if `key` is set: each instance fires its own request, but `useReload(key)` can still reload it.
   - **Caching:**
-    - **`options.cache`:** Cache instance. Create it with `new LRUCache({ max, ttl, ... })` from [`lru-cache`](https://github.com/isaacs/node-lru-cache). If not specified, a shared internal instance (the same one used by [`useCache`](./useCache)) is used. Pass the same instance to `useCache` to let the two hooks share data.
+    - **`options.cache`:** Cache instance. Any object implementing the `CacheLike` shape is accepted, e.g. an `LRUCache` created with `new LRUCache({ max, ttl, ... })` from [`lru-cache`](https://github.com/isaacs/node-lru-cache); the shape's contracts are described in the [`useCache` notes](./useCache#notes). If not specified, a shared internal instance (the same one used by [`useCache`](./useCache)) is used. Pass the same instance to `useCache` to let the two hooks share data.
     - **`options.cacheKey`:** Cache key to enable caching. It can be any type except `null` and `undefined`, and must be immutable. The resolved data is written to the cache, and the initial `data` is read back from it on mount.
     - **`options.cacheTime`:** Cache time, in milliseconds. Default is 5 minutes. Set `Infinity` for a permanent cache. A `NaN` value falls back to the default.
     - **`options.staleTime`:** Stale time, in milliseconds. Default is `0`. It must be used with `cacheKey`. Within the `staleTime` period after a cache write, the data is considered fresh: calling `load(...params)`, `reload()` or automatic reloads resolves the cached data directly without sending a request. You can bypass the `staleTime` option by calling `force(...params)` or `reload({ force: true })`. Note: the reader and the writer of the same `cacheKey` should use a consistent `cacheTime`, since freshness is derived from the entry's remaining TTL.

@@ -42,6 +42,55 @@ describe("useCache", () => {
     expect(result1.current[0]).toBe("value");
   });
 
+  it("accepts any cache matching the CacheLike shape", () => {
+    // `useCache` only relies on the structural shape, so a non-`LRUCache`
+    // implementation must work as long as it keeps the documented contracts.
+    class SimpleCache {
+      private data = new Map<any, any>();
+
+      get(key: any) {
+        return this.data.get(key);
+      }
+
+      set(key: any, value: any) {
+        this.data.set(key, value);
+      }
+
+      has(key: any) {
+        return this.data.has(key);
+      }
+
+      delete(key: any) {
+        this.data.delete(key);
+      }
+
+      peek(key: any) {
+        return this.data.get(key);
+      }
+
+      getRemainingTTL(key: any) {
+        return this.data.has(key) ? Infinity : 0;
+      }
+    }
+
+    const cache = new SimpleCache();
+    const key = Symbol();
+    const { result: writer } = renderHook(() => useCache(key, { cache, cacheTime: Infinity }));
+
+    act(() => {
+      writer.current[1]("value");
+    });
+    expect(cache.peek(key)).toBe("value");
+
+    const { result: reader } = renderHook(() => useCache(key, { cache, cacheSync: true }));
+    expect(reader.current[0]).toBe("value");
+
+    act(() => {
+      writer.current[1](undefined);
+    });
+    expect(cache.has(key)).toBe(false);
+  });
+
   it("shares the default cache instance between hooks", () => {
     const key = Symbol();
     const { result: result0 } = renderHook(() => useCache(key));

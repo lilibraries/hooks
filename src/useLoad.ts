@@ -4,9 +4,8 @@ import { useDebugValue, useEffect, useRef, type DependencyList } from "react";
 
 import isFunction from "lodash/isFunction";
 import isObject from "lodash/isObject";
-import type { LRUCache } from "lru-cache";
 
-import { getDefaultCache } from "./utils/cache";
+import { getDefaultCache, type CacheLike } from "./utils/cache";
 import getLoadStore from "./utils/getLoadStore";
 import useLatestRef from "./useLatestRef";
 import useMountedRef from "./useMountedRef";
@@ -38,8 +37,8 @@ interface UseLoadOptions<Callback extends LoadCallback> {
   initialData?: Awaited<ReturnType<Callback>>;
   /** Default params. Used by the first load or by `reload` when no params have been passed via `load(...params)` yet. */
   defaultParams?: Parameters<Callback>;
-  /** Cache instance. If not specified, the shared internal instance (the same one used by `useCache`) is used. */
-  cache?: LRUCache<any, any>;
+  /** Cache instance. Any object implementing the `CacheLike` shape (e.g. an `LRUCache`) is accepted. If not specified, the shared internal instance (the same one used by `useCache`) is used. */
+  cache?: CacheLike;
   /** Cache key to enable caching. The resolved data is written to the cache, and on mount the initial `data` is read back from it. Must be an immutable value. */
   cacheKey?: NonNullable<unknown>;
   /** Cache time in milliseconds, defaults to 5 minutes. Set `Infinity` for a permanent cache. */

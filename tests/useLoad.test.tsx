@@ -1048,6 +1048,29 @@ describe("useLoad", () => {
     unmount();
   });
 
+  it("accepts any cache matching the CacheLike shape", async () => {
+    // `useLoad` only relies on the structural shape: the per-entry TTL is the
+    // only thing it expects from `set` beyond the value itself.
+    const cache = {
+      get: jest.fn(() => undefined),
+      set: jest.fn(),
+      has: jest.fn(() => false),
+      delete: jest.fn(),
+      peek: jest.fn(() => undefined),
+      getRemainingTTL: jest.fn(() => Infinity),
+    };
+    const cacheKey = Symbol("cache-key");
+    const callback = jest.fn(async () => "loaded");
+    const { result, unmount } = renderHook(() =>
+      useLoad(callback, [], { cache, cacheKey, cacheTime: 60000 }),
+    );
+
+    await waitFor(() => expect(result.current.data).toBe("loaded"));
+    expect(cache.set).toHaveBeenCalledWith(cacheKey, "loaded", { ttl: 60000 });
+
+    unmount();
+  });
+
   it("reads cached data on mount and writes loaded data to the cache", async () => {
     const cacheKey = Symbol("cache-key");
     getDefaultCache().set(cacheKey, "cached", { ttl: Infinity });

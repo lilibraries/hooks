@@ -1,17 +1,16 @@
 import { useDebugValue, useEffect } from "react";
-import { LRUCache } from "lru-cache";
 
 import useUpdate from "./useUpdate";
 import usePersist from "./usePersist";
 import useSafeState from "./useSafeState";
-import { getCacheEmitter, getDefaultCache } from "./utils/cache";
+import { getCacheEmitter, getDefaultCache, type CacheLike } from "./utils/cache";
 import warn from "./utils/warn";
 
 interface CacheHookOptions<T> {
   /** Default value when the cache value does not exist. */
   defaultValue?: T;
-  /** Cache instance. If not specified, a shared internal instance is used. */
-  cache?: LRUCache<any, any>;
+  /** Cache instance. Any object implementing the `CacheLike` shape (e.g. an `LRUCache`) is accepted. If not specified, a shared internal instance is used. */
+  cache?: CacheLike;
   /** Cache time in milliseconds. Default is 5 minutes. Set `Infinity` for a permanent cache. */
   cacheTime?: number;
   /** Synchronize data between components on set and/or delete. Default is `false`. */
@@ -28,9 +27,10 @@ const DEFAULT_CACHE_TIME = 5 * 60 * 1000;
 
 /**
  * Cache data for a certain period of time, and synchronize data in different
- * components sharing the same `LRUCache` instance. Pass a cache instance
- * created with [`lru-cache`](https://github.com/isaacs/node-lru-cache) via
- * `options.cache`, otherwise a shared internal instance is used.
+ * components sharing the same cache instance. Pass an `LRUCache` from
+ * [`lru-cache`](https://github.com/isaacs/node-lru-cache), or any other
+ * object implementing the `CacheLike` shape, via `options.cache`, otherwise a
+ * shared internal instance is used.
  *
  * @param key Cache key. Any value except `null` and `undefined`.
  * @param options Options object.

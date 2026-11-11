@@ -14,14 +14,24 @@ import IndexedDBExampleCode from "!!raw-loader!./examples/UseCacheIndexedDB";
 import StorageCacheCode from "!!raw-loader!./examples/StorageCache";
 import IndexedDBCacheCode from "!!raw-loader!./examples/IndexedDBCache";
 
-Cache data for a certain period of time, and synchronize data between components sharing the same [`LRUCache`](https://github.com/isaacs/node-lru-cache) instance. Pass a cache instance via `options.cache`, otherwise a shared internal instance is used.
+Cache data for a certain period of time, and synchronize data between components sharing the same cache instance. Pass a cache instance via `options.cache` (an [`LRUCache`](https://github.com/isaacs/node-lru-cache) or any object implementing the `CacheLike` shape), otherwise a shared internal instance is used.
 
 ## API
 
 ```ts
+interface CacheLike<K = any, V = any> {
+  get(key: K): V | undefined;
+  /** `options.ttl` is the time to live in milliseconds, where `0` means "never expires". */
+  set(key: K, value: V, options?: { ttl?: number }): void;
+  has(key: K): boolean;
+  delete(key: K): void;
+  peek(key: K, options?: { allowStale?: boolean }): V | undefined;
+  getRemainingTTL(key: K): number;
+}
+
 interface UseCacheOptions<T> {
   defaultValue?: T;
-  cache?: LRUCache<any, any>;
+  cache?: CacheLike;
   cacheTime?: number;
   cacheSync?: boolean | { set?: boolean; delete?: boolean };
   validate?: (value: any) => boolean;
@@ -45,7 +55,7 @@ Parameters:
 - **`key`:** Cache key. Any value except `null` and `undefined`.
 - **`options`:** Options object.
   - **`options.defaultValue`:** Default value when the cache value does not exist. When set, the returned `value` type no longer includes `undefined`.
-  - **`options.cache`:** Cache instance. Create it with `new LRUCache({ max, ttl, ... })` from [`lru-cache`](https://github.com/isaacs/node-lru-cache). If not specified, a shared internal instance is used.
+  - **`options.cache`:** Cache instance. Any object implementing the `CacheLike` shape is accepted, e.g. an `LRUCache` created with `new LRUCache({ max, ttl, ... })` from [`lru-cache`](https://github.com/isaacs/node-lru-cache). If not specified, a shared internal instance is used.
   - **`options.cacheTime`:** Cache time, in milliseconds. Default is 5 minutes. The TTL is set per entry, so it works regardless of the `ttl` option of the cache instance. You can set a permanent cache by setting this option to `Infinity` (mapped to `ttl: 0`, so no expiry timer is registered). Non-positive values are normalized to 1 ms, so the entry expires on the next read. A `NaN` value falls back to the default.
   - **`options.cacheSync`:** Whether to synchronize data between components on set and/or delete events. Default is `false`. It can be an object to enable synchronization for each event separately.
     - **`options.cacheSync.set`:** Synchronize data on set cache.
@@ -62,7 +72,8 @@ Results:
 ## Notes
 
 - **Important**: `key` must be an immutable value: changing it triggers a warning and may corrupt shared state.
-- The default cache is a shared internal instance, so keys are global across the whole app. Pass your own `LRUCache` instance to isolate groups of components.
+- The default cache is a shared internal instance, so keys are global across the whole app. Pass your own cache instance (such as an `LRUCache`) to isolate groups of components.
+- The passed instance is only used through the `CacheLike` shape, so a custom implementation is fine as long as it keeps these contracts: `set` applies `options.ttl` in milliseconds, where `0` means "never expires"; `peek` is a pure read during render (it must not update the recency or lifetime of an entry) and returns expired entries only when `options.allowStale` is `true`; `has` reports expired entries as missing; `getRemainingTTL` returns a value `<= 0` for a missing or expired entry and `Infinity` for an entry that never expires.
 - `cacheSync` only synchronizes components that share the same cache instance.
 - [`LRUCache`](https://github.com/isaacs/node-lru-cache) expires entries lazily: expired entries are only removed and notified when they are read, so an expired cache may still occupy memory until the next read. The shared internal cache enables `ttlAutopurge` to purge expired entries in the background; enable it on your own cache instance if needed.
 
