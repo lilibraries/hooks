@@ -2,9 +2,6 @@
   "git": {
     "commitMessage": "chore(release): ${version}"
   },
-  "hooks": {
-    "after:release": ["node -e \"console.log('Successfully released ${name}@${version}.')\""]
-  },
   "plugins": {
     "@release-it/conventional-changelog": {
       "preset": "conventionalcommits",
