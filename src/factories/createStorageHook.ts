@@ -13,7 +13,7 @@ import useSafeState from "../useSafeState";
 import useUpdate from "../useUpdate";
 import inBrowser from "../utils/inBrowser";
 
-export interface UseStorageOptions<T> {
+interface UseStorageOptions<T> {
   defaultValue?: T;
   polling?: boolean;
   pollingInterval?: number;

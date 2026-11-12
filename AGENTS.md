@@ -26,6 +26,7 @@ Every hook must support React 16.8+ / 17 / 18 / 19, as well as SSR and StrictMod
 - One hook per file; return tuples/objects with `as const`.
 - lodash must be imported via subpaths (`lodash/isEqual`); importing the whole package is forbidden.
 - Published code may only import from within `src/` (the published package contains only `src` and `dist`).
+- Keep the export surface minimal: export something only when `src/index.ts` re-exports it or another module in `src/` imports it. Types used by a single module stay unexported — the package entry exposes hooks only and `package.json` `exports` blocks deep paths, so an unimported type export is unreachable API surface.
 - Docs and comments are written in English by default and must follow English writing conventions; when authoring docs for a specific language, write in that language with its corresponding conventions.
 - Hook docs must only include necessary notes: a `## Notes` section is optional and limited to non-obvious, hook-specific behavior (defaults, caveats, performance); never restate behavior already documented by the native API or describe obvious implementation details.
 - Every hook must have reasonable and accurate JSDoc comments describing its purpose, parameters, and return values (`@param`, `@returns`) — explain what the hook does, what each parameter means, and what each returned value represents.

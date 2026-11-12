@@ -8,7 +8,7 @@ import matchesHotkey, { parseHotkey } from "./utils/matchesHotkey";
 import unref from "./utils/unref";
 import warn from "./utils/warn";
 
-export interface UseHotkeyOptions {
+interface UseHotkeyOptions {
   /** Whether the hotkey is active. Defaults to `true`. */
   enabled?: boolean;
   /**

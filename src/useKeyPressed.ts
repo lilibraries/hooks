@@ -12,7 +12,7 @@ import parseKeystroke from "./utils/parseKeystroke";
 import unref from "./utils/unref";
 import warn from "./utils/warn";
 
-export interface UseKeyPressedOptions {
+interface UseKeyPressedOptions {
   /** Whether to track the key. Defaults to `true`. */
   enabled?: boolean;
   /**
