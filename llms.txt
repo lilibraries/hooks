@@ -75,6 +75,8 @@
 - [useKeyPressed](https://lilibraries.github.io/hooks/useKeyPressed.md): Detect whether a key is currently held down.
 - [useClickOutside](https://lilibraries.github.io/hooks/useClickOutside.md): Trigger a callback when a click happens outside the target area.
 - [useEventListener](https://lilibraries.github.io/hooks/useEventListener.md): Attach an event listener to a target and clean it up automatically.
+- [useScroll](https://lilibraries.github.io/hooks/useScroll.md): Track the scroll position, direction, and progress of the page or an element.
+- [useScrollLock](https://lilibraries.github.io/hooks/useScrollLock.md): Lock scrolling of a container, the page by default.
 - [useWindowSize](https://lilibraries.github.io/hooks/useWindowSize.md): Get the window size and update on resize.
 - [useElementSize](https://lilibraries.github.io/hooks/useElementSize.md): Observe the size of a DOM element.
 - [useIntersecting](https://lilibraries.github.io/hooks/useIntersecting.md): Detect whether an element intersects the viewport or a given root element.

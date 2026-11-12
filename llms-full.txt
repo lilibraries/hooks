@@ -130,6 +130,8 @@ For the full API reference and live examples, check out the docs of each hook li
 | [`useKeyPressed`](useKeyPressed.md)                     | Detect whether a key is currently held down.                                           |
 | [`useClickOutside`](useClickOutside.md)                 | Trigger a callback when clicking outside the target area.                              |
 | [`useEventListener`](useEventListener.md)               | Set up an event listener on the target.                                                |
+| [`useScroll`](useScroll.md)                             | Track the scroll position, direction, and progress of the page or an element.          |
+| [`useScrollLock`](useScrollLock.md)                     | Lock scrolling of the page or an element.                                              |
 | [`useWindowSize`](useWindowSize.md)                     | Get the window size.                                                                   |
 | [`useElementSize`](useElementSize.md)                   | Get the size of a DOM element.                                                         |
 | [`useIntersecting`](useIntersecting.md)                 | Detect whether an element intersects the viewport or a specified root.                 |
@@ -4923,6 +4925,318 @@ function Example() {
     <>
       <button ref={buttonRef}>Click</button> Count: {count}
     </>
+  );
+}
+
+export default Example;
+```
+
+---
+
+# useScroll
+
+Track the scroll position, direction, and progress of the page or an element. This hook only reads scroll state; use native `Element.scrollTo`/`Element.scrollBy` or `window.scrollTo` to scroll.
+
+## API
+
+```ts
+function useScroll(options?: { target?: Element | React.RefObject<Element | null> | null }): {
+  x: number;
+  y: number;
+  directionX: "left" | "right" | undefined;
+  directionY: "up" | "down" | undefined;
+  progressX: number;
+  progressY: number;
+};
+```
+
+Parameters:
+
+- **`options`:** Options object.
+  - **`options.target`:** The element (or its ref) whose scrolling is tracked. Defaults to the page scroll container; pass `null` to track nothing. A ref is read when the effect runs, so an element assigned after the first render is tracked on the next one.
+
+Results:
+
+- **`x`:** Horizontal scroll offset. It keeps the native `scrollLeft` sign, so it is negative in right-to-left layouts.
+- **`y`:** Vertical scroll offset.
+- **`directionX`:** The last horizontal movement direction; `right` when `x` increases and `left` when it decreases.
+- **`directionY`:** The last vertical movement direction; `down` when `y` increases and `up` when it decreases.
+- **`progressX`:** Horizontal scroll progress from the inline start to the inline end, from `0` to `1`.
+- **`progressY`:** Vertical scroll progress from the top to the bottom, from `0` to `1`.
+
+## Notes
+
+- `x` and `y` are clamped to their scrollable ranges, so rubber-band overscroll does not produce out-of-range values or direction jitter. `x` keeps the native sign, so it is negative in RTL.
+- `directionX` and `directionY` change only on scroll events, including programmatic scrolling. They stay unchanged when scrolling stops; while the axis remains scrollable, resize, content reflow, and bfcache restoration do not flip them. They are `undefined` before the first movement, after the target changes, or when that axis is not scrollable.
+- `progressX` accounts for right-to-left layouts; `progressY` does not need to. Both are `0` when their axis is not scrollable.
+- Omit `target` to track the page; `target: null` disables tracking.
+- Updates are coalesced with `requestAnimationFrame`, so there is at most one render per frame. The hook also refreshes on window or target resize and on `pageshow`; content that grows while the target is idle is reflected on the next scroll or resize.
+- Returns zeros and `undefined` directions outside the browser.
+
+## Examples
+
+### Track the page
+
+The following example shows the page reading progress and uses native `window.scrollTo` to return to the top.
+
+```tsx
+import { useScroll } from "@lilib/hooks";
+
+function Example() {
+  const { progressY, directionY } = useScroll();
+
+  return (
+    <>
+      <div
+        style={{
+          position: "sticky",
+          top: 0,
+          zIndex: 1,
+          height: 8,
+          backgroundColor: "rgba(128, 128, 128, 0.2)",
+        }}
+      >
+        <div
+          style={{
+            width: `${progressY * 100}%`,
+            height: "100%",
+            backgroundColor: "orange",
+          }}
+        />
+      </div>
+      <div style={{ display: "flex", gap: 8, alignItems: "center", marginTop: 8 }}>
+        <button onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>Back to top</button>
+        <span>
+          Progress: {Math.round(progressY * 100)}%; direction: {directionY || "none"}
+        </span>
+      </div>
+      <p>Scroll the page to see the progress bar and direction update.</p>
+    </>
+  );
+}
+
+export default Example;
+```
+
+### Track an element
+
+The following example tracks a two-dimensional scroll container; its buttons use the element's native `scrollTo` and `scrollBy`.
+
+```tsx
+import { useRef } from "react";
+import { useScroll } from "@lilib/hooks";
+
+function Example() {
+  const ref = useRef<HTMLDivElement>(null);
+  const { x, y, directionX, directionY, progressX, progressY } = useScroll({ target: ref });
+
+  return (
+    <>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 8 }}>
+        <button onClick={() => ref.current?.scrollTo({ left: 0, top: 0, behavior: "smooth" })}>
+          Reset
+        </button>
+        <button onClick={() => ref.current?.scrollBy({ left: 120, behavior: "smooth" })}>
+          Scroll right
+        </button>
+        <button onClick={() => ref.current?.scrollBy({ top: 120, behavior: "smooth" })}>
+          Scroll down
+        </button>
+      </div>
+      <div
+        ref={ref}
+        style={{
+          width: 320,
+          height: 180,
+          overflow: "auto",
+          border: "1px solid rgba(128, 128, 128, 0.3)",
+        }}
+      >
+        <div
+          style={{
+            width: 900,
+            height: 600,
+            padding: 16,
+            background: "linear-gradient(135deg, rgba(255, 165, 0, 0.08), rgba(0, 128, 255, 0.08))",
+          }}
+        >
+          Scroll this box horizontally and vertically.
+        </div>
+      </div>
+      <div style={{ marginTop: 8, fontSize: 14 }}>
+        x: {Math.round(x)}, y: {Math.round(y)}, directionX: {directionX || "none"}, directionY:{" "}
+        {directionY || "none"}, progressX: {Math.round(progressX * 100)}%, progressY:{" "}
+        {Math.round(progressY * 100)}%
+      </div>
+    </>
+  );
+}
+
+export default Example;
+```
+
+---
+
+# useScrollLock
+
+Lock scrolling of a container while it is enabled, and restore the previous styles when the lock is released.
+
+## API
+
+```ts
+function useScrollLock(options?: {
+  target?: Element | React.RefObject<Element | null> | null;
+  enabled?: boolean;
+}): void;
+```
+
+Parameters:
+
+- **`options`:** Options object.
+  - **`options.target`:** The element (or its ref) whose scrolling is locked. Defaults to the page scroll container (`document.scrollingElement`, falling back to `document.documentElement`); pass `null` to lock nothing. A ref is read when the effect runs, so an element assigned after the first render is locked on the next one.
+  - **`options.enabled`:** Whether the lock is active. Defaults to `true`.
+
+## Notes
+
+- Locks are reference counted per element, so overlapping modals and drawers keep it locked until the last one releases it.
+- The disappeared scrollbar's width is compensated on the target, so the layout does not shift; nothing is added for overlay scrollbars or `scrollbar-gutter: stable`.
+- Pass the element that actually scrolls the page as `target` when it is not the viewport, for example `#root { overflow: auto }`.
+- An `overflow` rule marked `!important` on the target overrides the lock.
+- On iOS Safari the page may still bounce while locked; this is the limit of the `overflow` approach.
+
+## Examples
+
+### Lock the page scroll
+
+The following example locks the page while the modal is open. Click the backdrop or the close button to dismiss it.
+
+```tsx
+import { useState } from "react";
+import { useScrollLock } from "@lilib/hooks";
+
+function Example() {
+  const [open, setOpen] = useState(false);
+  useScrollLock({ enabled: open });
+
+  return (
+    <>
+      <button onClick={() => setOpen(true)}>Open modal</button>
+      {open ? (
+        <div
+          onClick={(event) => {
+            if (event.target === event.currentTarget) {
+              setOpen(false);
+            }
+          }}
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 9999,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: 16,
+            background: "rgba(0, 0, 0, 0.5)",
+          }}
+        >
+          <div
+            style={{
+              width: "min(420px, 100%)",
+              padding: 24,
+              borderRadius: 8,
+              color: "#1b1b1d",
+              backgroundColor: "#ffffff",
+            }}
+          >
+            <h3 style={{ marginTop: 0 }}>Modal title</h3>
+            <p>The page behind this modal cannot be scrolled.</p>
+            <button onClick={() => setOpen(false)}>Close</button>
+          </div>
+        </div>
+      ) : null}
+    </>
+  );
+}
+
+export default Example;
+```
+
+### Lock the scroll of an element
+
+The following example locks the scroll of a container: open the drawer overlaying it, and the container no longer scrolls while the page around it does.
+
+```tsx
+import { useRef, useState } from "react";
+import { useScrollLock } from "@lilib/hooks";
+
+const rows = Array.from({ length: 8 }, (_, index) => `Row ${index + 1}`);
+
+function Example() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [open, setOpen] = useState(false);
+  useScrollLock({ target: containerRef, enabled: open });
+
+  return (
+    <div style={{ position: "relative", height: 220, overflow: "hidden", borderRadius: 8 }}>
+      <div
+        ref={containerRef}
+        style={{
+          height: "100%",
+          boxSizing: "border-box",
+          overflow: "auto",
+          border: "1px solid rgba(128, 128, 128, 0.25)",
+          borderRadius: 8,
+        }}
+      >
+        <div style={{ padding: 12, borderBottom: "1px solid rgba(128, 128, 128, 0.25)" }}>
+          <button onClick={() => setOpen(true)}>Open drawer</button>
+        </div>
+        {rows.map((row) => (
+          <div
+            key={row}
+            style={{
+              padding: "10px 16px",
+              borderBottom: "1px solid rgba(128, 128, 128, 0.15)",
+            }}
+          >
+            {row}
+          </div>
+        ))}
+      </div>
+
+      {open ? (
+        <>
+          <div
+            onClick={() => setOpen(false)}
+            style={{
+              position: "absolute",
+              inset: 0,
+              zIndex: 1,
+              background: "rgba(0, 0, 0, 0.35)",
+            }}
+          />
+          <div
+            style={{
+              position: "absolute",
+              top: 0,
+              right: 0,
+              bottom: 0,
+              zIndex: 2,
+              width: "min(220px, 100%)",
+              boxSizing: "border-box",
+              padding: 16,
+              color: "#1b1b1d",
+              backgroundColor: "#ffffff",
+              boxShadow: "-4px 0 12px rgba(0, 0, 0, 0.15)",
+            }}
+          >
+            <h4 style={{ marginTop: 0 }}>Drawer</h4>
+            <p>The container behind this drawer cannot be scrolled.</p>
+            <button onClick={() => setOpen(false)}>Close</button>
+          </div>
+        </>
+      ) : null}
+    </div>
   );
 }
 

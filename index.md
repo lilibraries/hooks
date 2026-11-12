@@ -124,6 +124,8 @@ For the full API reference and live examples, check out the docs of each hook li
 | [`useKeyPressed`](useKeyPressed.md)                     | Detect whether a key is currently held down.                                           |
 | [`useClickOutside`](useClickOutside.md)                 | Trigger a callback when clicking outside the target area.                              |
 | [`useEventListener`](useEventListener.md)               | Set up an event listener on the target.                                                |
+| [`useScroll`](useScroll.md)                             | Track the scroll position, direction, and progress of the page or an element.          |
+| [`useScrollLock`](useScrollLock.md)                     | Lock scrolling of the page or an element.                                              |
 | [`useWindowSize`](useWindowSize.md)                     | Get the window size.                                                                   |
 | [`useElementSize`](useElementSize.md)                   | Get the size of a DOM element.                                                         |
 | [`useIntersecting`](useIntersecting.md)                 | Detect whether an element intersects the viewport or a specified root.                 |
