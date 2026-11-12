@@ -1,0 +1,56 @@
+---
+title: useScrollLock
+description: Lock scrolling of a container, the page by default.
+---
+
+import CodeBlock from "@theme/CodeBlock";
+import ExampleBlock from "./components/ExampleBlock";
+import PageExample from "./examples/UseScrollLockPage";
+import PageExampleCode from "!!raw-loader!./examples/UseScrollLockPage";
+import ElementExample from "./examples/UseScrollLockElement";
+import ElementExampleCode from "!!raw-loader!./examples/UseScrollLockElement";
+
+Lock scrolling of a container while it is enabled, and restore the previous styles when the lock is released.
+
+## API
+
+```ts
+function useScrollLock(options?: {
+  target?: Element | React.RefObject<Element | null> | null;
+  enabled?: boolean;
+}): void;
+```
+
+Parameters:
+
+- **`options`:** Options object.
+  - **`options.target`:** The element (or its ref) whose scrolling is locked. Defaults to the page scroll container (`document.scrollingElement`, falling back to `document.documentElement`); pass `null` to lock nothing. A ref is read when the effect runs, so an element assigned after the first render is locked on the next one.
+  - **`options.enabled`:** Whether the lock is active. Defaults to `true`.
+
+## Notes
+
+- Locks are reference counted per element, so overlapping modals and drawers keep it locked until the last one releases it.
+- The disappeared scrollbar's width is compensated on the target, so the layout does not shift; nothing is added for overlay scrollbars or `scrollbar-gutter: stable`.
+- Pass the element that actually scrolls the page as `target` when it is not the viewport, for example `#root { overflow: auto }`.
+- An `overflow` rule marked `!important` on the target overrides the lock.
+- On iOS Safari the page may still bounce while locked; this is the limit of the `overflow` approach.
+
+## Examples
+
+### Lock the page scroll
+
+The following example locks the page while the modal is open. Click the backdrop or the close button to dismiss it.
+
+<ExampleBlock>
+  <PageExample />
+</ExampleBlock>
+<CodeBlock language="tsx">{PageExampleCode}</CodeBlock>
+
+### Lock the scroll of an element
+
+The following example locks the scroll of a container: open the drawer overlaying it, and the container no longer scrolls while the page around it does.
+
+<ExampleBlock>
+  <ElementExample />
+</ExampleBlock>
+<CodeBlock language="tsx">{ElementExampleCode}</CodeBlock>

@@ -49,6 +49,7 @@ import {
   useRerender,
   useResizeObserver,
   useSafeState,
+  useScrollLock,
   useSessionStorage,
   useSetState,
   useSubmit,
@@ -126,6 +127,8 @@ function AllHooks() {
   useHotkey("mod+k", () => {});
   useKeyPressed(["shift", "space"]);
   useClickOutside(nodeRef, () => {});
+  useScrollLock();
+  useScrollLock({ target: elementRef });
   useEventListener(eventTargetRef, "click", () => {});
   useWindowSize();
   useElementSize(elementRef);

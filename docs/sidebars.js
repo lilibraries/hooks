@@ -84,6 +84,7 @@ module.exports = {
         "useKeyPressed",
         "useClickOutside",
         "useEventListener",
+        "useScrollLock",
         "useWindowSize",
         "useElementSize",
         "useIntersecting",
