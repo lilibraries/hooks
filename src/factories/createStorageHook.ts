@@ -13,7 +13,8 @@ import useSafeState from "../useSafeState";
 import useUpdate from "../useUpdate";
 import inBrowser from "../utils/inBrowser";
 
-interface UseStorageOptions<T> {
+// Exported so the inferred types of `useLocalStorage`/`useSessionStorage` stay nameable in their declaration files (TS4023).
+export interface UseStorageOptions<T> {
   defaultValue?: T;
   polling?: boolean;
   pollingInterval?: number;
