@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.3.0](https://github.com/lilibraries/hooks/compare/v2.2.0...v2.3.0) (2026-11-12)
+
+### Features
+
+* add `useScroll` hook for tracking scroll position, direction and progress ([9d5af21](https://github.com/lilibraries/hooks/commit/9d5af218ab782c24246f0cb0a538de0cc4363167))
+* add `useScrollLock` hook for locking the scroll of the page or an element ([5cf55b1](https://github.com/lilibraries/hooks/commit/5cf55b136d7a3677f28fbbd3c09336df0a663dfe))
+
 ## [2.2.0](https://github.com/lilibraries/hooks/compare/v2.1.0...v2.2.0) (2026-11-11)
 
 ### Features
