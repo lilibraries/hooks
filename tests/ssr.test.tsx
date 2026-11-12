@@ -49,6 +49,7 @@ import {
   useRerender,
   useResizeObserver,
   useSafeState,
+  useScroll,
   useScrollLock,
   useSessionStorage,
   useSetState,
@@ -127,6 +128,8 @@ function AllHooks() {
   useHotkey("mod+k", () => {});
   useKeyPressed(["shift", "space"]);
   useClickOutside(nodeRef, () => {});
+  useScroll();
+  useScroll({ target: elementRef });
   useScrollLock();
   useScrollLock({ target: elementRef });
   useEventListener(eventTargetRef, "click", () => {});
@@ -159,6 +162,7 @@ function BrowserValueHooks() {
   const [cookie] = useCookie("missing");
   const [local] = useLocalStorage("missing");
   const [session] = useSessionStorage("missing");
+  const { x, y, progressX, progressY } = useScroll();
 
   return createElement(
     "div",
@@ -175,6 +179,7 @@ function BrowserValueHooks() {
       cookie,
       local,
       session,
+      scroll: { x, y, progressX, progressY },
     }),
   );
 }
@@ -212,6 +217,7 @@ describe("SSR", () => {
       darkMode: false,
       matches: false,
       keyPressed: false,
+      scroll: { x: 0, y: 0, progressX: 0, progressY: 0 },
     });
   });
 });

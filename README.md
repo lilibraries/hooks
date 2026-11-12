@@ -132,6 +132,7 @@ See the [documentation](https://lilibraries.github.io/hooks/) for the full API r
 | [`useKeyPressed`](https://lilibraries.github.io/hooks/useKeyPressed)                     | Detect whether a key is currently held down.                                           |
 | [`useClickOutside`](https://lilibraries.github.io/hooks/useClickOutside)                 | Trigger a callback when clicking outside the target area.                              |
 | [`useEventListener`](https://lilibraries.github.io/hooks/useEventListener)               | Set up an event listener on the target.                                                |
+| [`useScroll`](https://lilibraries.github.io/hooks/useScroll)                             | Track the scroll position, direction, and progress of the page or an element.          |
 | [`useScrollLock`](https://lilibraries.github.io/hooks/useScrollLock)                     | Lock scrolling of the page or an element.                                              |
 | [`useWindowSize`](https://lilibraries.github.io/hooks/useWindowSize)                     | Get the window size.                                                                   |
 | [`useElementSize`](https://lilibraries.github.io/hooks/useElementSize)                   | Get the size of a DOM element.                                                         |

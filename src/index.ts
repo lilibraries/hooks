@@ -56,6 +56,7 @@ export { default as useHotkey } from "./useHotkey";
 export { default as useKeyPressed } from "./useKeyPressed";
 export { default as useClickOutside } from "./useClickOutside";
 export { default as useEventListener } from "./useEventListener";
+export { default as useScroll } from "./useScroll";
 export { default as useScrollLock } from "./useScrollLock";
 export { default as useWindowSize } from "./useWindowSize";
 export { default as useElementSize } from "./useElementSize";
