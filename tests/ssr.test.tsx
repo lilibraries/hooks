@@ -44,6 +44,7 @@ import {
   usePersist,
   usePreviousRef,
   useRaf,
+  useRafState,
   useRefEffect,
   useRefUpdate,
   useReload,
@@ -96,6 +97,7 @@ function AllHooks() {
   useSetState({ count: 0 });
   useListState(["ssr"]);
   useSafeState(0);
+  useRafState(0);
   useDelayedValue("x", 100);
   useMemoizedValue({});
   useThrottledValue("x", 100);

@@ -1,0 +1,48 @@
+---
+title: useRafState
+description: Merge the state updates made within one animation frame into a single commit.
+---
+
+import CodeBlock from "@theme/CodeBlock";
+import ExampleBlock from "./components/ExampleBlock";
+import Example from "./examples/UseRafState";
+import ExampleCode from "!!raw-loader!./examples/UseRafState";
+
+This hook works like `React.useState`, except that the updates made within one animation frame are merged and committed once in the next frame. Use it for sources that fire more often than a frame — streamed messages, raw pointer events, timers — where only the latest value in a frame matters. Sources the browser already aligns to frames, such as `pointermove`, rarely gain from it.
+
+## API
+
+```ts
+function useRafState<S>(
+  initialState: S | (() => S),
+): [state: S, setState: React.Dispatch<React.SetStateAction<S>>];
+
+function useRafState<S = undefined>(): [
+  state: S | undefined,
+  setState: React.Dispatch<React.SetStateAction<S | undefined>>,
+];
+```
+
+Parameters:
+
+- **`initialState`:** The initial state, same as `React.useState`.
+
+Results:
+
+- **`state`:** The committed state.
+- **`setState`:** Update the state, same as the setter of `React.useState`.
+
+## Notes
+
+- Updates in a frame are applied in call order: updater functions accumulate, while a plain value overwrites earlier ones.
+- Unlike `useState`, `state` still holds the previous value right after `setState`; the new value appears in the next frame.
+- Animation frames are paused while the document is hidden, so pending updates are committed once it becomes visible again.
+
+## Example
+
+Press Start: a simulated socket pushes a traffic sample every 5 ms, so the message count climbs several times faster than the render count.
+
+<ExampleBlock>
+  <Example />
+</ExampleBlock>
+<CodeBlock language="tsx">{ExampleCode}</CodeBlock>
