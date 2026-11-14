@@ -15,6 +15,14 @@ export interface UseDebounceOptions {
   trailing?: boolean;
 }
 
+interface UseDebounceActions<T extends (...args: any[]) => any> {
+  /** Run the pending invocation immediately and return its result. */
+  flush: () => ReturnType<T> | undefined;
+
+  /** Abort the pending invocation. */
+  cancel: () => void;
+}
+
 /**
  * Use a debounced callback.
  *
@@ -24,7 +32,9 @@ export interface UseDebounceOptions {
  * @param options.maxWait The maximum wait time (milliseconds).
  * @param options.leading Whether to invoke at the start.
  * @param options.trailing Whether to invoke at the end.
- * @returns Returns a `[debounced, { flush, cancel }]` tuple: `debounced` is the debounced function, `flush` runs the pending invocation immediately, and `cancel` aborts it.
+ * @returns Returns a `[debounced, actions]` tuple: `debounced` is the debounced function;
+ *   `actions` keeps a stable identity and contains `flush`, which runs the pending
+ *   invocation immediately, and `cancel`, which aborts it.
  */
 function useDebounce<T extends (...args: any[]) => any>(
   callback: T,
@@ -91,7 +101,13 @@ function useDebounce<T extends (...args: any[]) => any>(
 
   useUnmount(cancel);
 
-  return [debounced, { flush, cancel }] as const;
+  const actionsRef = useRef<UseDebounceActions<T> | undefined>(undefined);
+
+  if (!actionsRef.current) {
+    actionsRef.current = { flush, cancel };
+  }
+
+  return [debounced, actionsRef.current] as const;
 }
 
 export default useDebounce;

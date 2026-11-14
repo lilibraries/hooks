@@ -180,13 +180,15 @@ describe("useDebounce", () => {
     expect(latest).toHaveBeenCalledTimes(1);
   });
 
-  it("debounced function identity is stable", () => {
+  it("the debounced function and the actions object have stable identities", () => {
     const { result, rerender } = renderHook(() => useDebounce(jest.fn(), 100));
     const [debounced, { flush, cancel }] = result.current;
+    const actions = result.current[1];
 
     rerender();
 
     expect(result.current[0]).toBe(debounced);
+    expect(result.current[1]).toBe(actions);
     expect(result.current[1].flush).toBe(flush);
     expect(result.current[1].cancel).toBe(cancel);
   });
