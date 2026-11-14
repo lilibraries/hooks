@@ -37,7 +37,7 @@ Parameters:
 Results:
 
 - **`debouncedValue`:** Debounced value.
-- **`actions`:** Actions object.
+- **`actions`:** Actions object with a stable identity.
   - **`actions.flush`:** Flush function. The `finalValue` will be returned as `debouncedValue` if it is specified.
   - **`actions.cancel`:** Cancel debounce timer.
 

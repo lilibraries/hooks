@@ -116,6 +116,15 @@ describe("useDebouncedValue", () => {
     expect(result.current[0]).toBe("a");
   });
 
+  it("actions identity is stable", () => {
+    const { result, rerender } = renderHook(() => useDebouncedValue("a", 100));
+    const [, actions] = result.current;
+
+    rerender();
+
+    expect(result.current[1]).toBe(actions);
+  });
+
   it("supports the numeric wait time", () => {
     const { result, rerender } = renderHook(({ value }) => useDebouncedValue(value, 50), {
       initialProps: { value: 1 },
