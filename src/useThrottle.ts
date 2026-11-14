@@ -14,6 +14,14 @@ export interface UseThrottleOptions {
   trailing?: boolean;
 }
 
+interface UseThrottleActions<T extends (...args: any[]) => any> {
+  /** Run the pending invocation immediately and return its result. */
+  flush: () => ReturnType<T> | undefined;
+
+  /** Abort the pending invocation. */
+  cancel: () => void;
+}
+
 /**
  * Use a throttled callback.
  *
@@ -22,7 +30,9 @@ export interface UseThrottleOptions {
  * @param options.wait The throttle wait time (milliseconds).
  * @param options.leading Whether to invoke at the start.
  * @param options.trailing Whether to invoke at the end.
- * @returns Returns a `[throttled, { flush, cancel }]` tuple: `throttled` is the throttled function, `flush` runs the pending invocation immediately, and `cancel` aborts it.
+ * @returns Returns a `[throttled, actions]` tuple: `throttled` is the throttled function;
+ *   `actions` keeps a stable identity and contains `flush`, which runs the pending
+ *   invocation immediately, and `cancel`, which aborts it.
  */
 function useThrottle<T extends (...args: any[]) => any>(
   callback: T,
@@ -82,7 +92,13 @@ function useThrottle<T extends (...args: any[]) => any>(
 
   useUnmount(cancel);
 
-  return [throttled, { flush, cancel }] as const;
+  const actionsRef = useRef<UseThrottleActions<T> | undefined>(undefined);
+
+  if (!actionsRef.current) {
+    actionsRef.current = { flush, cancel };
+  }
+
+  return [throttled, actionsRef.current] as const;
 }
 
 export default useThrottle;

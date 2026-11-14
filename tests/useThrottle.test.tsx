@@ -162,13 +162,15 @@ describe("useThrottle", () => {
     expect(latest).toHaveBeenCalledTimes(1);
   });
 
-  it("throttled function identity is stable", () => {
+  it("the throttled function and the actions object have stable identities", () => {
     const { result, rerender } = renderHook(() => useThrottle(jest.fn(), 100));
     const [throttled, { flush, cancel }] = result.current;
+    const actions = result.current[1];
 
     rerender();
 
     expect(result.current[0]).toBe(throttled);
+    expect(result.current[1]).toBe(actions);
     expect(result.current[1].flush).toBe(flush);
     expect(result.current[1].cancel).toBe(cancel);
   });
