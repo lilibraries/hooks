@@ -71,12 +71,14 @@ describe("useToggle", () => {
     expect(result.current[0]).toBe(false);
   });
 
-  it("the three operation function identities are stable", () => {
+  it("the actions object and its members have stable identities", () => {
     const { result, rerender } = renderHook(() => useToggle());
     const [, { toggle, toggleOn, toggleOff }] = result.current;
+    const actions = result.current[1];
 
     rerender();
 
+    expect(result.current[1]).toBe(actions);
     expect(result.current[1].toggle).toBe(toggle);
     expect(result.current[1].toggleOn).toBe(toggleOn);
     expect(result.current[1].toggleOff).toBe(toggleOff);
