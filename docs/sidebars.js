@@ -32,6 +32,7 @@ module.exports = {
         "useCache",
         "useToggle",
         "useSetState",
+        "useListState",
         "useSafeState",
         "useControllableState",
         "useDelayedValue",

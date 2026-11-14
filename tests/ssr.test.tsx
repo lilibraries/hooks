@@ -31,6 +31,7 @@ import {
   useLayoutRefEffect,
   useLayoutRefUpdate,
   useLayoutUpdate,
+  useListState,
   useLoad,
   useLocalStorage,
   useMatchMedia,
@@ -93,6 +94,7 @@ function AllHooks() {
   useControllableState({ defaultValue: "ssr" });
   useToggle();
   useSetState({ count: 0 });
+  useListState(["ssr"]);
   useSafeState(0);
   useDelayedValue("x", 100);
   useMemoizedValue({});
