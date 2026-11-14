@@ -100,6 +100,15 @@ describe("useThrottledValue", () => {
     expect(result.current[0]).toBe("a");
   });
 
+  it("actions identity is stable", () => {
+    const { result, rerender } = renderHook(() => useThrottledValue("a", 100));
+    const [, actions] = result.current;
+
+    rerender();
+
+    expect(result.current[1]).toBe(actions);
+  });
+
   it("supports the numeric wait time", () => {
     const { result, rerender } = renderHook(({ value }) => useThrottledValue(value, 50), {
       initialProps: { value: 1 },
