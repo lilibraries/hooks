@@ -146,6 +146,7 @@ See the [documentation](https://lilibraries.github.io/hooks/) for the full API r
 | [`useCookie`](https://lilibraries.github.io/hooks/useCookie)                             | Get, set and/or remove cookies.                                                        |
 | [`useLocalStorage`](https://lilibraries.github.io/hooks/useLocalStorage)                 | Get, set and/or remove `localStorage`.                                                 |
 | [`useSessionStorage`](https://lilibraries.github.io/hooks/useSessionStorage)             | Get, set and/or remove `sessionStorage`.                                               |
+| [`useCopyToClipboard`](https://lilibraries.github.io/hooks/useCopyToClipboard)           | Copy text to the clipboard and track the copied state.                                 |
 
 ## Changelog
 

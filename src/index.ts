@@ -70,3 +70,4 @@ export { default as useIntersectionObserver } from "./useIntersectionObserver";
 export { default as useCookie } from "./useCookie";
 export { default as useLocalStorage } from "./useLocalStorage";
 export { default as useSessionStorage } from "./useSessionStorage";
+export { default as useCopyToClipboard } from "./useCopyToClipboard";

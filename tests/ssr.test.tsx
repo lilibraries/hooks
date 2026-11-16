@@ -12,6 +12,7 @@ import {
   useComposedRef,
   useControllableState,
   useCookie,
+  useCopyToClipboard,
   useCountdown,
   useDarkMode,
   useDebounce,
@@ -148,6 +149,7 @@ function AllHooks() {
   useCookie("ssr-cookie");
   useLocalStorage("ssr-local");
   useSessionStorage("ssr-session");
+  useCopyToClipboard();
 
   // Async
   useLoad(async () => "data", []);

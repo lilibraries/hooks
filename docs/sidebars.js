@@ -98,6 +98,7 @@ module.exports = {
         "useCookie",
         "useLocalStorage",
         "useSessionStorage",
+        "useCopyToClipboard",
       ],
     },
   ],
