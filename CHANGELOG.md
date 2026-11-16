@@ -1,5 +1,22 @@
 # Changelog
 
+## [2.4.0](https://github.com/lilibraries/hooks/compare/v2.3.0...v2.4.0) (2026-11-16)
+
+### Features
+
+* add `useCountdown` hook for counting down to a deadline with pause and resume ([7dceaf3](https://github.com/lilibraries/hooks/commit/7dceaf396871f1eb27989b626956a349728eb666))
+* add `useRafState` hook for frame-aligned state updates ([9c7e80f](https://github.com/lilibraries/hooks/commit/9c7e80fd03dead8ba0037a95ce881a04bf3ce6b0))
+* **useListState:** add `useListState` for array state management ([41e895d](https://github.com/lilibraries/hooks/commit/41e895d90baaad35fe364f806e62857ef505363b))
+
+### Bug Fixes
+
+* make ESM build importable by native Node ESM and Vite SSR ([1f19700](https://github.com/lilibraries/hooks/commit/1f19700c728ada052566d9a5e08d45bf8be1ae36))
+* **useDebounce:** avoid re-creating the `actions` object on every render ([e9a944d](https://github.com/lilibraries/hooks/commit/e9a944d01121547259a66e5de23615b9355636a5))
+* **useDebouncedValue:** avoid re-creating the `actions` object on every render ([d7bf58c](https://github.com/lilibraries/hooks/commit/d7bf58c1ca5f1a8738a743a2198e46b6eea345cd))
+* **useThrottle:** avoid re-creating the `actions` object on every render ([17cf8a6](https://github.com/lilibraries/hooks/commit/17cf8a6739a8424b06f1c3f3b4ceb8341c9ad4af))
+* **useThrottledValue:** avoid re-creating the `actions` object on every render ([13004f0](https://github.com/lilibraries/hooks/commit/13004f0d87ff75f4e7286456b581edc41f27f3e9))
+* **useToggle:** avoid re-creating the `actions` object on every render ([8106058](https://github.com/lilibraries/hooks/commit/81060584451781a5bc0c011c6c0e6a4627201629))
+
 ## [2.3.0](https://github.com/lilibraries/hooks/compare/v2.2.0...v2.3.0) (2026-11-12)
 
 ### Features
