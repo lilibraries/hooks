@@ -34,7 +34,10 @@
 
 - [useCache](https://lilibraries.github.io/hooks/useCache.md): Cache data for a fixed time and keep components sharing the same cache instance in sync.
 - [useToggle](https://lilibraries.github.io/hooks/useToggle.md): Manage a boolean value with toggle, toggleOn and toggleOff actions.
+- [useCountdown](https://lilibraries.github.io/hooks/useCountdown.md): Track the remaining time until a deadline, with pause and resume.
+- [useRafState](https://lilibraries.github.io/hooks/useRafState.md): Merge the state updates made within one animation frame into a single commit.
 - [useSetState](https://lilibraries.github.io/hooks/useSetState.md): Merge partial state updates like this.setState in class components.
+- [useListState](https://lilibraries.github.io/hooks/useListState.md): Manage an array state with positional operations, reordering and value-based removal.
 - [useSafeState](https://lilibraries.github.io/hooks/useSafeState.md): Like React.useState, but setting state after unmount has no effect.
 - [useControllableState](https://lilibraries.github.io/hooks/useControllableState.md): Manage a value that can be either controlled or uncontrolled.
 - [useDelayedValue](https://lilibraries.github.io/hooks/useDelayedValue.md): Delay updates to a value.

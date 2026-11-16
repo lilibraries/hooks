@@ -83,7 +83,10 @@ For the full API reference and live examples, check out the docs of each hook li
 | ------------------------------------------------ | --------------------------------------------------------------------------------------------------------------- |
 | [`useCache`](useCache.md)                         | Cache data for a certain period of time, with optional sync between components sharing the same cache instance. |
 | [`useToggle`](useToggle.md)                       | Manage a boolean value.                                                                                         |
+| [`useCountdown`](useCountdown.md)                 | Track the remaining time until a deadline, with pause and resume.                                               |
+| [`useRafState`](useRafState.md)                   | Like `React.useState`, but updates within an animation frame are merged into a single commit.                   |
 | [`useSetState`](useSetState.md)                   | Like `this.setState` of class components, merging partial state updates.                                        |
+| [`useListState`](useListState.md)                 | Manage an array state with positional operations, reordering and value-based removal.                           |
 | [`useSafeState`](useSafeState.md)                 | Like `React.useState`, but setting state after unmount is safe.                                                 |
 | [`useControllableState`](useControllableState.md) | Manage a value that can be either controlled or uncontrolled.                                                   |
 | [`useDelayedValue`](useDelayedValue.md)           | Delay updates to a value.                                                                                       |
@@ -2917,7 +2920,7 @@ Parameters:
 Results:
 
 - **`value`:** A boolean value that can be changed by the following actions.
-- **`actions`:** Actions object.
+- **`actions`:** Actions object with a stable identity.
   - **`actions.toggle`:** Toggle the `value`. If the `newValue` param is not `undefined`, the `value` will be set to `newValue` (cast to boolean).
   - **`actions.toggleOn`:** Set the `value` to `true`.
   - **`actions.toggleOff`:** Set the `value` to `false`.
@@ -2944,6 +2947,196 @@ function Example() {
           Details panel
         </div>
       )}
+    </>
+  );
+}
+
+export default Example;
+```
+
+---
+
+# useCountdown
+
+Count down to a deadline. The hook returns the remaining time in milliseconds and leaves the formatting to you.
+
+## API
+
+```ts
+function useCountdown(options?: {
+  deadline?: number;
+  duration?: number;
+  interval?: number;
+  autoStart?: boolean;
+  onEnd?: () => void;
+}): [
+  remainingTime: number,
+  actions: {
+    start: (options?: { deadline?: number; duration?: number }) => void;
+    pause: () => void;
+    resume: () => void;
+  },
+];
+```
+
+Parameters:
+
+- **`deadline`:** The absolute deadline as a timestamp (epoch milliseconds); takes precedence over `duration`.
+- **`duration`:** The duration in milliseconds, converted to a deadline when the countdown starts.
+- **`interval`:** The interval in milliseconds between two state updates, defaults to `1000`.
+- **`autoStart`:** Whether to start counting down on mount, defaults to `true`.
+- **`onEnd`:** Called once when the deadline of a countdown target is reached.
+
+Results:
+
+- **`remainingTime`:** The remaining time in milliseconds, never negative.
+- **`actions`:** Actions object with a stable identity.
+  - **`actions.start`:** Start or restart the countdown, counting down to the given `deadline` or `duration`, falling back to the hook options. It clears any previous countdown first.
+  - **`actions.pause`:** Freeze `remainingTime` until `resume` is called. Pausing a finished countdown does nothing.
+  - **`actions.resume`:** Continue counting down from the frozen `remainingTime`. Does nothing unless paused.
+
+## Notes
+
+- The countdown is driven by the deadline rather than by decrementing a counter, so a throttled background tab never falls behind; it re-synchronizes as soon as the page becomes visible or focused again.
+- Changing the options alone does not restart the countdown.
+- `onEnd` fires once per countdown target, identified by the resolved deadline, so restarting with the same `deadline` does not fire it again while restarting with `duration` does; a target that has already passed fires it once as the countdown starts.
+- `remainingTime` is seeded from `duration`, or from `0` when only `deadline` is given, and ends at `0`; with `deadline` alone the server-rendered value is `0`, so render the number after mount.
+- Each instance runs one timer and tracks one target: rows that share the same deadline can share a single instance, while rows with independent deadlines each need their own.
+- Whether the countdown is paused is not part of the returned value, so record it yourself when the UI needs it. `remainingTime` on its own reads like this:
+
+  | `remainingTime`            | Meaning                                                  |
+  | -------------------------- | -------------------------------------------------------- |
+  | `duration`, unchanged      | Not started yet (`autoStart: false`, no `start()` call)  |
+  | `> 0`, decreasing per tick | Running                                                  |
+  | `> 0`, frozen              | Paused                                                   |
+  | `0`                        | Finished, or never started when only `deadline` is given |
+
+## Example
+
+The example is a one-time-password resend timer: `autoStart: false` keeps it idle until the code is sent, and `onEnd` restores the button when the countdown reaches zero.
+
+```tsx
+import { useState } from "react";
+import { useCountdown } from "@lilib/hooks";
+
+function Example() {
+  const [sent, setSent] = useState(false);
+  const [remainingTime, { start }] = useCountdown({
+    duration: 60 * 1000,
+    autoStart: false,
+    onEnd: () => setSent(false),
+  });
+
+  const send = () => {
+    setSent(true);
+    start();
+  };
+
+  return (
+    <button onClick={send} disabled={sent}>
+      {sent ? `Resend in ${Math.ceil(remainingTime / 1000)}s` : "Send code"}
+    </button>
+  );
+}
+
+export default Example;
+```
+
+---
+
+# useRafState
+
+This hook works like `React.useState`, except that the updates made within one animation frame are merged and committed once in the next frame. Use it for sources that fire more often than a frame — streamed messages, raw pointer events, timers — where only the latest value in a frame matters. Sources the browser already aligns to frames, such as `pointermove`, rarely gain from it.
+
+## API
+
+```ts
+function useRafState<S>(
+  initialState: S | (() => S),
+): [state: S, setState: React.Dispatch<React.SetStateAction<S>>];
+
+function useRafState<S = undefined>(): [
+  state: S | undefined,
+  setState: React.Dispatch<React.SetStateAction<S | undefined>>,
+];
+```
+
+Parameters:
+
+- **`initialState`:** The initial state, same as `React.useState`.
+
+Results:
+
+- **`state`:** The committed state.
+- **`setState`:** Update the state, same as the setter of `React.useState`.
+
+## Notes
+
+- Updates in a frame are applied in call order: updater functions accumulate, while a plain value overwrites earlier ones.
+- Unlike `useState`, `state` still holds the previous value right after `setState`; the new value appears in the next frame.
+- Animation frames are paused while the document is hidden, so pending updates are committed once it becomes visible again.
+
+## Example
+
+Press Start: a simulated socket pushes a traffic sample every 5 ms, so the message count climbs several times faster than the render count.
+
+```tsx
+import { useRef, useState } from "react";
+import { useInterval, useRafState } from "@lilib/hooks";
+
+function Example() {
+  const [running, setRunning] = useState(false);
+  const [traffic, setTraffic] = useRafState(0.5);
+  const countersRef = useRef({ messages: 0, renders: 0 });
+
+  countersRef.current.renders += 1;
+
+  // A simulated socket pushing a traffic sample every 5 ms.
+  const [start, cancel] = useInterval(() => {
+    countersRef.current.messages += 1;
+    setTraffic((previous) => previous + (Math.random() - previous) * 0.05);
+  }, 5);
+
+  function handleClick() {
+    if (running) {
+      cancel();
+    } else {
+      countersRef.current = { messages: 0, renders: 0 };
+      start();
+    }
+    setRunning(!running);
+  }
+
+  return (
+    <>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <span>Live traffic</span>
+        <button onClick={handleClick}>{running ? "Stop" : "Start"}</button>
+      </div>
+      <div style={{ marginTop: 8, fontSize: 28, fontWeight: 600, lineHeight: 1 }}>
+        {(traffic * 100).toFixed(1)}
+        <span style={{ marginLeft: 6, fontSize: 14, fontWeight: 400 }}>MB/s</span>
+      </div>
+      <div
+        style={{
+          height: 8,
+          marginTop: 8,
+          borderRadius: 4,
+          background: "rgba(128, 128, 128, 0.25)",
+        }}
+      >
+        <div
+          style={{
+            width: `${traffic * 100}%`,
+            height: "100%",
+            borderRadius: 4,
+            background: "orange",
+          }}
+        />
+      </div>
+      <div style={{ marginTop: 8, fontSize: 12, opacity: 0.7 }}>
+        {countersRef.current.messages} messages · {countersRef.current.renders} renders
+      </div>
     </>
   );
 }
@@ -3011,6 +3204,116 @@ function Example() {
       <div>
         Full name: {state.firstName} {state.lastName}
       </div>
+    </>
+  );
+}
+
+export default Example;
+```
+
+---
+
+# useListState
+
+Manage an array state with positional operations, reordering and value-based removal.
+
+## API
+
+```ts
+function useListState<T>(initialState?: T[] | (() => T[])): [
+  list: T[],
+  actions: {
+    set: (nextState: T[] | ((prevState: T[]) => T[])) => void;
+    push: (...items: T[]) => void;
+    unshift: (...items: T[]) => void;
+    pop: () => T | undefined;
+    shift: () => T | undefined;
+    setAt: (index: number, item: T) => void;
+    removeAt: (index: number) => T | undefined;
+    insertAt: (index: number, ...items: T[]) => void;
+    move: (from: number, to: number) => void;
+    remove: (item: T) => void;
+    clear: () => void;
+  },
+];
+```
+
+Parameters:
+
+- **`initialState`:** The initial list, or a function that returns it. Defaults to an empty array. The function is evaluated lazily and must be pure, because React may invoke it more than once in StrictMode.
+
+Results:
+
+- **`list`:** The current list.
+- **`actions`:** Actions object with a stable identity. Each action starts from the latest list, so consecutive calls in the same batch work as expected.
+  - **`actions.set`:** Replace the whole list, or update it from the previous list. An updater function must be pure and may be called more than once. Unlike `useSetState`, this replaces instead of merging.
+  - **`actions.push`:** Append items to the end.
+  - **`actions.unshift`:** Insert items at the beginning, keeping their order.
+  - **`actions.pop`:** Remove and return the last item, or `undefined` when the list is empty.
+  - **`actions.shift`:** Remove and return the first item, or `undefined` when the list is empty.
+  - **`actions.setAt`:** Replace the item at the given index. Similar to `Array.prototype.with`, but an out-of-range index is a no-op instead of throwing a `RangeError`.
+  - **`actions.removeAt`:** Remove and return the item at the given index, or `undefined` when the index is out of range.
+  - **`actions.insertAt`:** Insert items before the given index. `index` may equal the current length, which is the same as `push`.
+  - **`actions.move`:** Move the item at `from` so that it lands at index `to`. The list length is unchanged.
+  - **`actions.remove`:** Remove every item equal to `item`.
+  - **`actions.clear`:** Remove all items.
+
+## Notes
+
+- Out-of-range or non-integer indexes, and any operation that would not change the list, are no-ops: the same list reference is returned and no re-render is triggered.
+- Returned values reflect the list known at call time; if an uncommitted `startTransition` is replayed on a different base, `pop` / `shift` / `removeAt` may return an item that differs from the one actually removed.
+- `remove` matches items with `Object.is`, so object items must be the same reference as the one in the list; a mismatched `remove` does nothing. Prefer primitive items such as ids.
+
+## Example
+
+The following example manages a task list: adding tasks, moving them up or down, removing a single task and clearing them all.
+
+```tsx
+import { useState } from "react";
+
+import { useListState } from "@lilib/hooks";
+
+function Example() {
+  const [draft, setDraft] = useState("");
+  const [tasks, { push, removeAt, move, clear }] = useListState(["Write docs", "Review tests"]);
+
+  const addTask = () => {
+    const task = draft.trim();
+    if (task) {
+      push(task);
+      setDraft("");
+    }
+  };
+
+  return (
+    <>
+      <div>
+        <input
+          value={draft}
+          placeholder="New task"
+          onChange={(event) => setDraft(event.target.value)}
+          onKeyDown={(event) => {
+            if (event.key === "Enter") {
+              addTask();
+            }
+          }}
+        />{" "}
+        <button onClick={addTask}>Add</button> <button onClick={clear}>Clear all</button>
+      </div>
+      <ol>
+        {tasks.map((task, index) => (
+          <li key={index}>
+            {task}{" "}
+            <button disabled={index === 0} onClick={() => move(index, index - 1)}>
+              Up
+            </button>{" "}
+            <button disabled={index === tasks.length - 1} onClick={() => move(index, index + 1)}>
+              Down
+            </button>{" "}
+            <button onClick={() => removeAt(index)}>Remove</button>
+          </li>
+        ))}
+      </ol>
     </>
   );
 }
@@ -3296,7 +3599,7 @@ Parameters:
 Results:
 
 - **`throttledValue`:** Throttled value.
-- **`actions`:** Actions object.
+- **`actions`:** Actions object with a stable identity.
   - **`actions.flush`:** Flush function. The `finalValue` will be returned as `throttledValue` if it is specified.
   - **`actions.cancel`:** Cancel throttle timer.
 
@@ -3377,7 +3680,7 @@ Parameters:
 Results:
 
 - **`debouncedValue`:** Debounced value.
-- **`actions`:** Actions object.
+- **`actions`:** Actions object with a stable identity.
   - **`actions.flush`:** Flush function. The `finalValue` will be returned as `debouncedValue` if it is specified.
   - **`actions.cancel`:** Cancel debounce timer.
 
@@ -3904,7 +4207,7 @@ Parameters:
 Results:
 
 - **`throttledCallback`:** Throttled callback.
-- **`actions`:** Actions object.
+- **`actions`:** Actions object with a stable identity.
   - **`actions.flush`:** Flush function. Run callback immediately.
   - **`actions.cancel`:** Cancel throttle timer.
 
@@ -3981,7 +4284,7 @@ Parameters:
 Results:
 
 - **`debouncedCallback`:** Debounced callback.
-- **`actions`:** Actions object.
+- **`actions`:** Actions object with a stable identity.
   - **`actions.flush`:** Flush function. Run callback immediately.
   - **`actions.cancel`:** Cancel debounce timer.
 

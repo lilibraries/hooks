@@ -77,7 +77,10 @@ For the full API reference and live examples, check out the docs of each hook li
 | ------------------------------------------------ | --------------------------------------------------------------------------------------------------------------- |
 | [`useCache`](useCache.md)                         | Cache data for a certain period of time, with optional sync between components sharing the same cache instance. |
 | [`useToggle`](useToggle.md)                       | Manage a boolean value.                                                                                         |
+| [`useCountdown`](useCountdown.md)                 | Track the remaining time until a deadline, with pause and resume.                                               |
+| [`useRafState`](useRafState.md)                   | Like `React.useState`, but updates within an animation frame are merged into a single commit.                   |
 | [`useSetState`](useSetState.md)                   | Like `this.setState` of class components, merging partial state updates.                                        |
+| [`useListState`](useListState.md)                 | Manage an array state with positional operations, reordering and value-based removal.                           |
 | [`useSafeState`](useSafeState.md)                 | Like `React.useState`, but setting state after unmount is safe.                                                 |
 | [`useControllableState`](useControllableState.md) | Manage a value that can be either controlled or uncontrolled.                                                   |
 | [`useDelayedValue`](useDelayedValue.md)           | Delay updates to a value.                                                                                       |
