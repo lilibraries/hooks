@@ -12,6 +12,7 @@ import {
   useComposedRef,
   useControllableState,
   useCookie,
+  useCountdown,
   useDarkMode,
   useDebounce,
   useDebouncedValue,
@@ -94,6 +95,7 @@ function AllHooks() {
   useCache("ssr-cache");
   useControllableState({ defaultValue: "ssr" });
   useToggle();
+  useCountdown({ duration: 60000 });
   useSetState({ count: 0 });
   useListState(["ssr"]);
   useSafeState(0);
@@ -155,6 +157,9 @@ function AllHooks() {
   return createElement("div", null, "hooks");
 }
 
+// Computed at module scope: `Date.now()` is impure and must not be called during render.
+const FUTURE_DEADLINE = Date.now() + 60 * 1000;
+
 function BrowserValueHooks() {
   const online = useOnline();
   const visible = usePageVisible();
@@ -167,6 +172,7 @@ function BrowserValueHooks() {
   const [local] = useLocalStorage("missing");
   const [session] = useSessionStorage("missing");
   const { x, y, progressX, progressY } = useScroll();
+  const [remainingTime] = useCountdown({ deadline: FUTURE_DEADLINE });
 
   return createElement(
     "div",
@@ -184,6 +190,7 @@ function BrowserValueHooks() {
       local,
       session,
       scroll: { x, y, progressX, progressY },
+      remainingTime,
     }),
   );
 }
@@ -222,6 +229,7 @@ describe("SSR", () => {
       matches: false,
       keyPressed: false,
       scroll: { x: 0, y: 0, progressX: 0, progressY: 0 },
+      remainingTime: 0,
     });
   });
 });

@@ -85,6 +85,7 @@ See the [documentation](https://lilibraries.github.io/hooks/) for the full API r
 | ---------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
 | [`useCache`](https://lilibraries.github.io/hooks/useCache)                         | Cache data for a certain period of time, with optional sync between components sharing the same cache instance. |
 | [`useToggle`](https://lilibraries.github.io/hooks/useToggle)                       | Manage a boolean value.                                                                                         |
+| [`useCountdown`](https://lilibraries.github.io/hooks/useCountdown)                 | Track the remaining time until a deadline, with pause and resume.                                               |
 | [`useRafState`](https://lilibraries.github.io/hooks/useRafState)                   | Like `React.useState`, but updates within an animation frame are merged into a single commit.                   |
 | [`useSetState`](https://lilibraries.github.io/hooks/useSetState)                   | Like `this.setState` of class components, merging partial state updates.                                        |
 | [`useListState`](https://lilibraries.github.io/hooks/useListState)                 | Manage an array state with positional operations, reordering and value-based removal.                           |

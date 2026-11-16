@@ -31,6 +31,7 @@ module.exports = {
       items: [
         "useCache",
         "useToggle",
+        "useCountdown",
         "useRafState",
         "useSetState",
         "useListState",
