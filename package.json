@@ -64,7 +64,7 @@
     "lint:fix": "tsc -p tsconfig.json && eslint . --fix --max-warnings 0 && prettier --write . --log-level warn",
     "dist": "rimraf dist && concurrently --kill-others-on-fail npm:dist:*",
     "dist:cjs": "babel src --out-dir dist/cjs --config-file ./babel.cjs.json --extensions .ts,.tsx --no-babelrc",
-    "dist:esm": "babel src --out-dir dist/esm --config-file ./babel.esm.json --extensions .ts,.tsx --no-babelrc",
+    "dist:esm": "babel src --out-dir dist/esm --config-file ./babel.esm.json --extensions .ts,.tsx --no-babelrc && node scripts/writeEsmPackageJson.mjs",
     "dist:umd": "cross-env NODE_ENV=development rollup --config && cross-env NODE_ENV=production rollup --config",
     "dist:types": "tsc -p ./tsconfig.build.json",
     "gh-pages": "npm run build && gh-pages -d build --nojekyll",

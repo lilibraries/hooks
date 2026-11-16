@@ -1,3 +1,23 @@
+// Node's ESM resolver requires explicit file extensions for relative specifiers and for subpath
+// imports of packages without an `exports` map (e.g. `lodash/isFunction`), unlike bundlers.
+function addJsExtensionToImports() {
+  return {
+    visitor: {
+      "ImportDeclaration|ExportNamedDeclaration|ExportAllDeclaration"(path) {
+        const { source } = path.node;
+        if (!source) {
+          return;
+        }
+        const isRelative = source.value.startsWith(".");
+        const isLodashSubpath = source.value.startsWith("lodash/");
+        if ((isRelative || isLodashSubpath) && !/\.[cm]?js$/.test(source.value)) {
+          source.value += ".js";
+        }
+      },
+    },
+  };
+}
+
 module.exports = function (api, options = {}) {
   const isTest = api.env("test");
   const isDevelopment = api.env("development");
@@ -38,6 +58,7 @@ module.exports = function (api, options = {}) {
       ],
     ],
     plugins: [
+      ...(isESM ? [addJsExtensionToImports] : []),
       [
         "@babel/plugin-transform-runtime",
         {
