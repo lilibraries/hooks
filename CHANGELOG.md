@@ -6,7 +6,7 @@
 
 * add `useCountdown` hook for counting down to a deadline with pause and resume ([7dceaf3](https://github.com/lilibraries/hooks/commit/7dceaf396871f1eb27989b626956a349728eb666))
 * add `useRafState` hook for frame-aligned state updates ([9c7e80f](https://github.com/lilibraries/hooks/commit/9c7e80fd03dead8ba0037a95ce881a04bf3ce6b0))
-* **useListState:** add `useListState` for array state management ([41e895d](https://github.com/lilibraries/hooks/commit/41e895d90baaad35fe364f806e62857ef505363b))
+* add `useListState` for array state management ([41e895d](https://github.com/lilibraries/hooks/commit/41e895d90baaad35fe364f806e62857ef505363b))
 
 ### Bug Fixes
 
