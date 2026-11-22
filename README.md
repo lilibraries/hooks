@@ -133,6 +133,7 @@ See the [documentation](https://lilibraries.github.io/hooks/) for the full API r
 | [`useMatchMedia`](https://lilibraries.github.io/hooks/useMatchMedia)                     | Determine whether the document matches a media query.                                  |
 | [`useHotkey`](https://lilibraries.github.io/hooks/useHotkey)                             | Bind a keyboard shortcut to a callback.                                                |
 | [`useKeyPressed`](https://lilibraries.github.io/hooks/useKeyPressed)                     | Detect whether a key is currently held down.                                           |
+| [`usePointerPosition`](https://lilibraries.github.io/hooks/usePointerPosition)           | Track the position of the pointer within the viewport.                                 |
 | [`useClickOutside`](https://lilibraries.github.io/hooks/useClickOutside)                 | Trigger a callback when clicking outside the target area.                              |
 | [`useFocusWithin`](https://lilibraries.github.io/hooks/useFocusWithin)                   | Trigger a callback when the focus moves into or out of the target area.                |
 | [`useEventListener`](https://lilibraries.github.io/hooks/useEventListener)               | Set up an event listener on the target.                                                |

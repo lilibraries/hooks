@@ -46,6 +46,7 @@ import {
   useOnline,
   usePageVisible,
   usePersist,
+  usePointerPosition,
   usePreviousRef,
   useRaf,
   useRafState,
@@ -136,6 +137,7 @@ function AllHooks() {
   useWindowFocus();
   useHotkey("mod+k", () => {});
   useKeyPressed(["shift", "space"]);
+  usePointerPosition();
   useClickOutside(nodeRef, () => {});
   useFocusWithin(nodeRef, () => {});
   useScroll();
@@ -175,6 +177,7 @@ function BrowserValueHooks() {
   const darkMode = useDarkMode();
   const matches = useMatchMedia("(prefers-color-scheme: dark)");
   const keyPressed = useKeyPressed("shift");
+  const pointerPosition = usePointerPosition();
   const [cookie] = useCookie("missing");
   const [local] = useLocalStorage("missing");
   const [session] = useSessionStorage("missing");
@@ -194,6 +197,7 @@ function BrowserValueHooks() {
       darkMode,
       matches,
       keyPressed,
+      pointerPosition: pointerPosition ?? null,
       cookie,
       local,
       session,
@@ -237,6 +241,7 @@ describe("SSR", () => {
       darkMode: false,
       matches: false,
       keyPressed: false,
+      pointerPosition: null,
       scroll: { x: 0, y: 0, progressX: 0, progressY: 0 },
       fullscreen: false,
       remainingTime: 0,

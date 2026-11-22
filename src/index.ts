@@ -57,6 +57,7 @@ export { default as useDarkMode } from "./useDarkMode";
 export { default as useMatchMedia } from "./useMatchMedia";
 export { default as useHotkey } from "./useHotkey";
 export { default as useKeyPressed } from "./useKeyPressed";
+export { default as usePointerPosition } from "./usePointerPosition";
 export { default as useClickOutside } from "./useClickOutside";
 export { default as useFocusWithin } from "./useFocusWithin";
 export { default as useEventListener } from "./useEventListener";

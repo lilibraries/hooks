@@ -85,6 +85,7 @@ module.exports = {
         "useMatchMedia",
         "useHotkey",
         "useKeyPressed",
+        "usePointerPosition",
         "useClickOutside",
         "useFocusWithin",
         "useEventListener",
