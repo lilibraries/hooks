@@ -1,0 +1,50 @@
+---
+title: useFullscreen
+description: Enter, exit and track the fullscreen state of the page or an element.
+---
+
+import CodeBlock from "@theme/CodeBlock";
+import ExampleBlock from "./components/ExampleBlock";
+import Example from "./examples/UseFullscreen";
+import ExampleCode from "!!raw-loader!./examples/UseFullscreen";
+
+Control fullscreen for the page or a single element. The state and actions stay scoped to `target`: when another element is fullscreen, `fullscreen` stays `false` and `exit` leaves that session alone.
+
+## API
+
+```ts
+function useFullscreen(target?: Element | React.RefObject<Element | null> | null): [
+  fullscreen: boolean,
+  actions: {
+    enter: () => Promise<boolean>;
+    exit: () => Promise<boolean>;
+    toggle: () => Promise<boolean>;
+  },
+];
+```
+
+Parameters:
+
+- **`target`:** The element (or its ref) to track and control. Defaults to `document.documentElement` (the whole page); pass `null` to track nothing. A ref is read when an action runs, so an element assigned after the first render is handled on the next call.
+
+Results:
+
+- **`fullscreen`:** Whether the target is the current fullscreen element. It follows changes made outside the hook, such as the user pressing `Esc`.
+- **`actions`:** Actions object with a stable identity.
+  - **`actions.enter`:** Enter fullscreen; resolves with whether the browser accepted the request.
+  - **`actions.exit`:** Exit fullscreen when the target is the fullscreen element; resolves `false` when there is no target, otherwise with whether the target is not fullscreen afterwards.
+  - **`actions.toggle`:** Enter or exit depending on the current state; resolves like the action it performed.
+
+## Notes
+
+- A rejected request, for example one made outside a user interaction, resolves `false` instead of throwing.
+- Unmounting does not exit fullscreen.
+
+## Example
+
+The button toggles fullscreen for the panel it sits in; pressing `Esc` also exits.
+
+<ExampleBlock>
+  <Example />
+</ExampleBlock>
+<CodeBlock language="tsx">{ExampleCode}</CodeBlock>

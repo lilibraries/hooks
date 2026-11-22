@@ -22,6 +22,7 @@ import {
   useEventListener,
   useFavicon,
   useFocusWithin,
+  useFullscreen,
   useHotkey,
   useIdle,
   useIntersecting,
@@ -141,6 +142,8 @@ function AllHooks() {
   useScroll({ target: elementRef });
   useScrollLock();
   useScrollLock({ target: elementRef });
+  useFullscreen();
+  useFullscreen(elementRef);
   useEventListener(eventTargetRef, "click", () => {});
   useWindowSize();
   useElementSize(elementRef);
@@ -176,6 +179,7 @@ function BrowserValueHooks() {
   const [local] = useLocalStorage("missing");
   const [session] = useSessionStorage("missing");
   const { x, y, progressX, progressY } = useScroll();
+  const [fullscreen] = useFullscreen();
   const [remainingTime] = useCountdown({ deadline: FUTURE_DEADLINE });
 
   return createElement(
@@ -194,6 +198,7 @@ function BrowserValueHooks() {
       local,
       session,
       scroll: { x, y, progressX, progressY },
+      fullscreen,
       remainingTime,
     }),
   );
@@ -233,6 +238,7 @@ describe("SSR", () => {
       matches: false,
       keyPressed: false,
       scroll: { x: 0, y: 0, progressX: 0, progressY: 0 },
+      fullscreen: false,
       remainingTime: 0,
     });
   });

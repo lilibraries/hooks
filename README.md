@@ -127,10 +127,10 @@ See the [documentation](https://lilibraries.github.io/hooks/) for the full API r
 | [`useTitle`](https://lilibraries.github.io/hooks/useTitle)                               | Set the document title.                                                                |
 | [`useFavicon`](https://lilibraries.github.io/hooks/useFavicon)                           | Set the document favicon.                                                              |
 | [`useOnline`](https://lilibraries.github.io/hooks/useOnline)                             | Detect whether the network is online.                                                  |
-| [`useDarkMode`](https://lilibraries.github.io/hooks/useDarkMode)                         | Detect whether the system prefers a dark color scheme.                                 |
-| [`useMatchMedia`](https://lilibraries.github.io/hooks/useMatchMedia)                     | Determine whether the document matches a media query.                                  |
 | [`usePageVisible`](https://lilibraries.github.io/hooks/usePageVisible)                   | Detect whether the page is visible, including bfcache restores.                        |
 | [`useWindowFocus`](https://lilibraries.github.io/hooks/useWindowFocus)                   | Detect whether the window has focus.                                                   |
+| [`useDarkMode`](https://lilibraries.github.io/hooks/useDarkMode)                         | Detect whether the system prefers a dark color scheme.                                 |
+| [`useMatchMedia`](https://lilibraries.github.io/hooks/useMatchMedia)                     | Determine whether the document matches a media query.                                  |
 | [`useHotkey`](https://lilibraries.github.io/hooks/useHotkey)                             | Bind a keyboard shortcut to a callback.                                                |
 | [`useKeyPressed`](https://lilibraries.github.io/hooks/useKeyPressed)                     | Detect whether a key is currently held down.                                           |
 | [`useClickOutside`](https://lilibraries.github.io/hooks/useClickOutside)                 | Trigger a callback when clicking outside the target area.                              |
@@ -138,6 +138,7 @@ See the [documentation](https://lilibraries.github.io/hooks/) for the full API r
 | [`useEventListener`](https://lilibraries.github.io/hooks/useEventListener)               | Set up an event listener on the target.                                                |
 | [`useScroll`](https://lilibraries.github.io/hooks/useScroll)                             | Track the scroll position, direction, and progress of the page or an element.          |
 | [`useScrollLock`](https://lilibraries.github.io/hooks/useScrollLock)                     | Lock scrolling of the page or an element.                                              |
+| [`useFullscreen`](https://lilibraries.github.io/hooks/useFullscreen)                     | Enter, exit and track the fullscreen state of the page or an element.                  |
 | [`useWindowSize`](https://lilibraries.github.io/hooks/useWindowSize)                     | Get the window size.                                                                   |
 | [`useElementSize`](https://lilibraries.github.io/hooks/useElementSize)                   | Get the size of a DOM element.                                                         |
 | [`useIntersecting`](https://lilibraries.github.io/hooks/useIntersecting)                 | Detect whether an element intersects the viewport or a specified root.                 |
