@@ -86,6 +86,7 @@ module.exports = {
         "useHotkey",
         "useKeyPressed",
         "useClickOutside",
+        "useFocusWithin",
         "useEventListener",
         "useScroll",
         "useScrollLock",

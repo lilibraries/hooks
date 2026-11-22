@@ -134,6 +134,7 @@ See the [documentation](https://lilibraries.github.io/hooks/) for the full API r
 | [`useHotkey`](https://lilibraries.github.io/hooks/useHotkey)                             | Bind a keyboard shortcut to a callback.                                                |
 | [`useKeyPressed`](https://lilibraries.github.io/hooks/useKeyPressed)                     | Detect whether a key is currently held down.                                           |
 | [`useClickOutside`](https://lilibraries.github.io/hooks/useClickOutside)                 | Trigger a callback when clicking outside the target area.                              |
+| [`useFocusWithin`](https://lilibraries.github.io/hooks/useFocusWithin)                   | Trigger a callback when the focus moves into or out of the target area.                |
 | [`useEventListener`](https://lilibraries.github.io/hooks/useEventListener)               | Set up an event listener on the target.                                                |
 | [`useScroll`](https://lilibraries.github.io/hooks/useScroll)                             | Track the scroll position, direction, and progress of the page or an element.          |
 | [`useScrollLock`](https://lilibraries.github.io/hooks/useScrollLock)                     | Lock scrolling of the page or an element.                                              |

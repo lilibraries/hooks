@@ -21,6 +21,7 @@ import {
   useElementSize,
   useEventListener,
   useFavicon,
+  useFocusWithin,
   useHotkey,
   useIdle,
   useIntersecting,
@@ -135,6 +136,7 @@ function AllHooks() {
   useHotkey("mod+k", () => {});
   useKeyPressed(["shift", "space"]);
   useClickOutside(nodeRef, () => {});
+  useFocusWithin(nodeRef, () => {});
   useScroll();
   useScroll({ target: elementRef });
   useScrollLock();

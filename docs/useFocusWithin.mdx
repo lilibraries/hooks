@@ -1,0 +1,40 @@
+---
+title: useFocusWithin
+description: Trigger a callback when the focus moves into or out of the target area.
+---
+
+import CodeBlock from "@theme/CodeBlock";
+import ExampleBlock from "./components/ExampleBlock";
+import Example from "./examples/UseFocusWithin";
+import ExampleCode from "!!raw-loader!./examples/UseFocusWithin";
+
+Trigger a callback when the focus moves into or out of the target area. It is the JavaScript counterpart of CSS [`:focus-within`](https://developer.mozilla.org/en-US/docs/Web/CSS/:focus-within).
+
+## API
+
+```ts
+function useFocusWithin<E extends FocusEvent = FocusEvent>(
+  target: Node | React.RefObject<Node | null> | (Node | React.RefObject<Node | null>)[],
+  listener: (isFocusWithin: boolean, event: E) => void,
+): void;
+```
+
+Parameters:
+
+- **`target`:** The target area: a single element or element ref, or an array of them. A target that has focus itself counts as within.
+- **`listener`:** The callback invoked with whether the focus is within the target area, and the `focusin` or `focusout` event that reports the crossing.
+
+## Notes
+
+- The callback fires only when the focus crosses the boundary of the target area, so moving the focus between elements of the target area does not fire it.
+- If the target has focus when the hook mounts, no callback fires, but the later "out" crossing is still reported.
+- Focus inside a portal is not a DOM descendant of the target: pass the portal container in the `target` array to make it count as within.
+
+## Example
+
+The following example highlights a group of inputs while the focus is inside it.
+
+<ExampleBlock>
+  <Example />
+</ExampleBlock>
+<CodeBlock language="tsx">{ExampleCode}</CodeBlock>
