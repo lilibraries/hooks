@@ -128,6 +128,7 @@ See the [documentation](https://lilibraries.github.io/hooks/) for the full API r
 | [`useFavicon`](https://lilibraries.github.io/hooks/useFavicon)                           | Set the document favicon.                                                              |
 | [`useOnline`](https://lilibraries.github.io/hooks/useOnline)                             | Detect whether the network is online.                                                  |
 | [`usePageVisible`](https://lilibraries.github.io/hooks/usePageVisible)                   | Detect whether the page is visible, including bfcache restores.                        |
+| [`useBeforeUnload`](https://lilibraries.github.io/hooks/useBeforeUnload)                 | Prompt the user before leaving the page, typically to guard unsaved changes.           |
 | [`useWindowFocus`](https://lilibraries.github.io/hooks/useWindowFocus)                   | Detect whether the window has focus.                                                   |
 | [`useDarkMode`](https://lilibraries.github.io/hooks/useDarkMode)                         | Detect whether the system prefers a dark color scheme.                                 |
 | [`useMatchMedia`](https://lilibraries.github.io/hooks/useMatchMedia)                     | Determine whether the document matches a media query.                                  |

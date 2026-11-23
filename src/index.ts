@@ -52,6 +52,7 @@ export { default as useTitle } from "./useTitle";
 export { default as useFavicon } from "./useFavicon";
 export { default as useOnline } from "./useOnline";
 export { default as usePageVisible } from "./usePageVisible";
+export { default as useBeforeUnload } from "./useBeforeUnload";
 export { default as useWindowFocus } from "./useWindowFocus";
 export { default as useDarkMode } from "./useDarkMode";
 export { default as useMatchMedia } from "./useMatchMedia";

@@ -80,6 +80,7 @@ module.exports = {
         "useFavicon",
         "useOnline",
         "usePageVisible",
+        "useBeforeUnload",
         "useWindowFocus",
         "useDarkMode",
         "useMatchMedia",

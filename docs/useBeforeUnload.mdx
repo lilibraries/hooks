@@ -1,0 +1,31 @@
+---
+title: useBeforeUnload
+description: Prompt the user before leaving the page, typically to guard unsaved changes.
+---
+
+import CodeBlock from "@theme/CodeBlock";
+import ExampleBlock from "./components/ExampleBlock";
+import Example from "./examples/UseBeforeUnload";
+import ExampleCode from "!!raw-loader!./examples/UseBeforeUnload";
+
+Prompt the user before leaving the page, typically to guard unsaved changes.
+
+## API
+
+```ts
+function useBeforeUnload(options?: { enabled?: boolean }): void;
+```
+
+Parameters:
+
+- **`options`:** Options object.
+  - **`options.enabled`:** Whether the guard is active. Defaults to `true`.
+
+## Example
+
+Type something, then reload the page or close the tab.
+
+<ExampleBlock>
+  <Example />
+</ExampleBlock>
+<CodeBlock language="tsx">{ExampleCode}</CodeBlock>

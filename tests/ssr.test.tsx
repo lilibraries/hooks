@@ -7,6 +7,7 @@ import { renderToString } from "react-dom/server";
 
 import {
   useAnimate,
+  useBeforeUnload,
   useCache,
   useClickOutside,
   useComposedRef,
@@ -135,6 +136,7 @@ function AllHooks() {
   useDarkMode();
   useMatchMedia("(prefers-color-scheme: dark)");
   usePageVisible();
+  useBeforeUnload();
   useWindowFocus();
   useHotkey("mod+k", () => {});
   useKeyPressed(["shift", "space"]);
