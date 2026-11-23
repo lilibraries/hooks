@@ -24,6 +24,7 @@ import {
   useFocusWithin,
   useFullscreen,
   useHotkey,
+  useHover,
   useIdle,
   useIntersecting,
   useIntersectionObserver,
@@ -140,6 +141,7 @@ function AllHooks() {
   usePointerPosition();
   useClickOutside(nodeRef, () => {});
   useFocusWithin(nodeRef, () => {});
+  useHover(elementRef);
   useScroll();
   useScroll({ target: elementRef });
   useScrollLock();
@@ -170,6 +172,8 @@ function AllHooks() {
 const FUTURE_DEADLINE = Date.now() + 60 * 1000;
 
 function BrowserValueHooks() {
+  const elementRef = useRef<Element | null>(null);
+
   const online = useOnline();
   const visible = usePageVisible();
   const focused = useWindowFocus();
@@ -178,6 +182,7 @@ function BrowserValueHooks() {
   const matches = useMatchMedia("(prefers-color-scheme: dark)");
   const keyPressed = useKeyPressed("shift");
   const pointerPosition = usePointerPosition();
+  const hovered = useHover(elementRef);
   const [cookie] = useCookie("missing");
   const [local] = useLocalStorage("missing");
   const [session] = useSessionStorage("missing");
@@ -198,6 +203,7 @@ function BrowserValueHooks() {
       matches,
       keyPressed,
       pointerPosition: pointerPosition ?? null,
+      hovered,
       cookie,
       local,
       session,
@@ -242,6 +248,7 @@ describe("SSR", () => {
       matches: false,
       keyPressed: false,
       pointerPosition: null,
+      hovered: false,
       scroll: { x: 0, y: 0, progressX: 0, progressY: 0 },
       fullscreen: false,
       remainingTime: 0,
