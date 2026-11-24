@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.5.0](https://github.com/lilibraries/hooks/compare/v2.4.0...v2.5.0) (2026-11-24)
+
+### Features
+
+* add `useBeforeUnload` hook for prompting before leaving the page ([e3c8e2a](https://github.com/lilibraries/hooks/commit/e3c8e2ad26aeb1bbe24405aa07a313cf5ce2a1a4))
+* add `useCopyToClipboard` hook for copying text to the clipboard ([1c5ac22](https://github.com/lilibraries/hooks/commit/1c5ac2257e15d56e66bc19ef1d7f8175a999d2bd))
+* add `useFocusWithin` hook for tracking focus within an element ([316aeec](https://github.com/lilibraries/hooks/commit/316aeec327c0b30cd8ad107adab8b5f67f7d3157))
+* add `useFullscreen` hook for entering, exiting and tracking fullscreen ([5f21ccd](https://github.com/lilibraries/hooks/commit/5f21ccd2076fe7655c37f0769275b93120bb7200))
+* add `useHover` hook for tracking pointer hover over one or more targets ([21a1e4c](https://github.com/lilibraries/hooks/commit/21a1e4c46a9c957619b7242e84806cc754f564d6))
+* add `usePointerPosition` hook for tracking the position of the pointer ([d2d90d1](https://github.com/lilibraries/hooks/commit/d2d90d18235cdb51ab6580712f438c0cbef33d2c))
+* add `useScrollSpy` hook for tracking the item being read while scrolling ([4b02890](https://github.com/lilibraries/hooks/commit/4b02890ce31b698343fc679d4af47273d4e2cfea))
+
 ## [2.4.0](https://github.com/lilibraries/hooks/compare/v2.3.0...v2.4.0) (2026-11-16)
 
 ### Features
