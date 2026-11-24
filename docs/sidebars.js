@@ -92,6 +92,7 @@ module.exports = {
         "useClickOutside",
         "useEventListener",
         "useScroll",
+        "useScrollSpy",
         "useScrollLock",
         "useFullscreen",
         "useWindowSize",

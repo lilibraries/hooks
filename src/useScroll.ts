@@ -7,8 +7,10 @@ import usePersist from "./usePersist";
 import useRaf from "./useRaf";
 import useResizeObserver from "./useResizeObserver";
 import useSafeState from "./useSafeState";
-import inBrowser from "./utils/inBrowser";
-import unref from "./utils/unref";
+import getScroller from "./utils/getScroller";
+import getScrollListenerTarget from "./utils/getScrollListenerTarget";
+import isPageScroller from "./utils/isPageScroller";
+import isRtl from "./utils/isRtl";
 
 interface UseScrollOptions {
   /**
@@ -50,32 +52,6 @@ function clamp(value: number, min: number, max: number) {
   return Math.min(Math.max(value, min), max);
 }
 
-function getPageScroller(document: Document) {
-  return document.scrollingElement || document.documentElement;
-}
-
-function getScroller(target: UseScrollOptions["target"]): Element | null {
-  if (!inBrowser || target === null) {
-    return null;
-  }
-  if (target === undefined) {
-    return getPageScroller(document);
-  }
-  return unref(target);
-}
-
-function isPageScroller(element: Element) {
-  return element === getPageScroller(element.ownerDocument);
-}
-
-function getListenerTarget(scroller: Element): EventTarget {
-  if (isPageScroller(scroller)) {
-    // Page scroll events are dispatched on the window, not on the scrolling element.
-    return scroller.ownerDocument.defaultView || scroller;
-  }
-  return scroller;
-}
-
 function getScrollSnapshot(scroller: Element): ScrollSnapshot {
   return {
     x: scroller.scrollLeft,
@@ -83,11 +59,6 @@ function getScrollSnapshot(scroller: Element): ScrollSnapshot {
     maxX: Math.max(scroller.scrollWidth - scroller.clientWidth, 0),
     maxY: Math.max(scroller.scrollHeight - scroller.clientHeight, 0),
   };
-}
-
-function isRtl(scroller: Element) {
-  const view = scroller.ownerDocument.defaultView;
-  return !!view && view.getComputedStyle(scroller).direction === "rtl";
 }
 
 function getXPosition(x: number, maxX: number, rtl: boolean) {
@@ -239,7 +210,7 @@ function useScroll(options?: UseScrollOptions): ScrollState {
     const view = scroller?.ownerDocument.defaultView || null;
 
     scrollerRef.current = scroller;
-    listenerRef.current = scroller ? getListenerTarget(scroller) : null;
+    listenerRef.current = scroller ? getScrollListenerTarget(scroller) : null;
     resizeRef.current = scroller && !isPageScroller(scroller) ? scroller : null;
     windowRef.current = scroller ? view : null;
     rtlRef.current = scroller ? isRtl(scroller) : false;

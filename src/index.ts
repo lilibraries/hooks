@@ -64,6 +64,7 @@ export { default as useFocusWithin } from "./useFocusWithin";
 export { default as useClickOutside } from "./useClickOutside";
 export { default as useEventListener } from "./useEventListener";
 export { default as useScroll } from "./useScroll";
+export { default as useScrollSpy } from "./useScrollSpy";
 export { default as useScrollLock } from "./useScrollLock";
 export { default as useFullscreen } from "./useFullscreen";
 export { default as useWindowSize } from "./useWindowSize";

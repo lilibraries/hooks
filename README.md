@@ -140,6 +140,7 @@ See the [documentation](https://lilibraries.github.io/hooks/) for the full API r
 | [`useClickOutside`](https://lilibraries.github.io/hooks/useClickOutside)                 | Trigger a callback when clicking outside the target area.                              |
 | [`useEventListener`](https://lilibraries.github.io/hooks/useEventListener)               | Set up an event listener on the target.                                                |
 | [`useScroll`](https://lilibraries.github.io/hooks/useScroll)                             | Track the scroll position, direction, and progress of the page or an element.          |
+| [`useScrollSpy`](https://lilibraries.github.io/hooks/useScrollSpy)                       | Track which item of a list is currently being read as the page or an element scrolls.  |
 | [`useScrollLock`](https://lilibraries.github.io/hooks/useScrollLock)                     | Lock scrolling of the page or an element.                                              |
 | [`useFullscreen`](https://lilibraries.github.io/hooks/useFullscreen)                     | Enter, exit and track the fullscreen state of the page or an element.                  |
 | [`useWindowSize`](https://lilibraries.github.io/hooks/useWindowSize)                     | Get the window size.                                                                   |

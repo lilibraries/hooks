@@ -60,6 +60,7 @@ import {
   useSafeState,
   useScroll,
   useScrollLock,
+  useScrollSpy,
   useSessionStorage,
   useSetState,
   useSubmit,
@@ -146,6 +147,9 @@ function AllHooks() {
   useHover(elementRef);
   useScroll();
   useScroll({ target: elementRef });
+  useScrollSpy(["intro", "usage"]);
+  useScrollSpy(["intro", "usage"], { target: elementRef });
+  useScrollSpy(["intro", "usage"], { axis: "x" });
   useScrollLock();
   useScrollLock({ target: elementRef });
   useFullscreen();
@@ -190,6 +194,7 @@ function BrowserValueHooks() {
   const [session] = useSessionStorage("missing");
   const { x, y, progressX, progressY } = useScroll();
   const [fullscreen] = useFullscreen();
+  const [activeKey] = useScrollSpy(["intro", "usage"]);
   const [remainingTime] = useCountdown({ deadline: FUTURE_DEADLINE });
 
   return createElement(
@@ -211,6 +216,7 @@ function BrowserValueHooks() {
       session,
       scroll: { x, y, progressX, progressY },
       fullscreen,
+      activeKey: activeKey ?? null,
       remainingTime,
     }),
   );
@@ -253,6 +259,7 @@ describe("SSR", () => {
       hovered: false,
       scroll: { x: 0, y: 0, progressX: 0, progressY: 0 },
       fullscreen: false,
+      activeKey: null,
       remainingTime: 0,
     });
   });
