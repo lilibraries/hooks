@@ -119,16 +119,22 @@ For the full API reference and live examples, check out the docs of each hook li
 | [`useTitle`](useTitle.md)                               | Set the document title.                                                                |
 | [`useFavicon`](useFavicon.md)                           | Set the document favicon.                                                              |
 | [`useOnline`](useOnline.md)                             | Detect whether the network is online.                                                  |
+| [`usePageVisible`](usePageVisible.md)                   | Detect whether the page is visible, including bfcache restores.                        |
+| [`useBeforeUnload`](useBeforeUnload.md)                 | Prompt the user before leaving the page, typically to guard unsaved changes.           |
+| [`useWindowFocus`](useWindowFocus.md)                   | Detect whether the window has focus.                                                   |
 | [`useDarkMode`](useDarkMode.md)                         | Detect whether the system prefers a dark color scheme.                                 |
 | [`useMatchMedia`](useMatchMedia.md)                     | Determine whether the document matches a media query.                                  |
-| [`usePageVisible`](usePageVisible.md)                   | Detect whether the page is visible, including bfcache restores.                        |
-| [`useWindowFocus`](useWindowFocus.md)                   | Detect whether the window has focus.                                                   |
+| [`useHover`](useHover.md)                               | Detect whether the pointer hovers over one of the targets.                             |
 | [`useHotkey`](useHotkey.md)                             | Bind a keyboard shortcut to a callback.                                                |
 | [`useKeyPressed`](useKeyPressed.md)                     | Detect whether a key is currently held down.                                           |
+| [`usePointerPosition`](usePointerPosition.md)           | Track the position of the pointer within the viewport.                                 |
+| [`useFocusWithin`](useFocusWithin.md)                   | Trigger a callback when the focus moves into or out of the target area.                |
 | [`useClickOutside`](useClickOutside.md)                 | Trigger a callback when clicking outside the target area.                              |
 | [`useEventListener`](useEventListener.md)               | Set up an event listener on the target.                                                |
 | [`useScroll`](useScroll.md)                             | Track the scroll position, direction, and progress of the page or an element.          |
+| [`useScrollSpy`](useScrollSpy.md)                       | Track which item of a list is currently being read as the page or an element scrolls.  |
 | [`useScrollLock`](useScrollLock.md)                     | Lock scrolling of the page or an element.                                              |
+| [`useFullscreen`](useFullscreen.md)                     | Enter, exit and track the fullscreen state of the page or an element.                  |
 | [`useWindowSize`](useWindowSize.md)                     | Get the window size.                                                                   |
 | [`useElementSize`](useElementSize.md)                   | Get the size of a DOM element.                                                         |
 | [`useIntersecting`](useIntersecting.md)                 | Detect whether an element intersects the viewport or a specified root.                 |
@@ -138,6 +144,7 @@ For the full API reference and live examples, check out the docs of each hook li
 | [`useCookie`](useCookie.md)                             | Get, set and/or remove cookies.                                                        |
 | [`useLocalStorage`](useLocalStorage.md)                 | Get, set and/or remove `localStorage`.                                                 |
 | [`useSessionStorage`](useSessionStorage.md)             | Get, set and/or remove `sessionStorage`.                                               |
+| [`useCopyToClipboard`](useCopyToClipboard.md)           | Copy text to the clipboard and track the copied state.                                 |
 
 ## Changelog
 

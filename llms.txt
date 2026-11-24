@@ -70,16 +70,22 @@
 - [useTitle](https://lilibraries.github.io/hooks/useTitle.md): Set the document title.
 - [useFavicon](https://lilibraries.github.io/hooks/useFavicon.md): Set the document favicon.
 - [useOnline](https://lilibraries.github.io/hooks/useOnline.md): Detect whether the browser is online.
+- [usePageVisible](https://lilibraries.github.io/hooks/usePageVisible.md): Detect whether the page is visible, including restores from the bfcache.
+- [useBeforeUnload](https://lilibraries.github.io/hooks/useBeforeUnload.md): Prompt the user before leaving the page, typically to guard unsaved changes.
+- [useWindowFocus](https://lilibraries.github.io/hooks/useWindowFocus.md): Detect whether the window has focus.
 - [useDarkMode](https://lilibraries.github.io/hooks/useDarkMode.md): Detect whether the system prefers a dark color scheme.
 - [useMatchMedia](https://lilibraries.github.io/hooks/useMatchMedia.md): Determine whether the document matches a media query.
-- [usePageVisible](https://lilibraries.github.io/hooks/usePageVisible.md): Detect whether the page is visible, including restores from the bfcache.
-- [useWindowFocus](https://lilibraries.github.io/hooks/useWindowFocus.md): Detect whether the window has focus.
+- [useHover](https://lilibraries.github.io/hooks/useHover.md): Detect whether the pointer hovers over one of the targets.
 - [useHotkey](https://lilibraries.github.io/hooks/useHotkey.md): Bind a keyboard shortcut to a callback.
 - [useKeyPressed](https://lilibraries.github.io/hooks/useKeyPressed.md): Detect whether a key is currently held down.
+- [usePointerPosition](https://lilibraries.github.io/hooks/usePointerPosition.md): Track the position of the pointer.
+- [useFocusWithin](https://lilibraries.github.io/hooks/useFocusWithin.md): Trigger a callback when the focus moves into or out of the target area.
 - [useClickOutside](https://lilibraries.github.io/hooks/useClickOutside.md): Trigger a callback when a click happens outside the target area.
 - [useEventListener](https://lilibraries.github.io/hooks/useEventListener.md): Attach an event listener to a target and clean it up automatically.
 - [useScroll](https://lilibraries.github.io/hooks/useScroll.md): Track the scroll position, direction, and progress of the page or an element.
+- [useScrollSpy](https://lilibraries.github.io/hooks/useScrollSpy.md): Track which item of a list is currently being read as the page or an element scrolls.
 - [useScrollLock](https://lilibraries.github.io/hooks/useScrollLock.md): Lock scrolling of a container, the page by default.
+- [useFullscreen](https://lilibraries.github.io/hooks/useFullscreen.md): Enter, exit and track the fullscreen state of the page or an element.
 - [useWindowSize](https://lilibraries.github.io/hooks/useWindowSize.md): Get the window size and update on resize.
 - [useElementSize](https://lilibraries.github.io/hooks/useElementSize.md): Observe the size of a DOM element.
 - [useIntersecting](https://lilibraries.github.io/hooks/useIntersecting.md): Detect whether an element intersects the viewport or a given root element.
@@ -89,6 +95,7 @@
 - [useCookie](https://lilibraries.github.io/hooks/useCookie.md): Get, set and remove cookies, using js-cookie as the parser.
 - [useLocalStorage](https://lilibraries.github.io/hooks/useLocalStorage.md): Get, set and remove localStorage values.
 - [useSessionStorage](https://lilibraries.github.io/hooks/useSessionStorage.md): Get, set and remove sessionStorage values.
+- [useCopyToClipboard](https://lilibraries.github.io/hooks/useCopyToClipboard.md): Copy text to the clipboard and track the copied state.
 
 ## Optional
 

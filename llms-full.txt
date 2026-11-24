@@ -125,16 +125,22 @@ For the full API reference and live examples, check out the docs of each hook li
 | [`useTitle`](useTitle.md)                               | Set the document title.                                                                |
 | [`useFavicon`](useFavicon.md)                           | Set the document favicon.                                                              |
 | [`useOnline`](useOnline.md)                             | Detect whether the network is online.                                                  |
+| [`usePageVisible`](usePageVisible.md)                   | Detect whether the page is visible, including bfcache restores.                        |
+| [`useBeforeUnload`](useBeforeUnload.md)                 | Prompt the user before leaving the page, typically to guard unsaved changes.           |
+| [`useWindowFocus`](useWindowFocus.md)                   | Detect whether the window has focus.                                                   |
 | [`useDarkMode`](useDarkMode.md)                         | Detect whether the system prefers a dark color scheme.                                 |
 | [`useMatchMedia`](useMatchMedia.md)                     | Determine whether the document matches a media query.                                  |
-| [`usePageVisible`](usePageVisible.md)                   | Detect whether the page is visible, including bfcache restores.                        |
-| [`useWindowFocus`](useWindowFocus.md)                   | Detect whether the window has focus.                                                   |
+| [`useHover`](useHover.md)                               | Detect whether the pointer hovers over one of the targets.                             |
 | [`useHotkey`](useHotkey.md)                             | Bind a keyboard shortcut to a callback.                                                |
 | [`useKeyPressed`](useKeyPressed.md)                     | Detect whether a key is currently held down.                                           |
+| [`usePointerPosition`](usePointerPosition.md)           | Track the position of the pointer within the viewport.                                 |
+| [`useFocusWithin`](useFocusWithin.md)                   | Trigger a callback when the focus moves into or out of the target area.                |
 | [`useClickOutside`](useClickOutside.md)                 | Trigger a callback when clicking outside the target area.                              |
 | [`useEventListener`](useEventListener.md)               | Set up an event listener on the target.                                                |
 | [`useScroll`](useScroll.md)                             | Track the scroll position, direction, and progress of the page or an element.          |
+| [`useScrollSpy`](useScrollSpy.md)                       | Track which item of a list is currently being read as the page or an element scrolls.  |
 | [`useScrollLock`](useScrollLock.md)                     | Lock scrolling of the page or an element.                                              |
+| [`useFullscreen`](useFullscreen.md)                     | Enter, exit and track the fullscreen state of the page or an element.                  |
 | [`useWindowSize`](useWindowSize.md)                     | Get the window size.                                                                   |
 | [`useElementSize`](useElementSize.md)                   | Get the size of a DOM element.                                                         |
 | [`useIntersecting`](useIntersecting.md)                 | Detect whether an element intersects the viewport or a specified root.                 |
@@ -144,6 +150,7 @@ For the full API reference and live examples, check out the docs of each hook li
 | [`useCookie`](useCookie.md)                             | Get, set and/or remove cookies.                                                        |
 | [`useLocalStorage`](useLocalStorage.md)                 | Get, set and/or remove `localStorage`.                                                 |
 | [`useSessionStorage`](useSessionStorage.md)             | Get, set and/or remove `sessionStorage`.                                               |
+| [`useCopyToClipboard`](useCopyToClipboard.md)           | Copy text to the clipboard and track the copied state.                                 |
 
 ## Changelog
 
@@ -4783,6 +4790,136 @@ export default Example;
 
 ---
 
+# usePageVisible
+
+Detect whether the page is visible. The `visibilitychange` event doesn't fire when restoring from the bfcache, so this hook also listens to the `pageshow` event to re-detect.
+
+## API
+
+```ts
+function usePageVisible(): boolean;
+```
+
+Results:
+
+- Returns `true` if the page is visible, otherwise `false`.
+
+## Notes
+
+- Returns `true` in non-browser environments.
+
+## Example
+
+The following example pauses a timer while the page is hidden (typical for pausing video).
+
+```tsx
+import { useEffect, useState } from "react";
+import { usePageVisible } from "@lilib/hooks";
+
+function Example() {
+  const visible = usePageVisible();
+  const [elapsed, setElapsed] = useState(0);
+
+  useEffect(() => {
+    if (!visible) {
+      // Pause while the page is hidden.
+      return;
+    }
+    const timer = setInterval(() => {
+      setElapsed((elapsed) => elapsed + 1);
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [visible]);
+
+  return (
+    <div>
+      <div>The page is {visible ? "visible" : "hidden"}.</div>
+      <div>Elapsed seconds (pauses while hidden): {elapsed}</div>
+    </div>
+  );
+}
+
+export default Example;
+```
+
+---
+
+# useBeforeUnload
+
+Prompt the user before leaving the page, typically to guard unsaved changes.
+
+## API
+
+```ts
+function useBeforeUnload(options?: { enabled?: boolean }): void;
+```
+
+Parameters:
+
+- **`options`:** Options object.
+  - **`options.enabled`:** Whether the guard is active. Defaults to `true`.
+
+## Example
+
+Type something, then reload the page or close the tab.
+
+```tsx
+import { useState } from "react";
+import { useBeforeUnload } from "@lilib/hooks";
+
+function Example() {
+  const [draft, setDraft] = useState("");
+
+  useBeforeUnload({ enabled: draft !== "" });
+
+  return <input value={draft} onChange={(event) => setDraft(event.target.value)} />;
+}
+
+export default Example;
+```
+
+---
+
+# useWindowFocus
+
+Detect whether the `window` has focus. In a non-browser environment, it always returns `false`.
+
+## API
+
+```ts
+function useWindowFocus(): boolean;
+```
+
+Results:
+
+- Returns `true` if the `window` has focus, otherwise `false`.
+
+## Notes
+
+- `document.hasFocus()` also returns `true` when a nested iframe has focus.
+
+## Example
+
+The following example shows a notice when the window loses focus.
+
+```tsx
+import { useWindowFocus } from "@lilib/hooks";
+
+function Example() {
+  const focus = useWindowFocus();
+
+  return (
+    <div style={{ padding: 8, backgroundColor: focus ? "#d4edda" : "#fff3cd" }}>
+      {focus ? "The window has focus" : "The window lost focus"}
+    </div>
+  );
+}
+
+export default Example;
+```
+
+---
+
 # useDarkMode
 
 Detect whether the preferred color scheme of the system is dark.
@@ -4879,91 +5016,76 @@ export default Example;
 
 ---
 
-# usePageVisible
-
-Detect whether the page is visible. The `visibilitychange` event doesn't fire when restoring from the bfcache, so this hook also listens to the `pageshow` event to re-detect.
+# useHover
 
 ## API
 
 ```ts
-function usePageVisible(): boolean;
+function useHover(
+  target: Element | React.RefObject<Element | null> | (Element | React.RefObject<Element | null>)[],
+  options?: {
+    enterDelay?: number;
+    leaveDelay?: number;
+  },
+): boolean;
 ```
+
+Parameters:
+
+- **`target`:** The hovered element or its ref, or an array of them.
+- **`options`:** Options object.
+  - **`options.enterDelay`:** Delay in milliseconds before reporting `true` after the pointer enters. Defaults to `0`.
+  - **`options.leaveDelay`:** Delay in milliseconds before reporting `false` after the pointer leaves. Defaults to `0`.
 
 Results:
 
-- Returns `true` if the page is visible, otherwise `false`.
+- A boolean indicating whether the pointer is over any of the targets.
 
 ## Notes
 
-- Returns `true` in non-browser environments.
+- All targets form one hover area: moving the pointer between them is not a leave, and with a `leaveDelay` even a gap between them can be crossed.
+- A target that is replaced, unmounted, or removed from the document is treated as left.
+- `mouseenter` and `mouseleave` do not fire for touch input, so tapping never reports a hover.
+- Hover does not serve keyboard users; pair the hook with `useFocusWithin` when an overlay must also open on focus.
 
 ## Example
 
-The following example pauses a timer while the page is hidden (typical for pausing video).
+The leave delay covers the gap between the two targets.
 
 ```tsx
-import { useEffect, useState } from "react";
-import { usePageVisible } from "@lilib/hooks";
+import { useRef, type CSSProperties } from "react";
+import { useHover } from "@lilib/hooks";
+
+const boxStyle: CSSProperties = {
+  padding: 24,
+  border: "1px solid currentColor",
+  textAlign: "center",
+};
 
 function Example() {
-  const visible = usePageVisible();
-  const [elapsed, setElapsed] = useState(0);
+  const firstRef = useRef(null);
+  const secondRef = useRef(null);
 
-  useEffect(() => {
-    if (!visible) {
-      // Pause while the page is hidden.
-      return;
-    }
-    const timer = setInterval(() => {
-      setElapsed((elapsed) => elapsed + 1);
-    }, 1000);
-    return () => clearInterval(timer);
-  }, [visible]);
+  const hovered = useHover([firstRef, secondRef], {
+    enterDelay: 100,
+    leaveDelay: 300,
+  });
+
+  const style = {
+    ...boxStyle,
+    backgroundColor: hovered ? "rgba(255, 165, 0, 0.3)" : "transparent",
+  };
 
   return (
     <div>
-      <div>The page is {visible ? "visible" : "hidden"}.</div>
-      <div>Elapsed seconds (pauses while hidden): {elapsed}</div>
-    </div>
-  );
-}
-
-export default Example;
-```
-
----
-
-# useWindowFocus
-
-Detect whether the `window` has focus. In a non-browser environment, it always returns `false`.
-
-## API
-
-```ts
-function useWindowFocus(): boolean;
-```
-
-Results:
-
-- Returns `true` if the `window` has focus, otherwise `false`.
-
-## Notes
-
-- `document.hasFocus()` also returns `true` when a nested iframe has focus.
-
-## Example
-
-The following example shows a notice when the window loses focus.
-
-```tsx
-import { useWindowFocus } from "@lilib/hooks";
-
-function Example() {
-  const focus = useWindowFocus();
-
-  return (
-    <div style={{ padding: 8, backgroundColor: focus ? "#d4edda" : "#fff3cd" }}>
-      {focus ? "The window has focus" : "The window lost focus"}
+      <div ref={firstRef} style={style}>
+        First target
+      </div>
+      <div style={{ height: 16 }} />
+      <div ref={secondRef} style={style}>
+        Second target
+      </div>
+      <p>{hovered ? "Hovered" : "Not hovered"}</p>
     </div>
   );
 }
@@ -5113,6 +5235,144 @@ function Example() {
       }}
     >
       {shiftPressed ? "Shift is held down" : "Hold Shift"}
+    </div>
+  );
+}
+
+export default Example;
+```
+
+---
+
+# usePointerPosition
+
+Track the position of the pointer in viewport coordinates.
+
+## API
+
+```ts
+function usePointerPosition(options?: {
+  enabled?: boolean;
+}): { x: number; y: number; pointerType: string } | undefined;
+```
+
+Parameters:
+
+- **`options`:** Options object.
+  - **`options.enabled`:** Whether to track the pointer. Defaults to `true`.
+
+Results:
+
+- **`x`:** Horizontal position in CSS pixels, relative to the viewport's left edge.
+- **`y`:** Vertical position in CSS pixels, relative to the viewport's top edge.
+- **`pointerType`:** The kind of pointer: `"mouse"`, `"pen"`, `"touch"`, or `""` when the browser cannot detect it.
+
+## Notes
+
+- Coordinates are viewport coordinates, so they stay correct while the page scrolls; subtract the element's `getBoundingClientRect()` for element-relative coordinates.
+- `pointerdown` is tracked as well, so a tap reports its contact position; on touch screens the position updates only while the finger is in contact.
+- Updates are coalesced with `requestAnimationFrame`.
+- While `enabled` is `false` the listeners are detached and the last position is kept.
+
+## Example
+
+The text shows the position of the pointer.
+
+```tsx
+import { usePointerPosition } from "@lilib/hooks";
+
+function Example() {
+  const position = usePointerPosition();
+
+  return (
+    <div>
+      {position ? `x: ${Math.round(position.x)}, y: ${Math.round(position.y)}` : "Move the pointer"}
+    </div>
+  );
+}
+
+export default Example;
+```
+
+---
+
+# useFocusWithin
+
+Trigger a callback when the focus moves into or out of the target area. It is the JavaScript counterpart of CSS [`:focus-within`](https://developer.mozilla.org/en-US/docs/Web/CSS/:focus-within).
+
+## API
+
+```ts
+function useFocusWithin<E extends FocusEvent = FocusEvent>(
+  target: Node | React.RefObject<Node | null> | (Node | React.RefObject<Node | null>)[],
+  listener: (isFocusWithin: boolean, event: E) => void,
+): void;
+```
+
+Parameters:
+
+- **`target`:** The target area: a single element or element ref, or an array of them. A target that has focus itself counts as within.
+- **`listener`:** The callback invoked with whether the focus is within the target area, and the `focusin` or `focusout` event that reports the crossing.
+
+## Notes
+
+- The callback fires only when the focus crosses the boundary of the target area, so moving the focus between elements of the target area does not fire it.
+- If the target has focus when the hook mounts, no callback fires, but the later "out" crossing is still reported.
+- Focus inside a portal is not a DOM descendant of the target: pass the portal container in the `target` array to make it count as within.
+
+## Example
+
+The following example highlights a group of inputs while the focus is inside it.
+
+```tsx
+import type { CSSProperties } from "react";
+import { useRef, useState } from "react";
+import { useFocusWithin, useMount } from "@lilib/hooks";
+
+const inputStyle: CSSProperties = {
+  width: "100%",
+  boxSizing: "border-box",
+  padding: "6px 8px",
+  fontSize: 13,
+  color: "inherit",
+  backgroundColor: "transparent",
+  border: "1px solid rgba(128, 128, 128, 0.35)",
+  borderRadius: 6,
+};
+
+function Example() {
+  const groupRef = useRef<HTMLDivElement>(null);
+  const firstInputRef = useRef<HTMLInputElement>(null);
+  const [isFocusWithin, setFocusWithin] = useState(false);
+
+  useFocusWithin(groupRef, setFocusWithin);
+
+  // Focus the first field on mount without scrolling the page to the example.
+  useMount(() => {
+    firstInputRef.current?.focus({ preventScroll: true });
+  });
+
+  return (
+    <div>
+      <div
+        ref={groupRef}
+        style={{
+          display: "grid",
+          gap: 8,
+          maxWidth: 260,
+          padding: 12,
+          borderRadius: 10,
+          border: `1px solid ${isFocusWithin ? "#25c2a0" : "rgba(128, 128, 128, 0.35)"}`,
+          backgroundColor: isFocusWithin ? "rgba(37, 194, 160, 0.08)" : "transparent",
+          transition: "border-color 120ms ease, background-color 120ms ease",
+        }}
+      >
+        <input ref={firstInputRef} placeholder="First name" style={inputStyle} />
+        <input placeholder="Last name" style={inputStyle} />
+      </div>
+      <div style={{ marginTop: 8, fontSize: 12, opacity: 0.7 }}>
+        {isFocusWithin ? "Focus is within the group" : "Focus is outside the group"}
+      </div>
     </div>
   );
 }
@@ -5380,6 +5640,202 @@ export default Example;
 
 ---
 
+# useScrollSpy
+
+Track which item of a list is currently being read, vertically such as a table of contents, or horizontally such as a carousel. The active item is the last one whose section has scrolled past the start of the container. Before any section reaches the start, the first item is active; once the container reaches its end, the last item is.
+
+## API
+
+```ts
+function useScrollSpy(
+  keys: readonly string[],
+  options?: {
+    target?: Element | React.RefObject<Element | null> | null;
+    axis?: "x" | "y";
+    offset?: number;
+    getElement?: (key: string, index: number) => Element | null;
+  },
+): readonly [
+  string | undefined,
+  {
+    select: (key: string) => void;
+    release: () => void;
+  },
+];
+```
+
+Parameters:
+
+- **`keys`:** The keys of the items to track, in the order they are read.
+- **`options`:** Options object.
+  - **`options.target`:** The element that scrolls, or its ref. Defaults to the page; pass `null` to track nothing.
+  - **`options.axis`:** `"y"` to follow vertical scrolling, `"x"` to follow horizontal scrolling. Defaults to `"y"`.
+  - **`options.offset`:** How many pixels a section must scroll past the start of the container before it becomes active, for example the height of a sticky header. Defaults to `0`.
+  - **`options.getElement`:** Returns the element for a key. Defaults to looking the key up as an id in the container's document.
+
+Results:
+
+- **`activeKey`:** The key of the active item, or `undefined` before the first measurement, including outside the browser.
+- **`actions`:** An object that keeps the same identity between renders.
+  - **`actions.select`:** Makes `key` the active item and keeps it active until the user scrolls or `release` is called, so a smooth scroll to that section does not move the highlight. It does not scroll by itself.
+  - **`actions.release`:** Stops holding the selected key, so scrolling decides the active item again. Needed only when the scrolling is done by code.
+
+## Notes
+
+- The start of the container is its top edge on the vertical axis, and its left edge on the horizontal axis, or its right edge in right-to-left layouts.
+- Items whose section is missing or hidden, for example with `display: none`, are skipped.
+- Scrolling is measured at most once per frame, and the component re-renders only when the active item changes.
+
+## Examples
+
+### Vertical
+
+The panel is a scroll container: clicking a link scrolls the panel and keeps that item active until the panel is scrolled again.
+
+```tsx
+import { useRef } from "react";
+
+import { useScrollSpy } from "@lilib/hooks";
+
+const sections = ["Overview", "Usage", "Options"];
+
+function Example() {
+  const panelRef = useRef<HTMLDivElement>(null);
+  const [activeKey, { select }] = useScrollSpy(sections, { target: panelRef, offset: 12 });
+
+  const goTo = (section: string) => {
+    select(section);
+    const panel = panelRef.current;
+    const target = document.getElementById(section);
+    if (panel && target) {
+      const offset = target.getBoundingClientRect().top - panel.getBoundingClientRect().top;
+      panel.scrollTo({ top: offset + panel.scrollTop, behavior: "smooth" });
+    }
+  };
+
+  return (
+    <div style={{ display: "flex", gap: 24 }}>
+      <nav style={{ display: "grid", gap: 2, alignContent: "start" }}>
+        {sections.map((section) => (
+          <a
+            key={section}
+            href={`#${section}`}
+            onClick={(event) => {
+              event.preventDefault();
+              goTo(section);
+            }}
+            style={{
+              padding: "6px 0 6px 12px",
+              borderLeft: `2px solid ${section === activeKey ? "orange" : "transparent"}`,
+              color: section === activeKey ? "inherit" : "gray",
+              textDecoration: "none",
+            }}
+          >
+            {section}
+          </a>
+        ))}
+      </nav>
+      <div
+        ref={panelRef}
+        style={{
+          boxSizing: "border-box",
+          flex: 1,
+          height: 180,
+          overflowY: "auto",
+          padding: "0 16px",
+          border: "1px solid rgba(128, 128, 128, 0.6)",
+          borderRadius: 8,
+        }}
+      >
+        {sections.map((section, index) => (
+          <section
+            key={section}
+            id={section}
+            style={{
+              boxSizing: "border-box",
+              height: index === sections.length - 1 ? 180 : 88,
+              paddingTop: 12,
+            }}
+          >
+            <h4 style={{ margin: 0 }}>{section}</h4>
+            <p style={{ margin: "6px 0 0", color: "gray" }}>Section content</p>
+          </section>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export default Example;
+```
+
+### Horizontal
+
+The same hook with `axis: "x"`, following a horizontally scrolling strip.
+
+```tsx
+import { useRef } from "react";
+
+import { useScrollSpy } from "@lilib/hooks";
+
+const slides = ["One", "Two", "Three", "Four", "Five"];
+
+function Example() {
+  const stripRef = useRef<HTMLDivElement>(null);
+  const [activeKey, { select }] = useScrollSpy(slides, { target: stripRef, axis: "x" });
+
+  return (
+    <>
+      <div
+        ref={stripRef}
+        style={{
+          display: "flex",
+          gap: 12,
+          paddingBottom: 8,
+          overflowX: "auto",
+          scrollSnapType: "x mandatory",
+        }}
+      >
+        {slides.map((slide) => (
+          <a
+            key={slide}
+            id={slide}
+            href={`#${slide}`}
+            onClick={(event) => {
+              event.preventDefault();
+              select(slide);
+              event.currentTarget.scrollIntoView({
+                behavior: "smooth",
+                inline: "start",
+                block: "nearest",
+              });
+            }}
+            style={{
+              flex: "0 0 62%",
+              height: 104,
+              display: "grid",
+              placeItems: "center",
+              scrollSnapAlign: "start",
+              border: `2px solid ${slide === activeKey ? "orange" : "rgba(128, 128, 128, 0.6)"}`,
+              borderRadius: 8,
+              color: "inherit",
+              textDecoration: "none",
+            }}
+          >
+            {slide}
+          </a>
+        ))}
+      </div>
+      <p style={{ margin: "8px 0 0", color: "gray" }}>Active: {activeKey}</p>
+    </>
+  );
+}
+
+export default Example;
+```
+
+---
+
 # useScrollLock
 
 Lock scrolling of a container while it is enabled, and restore the previous styles when the lock is released.
@@ -5539,6 +5995,84 @@ function Example() {
           </div>
         </>
       ) : null}
+    </div>
+  );
+}
+
+export default Example;
+```
+
+---
+
+# useFullscreen
+
+Control fullscreen for the page or a single element. The state and actions stay scoped to `target`: when another element is fullscreen, `fullscreen` stays `false` and `exit` leaves that session alone.
+
+## API
+
+```ts
+function useFullscreen(target?: Element | React.RefObject<Element | null> | null): [
+  fullscreen: boolean,
+  actions: {
+    enter: () => Promise<boolean>;
+    exit: () => Promise<boolean>;
+    toggle: () => Promise<boolean>;
+  },
+];
+```
+
+Parameters:
+
+- **`target`:** The element (or its ref) to track and control. Defaults to `document.documentElement` (the whole page); pass `null` to track nothing. A ref is read when an action runs, so an element assigned after the first render is handled on the next call.
+
+Results:
+
+- **`fullscreen`:** Whether the target is the current fullscreen element. It follows changes made outside the hook, such as the user pressing `Esc`.
+- **`actions`:** Actions object with a stable identity.
+  - **`actions.enter`:** Enter fullscreen; resolves with whether the browser accepted the request.
+  - **`actions.exit`:** Exit fullscreen when the target is the fullscreen element; resolves `false` when there is no target, otherwise with whether the target is not fullscreen afterwards.
+  - **`actions.toggle`:** Enter or exit depending on the current state; resolves like the action it performed.
+
+## Notes
+
+- A rejected request, for example one made outside a user interaction, resolves `false` instead of throwing.
+- Unmounting does not exit fullscreen.
+
+## Example
+
+The button toggles fullscreen for the panel it sits in; pressing `Esc` also exits.
+
+```tsx
+import { useRef } from "react";
+import { useFullscreen } from "@lilib/hooks";
+
+function Example() {
+  const ref = useRef<HTMLDivElement>(null);
+  const [fullscreen, { toggle }] = useFullscreen(ref);
+
+  return (
+    <div
+      ref={ref}
+      style={{
+        display: "grid",
+        placeItems: "center",
+        minHeight: 200,
+        padding: 24,
+        boxSizing: "border-box",
+        color: "#1b1b1d",
+        backgroundColor: "#f5f6f7",
+        border: fullscreen ? "none" : "1px solid rgba(128, 128, 128, 0.25)",
+        borderRadius: fullscreen ? 0 : 8,
+      }}
+    >
+      <div style={{ textAlign: "center" }}>
+        <p style={{ margin: "0 0 16px" }}>
+          {fullscreen ? "The panel fills the screen." : "The panel is inline."}
+        </p>
+        <button onClick={() => toggle()}>
+          {fullscreen ? "Exit fullscreen" : "Enter fullscreen"}
+        </button>
+      </div>
     </div>
   );
 }
@@ -6224,6 +6758,57 @@ function Example() {
       </div>
       <div>The value is: {value}</div>
     </>
+  );
+}
+
+export default Example;
+```
+
+---
+
+# useCopyToClipboard
+
+Copy text to the clipboard and track whether a copy just succeeded.
+
+## API
+
+```ts
+function useCopyToClipboard(
+  resetTimeout?: number,
+): [copied: boolean, copy: (text: string) => Promise<boolean>];
+```
+
+Parameters:
+
+- **`resetTimeout`:** The time (milliseconds) `copied` stays `true` after a successful copy. Default is `1000`.
+
+Results:
+
+- **`copied`:** Whether a copy succeeded within the last `resetTimeout` milliseconds.
+- **`copy`:** Copy `text` to the clipboard and return a `Promise` that resolves with whether it succeeded.
+
+## Notes
+
+- The async Clipboard API requires a secure context (`https` or `localhost`). Outside of it, the hook falls back to `document.execCommand("copy")`, which is deprecated, and resolves `false` when neither is available.
+- A failed copy neither changes `copied` nor interrupts a pending reset.
+
+## Example
+
+The following example copies the text in the input and shows feedback with the default `resetTimeout`.
+
+```tsx
+import { useState } from "react";
+import { useCopyToClipboard } from "@lilib/hooks";
+
+function Example() {
+  const [text, setText] = useState("Hello, @lilib/hooks!");
+  const [copied, copy] = useCopyToClipboard();
+
+  return (
+    <div>
+      <input value={text} onChange={(event) => setText(event.target.value)} />{" "}
+      <button onClick={() => copy(text)}>{copied ? "Copied!" : "Copy"}</button>
+    </div>
   );
 }
 
